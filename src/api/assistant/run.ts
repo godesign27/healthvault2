@@ -3,21 +3,14 @@ import {
   assistantToolDefinitions,
   assistantToolHandlers,
 } from "../../lib/openai/tools";
+import { buildSystemPrompt } from "../../lib/openai/prompt";
 
 export async function POST(req: Request): Promise<Response> {
   try {
     const body = await req.json();
     const { userId, currentPage, userMessage, context } = body;
 
-    const systemPrompt = `
-You are the Health Vault AI Assistant.
-
-Rules:
-- Always use tools for user data
-- Never guess
-- Be concise
-- Guide the user to next actions
-`;
+    const systemPrompt = buildSystemPrompt(currentPage);
 
     const response = await openai.responses.create({
       model: "gpt-4.1-mini",
@@ -50,6 +43,9 @@ Rules:
     }
 
     const args = JSON.parse(toolCall.arguments || "{}");
+    if (!args.userId && userId) {
+      args.userId = userId;
+    }
     const result = await handler(args);
 
     const final = await openai.responses.create({
