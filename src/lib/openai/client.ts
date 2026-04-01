@@ -1,5 +1,10 @@
+import OpenAI from 'openai';
 import { supabase } from '../supabase';
 import type { ChatRequest, ChatResponse, ConversationMessage } from './types';
+
+export const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+});
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;

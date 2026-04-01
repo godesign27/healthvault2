@@ -16,6 +16,19 @@ export function createServerClient(serviceRoleKey?: string): SupabaseClient {
   });
 }
 
+export function createSupabaseServerClient(): SupabaseClient {
+  const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables (URL or service role key).');
+  }
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
 export function createAuthenticatedClient(accessToken: string): SupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Missing Supabase connection parameters');

@@ -1,22 +1,23 @@
-import {
-  TOOL_DEFINITIONS,
-  getToolByName,
-  executeTool,
-  toOpenAIFunctionDefinitions,
-} from '../ai-tools/registry';
-import type { ToolDefinition, ToolResult } from '../ai-tools/types';
+import { getIncompleteForms } from "../tools/getIncompleteForms";
 
-export { TOOL_DEFINITIONS, getToolByName, executeTool, toOpenAIFunctionDefinitions };
-export type { ToolDefinition, ToolResult };
+export const assistantToolDefinitions = [
+  {
+    type: "function" as const,
+    name: "getIncompleteForms",
+    description: "Get incomplete medical forms for a user",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string" },
+      },
+      required: ["userId"],
+    },
+  },
+];
 
-export function getOpenAITools() {
-  return toOpenAIFunctionDefinitions();
-}
-
-export async function runTool(
-  name: string,
-  args: Record<string, unknown>,
-  userId: string | null
-): Promise<ToolResult> {
-  return executeTool(name, args, userId);
-}
+export const assistantToolHandlers: Record<
+  string,
+  (args: Record<string, unknown>) => Promise<unknown>
+> = {
+  getIncompleteForms,
+};
