@@ -2,11 +2,16 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   Search, Plus, Check, Phone, MapPin, Building2, Languages,
   UserCheck, ChevronDown, ChevronUp, CheckCircle, Stethoscope,
+  ShieldCheck, ShieldX, UserPlus,
 } from 'lucide-react';
 import { useNetworkStore } from '../../lib/stores/network-store';
 import {
   DirectoryProvider, SPECIALTY_CATEGORIES, getInNetworkDirectory,
 } from '../../lib/network-directory';
+import {
+  fetchCareNetwork,
+  type CareNetworkProvider,
+} from '../../lib/network/api';
 import { ProviderCard } from './ProviderCard';
 import { Provider } from '../../types/network';
 
@@ -24,10 +29,16 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [showMyProviders, setShowMyProviders] = useState(true);
+  const [careNetwork, setCareNetwork] = useState<CareNetworkProvider[]>([]);
 
   useEffect(() => {
     loadDirectory();
+    loadCareNetworkData();
   }, []);
+
+  useEffect(() => {
+    loadCareNetworkData();
+  }, [providers]);
 
   const loadDirectory = async () => {
     setLoading(true);
@@ -36,6 +47,15 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
       setDirectory(data);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCareNetworkData = async () => {
+    try {
+      const result = await fetchCareNetwork();
+      setCareNetwork(result.allProviders);
+    } catch {
+      // Falls back to store providers
     }
   };
 
@@ -92,9 +112,18 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
   const primaryProviders = providers.filter(p => p.relationship === 'Primary');
   const specialistProviders = providers.filter(p => p.relationship !== 'Primary');
 
+  const getInsuranceLabel = (provider: Provider): string | null => {
+    const networkData = careNetwork.find(p => p.id === provider.id);
+    if (networkData?.insuranceLabel) return networkData.insuranceLabel;
+    if (!insurance.connected) return null;
+    if (provider.inNetwork === true) return `In-network with ${insurance.name}`;
+    if (provider.inNetwork === false) return 'Out of network';
+    return null;
+  };
+
   return (
     <div className="space-y-8">
-      {providers.length > 0 && (
+      {providers.length > 0 ? (
         <section>
           <button
             onClick={() => setShowMyProviders(!showMyProviders)}
@@ -124,10 +153,13 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
                   }`}>Primary Care</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {primaryProviders.map(p => (
-                      <ProviderCard
-                        key={p.id} provider={p} darkMode={darkMode}
-                        onRemove={onRemoveProvider}
-                      />
+                      <div key={p.id} className="relative">
+                        <ProviderCard
+                          provider={p} darkMode={darkMode}
+                          onRemove={onRemoveProvider}
+                        />
+                        <InsuranceBadge label={getInsuranceLabel(p)} darkMode={darkMode} />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -139,16 +171,38 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
                   }`}>Specialists</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {specialistProviders.map(p => (
-                      <ProviderCard
-                        key={p.id} provider={p} darkMode={darkMode}
-                        onRemove={onRemoveProvider}
-                      />
+                      <div key={p.id} className="relative">
+                        <ProviderCard
+                          provider={p} darkMode={darkMode}
+                          onRemove={onRemoveProvider}
+                        />
+                        <InsuranceBadge label={getInsuranceLabel(p)} darkMode={darkMode} />
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
           )}
+        </section>
+      ) : (
+        <section className={`rounded-xl border-2 border-dashed p-8 text-center ${
+          darkMode ? 'border-stone-700 bg-stone-900/30' : 'border-stone-300 bg-stone-50/50'
+        }`}>
+          <UserPlus className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-600' : 'text-stone-400'}`} />
+          <h3 className={`font-semibold text-lg mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            Your care team is empty
+          </h3>
+          <p className={`text-sm mb-4 max-w-md mx-auto ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            Start by adding your primary care doctor. You can browse the directory below or add a provider manually.
+          </p>
+          <button
+            onClick={onOpenManualAdd}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add a Provider
+          </button>
         </section>
       )}
 
@@ -175,7 +229,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
         <p className={`text-sm mb-5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
           {insurance.connected
             ? `Showing providers matched to your connected ${insurance.name} plan`
-            : 'Browse providers and add them to your care team'
+            : 'Browse providers and add them to your care team. Connect insurance on the Insurance page for in-network filtering.'
           }
         </p>
 
@@ -255,6 +309,28 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
           </>
         )}
       </section>
+    </div>
+  );
+}
+
+function InsuranceBadge({ label, darkMode }: { label: string | null; darkMode: boolean }) {
+  if (!label) return null;
+
+  const isInNetwork = label.startsWith('In-network');
+
+  return (
+    <div className={`absolute top-3 right-3 flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full z-10 ${
+      isInNetwork
+        ? 'bg-green-100 text-green-700'
+        : darkMode
+          ? 'bg-orange-900/30 text-orange-400'
+          : 'bg-orange-100 text-orange-700'
+    }`}>
+      {isInNetwork
+        ? <ShieldCheck className="w-3 h-3" />
+        : <ShieldX className="w-3 h-3" />
+      }
+      {label}
     </div>
   );
 }

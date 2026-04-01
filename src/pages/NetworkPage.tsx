@@ -1,4 +1,4 @@
-import { useState, MutableRefObject } from 'react';
+import { useState, useEffect, MutableRefObject } from 'react';
 import { Users, Stethoscope, Pill } from 'lucide-react';
 import { NetworkProvider, useNetworkStore } from '../lib/stores/network-store';
 import { ProvidersTab } from '../components/network/ProvidersTab';
@@ -7,6 +7,7 @@ import { AddProviderDrawer } from '../components/network/AddProviderDrawer';
 import { AddPharmacyDrawer } from '../components/network/AddPharmacyDrawer';
 import { Provider, Pharmacy } from '../types/network';
 import { Toast } from '../components/Toast';
+import { fetchInsuranceContext, type InsuranceContextResult } from '../lib/network/api';
 
 interface NetworkPageProps {
   darkMode?: boolean;
@@ -27,6 +28,13 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
   const [specialistMode, setSpecialistMode] = useState(false);
   const [showAddPharmacy, setShowAddPharmacy] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [insuranceDetail, setInsuranceDetail] = useState<InsuranceContextResult | null>(null);
+
+  useEffect(() => {
+    fetchInsuranceContext()
+      .then(setInsuranceDetail)
+      .catch(() => {});
+  }, []);
 
   if (actionsRef) {
     actionsRef.current = {
@@ -79,9 +87,11 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
             Your Care Network
           </h1>
           <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
-            {insurance.connected
-              ? `Connected with ${insurance.name}. Find providers and set your preferred pharmacy.`
-              : 'Search providers and pharmacies, or connect insurance for better matching.'
+            {insuranceDetail && insuranceDetail.activeCount > 0
+              ? insuranceDetail.summary
+              : insurance.connected
+                ? `Connected with ${insurance.name}. Find providers and set your preferred pharmacy.`
+                : 'Search providers and pharmacies, or connect insurance for in-network filtering.'
             }
           </p>
         </div>

@@ -4,7 +4,13 @@ import {
   ExternalLink, CheckCircle, XCircle, Pill, AlertCircle,
 } from 'lucide-react';
 import { useNetworkStore } from '../../lib/stores/network-store';
-import { NearbyPharmacyResult, getNearbyPharmacies } from '../../lib/network-directory';
+import { NearbyPharmacyResult, getNearbyPharmacies as getMockNearbyPharmacies } from '../../lib/network-directory';
+import {
+  fetchNearbyPharmacies,
+  setPreferredPharmacyApi,
+  type AddressContext,
+  type CareNetworkPharmacy,
+} from '../../lib/network/api';
 import { PharmacyCard } from './PharmacyCard';
 import { Pharmacy } from '../../types/network';
 
@@ -15,39 +21,56 @@ interface PharmaciesTabProps {
 }
 
 export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: PharmaciesTabProps) {
-  const { pharmacies, addPharmacy, updatePharmacy, insurance } = useNetworkStore();
+  const { pharmacies, addPharmacy, updatePharmacy, loadData, insurance } = useNetworkStore();
   const [nearbyPharmacies, setNearbyPharmacies] = useState<NearbyPharmacyResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [addressContext, setAddressContext] = useState<AddressContext | null>(null);
+  const [addressLoaded, setAddressLoaded] = useState(false);
 
   useEffect(() => {
-    loadPharmacies();
+    loadPharmacyData();
   }, []);
 
-  const loadPharmacies = async () => {
+  const loadPharmacyData = async () => {
     setLoading(true);
     try {
-      const data = await getNearbyPharmacies();
-      setNearbyPharmacies(data);
+      const [pharmacyResult, mockData] = await Promise.all([
+        fetchNearbyPharmacies(),
+        getMockNearbyPharmacies(),
+      ]);
+      setAddressContext(pharmacyResult.addressContext);
+      setAddressLoaded(true);
+      setNearbyPharmacies(mockData);
+    } catch {
+      try {
+        const mockData = await getMockNearbyPharmacies();
+        setNearbyPharmacies(mockData);
+        setAddressLoaded(true);
+      } catch {
+        setAddressLoaded(true);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const preferredPharmacy = pharmacies.find(p => p.preferred);
-  const addedNames = new Set(pharmacies.map(p => p.name));
 
   const handleDesignate = async (np: NearbyPharmacyResult) => {
     setAddingId(np.id);
     try {
-      if (preferredPharmacy) {
-        await updatePharmacy(preferredPharmacy.id, { preferred: false });
-      }
       const alreadyAdded = pharmacies.find(p => p.name === np.name);
       if (alreadyAdded) {
-        await updatePharmacy(alreadyAdded.id, { preferred: true });
+        await setPreferredPharmacyApi(
+          '00000000-0000-0000-0000-000000000000',
+          alreadyAdded.id
+        );
       } else {
+        if (preferredPharmacy) {
+          await updatePharmacy(preferredPharmacy.id, { preferred: false });
+        }
         await addPharmacy({
           userId: '00000000-0000-0000-0000-000000000000',
           name: np.name,
@@ -59,6 +82,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
           inNetwork: np.inNetwork,
         });
       }
+      await loadData();
     } catch {
       // handled silently
     } finally {
@@ -66,7 +90,25 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
     }
   };
 
-  const hasAddress = true;
+  const handleSetSavedPreferred = async (pharmacy: Pharmacy) => {
+    setAddingId(pharmacy.id);
+    try {
+      await setPreferredPharmacyApi(
+        '00000000-0000-0000-0000-000000000000',
+        pharmacy.id
+      );
+      await loadData();
+    } catch {
+      // handled silently
+    } finally {
+      setAddingId(null);
+    }
+  };
+
+  const hasAddress = addressLoaded ? !!addressContext : true;
+  const cityLabel = addressContext
+    ? `${addressContext.city}, ${addressContext.state || ''} ${addressContext.postalCode || ''}`.trim()
+    : 'Springfield, IL 62701';
   const mapLat = 39.7817;
   const mapLng = -89.6501;
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapLng - 0.06}%2C${mapLat - 0.04}%2C${mapLng + 0.06}%2C${mapLat + 0.04}&layer=mapnik&marker=${mapLat}%2C${mapLng}`;
@@ -130,12 +172,27 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
           }`}>Other Saved Pharmacies</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {pharmacies.filter(p => !p.preferred).map(pharmacy => (
-              <PharmacyCard
-                key={pharmacy.id}
-                pharmacy={pharmacy}
-                darkMode={darkMode}
-                onRemove={onRemovePharmacy}
-              />
+              <div key={pharmacy.id} className="relative">
+                <PharmacyCard
+                  pharmacy={pharmacy}
+                  darkMode={darkMode}
+                  onRemove={onRemovePharmacy}
+                />
+                {!pharmacy.preferred && (
+                  <button
+                    onClick={() => handleSetSavedPreferred(pharmacy)}
+                    disabled={addingId === pharmacy.id}
+                    className={`absolute top-3 right-3 flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-colors z-10 ${
+                      darkMode
+                        ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    }`}
+                  >
+                    <Star className="w-3 h-3" />
+                    Set Preferred
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         </section>
@@ -162,7 +219,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
         {hasAddress ? (
           <>
             <p className={`text-sm mb-5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-              Based on your saved address in Springfield, IL
+              Based on your saved address in {cityLabel}
               {insurance.connected && `. ${insurance.name} network status shown.`}
             </p>
 
@@ -175,13 +232,13 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                   className="absolute inset-0 w-full h-full"
                   style={{ border: 0 }}
                   loading="lazy"
-                  title="Pharmacy locations near Springfield, IL"
+                  title={`Pharmacy locations near ${cityLabel}`}
                 />
                 <div className={`absolute bottom-3 left-3 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium shadow-lg ${
                   darkMode ? 'bg-stone-900 text-stone-300' : 'bg-white text-stone-700'
                 }`}>
                   <Navigation className="w-3.5 h-3.5 text-blue-600" />
-                  Springfield, IL 62701
+                  {cityLabel}
                 </div>
               </div>
             </div>
@@ -189,6 +246,18 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : nearbyPharmacies.length === 0 ? (
+              <div className={`text-center py-16 rounded-xl border ${
+                darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
+              }`}>
+                <Pill className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
+                <p className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  No pharmacies found nearby
+                </p>
+                <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                  You can add a pharmacy manually to your profile.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -220,11 +289,18 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
           }`}>
             <AlertCircle className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
             <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-              Address needed
+              Address needed for nearby pharmacies
             </p>
             <p className={`text-sm max-w-sm mx-auto ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-              Add your address in Medical Profile so we can show nearby pharmacies.
+              Add your address in your profile to enable proximity-based pharmacy search.
+              You can still add pharmacies manually.
             </p>
+            <button
+              onClick={onOpenManualAdd}
+              className="inline-flex items-center gap-2 px-4 py-2 mt-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            >
+              + Add Pharmacy Manually
+            </button>
           </div>
         )}
       </section>
