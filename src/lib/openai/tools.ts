@@ -15,6 +15,12 @@ import { getCareTimeline } from "../tools/getCareTimeline";
 import { getMedicalProfile } from "../tools/getMedicalProfile";
 import { getFormDetails } from "../tools/getFormDetails";
 import { saveFormAnswers } from "../tools/saveFormAnswers";
+import { resolveProviderRecordConnection } from "../tools/resolveProviderRecordConnection";
+import { getConnectedProviders } from "../tools/getConnectedProviders";
+import { searchProviderOrganizations } from "../tools/searchProviderOrganizations";
+import { startProviderConnection } from "../tools/startProviderConnection";
+import { startEpicConnection } from "../tools/startEpicConnection";
+import { fetchProviderRecordPreview } from "../tools/fetchProviderRecordPreview";
 
 export const assistantToolDefinitions = [
   {
@@ -310,6 +316,125 @@ export const assistantToolDefinitions = [
       required: ["userId", "formId", "values"],
     },
   },
+  {
+    type: "function" as const,
+    name: "resolveProviderRecordConnection",
+    description:
+      "Determine the best connection strategy for importing records from a provider. Checks existing connections first, then direct/Epic paths, then manual fallback. Use this when a user wants to import or connect to a provider.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        providerName: {
+          type: "string",
+          description: "Name of the provider or organization to connect to",
+        },
+        providerOrganizationId: {
+          type: "string",
+          description: "ID of a known provider organization",
+        },
+        careNetworkProviderId: {
+          type: "string",
+          description: "ID of a provider from the user's care network",
+        },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "getConnectedProviders",
+    description:
+      "Get the user's connected provider organizations for record import. Returns connection method, status, and last sync time for each.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "searchProviderOrganizations",
+    description:
+      "Search the provider organization directory by name, EHR vendor, or location. Returns organizations with their connection capabilities (direct, Epic, manual).",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Search term (organization name, EHR vendor, or city)",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "startProviderConnection",
+    description:
+      "Initiate a direct provider connection for record import. Creates a pending connection record. Returns launch URL when SMART on FHIR credentials are configured, otherwise returns a pending status.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        providerOrganizationId: {
+          type: "string",
+          description: "ID of the provider organization to connect to",
+        },
+      },
+      required: ["userId", "providerOrganizationId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "startEpicConnection",
+    description:
+      "Initiate an Epic/MyChart-compatible connection for record import. Creates a pending connection record. Returns launch URL when Epic OAuth credentials are configured, otherwise returns a pending status.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        providerOrganizationId: {
+          type: "string",
+          description: "ID of the Epic-compatible provider organization",
+        },
+      },
+      required: ["userId", "providerOrganizationId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "fetchProviderRecordPreview",
+    description:
+      "Fetch a preview of records available for import from a connected provider. Shows counts and items by type (conditions, medications, allergies, immunizations) before the user confirms import.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        providerConnectionId: {
+          type: "string",
+          description: "ID of an active provider connection",
+        },
+        providerOrganizationId: {
+          type: "string",
+          description: "ID of the provider organization",
+        },
+        strategy: {
+          type: "string",
+          enum: [
+            "existing_connection",
+            "direct_provider_connection",
+            "epic_connection",
+            "manual_fallback",
+          ],
+          description: "The connection strategy being used",
+        },
+      },
+      required: ["userId"],
+    },
+  },
 ];
 
 export const assistantToolHandlers: Record<
@@ -333,4 +458,10 @@ export const assistantToolHandlers: Record<
   getMedicalProfile,
   getFormDetails,
   saveFormAnswers,
+  resolveProviderRecordConnection,
+  getConnectedProviders,
+  searchProviderOrganizations,
+  startProviderConnection,
+  startEpicConnection,
+  fetchProviderRecordPreview,
 };
