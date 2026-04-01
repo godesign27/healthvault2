@@ -4,7 +4,8 @@ import type { ChatRequest, ChatResponse, ConversationMessage } from './types';
 import { POST } from '../../api/assistant/run';
 
 export const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY || 'placeholder',
+  dangerouslyAllowBrowser: true,
 });
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
