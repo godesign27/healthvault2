@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { saveFormAnswers as saveFormImpl } from "../ai-tools/forms";
+import { createSupabaseServerClient } from "../supabase/server";
 
 export const saveFormAnswersInputSchema = z.object({
   userId: z.string().min(1),
@@ -17,41 +17,59 @@ export async function saveFormAnswers(input: unknown) {
     return { success: false, error: "Invalid input" };
   }
 
-  const { userId, formId, values, markComplete } = parsed.data;
+  try {
+    const supabase = createSupabaseServerClient();
+    const { userId, formId, values, markComplete } = parsed.data;
 
-  const existingRes = await import("../supabase").then((m) =>
-    m.supabase
+    const { data: existing, error: fetchErr } = await supabase
       .from("form_responses")
-      .select("template_id")
+      .select("answers_json, template_id")
       .eq("id", formId)
-      .maybeSingle()
-  );
+      .maybeSingle();
 
-  if (!existingRes.data?.template_id) {
-    return { success: false, error: "Form response not found" };
+    if (fetchErr) {
+      return { success: false, error: fetchErr.message };
+    }
+
+    if (!existing) {
+      return { success: false, error: "Form response not found" };
+    }
+
+    const mergedAnswers = { ...(existing.answers_json || {}), ...values };
+    const status = markComplete ? "complete" : "incomplete";
+    const signedAt = markComplete ? new Date().toISOString() : null;
+
+    const updatePayload: Record<string, unknown> = {
+      answers_json: mergedAnswers,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (signedAt) {
+      updatePayload.signed_at = signedAt;
+    }
+
+    const { error: updateErr } = await supabase
+      .from("form_responses")
+      .update(updatePayload)
+      .eq("id", formId);
+
+    if (updateErr) {
+      return { success: false, error: updateErr.message };
+    }
+
+    return {
+      success: true,
+      data: {
+        formId,
+        saved: true,
+        status,
+        savedFields: Object.keys(mergedAnswers).length,
+        updatedAt: updatePayload.updated_at,
+      },
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: message };
   }
-
-  const result = await saveFormImpl(
-    {
-      formId,
-      templateId: existingRes.data.template_id,
-      answers: values,
-      markComplete,
-    },
-    userId
-  );
-
-  if (!result.success || !result.data) {
-    return { success: false, error: result.error || "Save failed" };
-  }
-
-  return {
-    success: true,
-    data: {
-      formId: result.data.formId,
-      saved: true,
-      status: result.data.status,
-      savedFields: result.data.savedFields,
-    },
-  };
 }

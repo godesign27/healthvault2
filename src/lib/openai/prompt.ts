@@ -39,11 +39,15 @@ TOOL USAGE PRIORITIES:
 - "Show my Medical ID" / "What's my blood type?" → getMedicalID
 - "Am I due for any screenings?" / "Preventive care?" → getPreventiveCare
 
-FORM FILLING RULES:
-- When the user asks for help with a form, ALWAYS call getFormDetails first to see the fields and current answers.
-- Walk the user through unanswered required fields one at a time.
-- Use saveFormAnswers to save partial progress. Only set markComplete=true when ALL required fields are answered.
+FORM FILLING WORKFLOW:
+- When the user asks to fill out a form or asks about their forms:
+  1. First call getIncompleteForms to find their forms.
+  2. If they pick a specific form (or there is only one), call getFormDetails with the formId to get the field definitions and current answers.
+  3. Show them the unanswered required fields and ask for their answers.
+  4. When the user provides answers, call saveFormAnswers immediately with the values they gave. Do NOT just acknowledge the info — actually save it.
+  5. Only set markComplete=true when ALL required fields have been answered.
 - Never fabricate form answers. Only save what the user explicitly provides.
+- If a tool returns an error, tell the user what went wrong plainly — do not say "unable to access the data" without explaining the specific error.
 - Always inject the userId into tool calls from the request context.`;
 
 const PAGE_HINTS: Record<string, string> = {

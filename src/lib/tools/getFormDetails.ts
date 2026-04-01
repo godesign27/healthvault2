@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { openForm } from "../ai-tools/forms";
+import { createSupabaseServerClient } from "../supabase/server";
 
 export const getFormDetailsInputSchema = z.object({
   userId: z.string().min(1),
@@ -8,6 +8,14 @@ export const getFormDetailsInputSchema = z.object({
 
 export type GetFormDetailsInput = z.infer<typeof getFormDetailsInputSchema>;
 
+interface FormField {
+  key: string;
+  label: string;
+  type: string;
+  required: boolean;
+  options: string[] | null;
+}
+
 export async function getFormDetails(input: unknown) {
   const parsed = getFormDetailsInputSchema.safeParse(input);
 
@@ -15,32 +23,65 @@ export async function getFormDetails(input: unknown) {
     return { success: false, error: "Invalid input" };
   }
 
-  const { userId, formId } = parsed.data;
+  try {
+    const supabase = createSupabaseServerClient();
+    const { formId } = parsed.data;
 
-  const result = await openForm({ formId }, userId);
+    const { data: formResponse, error: responseError } = await supabase
+      .from("form_responses")
+      .select("id, template_id, answers_json, status, signed_at, updated_at")
+      .eq("id", formId)
+      .maybeSingle();
 
-  if (!result.success || !result.data) {
-    return { success: false, error: result.error || "Form not found" };
+    if (responseError) {
+      return { success: false, error: responseError.message };
+    }
+
+    if (!formResponse) {
+      return { success: false, error: "Form response not found" };
+    }
+
+    const { data: template, error: templateError } = await supabase
+      .from("form_templates")
+      .select("id, title, description, category, version, fhir_questionnaire_json")
+      .eq("id", formResponse.template_id)
+      .maybeSingle();
+
+    if (templateError) {
+      return { success: false, error: templateError.message };
+    }
+
+    if (!template) {
+      return { success: false, error: "Form template not found" };
+    }
+
+    const questionnaire = template.fhir_questionnaire_json || {};
+    const fields: FormField[] = (questionnaire.item || []).map((item: any) => ({
+      key: item.linkId || "",
+      label: item.text || "",
+      type: item.type || "string",
+      required: item.required || false,
+      options:
+        item.answerOption?.map(
+          (opt: any) => opt.valueCoding?.display || opt.valueString
+        ) || null,
+    }));
+
+    return {
+      success: true,
+      data: {
+        id: formResponse.id,
+        templateId: formResponse.template_id,
+        title: template.title,
+        category: template.category,
+        status: formResponse.status,
+        description: template.description,
+        fields,
+        values: formResponse.answers_json || {},
+      },
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: message };
   }
-
-  const detail = result.data;
-
-  return {
-    success: true,
-    data: {
-      id: detail.responseId || formId,
-      title: detail.title,
-      category: detail.category,
-      status: detail.status,
-      description: detail.description,
-      fields: detail.fields.map((f) => ({
-        key: f.linkId,
-        label: f.text,
-        type: f.type,
-        required: f.required,
-        options: f.options || null,
-      })),
-      values: detail.savedAnswers,
-    },
-  };
 }
