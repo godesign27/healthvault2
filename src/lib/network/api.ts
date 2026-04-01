@@ -372,6 +372,138 @@ export async function setPreferredPharmacyApi(
   if (setError) throw setError;
 }
 
+export type AddressType = 'home_1' | 'home_2' | 'work';
+
+export interface UserAddress {
+  id: string;
+  userId: string;
+  addressType: AddressType;
+  label: string;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  state: string | null;
+  postalCode: string | null;
+  country: string;
+  isActive: boolean;
+}
+
+export interface UserAddressInput {
+  addressType: AddressType;
+  label: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  isActive?: boolean;
+}
+
+const ADDRESS_LABELS: Record<AddressType, string> = {
+  home_1: 'Home',
+  home_2: 'Second Home',
+  work: 'Work',
+};
+
+function mapAddressRow(row: any): UserAddress {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    addressType: row.address_type,
+    label: row.label || ADDRESS_LABELS[row.address_type as AddressType] || '',
+    addressLine1: row.address_line1,
+    addressLine2: row.address_line2 || null,
+    city: row.city,
+    state: row.state || null,
+    postalCode: row.postal_code || null,
+    country: row.country || 'US',
+    isActive: row.is_active,
+  };
+}
+
+export async function fetchUserAddresses(
+  userId = DEMO_USER_ID
+): Promise<UserAddress[]> {
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .select('*')
+    .eq('user_id', userId)
+    .order('is_active', { ascending: false })
+    .order('address_type', { ascending: true });
+
+  if (error) throw error;
+  return (data || []).map(mapAddressRow);
+}
+
+export async function saveUserAddress(
+  userId = DEMO_USER_ID,
+  input: UserAddressInput
+): Promise<UserAddress> {
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .upsert(
+      {
+        user_id: userId,
+        address_type: input.addressType,
+        label: input.label || ADDRESS_LABELS[input.addressType],
+        address_line1: input.addressLine1,
+        address_line2: input.addressLine2 || null,
+        city: input.city,
+        state: input.state || null,
+        postal_code: input.postalCode || null,
+        country: input.country || 'US',
+        is_active: input.isActive ?? false,
+      },
+      { onConflict: 'user_id,address_type' }
+    )
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapAddressRow(data);
+}
+
+export async function setActiveAddress(
+  userId = DEMO_USER_ID,
+  addressId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('user_addresses')
+    .update({ is_active: true })
+    .eq('id', addressId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export async function deleteUserAddress(
+  userId = DEMO_USER_ID,
+  addressId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('user_addresses')
+    .delete()
+    .eq('id', addressId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export function getActiveAddressContext(addresses: UserAddress[]): AddressContext | null {
+  const active = addresses.find(a => a.isActive);
+  if (!active || !active.addressLine1 || !active.city) return null;
+  const parts = [active.addressLine1];
+  if (active.addressLine2) parts.push(active.addressLine2);
+  parts.push(`${active.city}, ${active.state || ''} ${active.postalCode || ''}`.trim());
+  return {
+    fullAddress: parts.join(', '),
+    city: active.city,
+    state: active.state,
+    postalCode: active.postalCode,
+  };
+}
+
 export async function saveProviderApi(
   userId = DEMO_USER_ID,
   data: {

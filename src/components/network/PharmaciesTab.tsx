@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
 import {
   MapPin, Phone, Clock, Star, Navigation, Check, Package,
-  ExternalLink, CheckCircle, XCircle, Pill, AlertCircle,
+  ExternalLink, CheckCircle, XCircle, Pill, Plus, Home,
+  Building2, Pencil, Trash2, Radio,
 } from 'lucide-react';
 import { useNetworkStore } from '../../lib/stores/network-store';
 import { NearbyPharmacyResult, getNearbyPharmacies as getMockNearbyPharmacies } from '../../lib/network-directory';
 import {
   fetchNearbyPharmacies,
   setPreferredPharmacyApi,
+  fetchUserAddresses,
+  saveUserAddress,
+  setActiveAddress,
+  deleteUserAddress,
+  getActiveAddressContext,
   type AddressContext,
-  type CareNetworkPharmacy,
+  type UserAddress,
+  type UserAddressInput,
 } from '../../lib/network/api';
+import { AddAddressDrawer } from './AddAddressDrawer';
 import { PharmacyCard } from './PharmacyCard';
 import { Pharmacy } from '../../types/network';
 
@@ -27,33 +35,61 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [addressContext, setAddressContext] = useState<AddressContext | null>(null);
-  const [addressLoaded, setAddressLoaded] = useState(false);
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [addressesLoaded, setAddressesLoaded] = useState(false);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
 
   useEffect(() => {
-    loadPharmacyData();
+    loadAllData();
   }, []);
 
-  const loadPharmacyData = async () => {
+  const loadAddresses = async () => {
+    try {
+      const result = await fetchUserAddresses();
+      setAddresses(result);
+      setAddressesLoaded(true);
+      const ctx = getActiveAddressContext(result);
+      setAddressContext(ctx);
+      return ctx;
+    } catch {
+      setAddressesLoaded(true);
+      return null;
+    }
+  };
+
+  const loadAllData = async () => {
     setLoading(true);
     try {
-      const [pharmacyResult, mockData] = await Promise.all([
-        fetchNearbyPharmacies(),
+      const [ctx, mockData] = await Promise.all([
+        loadAddresses(),
         getMockNearbyPharmacies(),
       ]);
-      setAddressContext(pharmacyResult.addressContext);
-      setAddressLoaded(true);
       setNearbyPharmacies(mockData);
     } catch {
       try {
         const mockData = await getMockNearbyPharmacies();
         setNearbyPharmacies(mockData);
-        setAddressLoaded(true);
-      } catch {
-        setAddressLoaded(true);
-      }
+      } catch {}
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveAddress = async (input: UserAddressInput) => {
+    await saveUserAddress(undefined, input);
+    await loadAddresses();
+  };
+
+  const handleSetActive = async (addr: UserAddress) => {
+    await setActiveAddress(undefined, addr.id);
+    await loadAddresses();
+  };
+
+  const handleDeleteAddress = async (addr: UserAddress) => {
+    if (!confirm(`Remove your ${addr.label} address?`)) return;
+    await deleteUserAddress(undefined, addr.id);
+    await loadAddresses();
   };
 
   const preferredPharmacy = pharmacies.find(p => p.preferred);
@@ -105,16 +141,148 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
     }
   };
 
-  const hasAddress = addressLoaded ? !!addressContext : true;
+  const hasAddress = addressesLoaded ? !!addressContext : true;
   const cityLabel = addressContext
     ? `${addressContext.city}, ${addressContext.state || ''} ${addressContext.postalCode || ''}`.trim()
     : 'Springfield, IL 62701';
   const mapLat = 39.7817;
   const mapLng = -89.6501;
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapLng - 0.06}%2C${mapLat - 0.04}%2C${mapLng + 0.06}%2C${mapLat + 0.04}&layer=mapnik&marker=${mapLat}%2C${mapLng}`;
+  const canAddMore = addresses.length < 3;
+  const addressTypeIcon = (type: string) => type === 'work' ? Building2 : Home;
 
   return (
     <div className="space-y-8">
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className={`text-sm font-medium uppercase tracking-wider ${
+              darkMode ? 'text-stone-400' : 'text-stone-500'
+            }`}>Your Addresses</h3>
+            <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+              Used to find nearby pharmacies
+            </p>
+          </div>
+          {canAddMore && addresses.length > 0 && (
+            <button
+              onClick={() => { setEditingAddress(null); setShowAddAddress(true); }}
+              className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                darkMode
+                  ? 'text-blue-400 hover:bg-stone-800'
+                  : 'text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              Add Address
+            </button>
+          )}
+        </div>
+
+        {addresses.length === 0 ? (
+          <button
+            onClick={() => { setEditingAddress(null); setShowAddAddress(true); }}
+            className={`w-full p-6 rounded-xl border-2 border-dashed text-center transition-colors group ${
+              darkMode
+                ? 'border-stone-700 hover:border-stone-600'
+                : 'border-stone-300 hover:border-blue-400'
+            }`}
+          >
+            <div className={`w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center transition-colors ${
+              darkMode
+                ? 'bg-stone-800 text-stone-500 group-hover:text-blue-400'
+                : 'bg-stone-100 text-stone-400 group-hover:text-blue-600'
+            }`}>
+              <MapPin className="w-6 h-6" />
+            </div>
+            <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              Add your first address
+            </p>
+            <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+              Home, second home, or work -- used to find pharmacies near you
+            </p>
+          </button>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {addresses.map(addr => {
+              const Icon = addressTypeIcon(addr.addressType);
+              return (
+                <div
+                  key={addr.id}
+                  className={`relative rounded-xl border p-4 transition-all ${
+                    addr.isActive
+                      ? darkMode
+                        ? 'border-blue-600 bg-blue-950/20 ring-1 ring-blue-600/30'
+                        : 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
+                      : darkMode
+                        ? 'border-stone-700 bg-stone-900'
+                        : 'border-stone-200 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        addr.isActive
+                          ? 'bg-blue-600 text-white'
+                          : darkMode
+                            ? 'bg-stone-800 text-stone-400'
+                            : 'bg-stone-100 text-stone-500'
+                      }`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                          {addr.label}
+                        </p>
+                        {addr.isActive && (
+                          <span className="text-[10px] font-medium text-blue-600 uppercase tracking-wider">Active</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {!addr.isActive && (
+                        <button
+                          onClick={() => handleSetActive(addr)}
+                          title="Use for pharmacy search"
+                          className={`p-1.5 rounded-md transition-colors ${
+                            darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-blue-400' : 'hover:bg-stone-100 text-stone-400 hover:text-blue-600'
+                          }`}
+                        >
+                          <Radio className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => { setEditingAddress(addr); setShowAddAddress(true); }}
+                        title="Edit"
+                        className={`p-1.5 rounded-md transition-colors ${
+                          darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-stone-300' : 'hover:bg-stone-100 text-stone-400 hover:text-stone-600'
+                        }`}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAddress(addr)}
+                        title="Remove"
+                        className={`p-1.5 rounded-md transition-colors ${
+                          darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-red-400' : 'hover:bg-stone-100 text-stone-400 hover:text-red-500'
+                        }`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    {addr.addressLine1}
+                    {addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
+                    <br />
+                    {addr.city}, {addr.state} {addr.postalCode}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
       {preferredPharmacy && (
         <section className={`rounded-xl border-2 p-5 ${
           darkMode ? 'border-emerald-800 bg-emerald-950/20' : 'border-emerald-200 bg-emerald-50/60'
@@ -284,26 +452,47 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
             )}
           </>
         ) : (
-          <div className={`text-center py-16 rounded-xl border mt-4 ${
+          <div className={`text-center py-12 rounded-xl border mt-4 ${
             darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
           }`}>
-            <AlertCircle className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
+            <MapPin className={`w-10 h-10 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
             <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-              Address needed for nearby pharmacies
+              Add an address to see nearby pharmacies
             </p>
-            <p className={`text-sm max-w-sm mx-auto ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-              Add your address in your profile to enable proximity-based pharmacy search.
-              You can still add pharmacies manually.
+            <p className={`text-sm max-w-sm mx-auto mb-4 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+              Use the address section above, or add a pharmacy manually.
             </p>
-            <button
-              onClick={onOpenManualAdd}
-              className="inline-flex items-center gap-2 px-4 py-2 mt-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-            >
-              + Add Pharmacy Manually
-            </button>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => { setEditingAddress(null); setShowAddAddress(true); }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Address
+              </button>
+              <button
+                onClick={onOpenManualAdd}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  darkMode
+                    ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                }`}
+              >
+                + Add Pharmacy
+              </button>
+            </div>
           </div>
         )}
       </section>
+
+      <AddAddressDrawer
+        isOpen={showAddAddress}
+        onClose={() => { setShowAddAddress(false); setEditingAddress(null); }}
+        onSave={handleSaveAddress}
+        darkMode={darkMode}
+        existingAddresses={addresses}
+        editAddress={editingAddress}
+      />
     </div>
   );
 }
