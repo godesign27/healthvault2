@@ -1,0 +1,348 @@
+import { Menu, X, Eye, Globe, Moon, Sun, LogIn, User, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+
+interface MarketingHeaderProps {
+  currentPage: string;
+  onPageChange: (page: string) => void;
+  onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
+  onDirectHealthVaultAccess?: () => void;
+  darkMode?: boolean;
+  onToggleDarkMode?: () => void;
+  onLoginClick?: () => void;
+  onGetStarted?: () => void;
+  isAuthenticated?: boolean;
+  currentView?: string;
+}
+
+export function MarketingHeader({
+  currentPage,
+  onPageChange,
+  onViewChange,
+  onDirectHealthVaultAccess,
+  darkMode = false,
+  onToggleDarkMode,
+  onLoginClick,
+  onGetStarted,
+  isAuthenticated = false,
+  currentView = 'marketing',
+}: MarketingHeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { id: 'home', label: 'Home' },
+    { id: 'personal-health-vault', label: 'Personal Health Vault' },
+    { id: 'providers', label: 'Providers' },
+    { id: 'security', label: 'Security' },
+    { id: 'pricing', label: 'Pricing' },
+  ];
+
+  const viewButtons = [
+    { id: 'health-vault', label: 'Health Vault', icon: Eye },
+    { id: 'marketing', label: 'Marketing', icon: Globe },
+  ];
+
+  const handleNavClick = (id: string) => {
+    onPageChange(id);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleViewClick = (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => {
+    if (view === 'health-vault' && onDirectHealthVaultAccess) {
+      onDirectHealthVaultAccess();
+    } else {
+      onViewChange?.(view);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  return (
+    <>
+      <header className={`sticky top-0 z-50 border-b ${
+        darkMode
+          ? 'bg-stone-900 border-stone-800'
+          : 'bg-white border-stone-200'
+      }`}>
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden">
+                  <img
+                    src={darkMode ? "/hv_logo-dark.png" : "/hv_logo-light.png"}
+                    alt="Health Vault"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div>
+                  <span className={`text-base font-bold ${
+                    darkMode ? 'text-white' : 'text-stone-900'
+                  }`}>Health Vault</span>
+                </div>
+              </div>
+
+              <div className="hidden lg:flex items-center gap-1">
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === item.id
+                        ? darkMode
+                          ? 'bg-stone-800 text-white'
+                          : 'bg-stone-100 text-stone-900'
+                        : darkMode
+                        ? 'text-stone-300 hover:bg-stone-800 hover:text-white'
+                        : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {isAuthenticated && (
+                <>
+                  <div className={`hidden md:flex items-center gap-1 mr-2 pr-3 border-r ${
+                    darkMode ? 'border-stone-700' : 'border-stone-200'
+                  }`}>
+                    {viewButtons.map((view) => {
+                      const Icon = view.icon;
+                      const isActive = currentView === view.id;
+                      return (
+                        <button
+                          key={view.id}
+                          onClick={() => handleViewClick(view.id as any)}
+                          className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+                            isActive
+                              ? darkMode
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-indigo-600 text-white'
+                              : darkMode
+                              ? 'hover:bg-stone-800 text-stone-400'
+                              : 'hover:bg-stone-100 text-stone-600'
+                          }`}
+                          title={view.label}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {onToggleDarkMode && (
+                <button
+                  onClick={onToggleDarkMode}
+                  className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+                    darkMode
+                      ? 'hover:bg-stone-800 text-stone-400'
+                      : 'hover:bg-stone-100 text-stone-600'
+                  }`}
+                  title={darkMode ? 'Light mode' : 'Dark mode'}
+                >
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+              )}
+
+              {!isAuthenticated && (
+                <>
+                  {onLoginClick && (
+                    <button
+                      onClick={onLoginClick}
+                      className={`hidden sm:block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                        darkMode
+                          ? 'text-stone-300 hover:bg-stone-800'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Log In
+                    </button>
+                  )}
+                  {onGetStarted && (
+                    <button
+                      onClick={onGetStarted}
+                      className="hidden sm:block px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                    >
+                      Get Started
+                    </button>
+                  )}
+                </>
+              )}
+
+              {isAuthenticated && (
+                <div className={`hidden sm:flex items-center gap-3 pl-3 ml-3 border-l ${
+                  darkMode ? 'border-stone-700' : 'border-stone-200'
+                }`}>
+                  <button
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                      darkMode
+                        ? 'hover:bg-stone-800 text-stone-300'
+                        : 'hover:bg-stone-100 text-stone-700'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                    }`}>
+                      <User className="w-4 h-4" />
+                    </div>
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={`lg:hidden p-2 rounded-lg transition-colors ${
+                  darkMode
+                    ? 'hover:bg-stone-800 text-stone-400'
+                    : 'hover:bg-stone-100 text-stone-600'
+                }`}
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {isMobileMenuOpen && (
+        <div className={`lg:hidden border-b ${
+          darkMode
+            ? 'bg-stone-900 border-stone-800'
+            : 'bg-white border-stone-200'
+        }`}>
+          <div className="px-4 py-4 space-y-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === item.id
+                    ? darkMode
+                      ? 'bg-stone-800 text-white'
+                      : 'bg-stone-100 text-stone-900'
+                    : darkMode
+                    ? 'text-stone-300 hover:bg-stone-800'
+                    : 'text-stone-600 hover:bg-stone-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+
+            {isAuthenticated && (
+              <>
+                <div className={`my-4 border-t ${
+                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                }`}></div>
+                <div className={`text-xs font-semibold uppercase tracking-wide px-4 mb-2 ${
+                  darkMode ? 'text-stone-500' : 'text-stone-500'
+                }`}>
+                  Quick Access
+                </div>
+                {viewButtons.map((view) => {
+                  const Icon = view.icon;
+                  const isActive = currentView === view.id;
+                  return (
+                    <button
+                      key={view.id}
+                      onClick={() => handleViewClick(view.id as any)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? darkMode
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-indigo-600 text-white'
+                          : darkMode
+                          ? 'text-stone-300 hover:bg-stone-800'
+                          : 'text-stone-600 hover:bg-stone-50'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {view.label}
+                    </button>
+                  );
+                })}
+              </>
+            )}
+
+            {!isAuthenticated && (onLoginClick || onGetStarted) && (
+              <>
+                <div className={`my-4 border-t ${
+                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                }`}></div>
+                {onLoginClick && (
+                  <button
+                    onClick={onLoginClick}
+                    className={`w-full px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors mb-2 ${
+                      darkMode
+                        ? 'text-stone-300 hover:bg-stone-800 border border-stone-700'
+                        : 'text-stone-700 hover:bg-stone-100 border border-stone-300'
+                    }`}
+                  >
+                    Log In
+                  </button>
+                )}
+                {onGetStarted && (
+                  <button
+                    onClick={onGetStarted}
+                    className="w-full px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                  >
+                    Get Started
+                  </button>
+                )}
+              </>
+            )}
+
+            {isAuthenticated && (
+              <>
+                <div className={`my-4 border-t ${
+                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                }`}></div>
+                <button
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    darkMode
+                      ? 'text-stone-300 hover:bg-stone-800'
+                      : 'text-stone-600 hover:bg-stone-50'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                  }`}>
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span>Profile</span>
+                </button>
+              </>
+            )}
+
+            {onToggleDarkMode && (
+              <>
+                <div className={`my-4 border-t sm:hidden ${
+                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                }`}></div>
+                <button
+                  onClick={onToggleDarkMode}
+                  className={`w-full sm:hidden flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    darkMode
+                      ? 'text-stone-300 hover:bg-stone-800'
+                      : 'text-stone-600 hover:bg-stone-50'
+                  }`}
+                >
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

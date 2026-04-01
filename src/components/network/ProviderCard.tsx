@@ -1,0 +1,152 @@
+import { Phone, Mail, MapPin, Calendar, Edit2, Share2, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Provider } from '../../types/network';
+
+interface ProviderCardProps {
+  provider: Provider;
+  darkMode?: boolean;
+  onView?: (provider: Provider) => void;
+  onEdit?: (provider: Provider) => void;
+  onShare?: (provider: Provider) => void;
+  onRemove?: (provider: Provider) => void;
+}
+
+export function ProviderCard({
+  provider,
+  darkMode = false,
+  onView,
+  onEdit,
+  onShare,
+  onRemove
+}: ProviderCardProps) {
+  const relationshipColors: Record<string, string> = {
+    Primary: 'bg-blue-600',
+    Specialist: 'bg-purple-600',
+    Dental: 'bg-teal-600',
+    Vision: 'bg-amber-600',
+    Therapy: 'bg-pink-600',
+    Other: 'bg-stone-600'
+  };
+
+  const relationshipColor = provider.relationship ? relationshipColors[provider.relationship] : 'bg-stone-600';
+
+  return (
+    <div
+      className={`rounded-xl border p-6 transition-all hover:shadow-lg cursor-pointer ${
+        darkMode ? 'border-stone-700 bg-stone-900 hover:border-stone-600' : 'border-stone-200 bg-white hover:border-stone-300'
+      }`}
+      onClick={() => onView?.(provider)}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h3 className={`text-lg font-semibold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            {provider.name}
+          </h3>
+          {provider.specialty && (
+            <p className={`text-sm mb-2 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+              {provider.specialty}
+            </p>
+          )}
+          {provider.clinic && (
+            <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>
+              {provider.clinic}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          {provider.relationship && (
+            <span className={`${relationshipColor} text-white text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap`}>
+              {provider.relationship}
+            </span>
+          )}
+          {provider.inNetwork !== undefined && (
+            <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${
+              provider.inNetwork
+                ? 'bg-green-100 text-green-700'
+                : 'bg-orange-100 text-orange-700'
+            }`}>
+              {provider.inNetwork ? (
+                <>
+                  <CheckCircle className="w-3 h-3" />
+                  In-Network
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-3 h-3" />
+                  Out-of-Network
+                </>
+              )}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className={`space-y-2 mb-4 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+        {provider.phone && (
+          <div className="flex items-center gap-2">
+            <Phone className="w-4 h-4" />
+            <span>{provider.phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}</span>
+          </div>
+        )}
+        {provider.email && (
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4" />
+            <span>{provider.email}</span>
+          </div>
+        )}
+        {provider.address && (
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            <span className="line-clamp-1">{provider.address}</span>
+          </div>
+        )}
+        {provider.lastVisitDate && (
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            <span>Last visit: {new Date(provider.lastVisitDate).toLocaleDateString()}</span>
+          </div>
+        )}
+      </div>
+
+      <div
+        className={`flex items-center gap-2 pt-4 border-t ${darkMode ? 'border-stone-800' : 'border-stone-200'}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {onEdit && (
+          <button
+            onClick={() => onEdit(provider)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              darkMode
+                ? 'text-stone-300 hover:bg-stone-800'
+                : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <Edit2 className="w-4 h-4" />
+            Edit
+          </button>
+        )}
+        {onShare && (
+          <button
+            onClick={() => onShare(provider)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              darkMode
+                ? 'text-stone-300 hover:bg-stone-800'
+                : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
+        )}
+        {onRemove && (
+          <button
+            onClick={() => onRemove(provider)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors ml-auto"
+          >
+            <Trash2 className="w-4 h-4" />
+            Remove
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

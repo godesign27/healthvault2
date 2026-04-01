@@ -1,0 +1,434 @@
+import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { MedicalIDCard } from '../components/MedicalIDCard';
+import { HealthStatsCard } from '../components/HealthStatsCard';
+import { RecentActivityItem } from '../components/RecentActivityItem';
+import { AIAssistantPanel } from '../components/AIAssistantPanel';
+import { DashboardSidebar } from '../components/DashboardSidebar';
+import { FloatingChatActions } from '../components/FloatingChatActions';
+import { CarePage } from './CarePage';
+import { MedicalFormsPage } from './MedicalFormsPage';
+import { MedicalProfilePage } from './MedicalProfilePage';
+import { InsurancePage } from './InsurancePage';
+import NetworkPage from './NetworkPage';
+import { HealthRecordsPage } from './HealthRecordsPage';
+import type { PageContext } from '../lib/voice/context-messages';
+
+interface DashboardPageProps {
+  onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
+}
+
+export default function DashboardPage({ onViewChange }: DashboardPageProps) {
+  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+  const medicalProfileActionsRef = useRef<{
+    openAddCondition?: () => void;
+    openAddMedication?: () => void;
+    openAddAllergy?: () => void;
+    openAddImmunization?: () => void;
+    refreshData?: () => Promise<void>;
+  }>({});
+
+  const careActionsRef = useRef<{
+    openAddProvider?: () => void;
+    refreshData?: () => void;
+  }>({});
+
+  const insuranceActionsRef = useRef<{
+    openAddCoverage?: () => void;
+    refreshData?: () => void;
+  }>({});
+
+  const networkActionsRef = useRef<{
+    openAddProvider?: () => void;
+    openAddPharmacy?: () => void;
+    openFindSpecialist?: () => void;
+    refreshData?: () => void;
+  }>({});
+
+  const healthRecordsActionsRef = useRef<{
+    openRequestRecords?: () => void;
+  }>({});
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const renderMainContent = () => {
+    if (currentPage === 'care') {
+      return <CarePage darkMode={darkMode} actionsRef={careActionsRef} />;
+    }
+
+    if (currentPage === 'medical-forms') {
+      return <MedicalFormsPage darkMode={darkMode} />;
+    }
+
+    if (currentPage === 'medical-profile') {
+      return <MedicalProfilePage darkMode={darkMode} actionsRef={medicalProfileActionsRef} />;
+    }
+
+    if (currentPage === 'network') {
+      return <NetworkPage darkMode={darkMode} actionsRef={networkActionsRef} />;
+    }
+
+    if (currentPage === 'insurance') {
+      return <InsurancePage darkMode={darkMode} actionsRef={insuranceActionsRef} />;
+    }
+
+    if (currentPage === 'health-records') {
+      return <HealthRecordsPage darkMode={darkMode} actionsRef={healthRecordsActionsRef} />;
+    }
+
+    if (currentPage === 'vitals') {
+      return (
+        <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
+          <div className="mb-8">
+            <h1 className={`text-2xl font-bold ${
+              darkMode ? 'text-white' : 'text-stone-900'
+            }`}>Vitals</h1>
+            <p className={`mt-1 ${
+              darkMode ? 'text-stone-400' : 'text-stone-600'
+            }`}>Track your vital signs and health metrics</p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+              darkMode ? 'bg-stone-800' : 'bg-stone-100'
+            }`}>
+              <Activity className={`w-8 h-8 ${
+                darkMode ? 'text-stone-400' : 'text-stone-500'
+              }`} />
+            </div>
+            <h2 className={`text-xl font-semibold mb-2 ${
+              darkMode ? 'text-white' : 'text-stone-900'
+            }`}>Coming Soon</h2>
+            <p className={`text-center max-w-md ${
+              darkMode ? 'text-stone-400' : 'text-stone-600'
+            }`}>
+              We're working on bringing you powerful vitals tracking features. Stay tuned!
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
+        <div className="mb-8">
+          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
+            darkMode ? 'text-white' : 'text-stone-900'
+          }`}>
+            <Home className="w-7 h-7" />
+            Dashboard
+          </h1>
+          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+            Welcome back, Timothy! Here's your health overview.
+          </p>
+        </div>
+
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:gap-6">
+          {/* Medical ID Card - Takes 2/3 width on medium, 1/2 on large */}
+          <div className="md:col-span-4 lg:col-span-6 lg:row-span-2">
+            <div className="h-full">
+              <MedicalIDCard darkMode={darkMode} />
+            </div>
+          </div>
+
+          {/* Stats Grid - 2 columns on medium, wraps nicely */}
+          <div className="md:col-span-3 lg:col-span-3">
+            <HealthStatsCard
+              icon={<FileText className="w-5 h-5" />}
+              title="Health Records"
+              value="24"
+              subtitle="+3 this month"
+              iconBgColor="bg-indigo-50"
+              iconColor="text-indigo-600"
+              darkMode={darkMode}
+            />
+          </div>
+
+          <div className="md:col-span-3 lg:col-span-3">
+            <HealthStatsCard
+              icon={<Activity className="w-5 h-5" />}
+              title="Forms Completed"
+              value="18"
+              subtitle="Out of 18 total"
+              iconBgColor="bg-emerald-50"
+              iconColor="text-emerald-600"
+              darkMode={darkMode}
+            />
+          </div>
+
+          <div className="md:col-span-3 lg:col-span-3">
+            <HealthStatsCard
+              icon={<Calendar className="w-5 h-5" />}
+              title="Appointments"
+              value="2"
+              subtitle="Next: Dec 15"
+              iconBgColor="bg-amber-50"
+              iconColor="text-amber-600"
+              darkMode={darkMode}
+            />
+          </div>
+
+          <div className="md:col-span-3 lg:col-span-3">
+            <HealthStatsCard
+              icon={<Pill className="w-5 h-5" />}
+              title="Medications"
+              value="3"
+              subtitle="All active"
+              iconBgColor="bg-rose-50"
+              iconColor="text-rose-600"
+              darkMode={darkMode}
+            />
+          </div>
+
+          {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
+          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
+            darkMode
+              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
+              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
+          }`}>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-indigo-50">
+                <Sparkles className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h2 className={`text-lg font-semibold ${
+                darkMode ? 'text-white' : 'text-stone-900'
+              }`}>Quick Actions</h2>
+            </div>
+            <p className={`text-sm mb-6 ${
+              darkMode ? 'text-stone-400' : 'text-stone-600'
+            }`}>Common tasks to manage your health data</p>
+
+            <div className="flex flex-col gap-3 mt-auto">
+              <button className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-600/20 hover:-translate-y-0.5">
+                <FileText className="w-4 h-4" />
+                Download Medical Forms
+              </button>
+              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
+                darkMode
+                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
+                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
+              }`}>
+                <div className={`flex items-center gap-2 text-sm font-medium ${
+                  darkMode ? 'text-stone-300' : 'text-stone-700'
+                }`}>
+                  <Activity className="w-4 h-4" />
+                  View Care History
+                </div>
+                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
+                  darkMode
+                    ? 'text-stone-500 group-hover:text-stone-400'
+                    : 'text-stone-400 group-hover:text-stone-600'
+                }`} />
+              </button>
+              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
+                darkMode
+                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
+                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
+              }`}>
+                <div className={`flex items-center gap-2 text-sm font-medium ${
+                  darkMode ? 'text-stone-300' : 'text-stone-700'
+                }`}>
+                  <Calendar className="w-4 h-4" />
+                  Schedule Appointment
+                </div>
+                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
+                  darkMode
+                    ? 'text-stone-500 group-hover:text-stone-400'
+                    : 'text-stone-400 group-hover:text-stone-600'
+                }`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Recent Activity - Balanced layout */}
+          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
+            darkMode
+              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
+              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
+          }`}>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-indigo-50">
+                <Activity className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h2 className={`text-lg font-semibold ${
+                darkMode ? 'text-white' : 'text-stone-900'
+              }`}>Recent Activity</h2>
+            </div>
+            <p className={`text-sm mb-6 ${
+              darkMode ? 'text-stone-400' : 'text-stone-600'
+            }`}>Your latest health updates</p>
+
+            <div className="space-y-3 flex-1">
+              <RecentActivityItem
+                icon={<Heart className="w-5 h-5" />}
+                title="Annual Physical Examination"
+                subtitle="Completed with Dr. Sarah Johnson"
+                time="2 days ago"
+                iconBgColor="bg-rose-50"
+                iconColor="text-rose-600"
+                darkMode={darkMode}
+              />
+              <RecentActivityItem
+                icon={<Activity className="w-5 h-5" />}
+                title="Lab Results Updated"
+                subtitle="Complete Blood Count (CBC) - Normal"
+                time="5 days ago"
+                iconBgColor="bg-emerald-50"
+                iconColor="text-emerald-600"
+                darkMode={darkMode}
+              />
+              <RecentActivityItem
+                icon={<Pill className="w-5 h-5" />}
+                title="Prescription Refilled"
+                subtitle="Albuterol Inhaler - 3 refills remaining"
+                time="1 week ago"
+                iconBgColor="bg-indigo-50"
+                iconColor="text-indigo-600"
+                darkMode={darkMode}
+              />
+            </div>
+
+            <button className="flex items-center gap-2 mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors group">
+              View All Activity
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`flex h-dvh w-screen ${
+      darkMode ? 'bg-stone-950' : 'bg-stone-50'
+    }`}>
+      <DashboardSidebar
+        onViewChange={onViewChange}
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          setIsMobileMenuOpen(false);
+        }}
+        currentPage={currentPage}
+        darkMode={darkMode}
+        onToggleDarkMode={toggleDarkMode}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapse}
+        isMobileMenuOpen={isMobileMenuOpen}
+        onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      />
+
+      <div className="flex-1 flex overflow-hidden min-w-0 relative">
+        <main className={`flex-1 overflow-y-auto min-w-0 relative ${
+          darkMode
+            ? 'bg-gradient-to-br from-stone-950 via-stone-950 to-stone-900'
+            : 'bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50'
+        }`}>
+          {/* Mobile hamburger menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className={`lg:hidden fixed top-4 left-4 z-30 p-3 rounded-xl shadow-lg transition-all active:scale-95 ${
+              darkMode
+                ? 'bg-stone-800 text-white hover:bg-stone-700'
+                : 'bg-white text-stone-900 hover:bg-stone-50'
+            }`}
+            aria-label="Open navigation menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {renderMainContent()}
+        </main>
+
+        {/* Floating AI Assistant Toggle Buttons */}
+        {!isAIPanelOpen && (
+          <FloatingChatActions
+            onOpenChat={() => setIsAIPanelOpen(true)}
+            darkMode={darkMode}
+            context={currentPage as any}
+          />
+        )}
+
+        {/* Mobile backdrop for AI panel */}
+        {isAIPanelOpen && (
+          <div
+            className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            onClick={() => setIsAIPanelOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* AI Assistant Panel */}
+        {isAIPanelOpen && (
+          <aside
+            className={`
+              shrink-0 relative bg-white z-50
+              fixed lg:relative inset-y-0 right-0
+              w-full lg:w-[33vw] lg:min-w-[400px]
+              transition-transform duration-300 ease-in-out
+              ${isAIPanelOpen ? 'translate-x-0' : 'translate-x-full'}
+            `}
+          >
+            <button
+              onClick={() => setIsAIPanelOpen(false)}
+              className="absolute top-6 right-6 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-stone-100 active:scale-95 text-stone-500 hover:text-stone-700"
+              title="Close"
+              aria-label="Close assistant"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <AIAssistantPanel
+              darkMode={darkMode}
+              currentPage={currentPage}
+              onAddCondition={() => medicalProfileActionsRef.current.openAddCondition?.()}
+              onAddMedication={() => medicalProfileActionsRef.current.openAddMedication?.()}
+              onAddAllergy={() => medicalProfileActionsRef.current.openAddAllergy?.()}
+              onAddImmunization={() => medicalProfileActionsRef.current.openAddImmunization?.()}
+              onAddCoverage={() => insuranceActionsRef.current.openAddCoverage?.()}
+              onAddProvider={() => networkActionsRef.current.openAddProvider?.()}
+              onAddPharmacy={() => networkActionsRef.current.openAddPharmacy?.()}
+              onFindSpecialist={() => networkActionsRef.current.openFindSpecialist?.()}
+              onRequestRecords={() => healthRecordsActionsRef.current.openRequestRecords?.()}
+              onRefreshData={async () => {
+                if (medicalProfileActionsRef.current.refreshData) {
+                  await medicalProfileActionsRef.current.refreshData();
+                }
+                if (insuranceActionsRef.current.refreshData) {
+                  await insuranceActionsRef.current.refreshData();
+                }
+                if (networkActionsRef.current.refreshData) {
+                  await networkActionsRef.current.refreshData();
+                }
+              }}
+            />
+          </aside>
+        )}
+      </div>
+    </div>
+  );
+}
