@@ -59,6 +59,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     openRequestRecords?: () => void;
   }>({});
 
+  const [providerConnectionRequested, setProviderConnectionRequested] = useState(false);
+
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
@@ -97,7 +99,16 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     if (currentPage === 'health-records') {
-      return <HealthRecordsPage darkMode={darkMode} actionsRef={healthRecordsActionsRef} />;
+      return (
+        <HealthRecordsPage
+          darkMode={darkMode}
+          actionsRef={healthRecordsActionsRef}
+          onConnectProvider={() => {
+            setIsAIPanelOpen(true);
+            setProviderConnectionRequested(true);
+          }}
+        />
+      );
     }
 
     if (currentPage === 'vitals') {
@@ -414,6 +425,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               onAddPharmacy={() => networkActionsRef.current.openAddPharmacy?.()}
               onFindSpecialist={() => networkActionsRef.current.openFindSpecialist?.()}
               onRequestRecords={() => healthRecordsActionsRef.current.openRequestRecords?.()}
+              startProviderConnection={providerConnectionRequested}
+              onProviderConnectionStarted={() => setProviderConnectionRequested(false)}
               onRefreshData={async () => {
                 if (medicalProfileActionsRef.current.refreshData) {
                   await medicalProfileActionsRef.current.refreshData();

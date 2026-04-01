@@ -10,9 +10,10 @@ import { AIResultCard } from '../components/records/AIResultCard';
 interface HealthRecordsPageProps {
   darkMode?: boolean;
   actionsRef?: MutableRefObject<{ openRequestRecords?: () => void }>;
+  onConnectProvider?: () => void;
 }
 
-export function HealthRecordsPage({ darkMode = false, actionsRef }: HealthRecordsPageProps) {
+export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvider }: HealthRecordsPageProps) {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
@@ -86,13 +87,26 @@ export function HealthRecordsPage({ darkMode = false, actionsRef }: HealthRecord
             Your labs, scans, and medical documents — all in one place.
           </p>
         </div>
-        <button
-          onClick={() => setRequestDrawerOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors shadow-sm shrink-0"
-        >
-          <SendHorizonal className="w-4 h-4" />
-          Request Health Record
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={onConnectProvider}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-colors shadow-sm"
+          >
+            <Link2 className="w-4 h-4" />
+            Connect Provider
+          </button>
+          <button
+            onClick={() => setRequestDrawerOpen(true)}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-xl font-medium transition-colors shadow-sm ${
+              darkMode
+                ? 'border-stone-700 text-stone-300 hover:bg-stone-800'
+                : 'border-stone-300 text-stone-700 hover:bg-stone-50'
+            }`}
+          >
+            <SendHorizonal className="w-4 h-4" />
+            Request Manually
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">

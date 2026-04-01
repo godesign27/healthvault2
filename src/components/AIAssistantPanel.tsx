@@ -1,9 +1,6 @@
-import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Syringe, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, Image, Share2, MessageCircle, ClipboardCheck, SendHorizontal } from 'lucide-react';
+import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, MessageCircle, ClipboardCheck, SendHorizontal } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { ImportReviewDialog } from './import/ImportReviewDialog';
-import { orchestrateProviderImport } from '../lib/import/import-orchestrator';
-import { importMedicalRecords } from '../lib/services/medical-import';
-import type { ProviderConnection } from '../lib/providers/types';
+import { ProviderRecordConnectionFlow } from './records/ProviderRecordConnectionFlow';
 import { InsuranceProvider, Coverage } from '../schemas/insurance';
 import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
@@ -13,10 +10,8 @@ import { sendAssistantMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 
 interface Message {
-  type: 'user' | 'assistant' | 'import-review';
+  type: 'user' | 'assistant';
   message: string;
-  importData?: any;
-  connection?: ProviderConnection;
 }
 
 interface AIAssistantPanelProps {
@@ -33,6 +28,8 @@ interface AIAssistantPanelProps {
   onImportComplete?: (data: any) => void;
   onRefreshData?: () => Promise<void>;
   onRequestRecords?: () => void;
+  startProviderConnection?: boolean;
+  onProviderConnectionStarted?: () => void;
 }
 
 export function AIAssistantPanel({
@@ -48,7 +45,9 @@ export function AIAssistantPanel({
   onFindSpecialist,
   onImportComplete,
   onRefreshData,
-  onRequestRecords
+  onRequestRecords,
+  startProviderConnection: startProviderConnectionProp,
+  onProviderConnectionStarted,
 }: AIAssistantPanelProps) {
   const getInitialMessage = () => {
     return getVoiceMessageForContext((currentPage || 'dashboard') as PageContext);
@@ -62,10 +61,7 @@ export function AIAssistantPanel({
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showImportReview, setShowImportReview] = useState(false);
-  const [importData, setImportData] = useState<any>(null);
-  const [importConnection, setImportConnection] = useState<ProviderConnection | null>(null);
-  // const [isWide, setIsWide] = useState(false); // Removed: Keeping panel at consistent 600px width
+  const [showProviderConnectionFlow, setShowProviderConnectionFlow] = useState(false);
   const [hasShownImportPrompt, setHasShownImportPrompt] = useState(false);
   const [awaitingImportResponse, setAwaitingImportResponse] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -112,6 +108,7 @@ export function AIAssistantPanel({
     setHasShownImportPrompt(false);
     setAwaitingImportResponse(false);
     setShowInsuranceFlow(false);
+    setShowProviderConnectionFlow(false);
     setIsFormFillingMode(false);
     setAwaitingProfileDataConfirmation(false);
     setCollectingProfileData(false);
@@ -119,6 +116,13 @@ export function AIAssistantPanel({
     setCollectedData({});
     setLastResponseId(undefined);
   }, [currentPage]);
+
+  useEffect(() => {
+    if (startProviderConnectionProp) {
+      setShowProviderConnectionFlow(true);
+      onProviderConnectionStarted?.();
+    }
+  }, [startProviderConnectionProp]);
 
   useEffect(() => {
     if (currentPage === 'medical-profile' && !hasShownImportPrompt) {
@@ -151,26 +155,22 @@ export function AIAssistantPanel({
     }
   }, [currentPage, hasShownImportPrompt]);
 
-  // Removed: Width expansion logic - keeping consistent 600px width
-  // useEffect(() => {
-  //   setIsWide(showImportReview);
-  // }, [showImportReview]);
+  const handleStartProviderConnection = () => {
+    setShowProviderConnectionFlow(true);
+  };
 
-  useEffect(() => {
-    const originalFn = window.aiAssistantShowImport;
-    window.aiAssistantShowImport = (connection, data) => {
-      setImportConnection(connection);
-      setImportData(data);
-      setShowImportReview(true);
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: `Great! I've connected to ${connection.name} and found ${data.conditions.unique.length} conditions, ${data.medications.unique.length} medications, ${data.allergies.unique.length} allergies, and ${data.immunizations.unique.length} immunizations. Let's review what to import.`
-      }]);
-    };
-    return () => {
-      window.aiAssistantShowImport = originalFn;
-    };
-  }, []);
+  const handleProviderConnectionClose = () => {
+    setShowProviderConnectionFlow(false);
+  };
+
+  const handleProviderConnectionImportComplete = (data: any) => {
+    setShowProviderConnectionFlow(false);
+    setMessages(prev => [...prev, {
+      type: 'assistant',
+      message: 'Your records have been imported successfully. You can find your updated data in your Medical Profile.'
+    }]);
+    if (onImportComplete) onImportComplete(data);
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -185,7 +185,7 @@ export function AIAssistantPanel({
 
     if (awaitingImportResponse && (userMessage === '1' || userMessage.toLowerCase() === 'yes')) {
       setAwaitingImportResponse(false);
-      handleStartImport();
+      handleStartProviderConnection();
       return;
     }
 
@@ -288,11 +288,19 @@ export function AIAssistantPanel({
 
     if (prompt.toLowerCase().includes('request health records') || prompt.toLowerCase().includes('request medical records')) {
       setIsLoading(false);
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: "I can help you find or request medical records. Opening the request form so you can select a provider or enter details manually."
-      }]);
-      onRequestRecords?.();
+      handleStartProviderConnection();
+      return;
+    }
+
+    if (prompt.toLowerCase().includes('import') && (prompt.toLowerCase().includes('record') || prompt.toLowerCase().includes('health'))) {
+      setIsLoading(false);
+      handleStartProviderConnection();
+      return;
+    }
+
+    if (prompt.toLowerCase().includes('connect') && prompt.toLowerCase().includes('provider')) {
+      setIsLoading(false);
+      handleStartProviderConnection();
       return;
     }
 
@@ -607,111 +615,9 @@ export function AIAssistantPanel({
     }
   };
 
-  const handleStartImport = async () => {
-    setMessages(prev => [...prev, {
-      type: 'user',
-      message: 'Import my medical records from my healthcare provider'
-    }]);
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: "I'll help you import your medical records! Let me connect to your healthcare provider using SMART on FHIR..."
-    }]);
-
-    setIsLoading(true);
-
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: "🔗 Connecting to MyChart..."
-    }]);
-
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: "📊 Fetching your medical records..."
-    }]);
-
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: "🔍 Analyzing and deduplicating records..."
-    }]);
-
-    try {
-      const result = await orchestrateProviderImport('mock_state', 'mock_code');
-
-      setIsLoading(false);
-      setImportConnection(result.connection);
-      setImportData(result.data);
-      setShowImportReview(true);
-
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: `Perfect! I've found ${result.data.conditions.unique.length} conditions, ${result.data.medications.unique.length} medications, ${result.data.allergies.unique.length} allergies, and ${result.data.immunizations.unique.length} immunizations. Let's review what to import.`
-      }]);
-    } catch (error) {
-      setIsLoading(false);
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: "I'm sorry, I had trouble connecting to your provider. Please try again."
-      }]);
-    }
-  };
-
-  const handleImportConfirm = async (selectedData: any) => {
-    setShowImportReview(false);
-
-    const totalRecords = selectedData.conditions.unique.length + selectedData.medications.unique.length + selectedData.allergies.unique.length + selectedData.immunizations.unique.length;
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: `Great! I'm importing ${totalRecords} records into your Health Vault...`
-    }]);
-
-    setIsLoading(true);
-
-    try {
-      const results = await importMedicalRecords(selectedData);
-
-      setIsLoading(false);
-
-      if (results.errors.length > 0) {
-        setMessages(prev => [...prev, {
-          type: 'assistant',
-          message: `Import completed with some issues: ${results.errors.join(', ')}. Successfully imported: ${results.conditions} conditions, ${results.medications} medications, ${results.allergies} allergies, ${results.immunizations} immunizations.`
-        }]);
-      } else {
-        setMessages(prev => [...prev, {
-          type: 'assistant',
-          message: `Perfect! Successfully imported ${results.conditions} conditions, ${results.medications} medications, ${results.allergies} allergies, and ${results.immunizations} immunizations. Your medical profile is now updated!`
-        }]);
-      }
-
-      console.log('Import complete, calling onRefreshData:', !!onRefreshData);
-      if (onRefreshData) {
-        try {
-          await onRefreshData();
-          console.log('onRefreshData completed successfully');
-        } catch (refreshError) {
-          console.error('Error refreshing data:', refreshError);
-        }
-      }
-
-      if (onImportComplete) {
-        await onImportComplete(selectedData);
-      }
-    } catch (error) {
-      console.error('Import error:', error);
-      setIsLoading(false);
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: "I'm sorry, there was an error importing your records. Please try again."
-      }]);
-    }
+  const handleOpenManualRequest = () => {
+    setShowProviderConnectionFlow(false);
+    onRequestRecords?.();
   };
 
   const loadProviders = async () => {
@@ -928,7 +834,7 @@ export function AIAssistantPanel({
   const getQuickActions = () => {
     if (currentPage === 'medical-profile') {
       return [
-        { icon: LinkIcon, label: 'Import Records', action: handleStartImport },
+        { icon: LinkIcon, label: 'Connect Provider', action: handleStartProviderConnection },
         { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
         { icon: Stethoscope, label: 'Add Condition', action: onAddCondition },
         { icon: Pill, label: 'Add Medication', action: onAddMedication },
@@ -965,9 +871,9 @@ export function AIAssistantPanel({
 
     if (currentPage === 'health-records') {
       return [
-        { icon: SendHorizontal, label: 'Request health records', action: onRequestRecords ? () => onRequestRecords() : undefined, prompt: onRequestRecords ? undefined : 'I want to request my health records from a provider' },
+        { icon: LinkIcon, label: 'Connect Provider', action: handleStartProviderConnection },
+        { icon: SendHorizontal, label: 'Request Records', action: onRequestRecords ? () => onRequestRecords() : undefined, prompt: onRequestRecords ? undefined : 'I want to request my health records from a provider' },
         { icon: FlaskConical, label: 'Show my lab results', prompt: 'Show my lab results' },
-        { icon: Image, label: 'View imaging records', prompt: 'Show my imaging records' },
         { icon: Upload, label: 'Upload a new record', prompt: 'I want to upload a new health record' }
       ];
     }
@@ -986,7 +892,7 @@ export function AIAssistantPanel({
     if (currentPage === 'medical-profile') {
       return [
         'Fill out this form for me',
-        'Import my health records',
+        'Connect my provider to import records',
         'What conditions should I track?',
         'Review my medication list'
       ];
@@ -1001,9 +907,9 @@ export function AIAssistantPanel({
     }
     if (currentPage === 'health-records') {
       return [
-        'Request health records',
+        'Connect my provider to import records',
+        'Request health records manually',
         'Show my lab results',
-        'View imaging records',
         'Upload a new record'
       ];
     }
@@ -1025,13 +931,12 @@ export function AIAssistantPanel({
           : 'border-stone-200 bg-white'
       }`}
     >
-      {showImportReview && importData && importConnection ? (
-        <ImportReviewDialog
-          open={showImportReview}
-          onClose={() => setShowImportReview(false)}
-          connection={importConnection}
-          data={importData}
-          onConfirm={handleImportConfirm}
+      {showProviderConnectionFlow ? (
+        <ProviderRecordConnectionFlow
+          onClose={handleProviderConnectionClose}
+          onImportComplete={handleProviderConnectionImportComplete}
+          onRefreshData={onRefreshData}
+          onOpenManualRequest={handleOpenManualRequest}
           darkMode={darkMode}
         />
       ) : (
@@ -1453,7 +1358,7 @@ export function AIAssistantPanel({
                 )}
               </>
             )}
-            {!showInsuranceFlow && <div ref={messagesEndRef} />}
+            {!showInsuranceFlow && !showProviderConnectionFlow && <div ref={messagesEndRef} />}
           </div>
 
           {!showInsuranceFlow && (
