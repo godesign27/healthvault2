@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { supabase } from '../supabase';
 import type { ChatRequest, ChatResponse, ConversationMessage } from './types';
+import { POST } from '../../api/assistant/run';
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -50,6 +51,36 @@ export async function sendChatMessage(params: {
   return {
     message: data.message || data.response || '',
     toolEvents: data.toolEvents,
+    error: data.error,
+  };
+}
+
+export async function sendAssistantMessage(params: {
+  message: string;
+  page?: string;
+  pageContext?: Record<string, unknown>;
+}): Promise<ChatResponse> {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const request = new Request('', {
+    method: 'POST',
+    body: JSON.stringify({
+      userId: user?.id,
+      currentPage: params.page,
+      userMessage: params.message,
+      context: params.pageContext,
+    }),
+  });
+
+  const response = await POST(request);
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(data.error || 'Assistant request failed');
+  }
+
+  return {
+    message: data.message || '',
     error: data.error,
   };
 }

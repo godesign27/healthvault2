@@ -9,7 +9,7 @@ import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
-import { sendChatMessage } from '../lib/openai/client';
+import { sendAssistantMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 
 interface Message {
@@ -259,16 +259,10 @@ export function AIAssistantPanel({
     setIsLoading(true);
 
     try {
-      const conversationHistory = messages.map(msg => ({
-        role: (msg.type === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-        content: msg.message
-      }));
-
-      const data = await sendChatMessage({
+      const data = await sendAssistantMessage({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        conversationHistory,
       });
 
       setMessages(prev => [...prev, {
@@ -315,7 +309,7 @@ export function AIAssistantPanel({
     }
 
     try {
-      const data = await sendChatMessage({
+      const data = await sendAssistantMessage({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
