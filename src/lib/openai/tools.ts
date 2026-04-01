@@ -21,6 +21,12 @@ import { searchProviderOrganizations } from "../tools/searchProviderOrganization
 import { startProviderConnection } from "../tools/startProviderConnection";
 import { startEpicConnection } from "../tools/startEpicConnection";
 import { fetchProviderRecordPreview } from "../tools/fetchProviderRecordPreview";
+import { getConnectedInsurance } from "../tools/getConnectedInsurance";
+import { searchInNetworkProviders } from "../tools/searchInNetworkProviders";
+import { saveProviderToNetwork } from "../tools/saveProviderToNetwork";
+import { getNearbyPharmacies } from "../tools/getNearbyPharmacies";
+import { setPreferredPharmacy } from "../tools/setPreferredPharmacy";
+import { getCareNetwork } from "../tools/getCareNetwork";
 
 export const assistantToolDefinitions = [
   {
@@ -435,6 +441,139 @@ export const assistantToolDefinitions = [
       required: ["userId"],
     },
   },
+  {
+    type: "function" as const,
+    name: "getConnectedInsurance",
+    description:
+      "Get the user's connected insurance plans with coverage status. Returns provider name, plan name, member ID, active/inactive status, and connection status. Use on the Network page to determine insurance context for in-network provider search.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "searchInNetworkProviders",
+    description:
+      "Search the user's care network providers. If insurance is connected, annotates results with in-network status. Supports filtering by name/specialty query, specialty, and insurance plan.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        query: {
+          type: "string",
+          description: "Search by provider name, specialty, or clinic",
+        },
+        specialty: {
+          type: "string",
+          description: "Filter by specialty (e.g. Cardiology, Family Medicine)",
+        },
+        insuranceId: {
+          type: "string",
+          description: "Insurance coverage ID to scope in-network context",
+        },
+        limit: {
+          type: "number",
+          description: "Max results to return (default 20)",
+        },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "saveProviderToNetwork",
+    description:
+      "Save a provider to the user's care network. Supports designating as primary care, specialist, dental, etc. Use when the user wants to add a doctor or provider to their network.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        name: {
+          type: "string",
+          description: "Provider name (required)",
+        },
+        specialty: { type: "string", description: "Provider specialty" },
+        clinic: { type: "string", description: "Clinic or practice name" },
+        phone: { type: "string", description: "Phone number" },
+        email: { type: "string", description: "Email address" },
+        address: { type: "string", description: "Office address" },
+        providerType: {
+          type: "string",
+          enum: ["primary_care", "specialist"],
+          description: "Provider type shorthand",
+        },
+        relationship: {
+          type: "string",
+          enum: ["Primary", "Specialist", "Dental", "Vision", "Therapy", "Other"],
+          description: "Relationship to patient",
+        },
+        inNetwork: {
+          type: "boolean",
+          description: "Whether the provider is in-network",
+        },
+      },
+      required: ["userId", "name"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "getNearbyPharmacies",
+    description:
+      "Get pharmacies near the user based on their saved address. Returns saved pharmacies with preferred status. If no address is on file, returns a prompt to update the profile.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        query: {
+          type: "string",
+          description: "Search by pharmacy name, chain, or address",
+        },
+        radiusMiles: {
+          type: "number",
+          description: "Search radius in miles (for future proximity search)",
+        },
+        limit: {
+          type: "number",
+          description: "Max results to return (default 20)",
+        },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "setPreferredPharmacy",
+    description:
+      "Set a pharmacy as the user's preferred pharmacy. Clears any previous preferred selection and sets the new one.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        pharmacyId: {
+          type: "string",
+          description: "The pharmacy ID to set as preferred",
+        },
+      },
+      required: ["userId", "pharmacyId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "getCareNetwork",
+    description:
+      "Get a summary of the user's care network: primary care providers, specialists, all providers, preferred pharmacy, and all pharmacies with counts.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+      },
+      required: ["userId"],
+    },
+  },
 ];
 
 export const assistantToolHandlers: Record<
@@ -464,4 +603,10 @@ export const assistantToolHandlers: Record<
   startProviderConnection,
   startEpicConnection,
   fetchProviderRecordPreview,
+  getConnectedInsurance,
+  searchInNetworkProviders,
+  saveProviderToNetwork,
+  getNearbyPharmacies,
+  setPreferredPharmacy,
+  getCareNetwork,
 };
