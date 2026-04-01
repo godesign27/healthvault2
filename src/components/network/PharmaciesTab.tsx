@@ -1,0 +1,376 @@
+import { useState, useEffect } from 'react';
+import {
+  MapPin, Phone, Clock, Star, Navigation, Check, Package,
+  ExternalLink, CheckCircle, XCircle, Pill, AlertCircle,
+} from 'lucide-react';
+import { useNetworkStore } from '../../lib/stores/network-store';
+import { NearbyPharmacyResult, getNearbyPharmacies } from '../../lib/network-directory';
+import { PharmacyCard } from './PharmacyCard';
+import { Pharmacy } from '../../types/network';
+
+interface PharmaciesTabProps {
+  darkMode: boolean;
+  onRemovePharmacy: (pharmacy: Pharmacy) => void;
+  onOpenManualAdd: () => void;
+}
+
+export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: PharmaciesTabProps) {
+  const { pharmacies, addPharmacy, updatePharmacy, insurance } = useNetworkStore();
+  const [nearbyPharmacies, setNearbyPharmacies] = useState<NearbyPharmacyResult[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadPharmacies();
+  }, []);
+
+  const loadPharmacies = async () => {
+    setLoading(true);
+    try {
+      const data = await getNearbyPharmacies();
+      setNearbyPharmacies(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const preferredPharmacy = pharmacies.find(p => p.preferred);
+  const addedNames = new Set(pharmacies.map(p => p.name));
+
+  const handleDesignate = async (np: NearbyPharmacyResult) => {
+    setAddingId(np.id);
+    try {
+      if (preferredPharmacy) {
+        await updatePharmacy(preferredPharmacy.id, { preferred: false });
+      }
+      const alreadyAdded = pharmacies.find(p => p.name === np.name);
+      if (alreadyAdded) {
+        await updatePharmacy(alreadyAdded.id, { preferred: true });
+      } else {
+        await addPharmacy({
+          userId: '00000000-0000-0000-0000-000000000000',
+          name: np.name,
+          chain: np.chain,
+          phone: np.phone.replace(/[^\d]/g, ''),
+          address: np.address,
+          preferred: true,
+          deliveryOptions: np.deliveryOptions,
+          inNetwork: np.inNetwork,
+        });
+      }
+    } catch {
+      // handled silently
+    } finally {
+      setAddingId(null);
+    }
+  };
+
+  const hasAddress = true;
+  const mapLat = 39.7817;
+  const mapLng = -89.6501;
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapLng - 0.06}%2C${mapLat - 0.04}%2C${mapLng + 0.06}%2C${mapLat + 0.04}&layer=mapnik&marker=${mapLat}%2C${mapLng}`;
+
+  return (
+    <div className="space-y-8">
+      {preferredPharmacy && (
+        <section className={`rounded-xl border-2 p-5 ${
+          darkMode ? 'border-emerald-800 bg-emerald-950/20' : 'border-emerald-200 bg-emerald-50/60'
+        }`}>
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+            <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              Your Preferred Pharmacy
+            </h3>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-emerald-600 flex items-center justify-center text-white shrink-0">
+              <Pill className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                {preferredPharmacy.name}
+              </h4>
+              {preferredPharmacy.address && (
+                <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  {preferredPharmacy.address}
+                </p>
+              )}
+              {preferredPharmacy.phone && (
+                <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                  {preferredPharmacy.phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
+                </p>
+              )}
+              {preferredPharmacy.deliveryOptions && preferredPharmacy.deliveryOptions.length > 0 && (
+                <div className="flex gap-1.5 mt-2">
+                  {preferredPharmacy.deliveryOptions.map(opt => (
+                    <span key={opt} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      {opt}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            {preferredPharmacy.inNetwork && (
+              <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700 whitespace-nowrap shrink-0">
+                <CheckCircle className="w-3 h-3" />
+                In-Network
+              </span>
+            )}
+          </div>
+        </section>
+      )}
+
+      {pharmacies.length > 0 && pharmacies.filter(p => !p.preferred).length > 0 && (
+        <section>
+          <h3 className={`text-sm font-medium uppercase tracking-wider mb-3 ${
+            darkMode ? 'text-stone-400' : 'text-stone-500'
+          }`}>Other Saved Pharmacies</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {pharmacies.filter(p => !p.preferred).map(pharmacy => (
+              <PharmacyCard
+                key={pharmacy.id}
+                pharmacy={pharmacy}
+                darkMode={darkMode}
+                onRemove={onRemovePharmacy}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-red-500" />
+            <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              Nearby Pharmacies
+            </h2>
+          </div>
+          <button
+            onClick={onOpenManualAdd}
+            className={`text-sm font-medium ${
+              darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+            }`}
+          >
+            + Add manually
+          </button>
+        </div>
+
+        {hasAddress ? (
+          <>
+            <p className={`text-sm mb-5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+              Based on your saved address in Springfield, IL
+              {insurance.connected && `. ${insurance.name} network status shown.`}
+            </p>
+
+            <div className={`rounded-xl overflow-hidden border mb-6 ${
+              darkMode ? 'border-stone-700' : 'border-stone-200'
+            }`}>
+              <div className="relative w-full h-64 lg:h-72">
+                <iframe
+                  src={mapSrc}
+                  className="absolute inset-0 w-full h-full"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  title="Pharmacy locations near Springfield, IL"
+                />
+                <div className={`absolute bottom-3 left-3 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium shadow-lg ${
+                  darkMode ? 'bg-stone-900 text-stone-300' : 'bg-white text-stone-700'
+                }`}>
+                  <Navigation className="w-3.5 h-3.5 text-blue-600" />
+                  Springfield, IL 62701
+                </div>
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {nearbyPharmacies.map((np, idx) => {
+                  const isDesignated = preferredPharmacy?.name === np.name;
+                  const isAdding = addingId === np.id;
+                  const isSelected = selectedId === np.id;
+
+                  return (
+                    <PharmacyResultCard
+                      key={np.id}
+                      pharmacy={np}
+                      index={idx}
+                      darkMode={darkMode}
+                      isDesignated={isDesignated}
+                      isSelected={isSelected}
+                      isAdding={isAdding}
+                      onSelect={() => setSelectedId(np.id === selectedId ? null : np.id)}
+                      onDesignate={() => handleDesignate(np)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className={`text-center py-16 rounded-xl border mt-4 ${
+            darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
+          }`}>
+            <AlertCircle className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
+            <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              Address needed
+            </p>
+            <p className={`text-sm max-w-sm mx-auto ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+              Add your address in Medical Profile so we can show nearby pharmacies.
+            </p>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function PharmacyResultCard({
+  pharmacy, index, darkMode, isDesignated, isSelected, isAdding, onSelect, onDesignate,
+}: {
+  pharmacy: NearbyPharmacyResult;
+  index: number;
+  darkMode: boolean;
+  isDesignated: boolean;
+  isSelected: boolean;
+  isAdding: boolean;
+  onSelect: () => void;
+  onDesignate: () => void;
+}) {
+  return (
+    <div
+      onClick={onSelect}
+      className={`rounded-xl border p-5 transition-all cursor-pointer ${
+        isDesignated
+          ? darkMode
+            ? 'border-emerald-700 bg-emerald-950/20'
+            : 'border-emerald-300 bg-emerald-50/50'
+          : isSelected
+          ? darkMode
+            ? 'border-blue-600 bg-blue-950/20'
+            : 'border-blue-300 bg-blue-50/30'
+          : darkMode
+          ? 'border-stone-700 bg-stone-900 hover:border-stone-600'
+          : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
+      }`}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+          isDesignated ? 'bg-emerald-600' : pharmacy.inNetwork ? 'bg-blue-600' : 'bg-stone-500'
+        }`}>
+          {pharmacy.distance === 'Mail'
+            ? <Package className="w-5 h-5" />
+            : index + 1
+          }
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className={`font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                {pharmacy.name}
+              </h3>
+              {isDesignated && <Star className="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" />}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {pharmacy.distance !== 'Mail' && (
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                  darkMode ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-600'
+                }`}>
+                  {pharmacy.distance}
+                </span>
+              )}
+              {pharmacy.inNetwork ? (
+                <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                  <CheckCircle className="w-3 h-3" />
+                  In-Network
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">
+                  <XCircle className="w-3 h-3" />
+                  Out-of-Network
+                </span>
+              )}
+            </div>
+          </div>
+
+          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            {pharmacy.chain !== 'Independent' ? pharmacy.chain : 'Independent Pharmacy'}
+          </p>
+
+          <div className={`space-y-1 mt-2 text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <span>{pharmacy.address}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 shrink-0" />
+              <span>{pharmacy.phone}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              <span>{pharmacy.hours}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-2">
+            {pharmacy.deliveryOptions.map(opt => (
+              <span key={opt} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                darkMode ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-600'
+              }`}>
+                {opt}
+              </span>
+            ))}
+          </div>
+
+          <div
+            className={`flex items-center gap-3 mt-3 pt-3 border-t ${
+              darkMode ? 'border-stone-800' : 'border-stone-200'
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
+            {isDesignated ? (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                <Check className="w-4 h-4" />
+                Your Preferred Pharmacy
+              </span>
+            ) : (
+              <button
+                onClick={onDesignate}
+                disabled={isAdding}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                {isAdding ? (
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Star className="w-3.5 h-3.5" />
+                )}
+                Set as Preferred
+              </button>
+            )}
+            {pharmacy.distance !== 'Mail' && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(pharmacy.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  darkMode ? 'text-stone-300 hover:bg-stone-800' : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Directions
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
