@@ -94,6 +94,7 @@ export function AIAssistantPanel({
   const [collectingProfileData, setCollectingProfileData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [collectedData, setCollectedData] = useState<any>({});
+  const [lastResponseId, setLastResponseId] = useState<string | undefined>(undefined);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -116,6 +117,7 @@ export function AIAssistantPanel({
     setCollectingProfileData(false);
     setCurrentFieldIndex(0);
     setCollectedData({});
+    setLastResponseId(undefined);
   }, [currentPage]);
 
   useEffect(() => {
@@ -250,12 +252,6 @@ export function AIAssistantPanel({
       return;
     }
 
-    const formFillingMatch = userMessage.match(/fill\s*(out)?.*form|help.*with.*form|auto.*fill|complete.*form/i);
-    if (formFillingMatch) {
-      await handleFormFillingRequest();
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -263,8 +259,10 @@ export function AIAssistantPanel({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
+        previousResponseId: lastResponseId,
       });
 
+      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -313,8 +311,10 @@ export function AIAssistantPanel({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
+        previousResponseId: lastResponseId,
       });
 
+      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -929,7 +929,7 @@ export function AIAssistantPanel({
     if (currentPage === 'medical-profile') {
       return [
         { icon: LinkIcon, label: 'Import Records', action: handleStartImport },
-        { icon: ClipboardCheck, label: 'Fill Form', action: handleFormFillingRequest },
+        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
         { icon: Stethoscope, label: 'Add Condition', action: onAddCondition },
         { icon: Pill, label: 'Add Medication', action: onAddMedication },
         { icon: AlertTriangle, label: 'Add Allergy', action: onAddAllergy }
@@ -940,7 +940,7 @@ export function AIAssistantPanel({
       return [
         { icon: Pill, label: 'Refill Medication', prompt: 'I need to refill my medication' },
         { icon: Calendar, label: 'Schedule Appointment', prompt: 'I want to schedule an appointment' },
-        { icon: ClipboardCheck, label: 'Fill Form', action: handleFormFillingRequest },
+        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
         { icon: FileText, label: 'Care Summary', prompt: 'Give me a summary of my recent care activities' }
       ];
     }
@@ -948,7 +948,7 @@ export function AIAssistantPanel({
     if (currentPage === 'insurance') {
       return [
         { icon: ShieldCheck, label: 'Add Coverage', action: handleStartInsuranceFlow },
-        { icon: ClipboardCheck, label: 'Fill Form', action: handleFormFillingRequest },
+        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
         { icon: FileText, label: 'View Benefits', prompt: 'What benefits does my insurance cover?' },
         { icon: Building2, label: 'Find Providers', prompt: 'Help me find in-network providers' }
       ];
@@ -958,7 +958,7 @@ export function AIAssistantPanel({
       return [
         { icon: Users, label: 'Add Provider', action: onAddProvider },
         { icon: Building2, label: 'Add Pharmacy', action: onAddPharmacy },
-        { icon: ClipboardCheck, label: 'Fill Form', action: handleFormFillingRequest },
+        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
         { icon: Search, label: 'Find Specialist', action: onFindSpecialist }
       ];
     }
@@ -973,7 +973,7 @@ export function AIAssistantPanel({
     }
 
     return [
-      { icon: ClipboardCheck, label: 'Fill Form', action: handleFormFillingRequest },
+      { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
       { icon: FileText, label: 'Show my forms', prompt: 'What forms do I need to complete?' },
       { icon: Calendar, label: 'Check appointments', prompt: 'When is my next appointment?' },
       { icon: Pill, label: 'View medications', prompt: 'What medications am I taking?' }

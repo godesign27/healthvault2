@@ -10,11 +10,11 @@ const MAX_TOOL_ROUNDS = 5;
 export async function POST(req: Request): Promise<Response> {
   try {
     const body = await req.json();
-    const { userId, currentPage, userMessage, context } = body;
+    const { userId, currentPage, userMessage, context, previousResponseId } = body;
 
     const systemPrompt = buildSystemPrompt(currentPage);
 
-    let response = await openai.responses.create({
+    const createParams: Record<string, unknown> = {
       model: "gpt-4.1-mini",
       instructions: systemPrompt,
       input: `${userMessage}\n\nContext:\n${JSON.stringify({
@@ -23,7 +23,13 @@ export async function POST(req: Request): Promise<Response> {
         context,
       })}`,
       tools: assistantToolDefinitions,
-    });
+    };
+
+    if (previousResponseId) {
+      createParams.previous_response_id = previousResponseId;
+    }
+
+    let response = await openai.responses.create(createParams as any);
 
     const toolsUsed: string[] = [];
     let lastToolResult: unknown = null;
@@ -86,6 +92,7 @@ export async function POST(req: Request): Promise<Response> {
       message: response.output_text,
       toolUsed: toolsUsed.length === 1 ? toolsUsed[0] : toolsUsed,
       toolResult: lastToolResult,
+      responseId: response.id,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";

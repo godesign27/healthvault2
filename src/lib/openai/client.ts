@@ -60,7 +60,8 @@ export async function sendAssistantMessage(params: {
   message: string;
   page?: string;
   pageContext?: Record<string, unknown>;
-}): Promise<ChatResponse> {
+  previousResponseId?: string;
+}): Promise<ChatResponse & { responseId?: string }> {
   const { data: { user } } = await supabase.auth.getUser();
 
   const request = new Request('', {
@@ -70,6 +71,7 @@ export async function sendAssistantMessage(params: {
       currentPage: params.page,
       userMessage: params.message,
       context: params.pageContext,
+      previousResponseId: params.previousResponseId,
     }),
   });
 
@@ -83,5 +85,6 @@ export async function sendAssistantMessage(params: {
   return {
     message: data.message || '',
     error: data.error,
+    responseId: data.responseId,
   };
 }
