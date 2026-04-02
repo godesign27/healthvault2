@@ -440,26 +440,43 @@ export async function saveUserAddress(
   userId = DEMO_USER_ID,
   input: UserAddressInput
 ): Promise<UserAddress> {
+  const payload = {
+    user_id: userId,
+    address_type: input.addressType,
+    label: input.label || ADDRESS_LABELS[input.addressType],
+    address_line1: input.addressLine1,
+    address_line2: input.addressLine2 || null,
+    city: input.city,
+    state: input.state || null,
+    postal_code: input.postalCode || null,
+    country: input.country || 'US',
+    is_active: input.isActive ?? false,
+  };
+
+  const { data: existing } = await supabase
+    .from('user_addresses')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('address_type', input.addressType)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('user_addresses')
+      .update(payload)
+      .eq('id', existing.id)
+      .eq('user_id', userId)
+      .select()
+      .single();
+    if (error) throw error;
+    return mapAddressRow(data);
+  }
+
   const { data, error } = await supabase
     .from('user_addresses')
-    .upsert(
-      {
-        user_id: userId,
-        address_type: input.addressType,
-        label: input.label || ADDRESS_LABELS[input.addressType],
-        address_line1: input.addressLine1,
-        address_line2: input.addressLine2 || null,
-        city: input.city,
-        state: input.state || null,
-        postal_code: input.postalCode || null,
-        country: input.country || 'US',
-        is_active: input.isActive ?? false,
-      },
-      { onConflict: 'user_id,address_type' }
-    )
+    .insert(payload)
     .select()
     .single();
-
   if (error) throw error;
   return mapAddressRow(data);
 }
