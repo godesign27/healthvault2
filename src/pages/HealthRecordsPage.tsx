@@ -86,8 +86,8 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
     try {
       const data = await fetchRecordRequests();
       setRequests(data);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('Failed to load record requests:', err);
     }
   };
 

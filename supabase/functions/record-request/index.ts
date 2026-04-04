@@ -145,6 +145,8 @@ async function handleCreateRequest(
         }),
       });
 
+      const fromAddress = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -152,16 +154,18 @@ async function handleCreateRequest(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Health Vault <team@healthvault27.com>",
+          from: `Health Vault <${fromAddress}>`,
           to: [providerEmail],
           subject: `${patientName || "A patient"} is requesting health records via Health Vault`,
           html: emailHtml,
         }),
       });
 
+      const responseText = await emailResponse.text();
+      console.log("Resend response:", emailResponse.status, responseText);
+
       if (!emailResponse.ok) {
-        const text = await emailResponse.text();
-        emailError = `Email send failed: ${emailResponse.status} ${text}`;
+        emailError = `Email send failed: ${emailResponse.status} ${responseText}`;
         console.error(emailError);
       } else {
         emailSent = true;
