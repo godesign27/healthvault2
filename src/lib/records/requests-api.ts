@@ -1,5 +1,3 @@
-import { supabase } from '../supabase';
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -75,12 +73,20 @@ export async function createRecordRequest(
 }
 
 export async function fetchRecordRequests(): Promise<RecordRequestRow[]> {
-  const { data, error } = await supabase
-    .from('health_record_requests')
-    .select('*')
-    .eq('user_id', DEMO_USER_ID)
-    .order('created_at', { ascending: false });
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/health_record_requests?user_id=eq.${DEMO_USER_ID}&order=created_at.desc&select=*`,
+    {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    }
+  );
 
-  if (error) throw error;
-  return data || [];
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch requests: ${res.status} ${text}`);
+  }
+
+  return res.json();
 }

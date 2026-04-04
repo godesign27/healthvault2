@@ -54,6 +54,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
   const [manualMessage, setManualMessage] = useState('');
   const [manualRecordTypes, setManualRecordTypes] = useState<RecordKind[]>([]);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const [submitError, setSubmitError] = useState('');
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +103,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
         dateRangeEnd: dateTo || undefined,
       });
       setEmailSent(result.emailSent);
+      setEmailError(result.emailError || '');
       setStep('submitted');
       onRequestSent?.();
     } catch (err: any) {
@@ -123,6 +125,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
         message: manualMessage || undefined,
       });
       setEmailSent(result.emailSent);
+      setEmailError(result.emailError || '');
       setSelectedProvider({ id: 'manual', name: manualDoctorName || manualProviderName, specialty: '', clinic: manualProviderName, address: '' });
       setSelectedTypes(manualRecordTypes);
       setStep('submitted');
@@ -154,6 +157,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     setManualMessage('');
     setManualRecordTypes([]);
     setEmailSent(false);
+    setEmailError('');
     setSubmitError('');
   };
 
@@ -290,6 +294,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 selectedTypes={selectedTypes}
                 urgency={urgency}
                 emailSent={emailSent}
+                emailError={emailError}
                 onClose={handleClose}
               />
             )}
@@ -830,27 +835,37 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
   );
 }
 
-function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, emailSent, onClose }: {
+function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, emailSent, emailError, onClose }: {
   darkMode: boolean;
   selectedProvider: ProviderOption | null;
   selectedTypes: RecordKind[];
   urgency: 'routine' | 'urgent';
   emailSent: boolean;
+  emailError?: string;
   onClose: () => void;
 }) {
   return (
     <div className="p-6 flex flex-col items-center justify-center min-h-[400px] text-center">
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 ${
-        darkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'
+        emailSent
+          ? darkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'
+          : darkMode ? 'bg-amber-900/30' : 'bg-amber-100'
       }`}>
-        <CheckCircle className={`w-8 h-8 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+        {emailSent ? (
+          <CheckCircle className={`w-8 h-8 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+        ) : (
+          <AlertCircle className={`w-8 h-8 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+        )}
       </div>
       <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-        Request Sent
+        {emailSent ? 'Request Sent' : 'Request Saved'}
       </h3>
       <p className={`text-sm max-w-xs mb-2 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-        Your request has been sent to <span className="font-medium">{selectedProvider?.name}</span>.
-        You'll be notified when records are available.
+        {emailSent ? (
+          <>Your request has been sent to <span className="font-medium">{selectedProvider?.name}</span>. You'll be notified when records are available.</>
+        ) : (
+          <>Your request has been saved but the email could not be delivered.</>
+        )}
       </p>
       {emailSent ? (
         <p className={`text-xs mb-6 flex items-center gap-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
@@ -858,10 +873,17 @@ function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, ema
           Email delivered to provider
         </p>
       ) : (
-        <p className={`text-xs mb-6 flex items-center gap-1 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
-          <AlertCircle className="w-3.5 h-3.5" />
-          Request logged (email delivery pending)
-        </p>
+        <div className="mb-6">
+          <p className={`text-xs flex items-center justify-center gap-1 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+            <AlertCircle className="w-3.5 h-3.5" />
+            Email delivery failed
+          </p>
+          {emailError && (
+            <p className={`text-[11px] mt-2 max-w-xs break-all ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+              {emailError}
+            </p>
+          )}
+        </div>
       )}
       <div className={`w-full max-w-sm p-4 rounded-xl text-left ${
         darkMode ? 'bg-stone-800' : 'bg-stone-50'
