@@ -53,21 +53,45 @@ import ProviderAdminPage from './pages/ProviderAdminPage';
 import { supabase } from './lib/supabase';
 import { parseSubdomain } from './lib/subdomain';
 
+type AppView = 'design-system' | 'projects' | 'health-vault' | 'marketing' | 'login' | 'onboarding';
+
+const SESSION_VIEW_KEY = 'hv-current-view';
+const SESSION_DEMO_KEY = 'hv-demo-mode';
+
+function getSavedView(): AppView {
+  try {
+    const saved = sessionStorage.getItem(SESSION_VIEW_KEY) as AppView | null;
+    if (saved && ['design-system', 'projects', 'health-vault', 'marketing', 'login', 'onboarding'].includes(saved)) {
+      return saved;
+    }
+  } catch {}
+  return 'marketing';
+}
+
 function App() {
-  const [currentView, setCurrentView] = useState<'design-system' | 'projects' | 'health-vault' | 'marketing' | 'login' | 'onboarding'>('marketing');
+  const [currentView, setCurrentView] = useState<AppView>(getSavedView);
   const [currentPage, setCurrentPage] = useState<string>('accordions');
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete'>('start');
   const [onboardingEmail, setOnboardingEmail] = useState<string>('');
-  const [authState, setAuthState] = useState({
-    isAuthenticated: false,
-    authChecked: false,
-    onboardingComplete: false,
-    onboardingChecked: false
+  const [authState, setAuthState] = useState(() => {
+    const demoMode = sessionStorage.getItem(SESSION_DEMO_KEY) === 'true';
+    return {
+      isAuthenticated: false,
+      authChecked: false,
+      onboardingComplete: demoMode,
+      onboardingChecked: false
+    };
   });
 
   const initializingRef = useRef(false);
   const authSubscriptionRef = useRef<any>(null);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SESSION_VIEW_KEY, currentView);
+    } catch {}
+  }, [currentView]);
 
   useEffect(() => {
     if (initializingRef.current) return;
@@ -181,7 +205,7 @@ function App() {
   };
 
   const handleDirectHealthVaultAccess = () => {
-    // Mark onboarding as complete for demo purposes
+    try { sessionStorage.setItem(SESSION_DEMO_KEY, 'true'); } catch {}
     setAuthState(prev => ({
       ...prev,
       onboardingComplete: true
