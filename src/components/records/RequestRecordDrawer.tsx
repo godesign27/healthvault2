@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail } from 'lucide-react';
+import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle } from 'lucide-react';
 import { RecordKind } from '../../lib/records/types';
+import { createRecordRequest } from '../../lib/records/requests-api';
 
 interface RequestRecordDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onRequestSent?: () => void;
   darkMode?: boolean;
 }
 
@@ -35,7 +37,7 @@ const RECORD_TYPES = [
   { kind: RecordKind.Other, label: 'Other Records', icon: FileText, description: 'Discharge summaries, visit notes, other' },
 ];
 
-export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: RequestRecordDrawerProps) {
+export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode = false }: RequestRecordDrawerProps) {
   const [step, setStep] = useState<'provider' | 'details' | 'manual' | 'submitted'>('provider');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProvider, setSelectedProvider] = useState<ProviderOption | null>(null);
@@ -51,6 +53,8 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
   const [manualEmail, setManualEmail] = useState('');
   const [manualMessage, setManualMessage] = useState('');
   const [manualRecordTypes, setManualRecordTypes] = useState<RecordKind[]>([]);
+  const [emailSent, setEmailSent] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,19 +87,51 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
   };
 
   const handleSubmit = async () => {
+    if (!selectedProvider) return;
     setSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSubmitting(false);
-    setStep('submitted');
+    setSubmitError('');
+    try {
+      const result = await createRecordRequest({
+        providerName: selectedProvider.clinic || selectedProvider.name,
+        providerEmail: `records@${selectedProvider.clinic.toLowerCase().replace(/\s+/g, '')}.com`,
+        doctorName: selectedProvider.name,
+        recordTypes: selectedTypes,
+        urgency,
+        notes,
+        dateRangeStart: dateFrom || undefined,
+        dateRangeEnd: dateTo || undefined,
+      });
+      setEmailSent(result.emailSent);
+      setStep('submitted');
+      onRequestSent?.();
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to send request');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleManualSubmit = async () => {
     setSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSubmitting(false);
-    setSelectedProvider({ id: 'manual', name: manualDoctorName || manualProviderName, specialty: '', clinic: manualProviderName, address: '' });
-    setSelectedTypes(manualRecordTypes);
-    setStep('submitted');
+    setSubmitError('');
+    try {
+      const result = await createRecordRequest({
+        providerName: manualProviderName,
+        providerEmail: manualEmail,
+        doctorName: manualDoctorName || undefined,
+        recordTypes: manualRecordTypes,
+        message: manualMessage || undefined,
+      });
+      setEmailSent(result.emailSent);
+      setSelectedProvider({ id: 'manual', name: manualDoctorName || manualProviderName, specialty: '', clinic: manualProviderName, address: '' });
+      setSelectedTypes(manualRecordTypes);
+      setStep('submitted');
+      onRequestSent?.();
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to send request');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -117,6 +153,8 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
     setManualEmail('');
     setManualMessage('');
     setManualRecordTypes([]);
+    setEmailSent(false);
+    setSubmitError('');
   };
 
   const canSubmit = selectedProvider && selectedTypes.length > 0;
@@ -251,6 +289,7 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
                 selectedProvider={selectedProvider}
                 selectedTypes={selectedTypes}
                 urgency={urgency}
+                emailSent={emailSent}
                 onClose={handleClose}
               />
             )}
@@ -260,6 +299,14 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
             <div className={`px-6 py-4 border-t ${
               darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'
             }`}>
+              {submitError && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
+                  darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {submitError}
+                </div>
+              )}
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep('provider')}
@@ -294,6 +341,14 @@ export function RequestRecordDrawer({ isOpen, onClose, darkMode = false }: Reque
             <div className={`px-6 py-4 border-t ${
               darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'
             }`}>
+              {submitError && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
+                  darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {submitError}
+                </div>
+              )}
               <button
                 onClick={handleManualSubmit}
                 disabled={!canSubmitManual || submitting}
@@ -775,27 +830,39 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
   );
 }
 
-function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, onClose }: {
+function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, emailSent, onClose }: {
   darkMode: boolean;
   selectedProvider: ProviderOption | null;
   selectedTypes: RecordKind[];
   urgency: 'routine' | 'urgent';
+  emailSent: boolean;
   onClose: () => void;
 }) {
   return (
     <div className="p-6 flex flex-col items-center justify-center min-h-[400px] text-center">
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 ${
-        darkMode ? 'bg-purple-900/30' : 'bg-purple-100'
+        darkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'
       }`}>
-        <CheckCircle className={`w-8 h-8 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+        <CheckCircle className={`w-8 h-8 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
       </div>
       <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-        Request Submitted
+        Request Sent
       </h3>
-      <p className={`text-sm max-w-xs mb-6 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+      <p className={`text-sm max-w-xs mb-2 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
         Your request has been sent to <span className="font-medium">{selectedProvider?.name}</span>.
         You'll be notified when records are available.
       </p>
+      {emailSent ? (
+        <p className={`text-xs mb-6 flex items-center gap-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+          <Mail className="w-3.5 h-3.5" />
+          Email delivered to provider
+        </p>
+      ) : (
+        <p className={`text-xs mb-6 flex items-center gap-1 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+          <AlertCircle className="w-3.5 h-3.5" />
+          Request logged (email delivery pending)
+        </p>
+      )}
       <div className={`w-full max-w-sm p-4 rounded-xl text-left ${
         darkMode ? 'bg-stone-800' : 'bg-stone-50'
       }`}>
