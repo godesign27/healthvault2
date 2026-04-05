@@ -350,18 +350,43 @@ async function handleSubmitRecords(
     OTHER: "other",
   };
 
+  const kindToTitle: Record<string, string> = {
+    LAB: "Lab Results",
+    IMAGING: "Imaging & Scans",
+    PATHOLOGY: "Pathology Report",
+    SPECIALIST_REPORT: "Specialist Report",
+    OTHER: "Health Record",
+    lab: "Lab Results",
+    imaging: "Imaging & Scans",
+    pathology: "Pathology Report",
+    specialist_report: "Specialist Report",
+    other: "Health Record",
+  };
+
+  const requestedKind =
+    request.record_types && request.record_types.length > 0
+      ? request.record_types[0]
+      : null;
+
   for (const file of fileRecords) {
+    const resolvedKind = kindToRecordKind[file.record_kind] || file.record_kind;
+    const title =
+      kindToTitle[file.record_kind] ||
+      (requestedKind ? kindToTitle[requestedKind] : null) ||
+      "Health Record";
+
     await supabase.from("health_records").insert({
       user_id: request.user_id,
-      kind: kindToRecordKind[file.record_kind] || file.record_kind,
-      title: file.file_name.replace(/\.[^/.]+$/, ""),
+      kind: resolvedKind,
+      title,
       provider_name: request.doctor_name || request.provider_name,
       source: "shared",
       file_type: file.file_type,
       file_size_bytes: file.file_size_bytes,
       ai_summary: file.provider_notes || null,
-      tags: [`from-request:${requestId}`],
+      tags: [resolvedKind, "requested"],
       received_at: new Date().toISOString(),
+      service_date: new Date().toISOString().split("T")[0],
     });
   }
 
