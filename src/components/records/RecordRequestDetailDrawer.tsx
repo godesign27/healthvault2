@@ -153,7 +153,6 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
       );
       if (res.ok) {
         onDelete(displayReq.id);
-        onClose();
       }
     } catch (err) {
       console.error('Failed to delete request:', err);
