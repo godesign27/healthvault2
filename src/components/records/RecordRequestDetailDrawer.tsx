@@ -21,6 +21,7 @@ interface RecordRequestDetailDrawerProps {
   darkMode?: boolean;
   onClose: () => void;
   onDelete?: (requestId: string) => void;
+  onRequestUpdated?: (updated: RecordRequestRow) => void;
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -51,12 +52,13 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, onDelete }: RecordRequestDetailDrawerProps) {
+export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, onDelete, onRequestUpdated }: RecordRequestDetailDrawerProps) {
   const [files, setFiles] = useState<RecordRequestFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [liveRequest, setLiveRequest] = useState<RecordRequestRow | null>(null);
   const isOpen = !!request;
 
   useEffect(() => {
@@ -70,11 +72,37 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
   useEffect(() => {
     if (request?.id) {
+      setLiveRequest(request);
+      refreshRequest(request.id);
       loadFiles(request.id);
     } else {
       setFiles([]);
+      setLiveRequest(null);
     }
   }, [request?.id]);
+
+  const refreshRequest = async (requestId: string) => {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${requestId}&select=*`,
+        {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length > 0) {
+          setLiveRequest(rows[0]);
+          if (onRequestUpdated) {
+            onRequestUpdated(rows[0]);
+          }
+        }
+      }
+    } catch {}
+  };
 
   const loadFiles = async (requestId: string) => {
     setLoadingFiles(true);
@@ -100,8 +128,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
   };
 
   const handleCopyLink = async () => {
-    if (!request) return;
-    const link = `${window.location.origin}/record-request/${request.id}`;
+    if (!displayReq) return;
+    const link = `${window.location.origin}/record-request/${displayReq.id}`;
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
@@ -110,11 +138,11 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
   };
 
   const handleDelete = async () => {
-    if (!request || !onDelete) return;
+    if (!displayReq || !onDelete) return;
     setDeleting(true);
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${request.id}`,
+        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${displayReq.id}`,
         {
           method: 'DELETE',
           headers: {
@@ -124,7 +152,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
         }
       );
       if (res.ok) {
-        onDelete(request.id);
+        onDelete(displayReq.id);
         onClose();
       }
     } catch (err) {
@@ -135,13 +163,14 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
     }
   };
 
-  if (!request) return null;
+  const displayReq = liveRequest || request;
+  if (!displayReq) return null;
 
   const timeline = [
-    { label: 'Request Created', time: request.created_at, icon: FileText, done: true },
-    { label: 'Email Sent', time: request.status !== 'pending' ? request.created_at : null, icon: Send, done: request.status !== 'pending' },
-    { label: 'Opened by Provider', time: request.opened_at, icon: Eye, done: !!request.opened_at },
-    { label: 'Records Submitted', time: request.submitted_at, icon: CheckCircle, done: request.status === 'received' },
+    { label: 'Request Created', time: displayReq.created_at, icon: FileText, done: true },
+    { label: 'Email Sent', time: displayReq.status !== 'pending' ? displayReq.created_at : null, icon: Send, done: displayReq.status !== 'pending' },
+    { label: 'Opened by Provider', time: displayReq.opened_at, icon: Eye, done: !!displayReq.opened_at },
+    { label: 'Records Submitted', time: displayReq.submitted_at, icon: CheckCircle, done: displayReq.status === 'received' },
   ];
 
   return (
@@ -159,9 +188,9 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
         }`}>
           <div className="flex items-center gap-3 min-w-0">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              request.status === 'received'
+              displayReq.status === 'received'
                 ? 'bg-emerald-100 text-emerald-600'
-                : request.status === 'sent'
+                : displayReq.status === 'sent'
                   ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
                   : darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
             }`}>
@@ -169,11 +198,11 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
             </div>
             <div className="min-w-0">
               <h2 className={`text-lg font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-                {request.doctor_name || request.provider_name}
+                {displayReq.doctor_name || displayReq.provider_name}
               </h2>
-              {request.doctor_name && (
+              {displayReq.doctor_name && (
                 <p className={`text-sm truncate ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-                  {request.provider_name}
+                  {displayReq.provider_name}
                 </p>
               )}
             </div>
@@ -190,16 +219,16 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
-            <StatusSection request={request} darkMode={darkMode} />
-            <RecordTypesSection request={request} darkMode={darkMode} />
-            {request.message && <MessageSection message={request.message} darkMode={darkMode} />}
+            <StatusSection request={displayReq} darkMode={darkMode} />
+            <RecordTypesSection request={displayReq} darkMode={darkMode} />
+            {displayReq.message && <MessageSection message={displayReq.message} darkMode={darkMode} />}
             <TimelineSection timeline={timeline} darkMode={darkMode} />
 
             {(files.length > 0 || loadingFiles) && (
               <SubmittedFilesSection files={files} loading={loadingFiles} darkMode={darkMode} />
             )}
 
-            <DetailsSection request={request} darkMode={darkMode} />
+            <DetailsSection request={displayReq} darkMode={darkMode} />
           </div>
         </div>
 
@@ -229,7 +258,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
             </button>
             <button
               onClick={() => {
-                const link = `${window.location.origin}/record-request/${request.id}`;
+                const link = `${window.location.origin}/record-request/${displayReq.id}`;
                 window.open(link, '_blank');
               }}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${

@@ -1,5 +1,6 @@
-import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
 import { MedicalIDCard } from '../components/MedicalIDCard';
 import { HealthStatsCard } from '../components/HealthStatsCard';
 import { RecentActivityItem } from '../components/RecentActivityItem';
@@ -60,6 +61,14 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   }>({});
 
   const [providerConnectionRequested, setProviderConnectionRequested] = useState(false);
+  const [receivedRequests, setReceivedRequests] = useState<RecordRequestRow[]>([]);
+  const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetchRecordRequests()
+      .then(data => setReceivedRequests(data.filter(r => r.status === 'received')))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -157,6 +166,50 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             Welcome back, Timothy! Here's your health overview.
           </p>
         </div>
+
+        {receivedRequests.filter(r => !dismissedDashboardBanners.has(r.id)).map(req => (
+          <div
+            key={req.id}
+            className={`mb-4 flex items-center gap-4 p-4 rounded-xl border transition-all ${
+              darkMode
+                ? 'bg-emerald-950/20 border-emerald-800/50'
+                : 'bg-emerald-50 border-emerald-200'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+              darkMode ? 'bg-emerald-900/40' : 'bg-emerald-100'
+            }`}>
+              <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
+                Records received from {req.doctor_name || req.provider_name}
+              </p>
+              <p className={`text-xs mt-0.5 ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
+                Your requested health records are now available.
+              </p>
+            </div>
+            <button
+              onClick={() => { setCurrentPage('health-records'); setDismissedDashboardBanners(prev => new Set(prev).add(req.id)); }}
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                darkMode
+                  ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60'
+                  : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+              }`}
+            >
+              View Records
+              <ArrowRight className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => setDismissedDashboardBanners(prev => new Set(prev).add(req.id))}
+              className={`shrink-0 p-1.5 rounded-lg transition-colors ${
+                darkMode ? 'text-emerald-500 hover:bg-emerald-900/40' : 'text-emerald-400 hover:bg-emerald-100'
+              }`}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:gap-6">

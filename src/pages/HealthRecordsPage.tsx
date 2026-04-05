@@ -1,5 +1,5 @@
-import { useState, useEffect, type MutableRefObject } from 'react';
-import { Database, Upload, Link2, FileText, SendHorizontal as SendHorizonal, Clock, CheckCircle, AlertCircle, Mail, Eye, Building2 } from 'lucide-react';
+import { useState, useEffect, useCallback, type MutableRefObject } from 'react';
+import { Database, Upload, Link2, FileText, SendHorizontal as SendHorizonal, Clock, CheckCircle, AlertCircle, Mail, Eye, Building2, ArrowRight, X } from 'lucide-react';
 import { RecordList } from '../components/records/RecordList';
 import { DocumentViewer } from '../components/records/DocumentViewer';
 import { RequestRecordDrawer } from '../components/records/RequestRecordDrawer';
@@ -84,21 +84,30 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
     }
   };
 
-  const loadRequests = async () => {
+  const loadRequests = useCallback(async () => {
     try {
       const data = await fetchRecordRequests();
       setRequests(data);
     } catch (err) {
       console.error('Failed to load record requests:', err);
     }
-  };
+  }, []);
+
+  const handleRequestUpdated = useCallback((updated: RecordRequestRow) => {
+    setRequests(prev => prev.map(r => r.id === updated.id ? updated : r));
+    if (updated.status === 'received') {
+      loadRecords();
+    }
+  }, []);
 
   const handleShowInsight = (insight: any) => {
     setInsights(prev => [insight, ...prev]);
   };
 
   const activeRequests = requests.filter(r => r.status !== 'received');
+  const receivedRequests = requests.filter(r => r.status === 'received');
   const pendingCount = activeRequests.length;
+  const [dismissedReceived, setDismissedReceived] = useState<Set<string>>(new Set());
 
   const filters = [
     { label: 'All', value: 'all' as const },
@@ -165,9 +174,18 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
         </div>
       </div>
 
-      {requests.length > 0 && (
+      {receivedRequests.filter(r => !dismissedReceived.has(r.id)).length > 0 && (
+        <ReceivedRecordsBanner
+          requests={receivedRequests.filter(r => !dismissedReceived.has(r.id))}
+          darkMode={darkMode}
+          onDismiss={(id) => setDismissedReceived(prev => new Set(prev).add(id))}
+          onViewRecord={(req) => setSelectedRequest(req)}
+        />
+      )}
+
+      {activeRequests.length > 0 && (
         <PendingRequestsSection
-          requests={requests}
+          requests={activeRequests}
           darkMode={darkMode}
           onRequestClick={setSelectedRequest}
         />
@@ -241,11 +259,16 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
       <RecordRequestDetailDrawer
         request={selectedRequest}
         darkMode={darkMode}
-        onClose={() => setSelectedRequest(null)}
+        onClose={() => {
+          setSelectedRequest(null);
+          loadRequests();
+          loadRecords();
+        }}
         onDelete={(deletedId) => {
           setRequests(prev => prev.filter(r => r.id !== deletedId));
           setSelectedRequest(null);
         }}
+        onRequestUpdated={handleRequestUpdated}
       />
     </div>
   );
@@ -295,21 +318,17 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
 }
 
 function PendingRequestsSection({ requests, darkMode, onRequestClick }: { requests: RecordRequestRow[]; darkMode: boolean; onRequestClick: (req: RecordRequestRow) => void }) {
-  const activeCount = requests.filter(r => r.status !== 'received').length;
-
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
         <h2 className={`text-sm font-semibold uppercase tracking-wider ${
           darkMode ? 'text-stone-400' : 'text-stone-500'
         }`}>
-          Record Requests
+          Pending Requests
         </h2>
-        {activeCount > 0 && (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-            {activeCount} active
-          </span>
-        )}
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+          {requests.length} active
+        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -376,6 +395,61 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ReceivedRecordsBanner({ requests, darkMode, onDismiss, onViewRecord }: {
+  requests: RecordRequestRow[];
+  darkMode: boolean;
+  onDismiss: (id: string) => void;
+  onViewRecord: (req: RecordRequestRow) => void;
+}) {
+  return (
+    <div className="mb-6 space-y-3">
+      {requests.map(req => (
+        <div
+          key={req.id}
+          className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
+            darkMode
+              ? 'bg-emerald-950/20 border-emerald-800/50'
+              : 'bg-emerald-50 border-emerald-200'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+            darkMode ? 'bg-emerald-900/40' : 'bg-emerald-100'
+          }`}>
+            <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-sm font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
+              Records received from {req.doctor_name || req.provider_name}
+            </p>
+            <p className={`text-xs mt-0.5 ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
+              {req.record_types?.map(t => KIND_LABELS[t] || t).join(', ')} -- now available in your records
+            </p>
+          </div>
+          <button
+            onClick={() => onViewRecord(req)}
+            className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              darkMode
+                ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60'
+                : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+            }`}
+          >
+            View
+            <ArrowRight className="w-3 h-3" />
+          </button>
+          <button
+            onClick={() => onDismiss(req.id)}
+            className={`shrink-0 p-1.5 rounded-lg transition-colors ${
+              darkMode ? 'text-emerald-500 hover:bg-emerald-900/40' : 'text-emerald-400 hover:bg-emerald-100'
+            }`}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
