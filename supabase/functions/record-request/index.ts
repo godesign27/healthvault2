@@ -176,13 +176,7 @@ async function handleCreateRequest(
         }),
       });
 
-      const rawFrom = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
-      let fromField: string;
-      if (rawFrom.includes("<") && rawFrom.includes(">")) {
-        fromField = rawFrom;
-      } else {
-        fromField = `Health Vault <${rawFrom}>`;
-      }
+      const fromField = "Health Vault <noreply@healthvault27.com>";
 
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
