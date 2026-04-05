@@ -3,6 +3,7 @@ import { Database, Upload, Link2, FileText, SendHorizontal as SendHorizonal, Clo
 import { RecordList } from '../components/records/RecordList';
 import { DocumentViewer } from '../components/records/DocumentViewer';
 import { RequestRecordDrawer } from '../components/records/RequestRecordDrawer';
+import { RecordRequestDetailDrawer } from '../components/records/RecordRequestDetailDrawer';
 import { HealthRecord, RecordKind } from '../lib/records/types';
 import { listRecords } from '../lib/records/query';
 import { AIResultCard } from '../components/records/AIResultCard';
@@ -41,6 +42,7 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestDrawerOpen, setRequestDrawerOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<RecordRequestRow | null>(null);
   const [requests, setRequests] = useState<RecordRequestRow[]>([]);
   const [stats, setStats] = useState({
     lastSynced: new Date().toLocaleDateString(),
@@ -167,6 +169,7 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
         <PendingRequestsSection
           requests={requests}
           darkMode={darkMode}
+          onRequestClick={setSelectedRequest}
         />
       )}
 
@@ -234,6 +237,12 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
         onRequestSent={loadRequests}
         darkMode={darkMode}
       />
+
+      <RecordRequestDetailDrawer
+        request={selectedRequest}
+        darkMode={darkMode}
+        onClose={() => setSelectedRequest(null)}
+      />
     </div>
   );
 }
@@ -281,7 +290,7 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
   }
 }
 
-function PendingRequestsSection({ requests, darkMode }: { requests: RecordRequestRow[]; darkMode: boolean }) {
+function PendingRequestsSection({ requests, darkMode, onRequestClick }: { requests: RecordRequestRow[]; darkMode: boolean; onRequestClick: (req: RecordRequestRow) => void }) {
   const activeCount = requests.filter(r => r.status !== 'received').length;
 
   return (
@@ -301,16 +310,17 @@ function PendingRequestsSection({ requests, darkMode }: { requests: RecordReques
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {requests.map(req => (
-          <div
+          <button
             key={req.id}
-            className={`rounded-xl border p-4 transition-colors ${
+            onClick={() => onRequestClick(req)}
+            className={`rounded-xl border p-4 transition-all text-left cursor-pointer ${
               req.status === 'received'
                 ? darkMode
-                  ? 'border-emerald-800/50 bg-emerald-950/10'
-                  : 'border-emerald-200 bg-emerald-50/30'
+                  ? 'border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
+                  : 'border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
                 : darkMode
-                  ? 'border-stone-700 bg-stone-900'
-                  : 'border-stone-200 bg-white'
+                  ? 'border-stone-700 bg-stone-900 hover:border-stone-600'
+                  : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
             }`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
@@ -359,7 +369,7 @@ function PendingRequestsSection({ requests, darkMode }: { requests: RecordReques
                 </span>
               )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
