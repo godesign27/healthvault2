@@ -279,6 +279,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 email={manualEmail}
                 message={manualMessage}
                 selectedTypes={manualRecordTypes}
+                urgency={urgency}
                 inputClasses={inputClasses}
                 labelClasses={labelClasses}
                 onSetProviderName={setManualProviderName}
@@ -286,6 +287,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 onSetEmail={setManualEmail}
                 onSetMessage={setManualMessage}
                 onToggleType={toggleManualRecordType}
+                onSetUrgency={setUrgency}
               />
             )}
 
@@ -524,13 +526,14 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
   );
 }
 
-function ManualEntryForm({ darkMode, providerName, doctorName, email, message, selectedTypes, inputClasses, labelClasses, onSetProviderName, onSetDoctorName, onSetEmail, onSetMessage, onToggleType }: {
+function ManualEntryForm({ darkMode, providerName, doctorName, email, message, selectedTypes, urgency, inputClasses, labelClasses, onSetProviderName, onSetDoctorName, onSetEmail, onSetMessage, onToggleType, onSetUrgency }: {
   darkMode: boolean;
   providerName: string;
   doctorName: string;
   email: string;
   message: string;
   selectedTypes: RecordKind[];
+  urgency: 'routine' | 'urgent';
   inputClasses: string;
   labelClasses: string;
   onSetProviderName: (v: string) => void;
@@ -538,6 +541,7 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
   onSetEmail: (v: string) => void;
   onSetMessage: (v: string) => void;
   onToggleType: (k: RecordKind) => void;
+  onSetUrgency: (v: 'routine' | 'urgent') => void;
 }) {
   return (
     <div className="p-6 space-y-5">
@@ -633,6 +637,60 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
               </button>
             );
           })}
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClasses}>Priority</label>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => onSetUrgency('routine')}
+            className={`p-3 rounded-xl border-2 text-center transition-all ${
+              urgency === 'routine'
+                ? darkMode
+                  ? 'border-purple-600 bg-purple-900/20'
+                  : 'border-purple-500 bg-purple-50'
+                : darkMode
+                  ? 'border-stone-800 hover:border-stone-600'
+                  : 'border-stone-100 hover:border-stone-300'
+            }`}
+          >
+            <Clock className={`w-5 h-5 mx-auto mb-1 ${
+              urgency === 'routine'
+                ? darkMode ? 'text-purple-400' : 'text-purple-600'
+                : darkMode ? 'text-stone-500' : 'text-stone-400'
+            }`} />
+            <div className={`text-sm font-medium ${
+              urgency === 'routine'
+                ? darkMode ? 'text-purple-300' : 'text-purple-800'
+                : darkMode ? 'text-stone-300' : 'text-stone-600'
+            }`}>Routine</div>
+            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>5-10 business days</div>
+          </button>
+          <button
+            onClick={() => onSetUrgency('urgent')}
+            className={`p-3 rounded-xl border-2 text-center transition-all ${
+              urgency === 'urgent'
+                ? darkMode
+                  ? 'border-amber-600 bg-amber-900/20'
+                  : 'border-amber-500 bg-amber-50'
+                : darkMode
+                  ? 'border-stone-800 hover:border-stone-600'
+                  : 'border-stone-100 hover:border-stone-300'
+            }`}
+          >
+            <Send className={`w-5 h-5 mx-auto mb-1 ${
+              urgency === 'urgent'
+                ? darkMode ? 'text-amber-400' : 'text-amber-600'
+                : darkMode ? 'text-stone-500' : 'text-stone-400'
+            }`} />
+            <div className={`text-sm font-medium ${
+              urgency === 'urgent'
+                ? darkMode ? 'text-amber-300' : 'text-amber-800'
+                : darkMode ? 'text-stone-300' : 'text-stone-600'
+            }`}>Urgent</div>
+            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>1-3 business days</div>
+          </button>
         </div>
       </div>
 
