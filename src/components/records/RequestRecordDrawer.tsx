@@ -233,8 +233,8 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto">
-            {step === 'provider' && (
+          {step === 'provider' && (
+            <div className="flex-1 overflow-hidden">
               <ProviderStep
                 darkMode={darkMode}
                 searchQuery={searchQuery}
@@ -247,8 +247,10 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 }}
                 onManualEntry={() => setStep('manual')}
               />
-            )}
+            </div>
+          )}
 
+          <div className={`flex-1 overflow-y-auto ${step === 'provider' ? 'hidden' : ''}`}>
             {step === 'details' && (
               <DetailsStep
                 darkMode={darkMode}
@@ -422,17 +424,18 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
   onManualEntry: () => void;
 }) {
   return (
-    <div className="p-6">
-      <div className="relative mb-4">
-        <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-          darkMode ? 'text-stone-500' : 'text-stone-400'
-        }`} />
-        <input
-          ref={searchInputRef}
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by provider name, specialty, or clinic..."
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-6 pb-0">
+        <div className="relative mb-4">
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
+            darkMode ? 'text-stone-500' : 'text-stone-400'
+          }`} />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by provider name, specialty, or clinic..."
           className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-colors ${
             darkMode
               ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500 focus:border-purple-500'
@@ -484,21 +487,23 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
         )}
       </div>
 
-      <div className={`mt-6 pt-6 border-t ${darkMode ? 'border-stone-800' : 'border-stone-100'}`}>
+      </div>
+
+      <div className={`shrink-0 px-6 py-4 border-t ${darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-100 bg-white'}`}>
         <button
           onClick={onManualEntry}
           className={`w-full p-4 rounded-xl border-2 border-dashed text-left transition-all group ${
             darkMode
-              ? 'border-stone-700 hover:border-purple-600 hover:bg-stone-800/60'
-              : 'border-stone-200 hover:border-purple-400 hover:bg-purple-50/30'
+              ? 'border-stone-700 hover:border-stone-500 hover:bg-stone-800/60'
+              : 'border-stone-200 hover:border-stone-400 hover:bg-stone-50'
           }`}
         >
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-              darkMode ? 'bg-stone-800 group-hover:bg-purple-900/30' : 'bg-stone-100 group-hover:bg-purple-100'
+              darkMode ? 'bg-stone-800 group-hover:bg-stone-700' : 'bg-stone-100 group-hover:bg-stone-200'
             } transition-colors`}>
               <PenLine className={`w-5 h-5 ${
-                darkMode ? 'text-stone-400 group-hover:text-purple-400' : 'text-stone-500 group-hover:text-purple-600'
+                darkMode ? 'text-stone-400' : 'text-stone-500'
               } transition-colors`} />
             </div>
             <div className="flex-1 min-w-0">
@@ -510,7 +515,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
               </div>
             </div>
             <ChevronRight className={`w-4 h-4 shrink-0 ${
-              darkMode ? 'text-stone-600 group-hover:text-purple-400' : 'text-stone-300 group-hover:text-purple-500'
+              darkMode ? 'text-stone-600' : 'text-stone-300'
             } transition-colors`} />
           </div>
         </button>
