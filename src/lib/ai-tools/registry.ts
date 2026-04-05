@@ -10,6 +10,8 @@ import {
   getHealthRecords, GetHealthRecordsInputZ,
   summarizeRecord, SummarizeRecordInputZ,
   requestHealthRecord, RequestHealthRecordInputZ,
+  getHealthRecordRequests, GetHealthRecordRequestsInputZ,
+  deleteHealthRecordRequest, DeleteHealthRecordRequestInputZ,
 } from './records';
 import {
   searchInsuranceProvider, SearchInsuranceProviderInputZ,
@@ -84,7 +86,8 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   },
   {
     name: 'getHealthRecords',
-    description: 'Returns health records for the current user. Supports filtering by category (lab, imaging, pathology, specialist_report, other), source, date range, and text search.',
+    description:
+      'Returns health records for the current user. Supports filtering by category (lab, imaging, pathology, specialist_report, other), source (use shared for provider-uploaded files from manual record requests), date range, and text search.',
     parameters: GetHealthRecordsInputZ,
     handler: (input, userId) => getHealthRecords(input as any, userId),
     requiresAuth: true,
@@ -99,10 +102,28 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     confirmationRequired: false,
   },
   {
+    name: 'getHealthRecordRequests',
+    description:
+      'Lists manual health record requests to providers (email + secure upload link). Filter by requestId or status. Omits secure tokens.',
+    parameters: GetHealthRecordRequestsInputZ,
+    handler: (input, userId) => getHealthRecordRequests(input as any, userId),
+    requiresAuth: true,
+    confirmationRequired: false,
+  },
+  {
     name: 'requestHealthRecord',
-    description: 'Submits a request to obtain health records from a provider. Requires confirmation. Creates a pending record request.',
+    description:
+      'Sends a manual record request: emails the provider a secure link to upload records. Requires provider email, provider name, and confirmation.',
     parameters: RequestHealthRecordInputZ,
     handler: (input, userId) => requestHealthRecord(input as any, userId),
+    requiresAuth: true,
+    confirmationRequired: true,
+  },
+  {
+    name: 'deleteHealthRecordRequest',
+    description: 'Deletes/cancels a manual health record request belonging to the user. Requires confirmation.',
+    parameters: DeleteHealthRecordRequestInputZ,
+    handler: (input, userId) => deleteHealthRecordRequest(input as any, userId),
     requiresAuth: true,
     confirmationRequired: true,
   },

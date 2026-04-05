@@ -61,9 +61,9 @@ User requests record import
 
 ### 4. manual_fallback
 - **Condition:** No digital connection path available
-- **Action:** Submit a `health_record_requests` entry via `requestHealthRecord` tool
+- **Action:** Call `requestHealthRecord` (invokes `record-request` edge function: email to provider with secure upload link). Use `getHealthRecordRequests` for status and `deleteHealthRecordRequest` to cancel.
 - **User experience:** Assistant helps compose and submit a records request
-- **Current state:** Fully functional
+- **Current state:** Email/portal flow backed by edge function; list/delete tools available
 
 ## Tables Involved
 

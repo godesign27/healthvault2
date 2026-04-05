@@ -440,7 +440,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       function: {
         name: 'getHealthRecords',
         description:
-          'Returns health records for the current user. Supports filtering by kind, source, date range, and text search.',
+          'Returns health records for the current user. Supports filtering by kind, source (use source=shared for records submitted by a provider via a manual record request), date range, and text search.',
         parameters: {
           type: 'object',
           properties: {
@@ -515,6 +515,125 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
           records,
           `Found ${records.length} health record${records.length !== 1 ? 's' : ''}.`
         );
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
+
+  getHealthRecordRequests: {
+    confirmationRequired: false,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'getHealthRecordRequests',
+        description:
+          'Lists the user\'s manual health record requests to providers (email + secure portal). Statuses: pending, sent, received, failed. Optional filters by requestId or status. Does not return secure tokens.',
+        parameters: {
+          type: 'object',
+          properties: {
+            requestId: {
+              type: 'string',
+              description: 'If set, returns only this request (must belong to the user).',
+            },
+            status: {
+              type: 'string',
+              enum: ['pending', 'sent', 'received', 'failed'],
+              description: 'Filter by request status.',
+            },
+            limit: {
+              type: 'number',
+              description: 'Max rows (1-50, default 20).',
+            },
+          },
+        },
+      },
+    },
+    execute: async (args, userId, sb) => {
+      try {
+        const limit = Math.min(Math.max(Number(args.limit) || 20, 1), 50);
+        let query = sb
+          .from('health_record_requests')
+          .select(
+            'id, provider_name, provider_id, provider_email, doctor_name, patient_name, record_types, date_range_start, date_range_end, status, notes, message, urgency, created_at, updated_at, opened_at, submitted_at, expires_at'
+          )
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+
+        if (args.requestId) {
+          query = query.eq('id', args.requestId);
+        }
+        if (args.status) {
+          query = query.eq('status', args.status);
+        }
+
+        const { data, error: dbErr } = await query;
+        if (dbErr) return error(`Database error: ${dbErr.message}`);
+
+        const rows = (data || []).map((r: any) => ({
+          id: r.id,
+          providerName: r.provider_name,
+          providerId: r.provider_id,
+          providerEmail: r.provider_email,
+          doctorName: r.doctor_name,
+          patientName: r.patient_name,
+          recordTypes: r.record_types || [],
+          dateRangeStart: r.date_range_start,
+          dateRangeEnd: r.date_range_end,
+          status: r.status,
+          notes: r.notes,
+          messagePreview: r.message
+            ? String(r.message).slice(0, 200)
+            : null,
+          urgency: r.urgency,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          openedAt: r.opened_at,
+          submittedAt: r.submitted_at,
+          expiresAt: r.expires_at,
+        }));
+
+        return success(
+          rows,
+          `Found ${rows.length} record request${rows.length !== 1 ? 's' : ''}.`
+        );
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
+
+  deleteHealthRecordRequest: {
+    confirmationRequired: true,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'deleteHealthRecordRequest',
+        description:
+          'Deletes/cancels a manual health record request owned by the user. Requires confirmation.',
+        parameters: {
+          type: 'object',
+          properties: {
+            requestId: { type: 'string', description: 'ID of the request to delete.' },
+            confirmed: { type: 'boolean', description: 'Must be true to delete.' },
+          },
+          required: ['requestId', 'confirmed'],
+        },
+      },
+    },
+    execute: async (args, userId, sb) => {
+      try {
+        if (!args.confirmed) {
+          return error('Deleting a record request requires confirmation.');
+        }
+        const { error: dbErr } = await sb
+          .from('health_record_requests')
+          .delete()
+          .eq('id', args.requestId)
+          .eq('user_id', userId);
+        if (dbErr) return error(`Database error: ${dbErr.message}`);
+        return success({ requestId: args.requestId, deleted: true }, 'Record request removed.');
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);
       }
@@ -898,43 +1017,91 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       type: 'function',
       function: {
         name: 'requestHealthRecord',
-        description: 'Submits a request to obtain health records from a provider. Requires confirmation.',
+        description:
+          'Creates a manual health record request: emails the provider a secure link to upload records (record-request edge function). Requires provider email, provider name, and confirmation.',
         parameters: {
           type: 'object',
           properties: {
-            providerName: { type: 'string', description: 'Name of the provider to request from.' },
-            providerId: { type: 'string', description: 'Optional provider ID.' },
-            recordTypes: { type: 'array', items: { type: 'string' }, description: 'Types of records to request.' },
+            providerName: { type: 'string', description: 'Name of the provider or facility.' },
+            providerEmail: {
+              type: 'string',
+              description: 'Provider email address (required to send the secure portal link).',
+            },
+            providerId: { type: 'string', description: 'Optional internal provider ID.' },
+            doctorName: { type: 'string', description: 'Optional specific doctor name.' },
+            patientName: { type: 'string', description: 'Patient name shown to the provider in the email.' },
+            recordTypes: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Types of records being requested.',
+            },
             dateRangeStart: { type: 'string', description: 'Start date (YYYY-MM-DD).' },
             dateRangeEnd: { type: 'string', description: 'End date (YYYY-MM-DD).' },
-            notes: { type: 'string', description: 'Optional notes for the request.' },
+            message: {
+              type: 'string',
+              description: 'Short message included in the email to the provider.',
+            },
+            notes: { type: 'string', description: 'Internal notes stored on the request.' },
+            urgency: {
+              type: 'string',
+              enum: ['routine', 'urgent', 'stat'],
+              description: 'Request urgency (default routine).',
+            },
             confirmed: { type: 'boolean', description: 'Must be true to submit.' },
           },
-          required: ['providerName', 'confirmed'],
+          required: ['providerName', 'providerEmail', 'confirmed'],
         },
       },
     },
-    execute: async (args, userId, sb) => {
+    execute: async (args, userId, _sb) => {
       try {
         if (!args.confirmed) return error('Record request requires confirmation.');
-        const { data, error: dbErr } = await sb
-          .from('health_record_requests')
-          .insert({
-            user_id: userId,
-            provider_name: args.providerName,
-            provider_id: args.providerId || null,
-            record_types: args.recordTypes || [],
-            date_range_start: args.dateRangeStart || null,
-            date_range_end: args.dateRangeEnd || null,
-            notes: args.notes || null,
-            status: 'pending',
-          })
-          .select('id, provider_name, status')
-          .single();
-        if (dbErr) return error(`Database error: ${dbErr.message}`);
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const res = await fetch(`${supabaseUrl}/functions/v1/record-request`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({
+            userId,
+            providerName: args.providerName,
+            providerEmail: args.providerEmail,
+            providerId: args.providerId || undefined,
+            doctorName: args.doctorName || undefined,
+            patientName: args.patientName || undefined,
+            recordTypes:
+              Array.isArray(args.recordTypes) && args.recordTypes.length > 0
+                ? args.recordTypes
+                : ['OTHER'],
+            dateRangeStart: args.dateRangeStart || undefined,
+            dateRangeEnd: args.dateRangeEnd || undefined,
+            message: args.message || undefined,
+            notes: args.notes || undefined,
+            urgency: args.urgency || 'routine',
+          }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          return error(
+            typeof body.error === 'string'
+              ? body.error
+              : `Record request failed (${res.status})`
+          );
+        }
         return success(
-          { requestId: data.id, providerName: data.provider_name, status: data.status },
-          `Record request submitted to ${data.provider_name}.`
+          {
+            requestId: body.id,
+            providerName: args.providerName,
+            status: body.status,
+            emailSent: body.emailSent,
+            emailError: body.emailError ?? null,
+            expiresAt: body.expiresAt ?? null,
+          },
+          body.emailSent
+            ? `Record request sent to ${args.providerName}; the provider received an email with a secure upload link.`
+            : `Record request created for ${args.providerName}. ${body.emailError ? `Email: ${body.emailError}` : ''}`
         );
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);
@@ -1226,7 +1393,8 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       type: 'function',
       function: {
         name: 'getCareTimeline',
-        description: 'Returns a chronological timeline of care events: records, form completions, and shares.',
+        description:
+          'Returns a chronological timeline of care events: health records, manual record requests to providers, form completions, and shares.',
         parameters: {
           type: 'object',
           properties: {
@@ -1238,14 +1406,29 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
     execute: async (args, userId, sb) => {
       try {
         const limit = Math.min(Math.max(Number(args.limit) || 20, 1), 50);
-        const [recRes, formRes, shareRes] = await Promise.all([
+        const [recRes, reqRes, formRes, shareRes] = await Promise.all([
           sb.from('health_records').select('id, title, service_date, kind, provider_name').eq('user_id', userId).order('service_date', { ascending: false, nullsFirst: false }).limit(limit),
+          sb.from('health_record_requests').select('id, provider_name, status, created_at, opened_at, submitted_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit),
           sb.from('form_responses').select('id, status, updated_at, form_templates!inner(title)').eq('patient_id', userId).order('updated_at', { ascending: false }).limit(limit),
           sb.from('share_events').select('id, sent_at, status, recipient').eq('patient_id', userId).order('sent_at', { ascending: false }).limit(limit),
         ]);
         const events: any[] = [];
         if (!recRes.error && recRes.data) {
           for (const r of recRes.data) events.push({ type: 'record', id: r.id, title: r.title, date: r.service_date || '', detail: r.provider_name ? `From ${r.provider_name}` : null });
+        }
+        if (!reqRes.error && reqRes.data) {
+          for (const q of reqRes.data as any[]) {
+            const detailParts = [`Status: ${q.status}`];
+            if (q.opened_at) detailParts.push('Provider opened link');
+            if (q.submitted_at) detailParts.push('Records submitted');
+            events.push({
+              type: 'record_request',
+              id: q.id,
+              title: `Record request to ${q.provider_name}`,
+              date: q.submitted_at || q.opened_at || q.created_at || '',
+              detail: detailParts.join('; '),
+            });
+          }
         }
         if (!formRes.error && formRes.data) {
           for (const f of formRes.data as any[]) events.push({ type: 'form', id: f.id, title: f.form_templates?.title || 'Medical Form', date: f.updated_at || '', detail: f.status === 'complete' ? 'Completed' : 'In progress' });
@@ -1268,26 +1451,43 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       type: 'function',
       function: {
         name: 'getCareOverview',
-        description: 'Returns a high-level summary: care team, medications, pending forms, records, conditions, allergies, immunizations.',
+        description:
+          'Returns a high-level summary: care team, medications, pending forms, records, manual record requests (sent/received), conditions, allergies, immunizations.',
         parameters: { type: 'object', properties: {} },
       },
     },
     execute: async (_args, userId, sb) => {
       try {
         const today = new Date().toISOString().split('T')[0];
-        const [ct, meds, forms, recs, conds, allerg, immun] = await Promise.all([
-          sb.from('care_team').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-          sb.from('medications').select('id, end_date').eq('user_id', userId),
-          sb.from('form_responses').select('id', { count: 'exact', head: true }).eq('patient_id', userId).eq('status', 'incomplete'),
-          sb.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-          sb.from('conditions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'Active'),
-          sb.from('allergies').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-          sb.from('immunizations').select('id, next_dose').eq('user_id', userId),
-        ]);
+        const [ct, meds, forms, recs, conds, allerg, immun, reqSent, reqReceived] =
+          await Promise.all([
+            sb.from('care_team').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+            sb.from('medications').select('id, end_date').eq('user_id', userId),
+            sb.from('form_responses').select('id', { count: 'exact', head: true }).eq('patient_id', userId).eq('status', 'incomplete'),
+            sb.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+            sb.from('conditions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'Active'),
+            sb.from('allergies').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+            sb.from('immunizations').select('id, next_dose').eq('user_id', userId),
+            sb.from('health_record_requests').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'sent'),
+            sb.from('health_record_requests').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'received'),
+          ]);
         const activeMeds = (meds.data || []).filter((m: any) => !m.end_date || m.end_date >= today).length;
         const upcoming = (immun.data || []).filter((i: any) => i.next_dose && i.next_dose >= today).length;
-        const overview = { careTeamCount: ct.count || 0, activeMedications: activeMeds, pendingForms: forms.count || 0, recentRecords: recs.count || 0, activeConditions: conds.count || 0, allergies: allerg.count || 0, upcomingImmunizations: upcoming };
-        return success(overview, `Overview: ${overview.activeConditions} conditions, ${overview.activeMedications} meds, ${overview.pendingForms} pending forms, ${overview.careTeamCount} care team.`);
+        const overview = {
+          careTeamCount: ct.count || 0,
+          activeMedications: activeMeds,
+          pendingForms: forms.count || 0,
+          recentRecords: recs.count || 0,
+          recordRequestsAwaitingProvider: reqSent.count || 0,
+          recordRequestsCompleted: reqReceived.count || 0,
+          activeConditions: conds.count || 0,
+          allergies: allerg.count || 0,
+          upcomingImmunizations: upcoming,
+        };
+        return success(
+          overview,
+          `Overview: ${overview.activeConditions} conditions, ${overview.activeMedications} meds, ${overview.pendingForms} pending forms, ${overview.recordRequestsAwaitingProvider} record requests in progress, ${overview.careTeamCount} care team.`
+        );
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);
       }

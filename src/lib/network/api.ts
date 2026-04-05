@@ -2,6 +2,12 @@ import { supabase } from '../supabase';
 
 const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
 
+async function resolveUserId(providedId?: string): Promise<string> {
+  if (providedId) return providedId;
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || DEMO_USER_ID;
+}
+
 export interface InsuranceDetail {
   id: string;
   insuranceProviderId: string | null;
@@ -423,12 +429,13 @@ function mapAddressRow(row: any): UserAddress {
 }
 
 export async function fetchUserAddresses(
-  userId = DEMO_USER_ID
+  userId?: string
 ): Promise<UserAddress[]> {
+  const effectiveId = await resolveUserId(userId);
   const { data, error } = await supabase
     .from('user_addresses')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', effectiveId)
     .order('is_active', { ascending: false })
     .order('address_type', { ascending: true });
 
@@ -437,44 +444,28 @@ export async function fetchUserAddresses(
 }
 
 export async function saveUserAddress(
-  userId = DEMO_USER_ID,
-  input: UserAddressInput
+  userId?: string,
+  input?: UserAddressInput
 ): Promise<UserAddress> {
-  const payload = {
-    user_id: userId,
-    address_type: input.addressType,
-    label: input.label || ADDRESS_LABELS[input.addressType],
-    address_line1: input.addressLine1,
-    address_line2: input.addressLine2 || null,
-    city: input.city,
-    state: input.state || null,
-    postal_code: input.postalCode || null,
-    country: input.country || 'US',
-    is_active: input.isActive ?? false,
-  };
-
-  const { data: existing } = await supabase
-    .from('user_addresses')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('address_type', input.addressType)
-    .maybeSingle();
-
-  if (existing) {
-    const { data, error } = await supabase
-      .from('user_addresses')
-      .update(payload)
-      .eq('id', existing.id)
-      .eq('user_id', userId)
-      .select()
-      .single();
-    if (error) throw error;
-    return mapAddressRow(data);
-  }
-
+  if (!input) throw new Error('Address input is required');
+  const effectiveId = await resolveUserId(userId);
   const { data, error } = await supabase
     .from('user_addresses')
-    .insert(payload)
+    .upsert(
+      {
+        user_id: effectiveId,
+        address_type: input.addressType,
+        label: input.label || ADDRESS_LABELS[input.addressType],
+        address_line1: input.addressLine1,
+        address_line2: input.addressLine2 || null,
+        city: input.city,
+        state: input.state || null,
+        postal_code: input.postalCode || null,
+        country: input.country || 'US',
+        is_active: input.isActive ?? false,
+      },
+      { onConflict: 'user_id,address_type' }
+    )
     .select()
     .single();
   if (error) throw error;
@@ -482,27 +473,31 @@ export async function saveUserAddress(
 }
 
 export async function setActiveAddress(
-  userId = DEMO_USER_ID,
-  addressId: string
+  userId?: string,
+  addressId?: string
 ): Promise<void> {
+  if (!addressId) throw new Error('Address ID is required');
+  const effectiveId = await resolveUserId(userId);
   const { error } = await supabase
     .from('user_addresses')
     .update({ is_active: true })
     .eq('id', addressId)
-    .eq('user_id', userId);
+    .eq('user_id', effectiveId);
 
   if (error) throw error;
 }
 
 export async function deleteUserAddress(
-  userId = DEMO_USER_ID,
-  addressId: string
+  userId?: string,
+  addressId?: string
 ): Promise<void> {
+  if (!addressId) throw new Error('Address ID is required');
+  const effectiveId = await resolveUserId(userId);
   const { error } = await supabase
     .from('user_addresses')
     .delete()
     .eq('id', addressId)
-    .eq('user_id', userId);
+    .eq('user_id', effectiveId);
 
   if (error) throw error;
 }

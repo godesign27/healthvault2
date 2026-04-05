@@ -36,8 +36,8 @@ The system resolves the best connection strategy in this priority order:
 
 ### Manual Fallback
 - The user submits a health record request to the provider.
-- Uses the existing `requestHealthRecord` tool and `health_record_requests` table.
-- No digital integration required.
+- Uses `requestHealthRecord` (calls `record-request` edge function: email + secure upload link), `getHealthRecordRequests`, and `deleteHealthRecordRequest`. Rows live in `health_record_requests` (and files in `record_request_files` when the provider uploads).
+- No FHIR OAuth required.
 
 ## Real vs Placeholder Integrations
 
@@ -50,7 +50,7 @@ The system resolves the best connection strategy in this priority order:
 | SMART on FHIR OAuth flow | **Placeholder** — no real credentials |
 | Epic OAuth flow | **Placeholder** — no real credentials |
 | FHIR resource fetching | **Placeholder** — uses scaffold preview data |
-| Manual records request | **Real** — uses existing `health_record_requests` |
+| Manual records request | **Real** — edge `record-request` + `health_record_requests` |
 
 ## Future: Epic / SMART on FHIR Implementation
 

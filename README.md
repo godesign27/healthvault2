@@ -22,7 +22,7 @@ Frontend (React)           Edge Function (Deno)           OpenAI
   |                              |                          |
   |--- ChatRequest ------------>|                          |
   |                              |--- system prompt ------->|
-  |                              |--- 24 tool definitions ->|
+  |                              |--- 26 tool definitions ->|
   |                              |--- user message -------->|
   |                              |                          |
   |                              |<-- tool call request ----|
@@ -43,7 +43,7 @@ Frontend (React)           Edge Function (Deno)           OpenAI
 
 ## Tooling Structure
 
-### Backend Tool Handlers (24 tools)
+### Backend Tool Handlers (26 tools)
 
 `src/lib/ai-tools/` -- Zod-validated handlers organized by domain:
 
@@ -51,7 +51,7 @@ Frontend (React)           Edge Function (Deno)           OpenAI
 |------|-------|
 | `medical-history.ts` | getMedicalHistory |
 | `forms.ts` | getIncompleteForms, openForm, saveFormAnswers, shareForm |
-| `records.ts` | getHealthRecords, summarizeRecord, requestHealthRecord |
+| `records.ts` | getHealthRecords, getHealthRecordRequests, summarizeRecord, requestHealthRecord, deleteHealthRecordRequest |
 | `insurance.ts` | searchInsuranceProvider, getUserCoverages, setPrimaryInsurance, verifyInsurance |
 | `network.ts` | searchInNetworkProviders, searchPharmacies, addProvider, setPreferredPharmacy |
 | `medications.ts` | getMedications, summarizeMedication, checkRefillStatus |
@@ -64,7 +64,7 @@ Frontend (React)           Edge Function (Deno)           OpenAI
 
 `supabase/functions/ai-health-assistant/`:
 - `index.ts` -- Main orchestration with multi-turn tool execution loop (max 5 rounds)
-- `tools.ts` -- 24 tool definitions with OpenAI function schemas and server-side handlers
+- `tools.ts` -- 26 tool definitions with OpenAI function schemas and server-side handlers
 - `system-prompt.ts` -- Context-aware system prompt with per-page behavior models
 - `types.ts` -- Shared types for the edge function
 - `logger.ts` -- Structured JSON logging (request, tool calls, errors, responses)
@@ -89,7 +89,7 @@ All assistant documentation lives in `docs/ai-assistant/`:
 | `assistant-flows.md` | 10 detailed assistant-driven workflow definitions |
 | `assistant-scripts.md` | Tone guidelines and example scripts per page |
 | `page-context-prompts.md` | Page-to-behavior mapping with context signals |
-| `tools-registry.md` | Complete reference of all 24 tools with inputs/outputs |
+| `tools-registry.md` | Complete reference of all 26 tools with inputs/outputs |
 | `tool-contracts.md` | Formal input/output contracts for each tool |
 | `openai-integration.md` | How the OpenAI orchestration works end-to-end |
 | `tool-exposure-map.md` | Maps each OpenAI tool name to its backend handler |

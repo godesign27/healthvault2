@@ -465,49 +465,66 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 12. requestHealthRecord
+## 12. getHealthRecordRequests
 
-**Purpose:** Submit a request to obtain health records from a specific provider. Creates a pending request.
+**Purpose:** List manual health record requests and their statuses (sent, opened, received, failed). Does not return `secure_token`.
 
 **Backend location:** `src/lib/ai-tools/records.ts`
 
-**Required inputs:**
-- `providerName` (string) — name of the provider to request records from
-- `confirmed` (boolean) — MUST be true to execute
+**Required inputs:** None
 
 **Optional inputs:**
-- `providerId` (string) — provider ID if known
-- `recordTypes` (string[], default []) — types of records to request
-- `dateRangeStart` (string) — start of date range for requested records
-- `dateRangeEnd` (string) — end of date range for requested records
-- `notes` (string) — additional notes for the request
+- `requestId` (string) — return a single request
+- `status` (enum: pending, sent, received, failed)
+- `limit` (number, default 20, max 50)
 
-**Output shape:**
-```
-{
-  success: boolean,
-  data: {
-    requestId: string,
-    providerName: string,
-    status: "pending"
-  },
-  message: string
-}
-```
+**Confirmation required:** No
 
-**Confirmation required:** YES. Blocks if `confirmed !== true`.
+**Auth:** Required. Rows scoped to `user_id`.
 
-**Error cases:**
-- confirmed is false (blocked)
-- Database insert failure
-
-**Auth:** Required. Inserts with user_id ownership.
-
-**Implementation status:** Real logic. Inserts into `health_record_requests` table.
+**Implementation status:** Real logic. `SELECT` on `health_record_requests`.
 
 ---
 
-## 13. setPrimaryInsurance
+## 13. requestHealthRecord
+
+**Purpose:** Create a manual record request: calls `/functions/v1/record-request` so the provider receives an email with a secure upload link.
+
+**Backend location:** `src/lib/ai-tools/records.ts`, edge `supabase/functions/record-request/index.ts`, `supabase/functions/ai-health-assistant/tools.ts`
+
+**Required inputs:**
+- `providerName` (string)
+- `providerEmail` (string)
+- `confirmed` (boolean) — MUST be true to execute
+
+**Optional inputs:**
+- `providerId`, `doctorName`, `patientName`, `recordTypes[]`, `dateRangeStart`, `dateRangeEnd`, `message`, `notes`, `urgency` (routine | urgent | stat)
+
+**Output shape:** `requestId`, `providerName`, `status` (typically `sent` or `failed` if Resend fails), `emailSent`, `emailError`, `expiresAt`
+
+**Confirmation required:** YES.
+
+**Auth:** User JWT (browser) or service role + `userId` in body (edge assistant / OpenAI tool handlers).
+
+**Implementation status:** Edge function writes `health_record_requests` with `status: sent` and sends mail when `RESEND_API_KEY` is set.
+
+---
+
+## 14. deleteHealthRecordRequest
+
+**Purpose:** Delete/cancel a manual record request owned by the user.
+
+**Backend location:** `src/lib/ai-tools/records.ts`
+
+**Required inputs:** `requestId`, `confirmed` (must be true)
+
+**Confirmation required:** YES.
+
+**Implementation status:** `DELETE` on `health_record_requests` scoped to owner.
+
+---
+
+## 15. setPrimaryInsurance
 
 **Purpose:** Set a specific insurance coverage as the user's primary plan. Clears primary status from all other coverages first.
 
@@ -543,7 +560,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 14. verifyInsurance
+## 16. verifyInsurance
 
 **Purpose:** Mark an insurance coverage as verified. Updates verification status and timestamp.
 
@@ -576,7 +593,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 15. addProvider
+## 17. addProvider
 
 **Purpose:** Add a new care provider/doctor to the user's saved care network.
 
@@ -619,7 +636,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 16. setPreferredPharmacy
+## 18. setPreferredPharmacy
 
 **Purpose:** Set a pharmacy as the user's preferred pharmacy. Clears preferred status from all other pharmacies first.
 
@@ -654,7 +671,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 17. getMedications
+## 19. getMedications
 
 **Purpose:** List the user's medications with dosage, frequency, prescriber, and active/inactive status.
 
@@ -697,7 +714,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 18. summarizeMedication
+## 20. summarizeMedication
 
 **Purpose:** Generate a plain-language summary of a specific medication including dosage, frequency, prescriber, duration, and active status.
 
@@ -736,7 +753,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 19. checkRefillStatus
+## 21. checkRefillStatus
 
 **Purpose:** Check which medications may need a refill soon. Flags medications with end dates within 30 days.
 
@@ -776,7 +793,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 20. getCareTeam
+## 22. getCareTeam
 
 **Purpose:** Return the user's care team members (doctors, specialists, therapists) with roles and contact info.
 
@@ -818,7 +835,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 21. getCareTimeline
+## 23. getCareTimeline
 
 **Purpose:** Return a chronological timeline of care events aggregated from health records, form completions, and share events.
 
@@ -855,7 +872,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 22. getCareOverview
+## 24. getCareOverview
 
 **Purpose:** Return a high-level summary of the user's overall care status in a single call.
 
@@ -891,7 +908,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 23. getMedicalProfile
+## 25. getMedicalProfile
 
 **Purpose:** Return the user's profile overview: personal information and counts of medical data items with a completion status assessment.
 
@@ -934,7 +951,7 @@ This document defines the contract for each backend tool available to the Health
 
 ---
 
-## 24. updateMedicalProfile
+## 26. updateMedicalProfile
 
 **Purpose:** Update the user's profile information (name, phone, date of birth). Confirmation required.
 

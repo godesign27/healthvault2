@@ -15,9 +15,12 @@ export {
 
 export {
   getHealthRecords,
+  getHealthRecordRequests,
   summarizeRecord,
   requestHealthRecord,
+  deleteHealthRecordRequest,
   type HealthRecordRow,
+  type HealthRecordRequestRow,
   type RecordSummary,
   type RecordRequestResult,
 } from './records';

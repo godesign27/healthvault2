@@ -83,7 +83,7 @@ export const GetCareTimelineInputZ = z.object({
 export type GetCareTimelineInput = z.infer<typeof GetCareTimelineInputZ>;
 
 export interface CareTimelineEvent {
-  type: 'record' | 'form' | 'share';
+  type: 'record' | 'form' | 'share' | 'record_request';
   id: string;
   title: string;
   date: string;
@@ -103,12 +103,18 @@ export async function getCareTimeline(
     const effectiveUserId = userId || DEMO_USER_ID;
     const { limit } = parsed.data;
 
-    const [recordsRes, formsRes, sharesRes] = await Promise.all([
+    const [recordsRes, requestsRes, formsRes, sharesRes] = await Promise.all([
       supabase
         .from('health_records')
         .select('id, title, service_date, kind, provider_name')
         .eq('user_id', effectiveUserId)
         .order('service_date', { ascending: false, nullsFirst: false })
+        .limit(limit),
+      supabase
+        .from('health_record_requests')
+        .select('id, provider_name, status, created_at, opened_at, submitted_at')
+        .eq('user_id', effectiveUserId)
+        .order('created_at', { ascending: false })
         .limit(limit),
       supabase
         .from('form_responses')
@@ -134,6 +140,21 @@ export async function getCareTimeline(
           title: r.title,
           date: r.service_date || '',
           detail: r.provider_name ? `From ${r.provider_name}` : null,
+        });
+      }
+    }
+
+    if (!requestsRes.error && requestsRes.data) {
+      for (const q of requestsRes.data as any[]) {
+        const parts = [`Status: ${q.status}`];
+        if (q.opened_at) parts.push('Provider opened link');
+        if (q.submitted_at) parts.push('Records submitted');
+        events.push({
+          type: 'record_request',
+          id: q.id,
+          title: `Record request to ${q.provider_name}`,
+          date: q.submitted_at || q.opened_at || q.created_at || '',
+          detail: parts.join('; '),
         });
       }
     }
@@ -190,6 +211,8 @@ export interface CareOverviewResult {
   activeMedications: number;
   pendingForms: number;
   recentRecords: number;
+  recordRequestsAwaitingProvider: number;
+  recordRequestsCompleted: number;
   activeConditions: number;
   allergies: number;
   upcomingImmunizations: number;
@@ -211,6 +234,8 @@ export async function getCareOverview(
       conditionsRes,
       allergiesRes,
       immunizationsRes,
+      reqSentRes,
+      reqReceivedRes,
     ] = await Promise.all([
       supabase.from('care_team').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
       supabase.from('medications').select('id, end_date').eq('user_id', effectiveUserId),
@@ -219,6 +244,8 @@ export async function getCareOverview(
       supabase.from('conditions').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId).eq('status', 'Active'),
       supabase.from('allergies').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
       supabase.from('immunizations').select('id, next_dose').eq('user_id', effectiveUserId),
+      supabase.from('health_record_requests').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId).eq('status', 'sent'),
+      supabase.from('health_record_requests').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId).eq('status', 'received'),
     ]);
 
     const activeMeds = (medsRes.data || []).filter(
@@ -234,6 +261,8 @@ export async function getCareOverview(
       activeMedications: activeMeds,
       pendingForms: formsRes.count || 0,
       recentRecords: recordsRes.count || 0,
+      recordRequestsAwaitingProvider: reqSentRes.count || 0,
+      recordRequestsCompleted: reqReceivedRes.count || 0,
       activeConditions: conditionsRes.count || 0,
       allergies: allergiesRes.count || 0,
       upcomingImmunizations,
@@ -241,7 +270,7 @@ export async function getCareOverview(
 
     return toolSuccess(
       overview,
-      `Health overview: ${overview.activeConditions} active conditions, ${overview.activeMedications} medications, ${overview.pendingForms} pending forms, ${overview.careTeamCount} care team members.`
+      `Health overview: ${overview.activeConditions} active conditions, ${overview.activeMedications} medications, ${overview.pendingForms} pending forms, ${overview.recordRequestsAwaitingProvider} record requests in progress, ${overview.careTeamCount} care team members.`
     );
   } catch (err) {
     return toolError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);

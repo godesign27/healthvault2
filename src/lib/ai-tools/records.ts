@@ -208,13 +208,151 @@ function formatKind(kind: string): string {
   return map[kind] || kind;
 }
 
+export const GetHealthRecordRequestsInputZ = z.object({
+  requestId: z.string().optional(),
+  status: z.enum(['pending', 'sent', 'received', 'failed']).optional(),
+  limit: z.number().int().min(1).max(50).default(20),
+});
+
+export type GetHealthRecordRequestsInput = z.infer<typeof GetHealthRecordRequestsInputZ>;
+
+export interface HealthRecordRequestRow {
+  id: string;
+  providerName: string;
+  providerId: string | null;
+  providerEmail: string | null;
+  doctorName: string | null;
+  patientName: string | null;
+  recordTypes: string[];
+  dateRangeStart: string | null;
+  dateRangeEnd: string | null;
+  status: string;
+  notes: string | null;
+  messagePreview: string | null;
+  urgency: string | null;
+  createdAt: string;
+  updatedAt: string;
+  openedAt: string | null;
+  submittedAt: string | null;
+  expiresAt: string | null;
+}
+
+export async function getHealthRecordRequests(
+  input: GetHealthRecordRequestsInput,
+  userId: string
+): Promise<ToolResult<HealthRecordRequestRow[]>> {
+  try {
+    const parsed = GetHealthRecordRequestsInputZ.safeParse(input);
+    if (!parsed.success) {
+      return toolError(`Invalid input: ${parsed.error.issues[0]?.message}`);
+    }
+
+    const { requestId, status, limit } = parsed.data;
+
+    let query = supabase
+      .from('health_record_requests')
+      .select(
+        'id, provider_name, provider_id, provider_email, doctor_name, patient_name, record_types, date_range_start, date_range_end, status, notes, message, urgency, created_at, updated_at, opened_at, submitted_at, expires_at'
+      )
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (requestId) {
+      query = query.eq('id', requestId);
+    }
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      return toolError(`Database error: ${error.message}`);
+    }
+
+    const rows: HealthRecordRequestRow[] = (data || []).map((r: any) => ({
+      id: r.id,
+      providerName: r.provider_name,
+      providerId: r.provider_id,
+      providerEmail: r.provider_email,
+      doctorName: r.doctor_name,
+      patientName: r.patient_name,
+      recordTypes: r.record_types || [],
+      dateRangeStart: r.date_range_start,
+      dateRangeEnd: r.date_range_end,
+      status: r.status,
+      notes: r.notes,
+      messagePreview: r.message ? String(r.message).slice(0, 200) : null,
+      urgency: r.urgency,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+      openedAt: r.opened_at,
+      submittedAt: r.submitted_at,
+      expiresAt: r.expires_at,
+    }));
+
+    return toolSuccess(
+      rows,
+      `Found ${rows.length} record request${rows.length !== 1 ? 's' : ''}.`
+    );
+  } catch (err) {
+    return toolError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+export const DeleteHealthRecordRequestInputZ = z.object({
+  requestId: z.string().min(1, 'Request ID is required'),
+  confirmed: z.boolean(),
+});
+
+export type DeleteHealthRecordRequestInput = z.infer<typeof DeleteHealthRecordRequestInputZ>;
+
+export async function deleteHealthRecordRequest(
+  input: DeleteHealthRecordRequestInput,
+  userId: string
+): Promise<ToolResult<{ requestId: string; deleted: boolean }>> {
+  try {
+    const parsed = DeleteHealthRecordRequestInputZ.safeParse(input);
+    if (!parsed.success) {
+      return toolError(`Invalid input: ${parsed.error.issues[0]?.message}`);
+    }
+
+    if (!parsed.data.confirmed) {
+      return toolError('Deleting a record request requires confirmation.');
+    }
+
+    const { error } = await supabase
+      .from('health_record_requests')
+      .delete()
+      .eq('id', parsed.data.requestId)
+      .eq('user_id', userId);
+
+    if (error) {
+      return toolError(`Database error: ${error.message}`);
+    }
+
+    return toolSuccess(
+      { requestId: parsed.data.requestId, deleted: true },
+      'Record request removed.'
+    );
+  } catch (err) {
+    return toolError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
 export const RequestHealthRecordInputZ = z.object({
   providerName: z.string().min(1, 'Provider name is required'),
+  providerEmail: z.string().email('Valid provider email is required'),
   providerId: z.string().optional(),
-  recordTypes: z.array(z.string()).default([]),
+  doctorName: z.string().optional(),
+  patientName: z.string().optional(),
+  recordTypes: z.array(z.string()).default(['OTHER']),
   dateRangeStart: z.string().optional(),
   dateRangeEnd: z.string().optional(),
+  message: z.string().optional(),
   notes: z.string().optional(),
+  urgency: z.enum(['routine', 'urgent', 'stat']).default('routine'),
   confirmed: z.boolean(),
 });
 
@@ -224,6 +362,9 @@ export interface RecordRequestResult {
   requestId: string;
   providerName: string;
   status: string;
+  emailSent?: boolean;
+  emailError?: string | null;
+  expiresAt?: string | null;
 }
 
 export async function requestHealthRecord(
@@ -240,32 +381,51 @@ export async function requestHealthRecord(
       return toolError('Requesting health records requires confirmation. Please confirm to proceed.');
     }
 
-    const { data, error } = await supabase
-      .from('health_record_requests')
-      .insert({
-        user_id: userId,
-        provider_name: parsed.data.providerName,
-        provider_id: parsed.data.providerId || null,
-        record_types: parsed.data.recordTypes,
-        date_range_start: parsed.data.dateRangeStart || null,
-        date_range_end: parsed.data.dateRangeEnd || null,
-        notes: parsed.data.notes || null,
-        status: 'pending',
-      })
-      .select('id, provider_name, status')
-      .single();
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
 
-    if (error) {
-      return toolError(`Database error: ${error.message}`);
+    const res = await fetch(`${supabaseUrl}/functions/v1/record-request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({
+        providerName: parsed.data.providerName,
+        providerEmail: parsed.data.providerEmail,
+        providerId: parsed.data.providerId,
+        doctorName: parsed.data.doctorName,
+        patientName: parsed.data.patientName,
+        recordTypes: parsed.data.recordTypes,
+        dateRangeStart: parsed.data.dateRangeStart,
+        dateRangeEnd: parsed.data.dateRangeEnd,
+        message: parsed.data.message,
+        notes: parsed.data.notes,
+        urgency: parsed.data.urgency,
+      }),
+    });
+
+    const body = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      return toolError(
+        typeof body.error === 'string' ? body.error : `Record request failed (${res.status})`
+      );
     }
 
     return toolSuccess(
       {
-        requestId: data.id,
-        providerName: data.provider_name,
-        status: data.status,
+        requestId: body.id,
+        providerName: parsed.data.providerName,
+        status: body.status,
+        emailSent: body.emailSent,
+        emailError: body.emailError ?? null,
+        expiresAt: body.expiresAt ?? null,
       },
-      `Health record request submitted to ${data.provider_name}. Status: pending.`
+      body.emailSent
+        ? `Record request sent to ${parsed.data.providerName}; the provider received an email with a secure upload link.`
+        : `Record request created for ${parsed.data.providerName}.${body.emailError ? ` ${body.emailError}` : ''}`
     );
   } catch (err) {
     return toolError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);

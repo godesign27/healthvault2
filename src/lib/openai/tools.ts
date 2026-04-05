@@ -1,5 +1,8 @@
 import { getIncompleteForms } from "../tools/getIncompleteForms";
 import { getHealthRecords } from "../tools/getHealthRecords";
+import { getHealthRecordRequests } from "../tools/getHealthRecordRequests";
+import { requestHealthRecord } from "../tools/requestHealthRecord";
+import { deleteHealthRecordRequest } from "../tools/deleteHealthRecordRequest";
 import { summarizeRecord } from "../tools/summarizeRecord";
 import { getCareOverview } from "../tools/getCareOverview";
 import { getMedications } from "../tools/getMedications";
@@ -46,7 +49,7 @@ export const assistantToolDefinitions = [
     type: "function" as const,
     name: "getHealthRecords",
     description:
-      "Get the user's health records. Supports filtering by category (lab, imaging, pathology, specialist_report, other) and source (connected, uploaded, shared).",
+      "Get the user's health records. Supports filtering by category (lab, imaging, pathology, specialist_report, other) and source (connected, uploaded, shared). Use source=shared for files a provider uploaded via a manual record-request link.",
     parameters: {
       type: "object",
       properties: {
@@ -71,6 +74,71 @@ export const assistantToolDefinitions = [
   },
   {
     type: "function" as const,
+    name: "getHealthRecordRequests",
+    description:
+      "List the user's manual health record requests to providers (email + secure portal). Statuses: pending, sent, received, failed. Optional requestId or status filter. Does not return secure tokens.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        requestId: {
+          type: "string",
+          description: "If set, return only this request",
+        },
+        status: {
+          type: "string",
+          enum: ["pending", "sent", "received", "failed"],
+        },
+        limit: { type: "number", description: "Max rows (default 20)" },
+      },
+      required: ["userId"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "requestHealthRecord",
+    description:
+      "Create a manual record request: sends the provider an email with a secure link to upload records. Requires provider email, provider name, and confirmation.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string", description: "The user's ID" },
+        providerName: { type: "string" },
+        providerEmail: { type: "string", description: "Provider email for the portal link" },
+        providerId: { type: "string" },
+        doctorName: { type: "string" },
+        patientName: { type: "string" },
+        recordTypes: { type: "array", items: { type: "string" } },
+        dateRangeStart: { type: "string" },
+        dateRangeEnd: { type: "string" },
+        message: { type: "string", description: "Message included in the email" },
+        notes: { type: "string" },
+        urgency: { type: "string", enum: ["routine", "urgent", "stat"] },
+        confirmed: {
+          type: "boolean",
+          description: "Must be true after user confirms",
+        },
+      },
+      required: ["userId", "providerName", "providerEmail", "confirmed"],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "deleteHealthRecordRequest",
+    description:
+      "Delete/cancel a manual health record request owned by the user. Requires confirmation.",
+    parameters: {
+      type: "object",
+      properties: {
+        userId: { type: "string" },
+        requestId: { type: "string" },
+        confirmed: { type: "boolean" },
+      },
+      required: ["userId", "requestId", "confirmed"],
+    },
+  },
+  {
+    type: "function" as const,
     name: "summarizeRecord",
     description:
       "Get details of a specific health record for summarization. Returns title, category, provider, date, existing AI summary, and tags. Does not invent medical conclusions.",
@@ -87,7 +155,7 @@ export const assistantToolDefinitions = [
     type: "function" as const,
     name: "getCareOverview",
     description:
-      "Get a high-level care dashboard summary: care team count, active medications, active conditions, allergies, health records, upcoming appointments, past encounters, insurance claims, and upcoming immunizations.",
+      "Get a high-level care dashboard summary: care team count, active medications, active conditions, allergies, health records, manual record requests in progress and completed, upcoming appointments, past encounters, insurance claims, and upcoming immunizations.",
     parameters: {
       type: "object",
       properties: {
@@ -246,14 +314,21 @@ export const assistantToolDefinitions = [
     type: "function" as const,
     name: "getCareTimeline",
     description:
-      "Get a chronological timeline of care events: health records, form completions, record shares, appointments, and encounters. Supports filtering by event type.",
+      "Get a chronological timeline of care events: health records, manual record requests to providers, form completions, record shares, appointments, and encounters. Supports filtering by event type.",
     parameters: {
       type: "object",
       properties: {
         userId: { type: "string", description: "The user's ID" },
         filter: {
           type: "string",
-          enum: ["record", "form", "share", "appointment", "encounter"],
+          enum: [
+            "record",
+            "record_request",
+            "form",
+            "share",
+            "appointment",
+            "encounter",
+          ],
           description: "Filter to a specific event type",
         },
         limit: {
@@ -582,6 +657,9 @@ export const assistantToolHandlers: Record<
 > = {
   getIncompleteForms,
   getHealthRecords,
+  getHealthRecordRequests,
+  requestHealthRecord,
+  deleteHealthRecordRequest,
   summarizeRecord,
   getCareOverview,
   getMedications,

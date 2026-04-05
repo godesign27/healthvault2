@@ -4,7 +4,14 @@ import { createSupabaseServerClient } from "../supabase/server";
 export const getCareTimelineInputSchema = z.object({
   userId: z.string().min(1),
   filter: z
-    .enum(["record", "form", "share", "appointment", "encounter"])
+    .enum([
+      "record",
+      "record_request",
+      "form",
+      "share",
+      "appointment",
+      "encounter",
+    ])
     .optional(),
   limit: z.number().int().min(1).max(50).default(25),
 });
@@ -32,7 +39,9 @@ export async function getCareTimeline(input: unknown) {
     const supabase = createSupabaseServerClient();
     const { userId, filter, limit } = parsed.data;
     const items: TimelineItem[] = [];
-    const types = filter ? [filter] : ["record", "form", "share", "appointment", "encounter"];
+    const types = filter
+      ? [filter]
+      : ["record", "record_request", "form", "share", "appointment", "encounter"];
 
     const queries: Promise<void>[] = [];
 
@@ -54,6 +63,33 @@ export async function getCareTimeline(input: unknown) {
                 source: r.provider_name || null,
                 summary: r.ai_summary || null,
                 tags: r.tags || [],
+              });
+            }
+          })
+      );
+    }
+
+    if (types.includes("record_request")) {
+      queries.push(
+        supabase
+          .from("health_record_requests")
+          .select("id, provider_name, status, created_at, opened_at, submitted_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(limit)
+          .then(({ data }) => {
+            for (const q of (data || []) as any[]) {
+              const parts = [`Status: ${q.status}`];
+              if (q.opened_at) parts.push("Provider opened link");
+              if (q.submitted_at) parts.push("Records submitted");
+              items.push({
+                id: q.id,
+                type: "record_request",
+                title: `Record request to ${q.provider_name}`,
+                date: q.submitted_at || q.opened_at || q.created_at || "",
+                source: q.provider_name || null,
+                summary: parts.join("; "),
+                tags: [q.status],
               });
             }
           })

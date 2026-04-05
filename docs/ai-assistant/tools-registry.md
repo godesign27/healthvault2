@@ -1,6 +1,6 @@
 # HealthVault Tools Registry
 
-Complete reference of all 24 backend tools available to the AI assistant. Each tool is registered in both the frontend registry (`src/lib/ai-tools/registry.ts`) and the edge function (`supabase/functions/ai-health-assistant/tools.ts`).
+Complete reference of all 26 backend tools available to the AI assistant. Each tool is registered in both the frontend registry (`src/lib/ai-tools/registry.ts`) and the edge function (`supabase/functions/ai-health-assistant/tools.ts`).
 
 ---
 
@@ -14,24 +14,26 @@ Complete reference of all 24 backend tools available to the AI assistant. Each t
 | 4 | saveFormAnswers | Forms | No | Yes |
 | 5 | shareForm | Forms | Yes | Yes |
 | 6 | getHealthRecords | Records | No | Yes |
-| 7 | summarizeRecord | Records | No | Yes |
-| 8 | requestHealthRecord | Records | Yes | Yes |
-| 9 | searchInsuranceProvider | Insurance | No | No |
-| 10 | getUserCoverages | Insurance | No | Yes |
-| 11 | setPrimaryInsurance | Insurance | Yes | Yes |
-| 12 | verifyInsurance | Insurance | No | Yes |
-| 13 | searchInNetworkProviders | Network | No | Yes |
-| 14 | searchPharmacies | Network | No | Yes |
-| 15 | addProvider | Network | Yes | Yes |
-| 16 | setPreferredPharmacy | Network | Yes | Yes |
-| 17 | getMedications | Medications | No | Yes |
-| 18 | summarizeMedication | Medications | No | Yes |
-| 19 | checkRefillStatus | Medications | No | Yes |
-| 20 | getCareTeam | Care | No | Yes |
-| 21 | getCareTimeline | Care | No | Yes |
-| 22 | getCareOverview | Care | No | Yes |
-| 23 | getMedicalProfile | Profile | No | Yes |
-| 24 | updateMedicalProfile | Profile | Yes | Yes |
+| 7 | getHealthRecordRequests | Records | No | Yes |
+| 8 | summarizeRecord | Records | No | Yes |
+| 9 | requestHealthRecord | Records | Yes | Yes |
+| 10 | deleteHealthRecordRequest | Records | Yes | Yes |
+| 11 | searchInsuranceProvider | Insurance | No | No |
+| 12 | getUserCoverages | Insurance | No | Yes |
+| 13 | setPrimaryInsurance | Insurance | Yes | Yes |
+| 14 | verifyInsurance | Insurance | No | Yes |
+| 15 | searchInNetworkProviders | Network | No | Yes |
+| 16 | searchPharmacies | Network | No | Yes |
+| 17 | addProvider | Network | Yes | Yes |
+| 18 | setPreferredPharmacy | Network | Yes | Yes |
+| 19 | getMedications | Medications | No | Yes |
+| 20 | summarizeMedication | Medications | No | Yes |
+| 21 | checkRefillStatus | Medications | No | Yes |
+| 22 | getCareTeam | Care | No | Yes |
+| 23 | getCareTimeline | Care | No | Yes |
+| 24 | getCareOverview | Care | No | Yes |
+| 25 | getMedicalProfile | Profile | No | Yes |
+| 26 | updateMedicalProfile | Profile | Yes | Yes |
 
 ---
 
@@ -83,14 +85,24 @@ Complete reference of all 24 backend tools available to the AI assistant. Each t
 - Output: `Array<{ id, kind, title, providerName, serviceDate, source, aiSummary, tags }>`
 - Tables: `health_records`
 
+**getHealthRecordRequests** -- Lists manual record requests (email + secure portal). Omits secure tokens.
+- Input: `{ requestId?, status?, limit? }`
+- Output: `Array<{ id, providerName, status, openedAt, submittedAt, ... }>`
+- Tables: `health_record_requests`
+
 **summarizeRecord** -- Returns a plain-language summary of a health record.
 - Input: `{ recordId }`
 - Output: `{ recordId, title, kind, providerName, serviceDate, summary }`
 - Tables: `health_records`
 
-**requestHealthRecord** -- Submits a record request to a provider. Confirmation required.
-- Input: `{ providerName, confirmed, providerId?, recordTypes?, dateRangeStart?, dateRangeEnd?, notes? }`
-- Output: `{ requestId, providerName, status }`
+**requestHealthRecord** -- Sends a manual record request via `/functions/v1/record-request` (provider email + secure upload link). Confirmation required.
+- Input: `{ providerName, providerEmail, confirmed, providerId?, doctorName?, patientName?, recordTypes?, dateRangeStart?, dateRangeEnd?, message?, notes?, urgency? }`
+- Output: `{ requestId, providerName, status, emailSent?, emailError?, expiresAt? }`
+- Tables: `health_record_requests` (written by edge function)
+
+**deleteHealthRecordRequest** -- Deletes/cancels a manual record request. Confirmation required.
+- Input: `{ requestId, confirmed }`
+- Output: `{ requestId, deleted: true }`
 - Tables: `health_record_requests`
 
 ### Insurance
@@ -163,13 +175,13 @@ Complete reference of all 24 backend tools available to the AI assistant. Each t
 
 **getCareTimeline** -- Chronological timeline of care events.
 - Input: `{ limit? }`
-- Output: `Array<{ type, id, title, date, detail }>`
-- Tables: `health_records`, `form_responses`, `share_events`
+- Output: `Array<{ type, id, title, date, detail }>` (type may include `record_request`)
+- Tables: `health_records`, `health_record_requests`, `form_responses`, `share_events`
 
 **getCareOverview** -- High-level health status summary.
 - Input: `{}`
-- Output: `{ careTeamCount, activeMedications, pendingForms, recentRecords, activeConditions, allergies, upcomingImmunizations }`
-- Tables: `care_team`, `medications`, `form_responses`, `health_records`, `conditions`, `allergies`, `immunizations`
+- Output: `{ careTeamCount, activeMedications, pendingForms, recentRecords, recordRequestsAwaitingProvider, recordRequestsCompleted, activeConditions, allergies, upcomingImmunizations }`
+- Tables: `care_team`, `medications`, `form_responses`, `health_records`, `health_record_requests`, `conditions`, `allergies`, `immunizations`
 
 ---
 
@@ -177,10 +189,10 @@ Complete reference of all 24 backend tools available to the AI assistant. Each t
 
 | Layer | Location | Count |
 |-------|----------|-------|
-| Frontend registry | `src/lib/ai-tools/registry.ts` | 24 tools |
-| Frontend handlers | `src/lib/ai-tools/*.ts` (7 files) | 24 handlers |
-| Edge function definitions | `supabase/functions/ai-health-assistant/tools.ts` | 24 tools |
-| Tool contracts | `docs/ai-assistant/tool-contracts.md` | 24 contracts |
+| Frontend registry | `src/lib/ai-tools/registry.ts` | 26 tools |
+| Frontend handlers | `src/lib/ai-tools/*.ts` (7 files) | 26 handlers |
+| Edge function definitions | `supabase/functions/ai-health-assistant/tools.ts` | 26 tools |
+| Tool contracts | `docs/ai-assistant/tool-contracts.md` | 26 numbered sections (index order differs) |
 
 ---
 
