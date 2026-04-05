@@ -15,6 +15,23 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+interface PatientIdentity {
+  fullName: string;
+  dateOfBirth: string | null;
+  phone: string | null;
+  email: string | null;
+  healthVaultId: string | null;
+  address: string | null;
+}
+
+const KIND_LABELS: Record<string, string> = {
+  LAB: "Lab Results",
+  IMAGING: "Imaging & Scans",
+  PATHOLOGY: "Pathology Reports",
+  SPECIALIST_REPORT: "Specialist Reports",
+  OTHER: "Other Records",
+};
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -47,9 +64,110 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Not found" }, 404);
   } catch (error: any) {
     console.error("Error:", error);
-    return jsonResponse({ error: error.message || "Internal server error" }, 500);
+    return jsonResponse(
+      { error: error.message || "Internal server error" },
+      500
+    );
   }
 });
+
+async function fetchPatientIdentity(
+  supabase: any,
+  userId: string,
+  fallbackName: string
+): Promise<PatientIdentity> {
+  const identity: PatientIdentity = {
+    fullName: fallbackName,
+    dateOfBirth: null,
+    phone: null,
+    email: null,
+    healthVaultId: null,
+    address: null,
+  };
+
+  try {
+    const { data: up } = await supabase
+      .from("user_profiles")
+      .select(
+        "first_name, last_name, display_name, full_name, date_of_birth, phone, email, address_line1, address_line2, city, state, postal_code"
+      )
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (up) {
+      const name =
+        up.display_name ||
+        up.full_name ||
+        [up.first_name, up.last_name].filter(Boolean).join(" ");
+      if (name) identity.fullName = name;
+      if (up.date_of_birth) identity.dateOfBirth = up.date_of_birth;
+      if (up.phone) identity.phone = up.phone;
+      if (up.email) identity.email = up.email;
+
+      const parts = [
+        up.address_line1,
+        up.address_line2,
+        [up.city, up.state].filter(Boolean).join(", "),
+        up.postal_code,
+      ].filter(Boolean);
+      if (parts.length > 0) identity.address = parts.join(", ");
+    }
+  } catch {}
+
+  try {
+    const { data: pp } = await supabase
+      .from("patient_profiles")
+      .select("name, birth_date, contact_phone, contact_email")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (pp) {
+      if (!identity.fullName || identity.fullName === fallbackName) {
+        if (pp.name) identity.fullName = pp.name;
+      }
+      if (!identity.dateOfBirth && pp.birth_date)
+        identity.dateOfBirth = pp.birth_date;
+      if (!identity.phone && pp.contact_phone)
+        identity.phone = pp.contact_phone;
+      if (!identity.email && pp.contact_email)
+        identity.email = pp.contact_email;
+    }
+  } catch {}
+
+  const shortId = userId.replace(/-/g, "").slice(0, 5).toUpperCase();
+  const numericSuffix = parseInt(shortId, 16) % 100000;
+  identity.healthVaultId = `HV-${String(numericSuffix).padStart(5, "0")}`;
+
+  return identity;
+}
+
+function formatDob(raw: string | null): string | null {
+  if (!raw) return null;
+  try {
+    const d = new Date(raw + "T00:00:00");
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    });
+  } catch {
+    return raw;
+  }
+}
+
+function formatRequestDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
 
 async function handleCreateRequest(
   req: Request,
@@ -80,34 +198,11 @@ async function handleCreateRequest(
 
   const resolvedUserId = userId || "00000000-0000-0000-0000-000000000000";
 
-  let displayName = patientName || "";
-  if (!displayName) {
-    try {
-      const { data: profile } = await supabase
-        .from("user_profiles")
-        .select("full_name, display_name")
-        .eq("user_id", resolvedUserId)
-        .maybeSingle();
-      if (profile?.display_name || profile?.full_name) {
-        displayName = profile.display_name || profile.full_name;
-      }
-    } catch {}
-  }
-  if (!displayName) {
-    try {
-      const { data: patient } = await supabase
-        .from("patient_profiles")
-        .select("first_name, last_name")
-        .eq("user_id", resolvedUserId)
-        .maybeSingle();
-      if (patient?.first_name) {
-        displayName = `${patient.first_name}${patient.last_name ? " " + patient.last_name : ""}`;
-      }
-    } catch {}
-  }
-  if (!displayName) {
-    displayName = "Health Vault Patient";
-  }
+  const patient = await fetchPatientIdentity(
+    supabase,
+    resolvedUserId,
+    patientName || "Health Vault Patient"
+  );
 
   const secureToken = crypto.randomUUID();
   const expiresAt = new Date();
@@ -122,7 +217,7 @@ async function handleCreateRequest(
       doctor_name: doctorName || null,
       record_types: recordTypes,
       message: message || null,
-      patient_name: displayName,
+      patient_name: patient.fullName,
       secure_token: secureToken,
       urgency: urgency || "routine",
       status: "sent",
@@ -137,9 +232,7 @@ async function handleCreateRequest(
   if (insertError) throw insertError;
 
   const appUrl =
-    Deno.env.get("APP_URL") ||
-    req.headers.get("origin") ||
-    supabaseUrl;
+    Deno.env.get("APP_URL") || req.headers.get("origin") || supabaseUrl;
   const submitUrl = `${appUrl}/record-request/${request.id}?token=${secureToken}`;
 
   let emailSent = false;
@@ -151,22 +244,17 @@ async function handleCreateRequest(
       emailError = "RESEND_API_KEY not configured";
       console.error(emailError);
     } else {
-      const kindLabels: Record<string, string> = {
-        LAB: "Lab Results",
-        IMAGING: "Imaging & Scans",
-        PATHOLOGY: "Pathology Reports",
-        SPECIALIST_REPORT: "Specialist Reports",
-        OTHER: "Other Records",
-      };
       const typeLabels = (recordTypes as string[])
-        .map((t: string) => kindLabels[t] || t)
+        .map((t: string) => KIND_LABELS[t] || t)
         .join(", ");
 
       const emailHtml = generateRequestEmailHtml({
         providerName: doctorName || providerName,
-        patientName: displayName,
+        patient,
         recordTypeLabels: typeLabels,
+        recordTypes: recordTypes as string[],
         message: message || "",
+        notes: notes || "",
         urgency: urgency || "routine",
         submitUrl,
         expiryDate: expiresAt.toLocaleDateString("en-US", {
@@ -174,6 +262,9 @@ async function handleCreateRequest(
           month: "long",
           day: "numeric",
         }),
+        requestDate: formatRequestDate(request.created_at),
+        dateRangeStart: dateRangeStart || null,
+        dateRangeEnd: dateRangeEnd || null,
       });
 
       const fromField = "Health Vault <noreply@healthvault27.com>";
@@ -187,7 +278,7 @@ async function handleCreateRequest(
         body: JSON.stringify({
           from: fromField,
           to: [providerEmail],
-          subject: `${displayName} is requesting health records via Health Vault`,
+          subject: `${patient.fullName} is requesting health records via Health Vault`,
           html: emailHtml,
         }),
       });
@@ -216,11 +307,7 @@ async function handleCreateRequest(
   });
 }
 
-async function handleGetRequest(
-  requestId: string,
-  url: URL,
-  supabase: any
-) {
+async function handleGetRequest(requestId: string, url: URL, supabase: any) {
   const token = url.searchParams.get("token");
   if (!token) {
     return jsonResponse({ error: "Token required" }, 401);
@@ -369,7 +456,8 @@ async function handleSubmitRecords(
       : null;
 
   for (const file of fileRecords) {
-    const resolvedKind = kindToRecordKind[file.record_kind] || file.record_kind;
+    const resolvedKind =
+      kindToRecordKind[file.record_kind] || file.record_kind;
     const title =
       kindToTitle[file.record_kind] ||
       (requestedKind ? kindToTitle[requestedKind] : null) ||
@@ -408,21 +496,31 @@ async function handleSubmitRecords(
 
 function generateRequestEmailHtml(params: {
   providerName: string;
-  patientName: string;
+  patient: PatientIdentity;
   recordTypeLabels: string;
+  recordTypes: string[];
   message: string;
+  notes: string;
   urgency: string;
   submitUrl: string;
   expiryDate: string;
+  requestDate: string;
+  dateRangeStart: string | null;
+  dateRangeEnd: string | null;
 }): string {
   const {
     providerName,
-    patientName,
+    patient,
     recordTypeLabels,
+    recordTypes,
     message,
+    notes,
     urgency,
     submitUrl,
     expiryDate,
+    requestDate,
+    dateRangeStart,
+    dateRangeEnd,
   } = params;
 
   const urgencyBadge =
@@ -430,12 +528,81 @@ function generateRequestEmailHtml(params: {
       ? '<span style="display:inline-block;padding:4px 12px;background-color:#fef3c7;color:#92400e;border-radius:4px;font-size:12px;font-weight:600;">URGENT</span>'
       : '<span style="display:inline-block;padding:4px 12px;background-color:#ecfdf5;color:#065f46;border-radius:4px;font-size:12px;font-weight:600;">Routine</span>';
 
-  const messageBlock = message
-    ? `<div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:6px;border-left:3px solid #a8a29e;">
-        <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#78716c;text-transform:uppercase;letter-spacing:0.5px;">Message from patient</p>
-        <p style="margin:0;font-size:14px;line-height:21px;color:#44403c;">${message}</p>
+  const verificationRows: string[] = [];
+  verificationRows.push(verificationRow("Full Name", patient.fullName));
+  if (patient.dateOfBirth) {
+    verificationRows.push(
+      verificationRow("Date of Birth", formatDob(patient.dateOfBirth)!)
+    );
+  }
+  if (patient.phone) {
+    verificationRows.push(verificationRow("Phone Number", patient.phone));
+  }
+  if (patient.email) {
+    verificationRows.push(verificationRow("Email Address", patient.email));
+  }
+  if (patient.healthVaultId) {
+    verificationRows.push(
+      verificationRow("Health Vault ID", patient.healthVaultId)
+    );
+  }
+  if (patient.address) {
+    verificationRows.push(
+      verificationRow("Mailing Address", patient.address)
+    );
+  }
+
+  const verificationBlock = `
+    <div style="margin:24px 0;border:1px solid #e7e5e4;border-radius:8px;overflow:hidden;">
+      <div style="padding:12px 16px;background-color:#fafaf9;border-bottom:1px solid #e7e5e4;">
+        <p style="margin:0;font-size:12px;font-weight:700;color:#57534e;text-transform:uppercase;letter-spacing:0.5px;">Patient Identity Verification</p>
+      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
+        ${verificationRows.join("")}
+      </table>
+    </div>`;
+
+  const authorizationBlock = `
+    <div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:8px;border-left:3px solid #292524;">
+      <p style="margin:0;font-size:13px;font-style:italic;line-height:20px;color:#44403c;">
+        &ldquo;I am the patient listed above and authorize the release of my health records as requested through Health Vault.&rdquo;
+      </p>
+    </div>`;
+
+  let dateRangeText = "";
+  if (dateRangeStart || dateRangeEnd) {
+    const from = dateRangeStart
+      ? formatRequestDate(dateRangeStart)
+      : "Any date";
+    const to = dateRangeEnd ? formatRequestDate(dateRangeEnd) : "Present";
+    dateRangeText = `<p style="margin:8px 0 0;font-size:13px;color:#57534e;">Date Range: ${from} &ndash; ${to}</p>`;
+  }
+
+  const notesFromPatient = notes || message;
+  const messageBlock = notesFromPatient
+    ? `<div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:8px;border-left:3px solid #a8a29e;">
+        <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#78716c;text-transform:uppercase;letter-spacing:0.5px;">Message from Patient</p>
+        <p style="margin:0;font-size:14px;line-height:21px;color:#44403c;">${notesFromPatient}</p>
       </div>`
     : "";
+
+  const digitalConfirmation = `
+    <div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:8px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:4px 0;">
+            <span style="font-size:12px;color:#78716c;">Digitally confirmed by:</span>
+            <span style="font-size:13px;font-weight:600;color:#1c1917;margin-left:8px;">${patient.fullName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;">
+            <span style="font-size:12px;color:#78716c;">Date:</span>
+            <span style="font-size:13px;font-weight:600;color:#1c1917;margin-left:8px;">${requestDate}</span>
+          </td>
+        </tr>
+      </table>
+    </div>`;
 
   return `<!DOCTYPE html>
 <html>
@@ -449,6 +616,8 @@ function generateRequestEmailHtml(params: {
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+
+          <!-- Header -->
           <tr>
             <td style="padding:32px;text-align:center;background-color:#ffffff;">
               <img src="https://sgwekxjlvadvdosyudgj.supabase.co/storage/v1/object/public/profile-images/hv_logo-light.png" alt="Health Vault" style="width:80px;height:80px;margin:0 auto 16px;" />
@@ -456,19 +625,39 @@ function generateRequestEmailHtml(params: {
               <div>${urgencyBadge}</div>
             </td>
           </tr>
-          <tr>
-            <td style="padding:32px;background-color:#ffffff;">
-              <p style="margin:0 0 16px;font-size:16px;line-height:24px;color:#44403c;">Hello ${providerName},</p>
-              <p style="margin:0 0 16px;font-size:16px;line-height:24px;color:#44403c;"><strong>${patientName}</strong> is requesting health records from your office through Health Vault.</p>
 
-              <div style="margin:20px 0;padding:16px;background-color:#fafaf9;border-radius:6px;">
-                <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#78716c;text-transform:uppercase;letter-spacing:0.5px;">Requested Records</p>
+          <!-- Body -->
+          <tr>
+            <td style="padding:0 32px 32px;background-color:#ffffff;">
+
+              <!-- Greeting & Intro -->
+              <p style="margin:0 0 16px;font-size:16px;line-height:24px;color:#44403c;">Hello ${providerName},</p>
+              <p style="margin:0 0 8px;font-size:16px;line-height:24px;color:#44403c;"><strong>${patient.fullName}</strong> is requesting their health records from your office through their authenticated Health Vault account.</p>
+              <p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#57534e;">The patient listed below has authorized release of the requested records and provided identifying information to help your staff verify the request.</p>
+
+              <!-- Patient Identity Verification -->
+              ${verificationBlock}
+
+              <!-- Authorization Statement -->
+              ${authorizationBlock}
+
+              <!-- Requested Records -->
+              <div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:8px;">
+                <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:0.5px;">Requested Records</p>
                 <p style="margin:0;font-size:15px;font-weight:500;color:#1c1917;">${recordTypeLabels}</p>
+                ${dateRangeText}
               </div>
 
+              <!-- Message From Patient -->
               ${messageBlock}
 
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+              <!-- Digital Confirmation -->
+              ${digitalConfirmation}
+
+              <!-- CTA -->
+              <p style="margin:0 0 16px;font-size:14px;line-height:21px;color:#57534e;text-align:center;">Please use the secure link below to upload the requested records to Health Vault.</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
                 <tr>
                   <td align="center">
                     <a href="${submitUrl}" style="display:inline-block;padding:14px 36px;background-color:#292524;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:500;font-size:16px;">Upload Records</a>
@@ -476,13 +665,17 @@ function generateRequestEmailHtml(params: {
                 </tr>
               </table>
 
-              <p style="margin:0 0 16px;font-size:14px;line-height:21px;color:#57534e;">This secure link will expire on <strong>${expiryDate}</strong>.</p>
+              <p style="margin:0 0 8px;font-size:13px;line-height:20px;color:#78716c;text-align:center;">If your office cannot use the upload link, please contact the patient directly using the information above.</p>
+              <p style="margin:0 0 24px;font-size:14px;line-height:21px;color:#57534e;text-align:center;">This secure link will expire on <strong>${expiryDate}</strong>.</p>
 
-              <div style="margin:24px 0;padding:16px;background-color:#fafaf9;border-radius:6px;border-left:3px solid #a8a29e;">
-                <p style="margin:0;font-size:13px;line-height:19px;color:#57534e;"><strong>Security Note:</strong> This link is intended only for the provider. Do not forward this email or share the link.</p>
+              <!-- Security Note -->
+              <div style="margin:0;padding:16px;background-color:#fafaf9;border-radius:8px;border-left:3px solid #a8a29e;">
+                <p style="margin:0;font-size:13px;line-height:19px;color:#57534e;"><strong>Security Note:</strong> This secure link is intended only for the provider receiving this request. Do not forward or share this link.</p>
               </div>
             </td>
           </tr>
+
+          <!-- Footer -->
           <tr>
             <td style="padding:24px 32px;background-color:#fafaf9;border-top:1px solid #e7e5e4;">
               <p style="margin:0;font-size:13px;line-height:19px;color:#78716c;text-align:center;">
@@ -491,10 +684,23 @@ function generateRequestEmailHtml(params: {
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>
   </table>
 </body>
 </html>`.trim();
+}
+
+function verificationRow(label: string, value: string): string {
+  return `
+    <tr>
+      <td style="padding:10px 16px;border-bottom:1px solid #f5f5f4;vertical-align:top;width:140px;">
+        <span style="font-size:12px;font-weight:600;color:#78716c;">${label}</span>
+      </td>
+      <td style="padding:10px 16px;border-bottom:1px solid #f5f5f4;vertical-align:top;">
+        <span style="font-size:14px;color:#1c1917;">${value}</span>
+      </td>
+    </tr>`;
 }

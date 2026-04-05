@@ -1,7 +1,78 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle, ShieldCheck, User } from 'lucide-react';
 import { RecordKind } from '../../lib/records/types';
 import { createRecordRequest } from '../../lib/records/requests-api';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+
+interface PatientProfileSnapshot {
+  dateOfBirth: string;
+  phone: string;
+  email: string;
+}
+
+async function fetchPatientProfile(): Promise<PatientProfileSnapshot> {
+  const result: PatientProfileSnapshot = { dateOfBirth: '', phone: '', email: '' };
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}&select=date_of_birth,phone,email`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows.length > 0) {
+        result.dateOfBirth = rows[0].date_of_birth || '';
+        result.phone = rows[0].phone || '';
+        result.email = rows[0].email || '';
+      }
+    }
+  } catch {}
+  if (!result.dateOfBirth || !result.phone || !result.email) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/patient_profiles?user_id=eq.${DEMO_USER_ID}&select=birth_date,contact_phone,contact_email`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length > 0) {
+          if (!result.dateOfBirth) result.dateOfBirth = rows[0].birth_date || '';
+          if (!result.phone) result.phone = rows[0].contact_phone || '';
+          if (!result.email) result.email = rows[0].contact_email || '';
+        }
+      }
+    } catch {}
+  }
+  return result;
+}
+
+async function saveProfileFields(fields: Partial<PatientProfileSnapshot>): Promise<boolean> {
+  try {
+    const body: Record<string, string> = {};
+    if (fields.dateOfBirth) body.date_of_birth = fields.dateOfBirth;
+    if (fields.phone) body.phone = fields.phone;
+    if (fields.email) body.email = fields.email;
+    if (Object.keys(body).length === 0) return true;
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 interface RequestRecordDrawerProps {
   isOpen: boolean;
@@ -57,7 +128,25 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
   const [emailError, setEmailError] = useState('');
   const [submitError, setSubmitError] = useState('');
 
+  const [profile, setProfile] = useState<PatientProfileSnapshot>({ dateOfBirth: '', phone: '', email: '' });
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [editDob, setEditDob] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen && !profileLoaded) {
+      fetchPatientProfile().then(p => {
+        setProfile(p);
+        setEditDob(p.dateOfBirth);
+        setEditPhone(p.phone);
+        setEditEmail(p.email);
+        setProfileLoaded(true);
+      });
+    }
+  }, [isOpen, profileLoaded]);
 
   useEffect(() => {
     if (isOpen) {
@@ -68,6 +157,8 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     }
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
+
+  const missingFields = profileLoaded && (!editDob || !editPhone || !editEmail);
 
   const filteredProviders = MOCK_PROVIDERS.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -87,11 +178,26 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     );
   };
 
+  const saveProfileIfNeeded = async () => {
+    const updates: Partial<PatientProfileSnapshot> = {};
+    if (editDob && editDob !== profile.dateOfBirth) updates.dateOfBirth = editDob;
+    if (editPhone && editPhone !== profile.phone) updates.phone = editPhone;
+    if (editEmail && editEmail !== profile.email) updates.email = editEmail;
+    if (Object.keys(updates).length > 0) {
+      await saveProfileFields(updates);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedProvider) return;
+    if (!editDob || !editPhone || !editEmail) {
+      setSubmitError('Please complete your identity information before sending.');
+      return;
+    }
     setSubmitting(true);
     setSubmitError('');
     try {
+      await saveProfileIfNeeded();
       const result = await createRecordRequest({
         providerName: selectedProvider.clinic || selectedProvider.name,
         providerEmail: `records@${selectedProvider.clinic.toLowerCase().replace(/\s+/g, '')}.com`,
@@ -114,9 +220,14 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
   };
 
   const handleManualSubmit = async () => {
+    if (!editDob || !editPhone || !editEmail) {
+      setSubmitError('Please complete your identity information before sending.');
+      return;
+    }
     setSubmitting(true);
     setSubmitError('');
     try {
+      await saveProfileIfNeeded();
       const result = await createRecordRequest({
         providerName: manualProviderName,
         providerEmail: manualEmail,
@@ -159,6 +270,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     setEmailSent(false);
     setEmailError('');
     setSubmitError('');
+    setProfileLoaded(false);
   };
 
   const canSubmit = selectedProvider && selectedTypes.length > 0;
@@ -268,6 +380,13 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 onSetDateTo={setDateTo}
                 onSetNotes={setNotes}
                 onSetUrgency={setUrgency}
+                profileLoaded={profileLoaded}
+                editDob={editDob}
+                editPhone={editPhone}
+                editEmail={editEmail}
+                onSetDob={setEditDob}
+                onSetPhone={setEditPhone}
+                onSetEmail={setEditEmail}
               />
             )}
 
@@ -288,6 +407,13 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 onSetMessage={setManualMessage}
                 onToggleType={toggleManualRecordType}
                 onSetUrgency={setUrgency}
+                profileLoaded={profileLoaded}
+                editDob={editDob}
+                editPhone={editPhone}
+                editEmail={editEmail}
+                onSetDob={setEditDob}
+                onSetPhone={setEditPhone}
+                onSetPatientEmail={setEditEmail}
               />
             )}
 
@@ -526,7 +652,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
   );
 }
 
-function ManualEntryForm({ darkMode, providerName, doctorName, email, message, selectedTypes, urgency, inputClasses, labelClasses, onSetProviderName, onSetDoctorName, onSetEmail, onSetMessage, onToggleType, onSetUrgency }: {
+function ManualEntryForm({ darkMode, providerName, doctorName, email, message, selectedTypes, urgency, inputClasses, labelClasses, onSetProviderName, onSetDoctorName, onSetEmail, onSetMessage, onToggleType, onSetUrgency, profileLoaded, editDob, editPhone, editEmail, onSetDob, onSetPhone, onSetPatientEmail }: {
   darkMode: boolean;
   providerName: string;
   doctorName: string;
@@ -542,6 +668,13 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
   onSetMessage: (v: string) => void;
   onToggleType: (k: RecordKind) => void;
   onSetUrgency: (v: 'routine' | 'urgent') => void;
+  profileLoaded: boolean;
+  editDob: string;
+  editPhone: string;
+  editEmail: string;
+  onSetDob: (v: string) => void;
+  onSetPhone: (v: string) => void;
+  onSetPatientEmail: (v: string) => void;
 }) {
   return (
     <div className="p-6 space-y-5">
@@ -704,11 +837,23 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
           className={`${inputClasses} resize-none`}
         />
       </div>
+
+      <IdentityVerificationCard
+        darkMode={darkMode}
+        profileLoaded={profileLoaded}
+        editDob={editDob}
+        editPhone={editPhone}
+        editEmail={editEmail}
+        onSetDob={onSetDob}
+        onSetPhone={onSetPhone}
+        onSetEmail={onSetPatientEmail}
+        inputClasses={inputClasses}
+      />
     </div>
   );
 }
 
-function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, dateTo, notes, urgency, inputClasses, labelClasses, onChangeProvider, onToggleType, onSetDateFrom, onSetDateTo, onSetNotes, onSetUrgency }: {
+function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, dateTo, notes, urgency, inputClasses, labelClasses, onChangeProvider, onToggleType, onSetDateFrom, onSetDateTo, onSetNotes, onSetUrgency, profileLoaded, editDob, editPhone, editEmail, onSetDob, onSetPhone, onSetEmail }: {
   darkMode: boolean;
   selectedProvider: ProviderOption | null;
   selectedTypes: RecordKind[];
@@ -724,6 +869,13 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
   onSetDateTo: (v: string) => void;
   onSetNotes: (v: string) => void;
   onSetUrgency: (v: 'routine' | 'urgent') => void;
+  profileLoaded: boolean;
+  editDob: string;
+  editPhone: string;
+  editEmail: string;
+  onSetDob: (v: string) => void;
+  onSetPhone: (v: string) => void;
+  onSetEmail: (v: string) => void;
 }) {
   return (
     <div className="p-6 space-y-6">
@@ -894,6 +1046,18 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
           className={`${inputClasses} resize-none`}
         />
       </div>
+
+      <IdentityVerificationCard
+        darkMode={darkMode}
+        profileLoaded={profileLoaded}
+        editDob={editDob}
+        editPhone={editPhone}
+        editEmail={editEmail}
+        onSetDob={onSetDob}
+        onSetPhone={onSetPhone}
+        onSetEmail={onSetEmail}
+        inputClasses={inputClasses}
+      />
     </div>
   );
 }
@@ -985,6 +1149,112 @@ function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, ema
       >
         Done
       </button>
+    </div>
+  );
+}
+
+function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone, editEmail, onSetDob, onSetPhone, onSetEmail, inputClasses }: {
+  darkMode: boolean;
+  profileLoaded: boolean;
+  editDob: string;
+  editPhone: string;
+  editEmail: string;
+  onSetDob: (v: string) => void;
+  onSetPhone: (v: string) => void;
+  onSetEmail: (v: string) => void;
+  inputClasses: string;
+}) {
+  if (!profileLoaded) {
+    return (
+      <div className={`p-4 rounded-xl border ${darkMode ? 'border-stone-700 bg-stone-800/50' : 'border-stone-200 bg-stone-50'}`}>
+        <div className="flex items-center gap-2">
+          <div className={`w-4 h-4 border-2 rounded-full animate-spin ${darkMode ? 'border-stone-600 border-t-stone-400' : 'border-stone-300 border-t-stone-500'}`} />
+          <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Loading your verification info...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const allComplete = editDob && editPhone && editEmail;
+
+  return (
+    <div className={`rounded-xl border overflow-hidden ${
+      allComplete
+        ? darkMode ? 'border-emerald-800/50 bg-emerald-950/10' : 'border-emerald-200 bg-emerald-50/30'
+        : darkMode ? 'border-amber-800/50 bg-amber-950/10' : 'border-amber-200 bg-amber-50/30'
+    }`}>
+      <div className={`px-4 py-3 flex items-center gap-2 border-b ${
+        allComplete
+          ? darkMode ? 'border-emerald-800/30' : 'border-emerald-200/60'
+          : darkMode ? 'border-amber-800/30' : 'border-amber-200/60'
+      }`}>
+        <ShieldCheck className={`w-4 h-4 ${
+          allComplete
+            ? darkMode ? 'text-emerald-400' : 'text-emerald-600'
+            : darkMode ? 'text-amber-400' : 'text-amber-600'
+        }`} />
+        <span className={`text-xs font-semibold uppercase tracking-wider ${
+          allComplete
+            ? darkMode ? 'text-emerald-400' : 'text-emerald-700'
+            : darkMode ? 'text-amber-400' : 'text-amber-700'
+        }`}>
+          {allComplete ? 'Identity Verification Ready' : 'Complete Your Identity Info'}
+        </span>
+      </div>
+      <div className="px-4 py-3 space-y-3">
+        {allComplete ? (
+          <p className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            Your date of birth, phone, and email will be included in the request to help the provider verify your identity.
+          </p>
+        ) : (
+          <p className={`text-xs ${darkMode ? 'text-amber-400/80' : 'text-amber-700'}`}>
+            The provider needs this information to verify your identity. Please complete any missing fields below.
+          </p>
+        )}
+        <div className="grid grid-cols-1 gap-2.5">
+          {(!editDob || !allComplete) && (
+            <div>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Date of Birth</label>
+              <input
+                type="date"
+                value={editDob}
+                onChange={(e) => onSetDob(e.target.value)}
+                className={`${inputClasses} !py-2 text-sm`}
+              />
+            </div>
+          )}
+          {(!editPhone || !allComplete) && (
+            <div>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Phone Number</label>
+              <input
+                type="tel"
+                value={editPhone}
+                onChange={(e) => onSetPhone(e.target.value)}
+                placeholder="(555) 555-5555"
+                className={`${inputClasses} !py-2 text-sm`}
+              />
+            </div>
+          )}
+          {(!editEmail || !allComplete) && (
+            <div>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Email Address</label>
+              <input
+                type="email"
+                value={editEmail}
+                onChange={(e) => onSetEmail(e.target.value)}
+                placeholder="you@example.com"
+                className={`${inputClasses} !py-2 text-sm`}
+              />
+            </div>
+          )}
+        </div>
+        {allComplete && (
+          <div className={`flex items-center gap-2 pt-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span className="text-xs font-medium">All verification fields complete</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
