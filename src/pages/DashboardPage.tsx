@@ -62,7 +62,18 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
   const [providerConnectionRequested, setProviderConnectionRequested] = useState(false);
   const [receivedRequests, setReceivedRequests] = useState<RecordRequestRow[]>([]);
-  const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(new Set());
+  const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem('dismissedRecordBanners');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  useEffect(() => {
+    if (dismissedDashboardBanners.size > 0) {
+      localStorage.setItem('dismissedRecordBanners', JSON.stringify([...dismissedDashboardBanners]));
+    }
+  }, [dismissedDashboardBanners]);
 
   useEffect(() => {
     fetchRecordRequests()

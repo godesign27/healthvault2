@@ -107,7 +107,18 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   const activeRequests = requests.filter(r => r.status !== 'received');
   const receivedRequests = requests.filter(r => r.status === 'received');
   const pendingCount = activeRequests.length;
-  const [dismissedReceived, setDismissedReceived] = useState<Set<string>>(new Set());
+  const [dismissedReceived, setDismissedReceived] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem('dismissedRecordBanners');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  useEffect(() => {
+    if (dismissedReceived.size > 0) {
+      localStorage.setItem('dismissedRecordBanners', JSON.stringify([...dismissedReceived]));
+    }
+  }, [dismissedReceived]);
 
   const filters = [
     { label: 'All', value: 'all' as const },
