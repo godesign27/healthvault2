@@ -78,6 +78,37 @@ async function handleCreateRequest(
     );
   }
 
+  const resolvedUserId = userId || "00000000-0000-0000-0000-000000000000";
+
+  let displayName = patientName || "";
+  if (!displayName) {
+    try {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("full_name, display_name")
+        .eq("user_id", resolvedUserId)
+        .maybeSingle();
+      if (profile?.display_name || profile?.full_name) {
+        displayName = profile.display_name || profile.full_name;
+      }
+    } catch {}
+  }
+  if (!displayName) {
+    try {
+      const { data: patient } = await supabase
+        .from("patient_profiles")
+        .select("first_name, last_name")
+        .eq("user_id", resolvedUserId)
+        .maybeSingle();
+      if (patient?.first_name) {
+        displayName = `${patient.first_name}${patient.last_name ? " " + patient.last_name : ""}`;
+      }
+    } catch {}
+  }
+  if (!displayName) {
+    displayName = "Health Vault Patient";
+  }
+
   const secureToken = crypto.randomUUID();
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
@@ -85,13 +116,13 @@ async function handleCreateRequest(
   const { data: request, error: insertError } = await supabase
     .from("health_record_requests")
     .insert({
-      user_id: userId || "00000000-0000-0000-0000-000000000000",
+      user_id: resolvedUserId,
       provider_name: providerName,
       provider_email: providerEmail,
       doctor_name: doctorName || null,
       record_types: recordTypes,
       message: message || null,
-      patient_name: patientName || "Health Vault Patient",
+      patient_name: displayName,
       secure_token: secureToken,
       urgency: urgency || "routine",
       status: "sent",
@@ -133,7 +164,7 @@ async function handleCreateRequest(
 
       const emailHtml = generateRequestEmailHtml({
         providerName: doctorName || providerName,
-        patientName: patientName || "A patient",
+        patientName: displayName,
         recordTypeLabels: typeLabels,
         message: message || "",
         urgency: urgency || "routine",
@@ -145,7 +176,13 @@ async function handleCreateRequest(
         }),
       });
 
-      const fromAddress = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+      const rawFrom = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+      let fromField: string;
+      if (rawFrom.includes("<") && rawFrom.includes(">")) {
+        fromField = rawFrom;
+      } else {
+        fromField = `Health Vault <${rawFrom}>`;
+      }
 
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -154,9 +191,9 @@ async function handleCreateRequest(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: `Health Vault <${fromAddress}>`,
+          from: fromField,
           to: [providerEmail],
-          subject: `${patientName || "A patient"} is requesting health records via Health Vault`,
+          subject: `${displayName} is requesting health records via Health Vault`,
           html: emailHtml,
         }),
       });
