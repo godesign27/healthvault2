@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   X, Building2, Mail, Clock, CheckCircle, AlertCircle, Eye,
   FileText, FlaskConical, ScanLine, Microscope, Stethoscope,
-  ExternalLink, Send, Copy, AlertTriangle, Loader2,
+  ExternalLink, Send, Copy, AlertTriangle, Loader2, Trash2,
 } from 'lucide-react';
 import { type RecordRequestRow } from '../../lib/records/requests-api';
 
@@ -20,7 +20,7 @@ interface RecordRequestDetailDrawerProps {
   request: RecordRequestRow | null;
   darkMode?: boolean;
   onClose: () => void;
-  onResend?: (request: RecordRequestRow) => void;
+  onDelete?: (requestId: string) => void;
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -51,10 +51,12 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function RecordRequestDetailDrawer({ request, darkMode = false, onClose }: RecordRequestDetailDrawerProps) {
+export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, onDelete }: RecordRequestDetailDrawerProps) {
   const [files, setFiles] = useState<RecordRequestFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const isOpen = !!request;
 
   useEffect(() => {
@@ -105,6 +107,32 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
+  };
+
+  const handleDelete = async () => {
+    if (!request || !onDelete) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${request.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
+      if (res.ok) {
+        onDelete(request.id);
+        onClose();
+      }
+    } catch (err) {
+      console.error('Failed to delete request:', err);
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   if (!request) return null;
@@ -213,6 +241,56 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose }
               <ExternalLink className="w-4 h-4" />
               View Portal
             </button>
+            {onDelete && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className={`flex items-center justify-center p-3 rounded-xl transition-colors ${
+                    darkMode
+                      ? 'text-stone-500 hover:text-red-400 hover:bg-red-900/20'
+                      : 'text-stone-400 hover:text-red-600 hover:bg-red-50'
+                  }`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+
+                {showDeleteConfirm && (
+                  <div className={`absolute bottom-full right-0 mb-2 w-64 rounded-xl shadow-xl border p-4 z-10 ${
+                    darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
+                  }`}>
+                    <p className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                      Are you sure?
+                    </p>
+                    <p className={`text-xs mb-3 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                      This will permanently delete this request. This action cannot be undone.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          darkMode
+                            ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
+                            : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                        }`}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        className="flex-1 px-3 py-2 rounded-lg text-xs font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
+                      >
+                        {deleting ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          'Delete'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

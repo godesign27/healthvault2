@@ -242,6 +242,10 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
         request={selectedRequest}
         darkMode={darkMode}
         onClose={() => setSelectedRequest(null)}
+        onDelete={(deletedId) => {
+          setRequests(prev => prev.filter(r => r.id !== deletedId));
+          setSelectedRequest(null);
+        }}
       />
     </div>
   );
