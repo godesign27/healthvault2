@@ -1,6 +1,7 @@
 import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, MessageCircle, ClipboardCheck, SendHorizontal } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { ProviderRecordConnectionFlow } from './records/ProviderRecordConnectionFlow';
+import { InlineRecordRequestForm } from './records/InlineRecordRequestForm';
 import { InsuranceProvider, Coverage } from '../schemas/insurance';
 import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
@@ -81,6 +82,9 @@ export function AIAssistantPanel({
   const [pendingStopCoverageId, setPendingStopCoverageId] = useState<string | null>(null);
   const [awaitingAddAfterStop, setAwaitingAddAfterStop] = useState(false);
 
+  // Record request flow state
+  const [showRecordRequestFlow, setShowRecordRequestFlow] = useState(false);
+
   // Form filling state
   const [isFormFillingMode, setIsFormFillingMode] = useState(false);
   const [userProfileData, setUserProfileData] = useState<UserProfileData | null>(null);
@@ -109,6 +113,7 @@ export function AIAssistantPanel({
     setAwaitingImportResponse(false);
     setShowInsuranceFlow(false);
     setShowProviderConnectionFlow(false);
+    setShowRecordRequestFlow(false);
     setIsFormFillingMode(false);
     setAwaitingProfileDataConfirmation(false);
     setCollectingProfileData(false);
@@ -288,7 +293,11 @@ export function AIAssistantPanel({
 
     if (prompt.toLowerCase().includes('request health records') || prompt.toLowerCase().includes('request medical records')) {
       setIsLoading(false);
-      handleStartProviderConnection();
+      setMessages(prev => [...prev, {
+        type: 'assistant',
+        message: "I'll help you send a record request to your provider. Fill out the form below and I'll take care of the rest."
+      }]);
+      setShowRecordRequestFlow(true);
       return;
     }
 
@@ -620,6 +629,32 @@ export function AIAssistantPanel({
     onRequestRecords?.();
   };
 
+  const handleRecordRequestComplete = (result: { providerName: string; emailSent: boolean; emailError?: string }) => {
+    setShowRecordRequestFlow(false);
+    if (result.emailSent) {
+      setMessages(prev => [...prev, {
+        type: 'assistant',
+        message: `Your record request has been sent to ${result.providerName}. You'll be notified when the provider responds. You can track the status on your Health Records page.`
+      }]);
+    } else {
+      setMessages(prev => [...prev, {
+        type: 'assistant',
+        message: `Your request to ${result.providerName} has been saved, but the email could not be delivered${result.emailError ? `: ${result.emailError}` : '.'}. You can check the status on your Health Records page.`
+      }]);
+    }
+    if (onRefreshData) {
+      onRefreshData();
+    }
+  };
+
+  const handleRecordRequestCancel = () => {
+    setShowRecordRequestFlow(false);
+    setMessages(prev => [...prev, {
+      type: 'assistant',
+      message: "No problem! Let me know if you'd like to request records later."
+    }]);
+  };
+
   const loadProviders = async () => {
     setLoadingProviders(true);
     try {
@@ -872,7 +907,7 @@ export function AIAssistantPanel({
     if (currentPage === 'health-records') {
       return [
         { icon: LinkIcon, label: 'Connect Provider', action: handleStartProviderConnection },
-        { icon: SendHorizontal, label: 'Request Records', action: onRequestRecords ? () => onRequestRecords() : undefined, prompt: onRequestRecords ? undefined : 'I want to request my health records from a provider' },
+        { icon: SendHorizontal, label: 'Request Records', prompt: 'Request health records manually' },
         { icon: FlaskConical, label: 'Show my lab results', prompt: 'Show my lab results' },
         { icon: Upload, label: 'Upload a new record', prompt: 'I want to upload a new health record' }
       ];
@@ -1351,6 +1386,17 @@ export function AIAssistantPanel({
                       <div className="flex justify-start">
                         <div className="bg-stone-50 rounded-2xl px-5 py-4">
                           <Loader2 className="w-4 h-4 animate-spin text-stone-600" />
+                        </div>
+                      </div>
+                    )}
+                    {showRecordRequestFlow && (
+                      <div className="flex justify-start">
+                        <div className="w-full max-w-[95%]">
+                          <InlineRecordRequestForm
+                            onComplete={handleRecordRequestComplete}
+                            onCancel={handleRecordRequestCancel}
+                            onRequestSent={onRefreshData ? () => onRefreshData() : undefined}
+                          />
                         </div>
                       </div>
                     )}
