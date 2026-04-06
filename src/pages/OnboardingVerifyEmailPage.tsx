@@ -12,7 +12,7 @@ interface OnboardingVerifyEmailPageProps {
 }
 
 export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onBack }: OnboardingVerifyEmailPageProps) {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState('');
@@ -38,11 +38,11 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
     setCode(newCode);
     setError('');
 
-    if (value && index < 5) {
+    if (value && index < 7) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    if (newCode.every(digit => digit !== '') && newCode.join('').length === 6) {
+    if (newCode.every(digit => digit !== '') && newCode.join('').length === 8) {
       handleVerify(newCode.join(''));
     }
   };
@@ -55,14 +55,14 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newCode = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8);
+    const newCode = pastedData.split('').concat(Array(8).fill('')).slice(0, 8);
     setCode(newCode);
 
-    if (pastedData.length === 6) {
+    if (pastedData.length === 8) {
       handleVerify(pastedData);
     } else if (pastedData.length > 0) {
-      inputRefs.current[Math.min(pastedData.length, 5)]?.focus();
+      inputRefs.current[Math.min(pastedData.length, 7)]?.focus();
     }
   };
 
@@ -89,7 +89,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         : error.message?.includes('Invalid') || error.message?.includes('invalid')
         ? 'Invalid code. Please check and try again.'
         : 'Verification failed. Please try again.');
-      setCode(['', '', '', '', '', '']);
+      setCode(['', '', '', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
       setIsVerifying(false);
@@ -133,7 +133,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
     }
   ];
 
-  const inputClass = `w-12 h-14 text-center text-2xl font-semibold rounded-lg border-2 ${
+  const inputClass = `w-10 h-12 text-center text-xl font-semibold rounded-lg border-2 ${
     error
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
@@ -150,7 +150,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         <OnboardingAssistantPanel
           step="1 of 5"
           title="Verify Your Email"
-          message="We've sent a 6-digit verification code to your email address. Please enter it below to continue."
+          message="We've sent an 8-digit verification code to your email address. Please enter it below to continue."
           quickActions={quickActions}
           darkMode={darkMode}
         />
@@ -185,7 +185,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
           <p className={`text-sm ${
             darkMode ? 'text-stone-400' : 'text-stone-600'
           }`}>
-            Enter the 6-digit code sent to
+            Enter the 8-digit code sent to
           </p>
           <p className={`text-sm font-medium ${
             darkMode ? 'text-emerald-400' : 'text-emerald-600'
