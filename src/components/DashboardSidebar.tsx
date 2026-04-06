@@ -30,8 +30,9 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState('Timothy');
-  const [lastName, setLastName] = useState('McGuire');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [toasts, setToasts] = useState<ToastProps[]>([]);
   const [showViewsDropdown, setShowViewsDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,22 +55,30 @@ export function DashboardSidebar({
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    onViewChange?.('marketing');
+  };
+
   useEffect(() => {
-    // Load profile data on mount
     const loadProfile = async () => {
       try {
-        const userId = 'demo-user';
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        setUserEmail(session.user.email || '');
+
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('*')
-          .eq('user_id', userId)
+          .select('first_name, last_name, profile_photo_url')
+          .eq('user_id', session.user.id)
           .maybeSingle();
 
         if (error) throw error;
 
         if (data) {
-          setFirstName(data.first_name);
-          setLastName(data.last_name);
+          setFirstName(data.first_name || '');
+          setLastName(data.last_name || '');
           setProfilePhoto(data.profile_photo_url);
         }
       } catch (error) {
@@ -292,6 +301,7 @@ export function DashboardSidebar({
                   </div>
                   <Tooltip content="Log Out" position="right" className="w-full">
                     <button
+                      onClick={handleSignOut}
                       className={`
                         w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                         justify-center px-3 py-2
@@ -359,6 +369,7 @@ export function DashboardSidebar({
                     </span>
                   </button>
                   <button
+                    onClick={handleSignOut}
                     className={`
                       w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
@@ -504,7 +515,7 @@ export function DashboardSidebar({
                 }`}>{firstName} {lastName}</p>
                 <p className={`text-xs truncate whitespace-nowrap ${
                   darkMode ? 'text-stone-400' : 'text-stone-500'
-                }`}>godesigngo@gmail.com</p>
+                }`}>{userEmail}</p>
               </div>
             </button>
           )}
@@ -516,6 +527,7 @@ export function DashboardSidebar({
         onClose={() => setShowProfileSettings(false)}
         darkMode={darkMode}
         onSave={handleProfileSave}
+        onSignOut={handleSignOut}
       />
 
       <ToastContainer toasts={toasts} onClose={removeToast} />

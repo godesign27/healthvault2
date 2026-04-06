@@ -94,6 +94,16 @@ function App() {
   }, [currentView]);
 
   useEffect(() => {
+    if (
+      authState.authChecked &&
+      !authState.isAuthenticated &&
+      (currentView === 'health-vault' || currentView === 'design-system' || currentView === 'projects')
+    ) {
+      setCurrentView('marketing');
+    }
+  }, [authState.isAuthenticated, authState.authChecked, currentView]);
+
+  useEffect(() => {
     if (initializingRef.current) return;
     initializingRef.current = true;
 

@@ -1,4 +1,4 @@
-import { X, Upload, Mail, Calendar, Shield, Bell, Globe, User } from 'lucide-react';
+import { X, Upload, Mail, Calendar, Shield, Bell, Globe, User, LogOut } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -7,11 +7,12 @@ interface ProfileSettingsDrawerProps {
   onClose: () => void;
   darkMode?: boolean;
   onSave?: (data: { profilePhoto: string | null; firstName: string; lastName: string }) => void;
+  onSignOut?: () => void;
 }
 
-export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSave }: ProfileSettingsDrawerProps) {
-  const [firstName, setFirstName] = useState('Timothy');
-  const [lastName, setLastName] = useState('McGuire');
+export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSave, onSignOut }: ProfileSettingsDrawerProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -80,8 +81,10 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
     };
 
     try {
-      // Save to database
-      const userId = 'demo-user'; // For demo purposes
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('user_profiles')
         .upsert({
@@ -89,7 +92,7 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
           first_name: firstName,
           last_name: lastName,
           profile_photo_url: profileData.profilePhoto,
-          email: 'godesigngo@gmail.com'
+          email: session.user.email,
         }, {
           onConflict: 'user_id'
         });
@@ -104,23 +107,34 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
     }
   };
 
+  const [userEmail, setUserEmail] = useState('');
+  const [memberSince, setMemberSince] = useState('');
+
   useEffect(() => {
     if (isOpen) {
-      // Load profile data when drawer opens
       const loadProfile = async () => {
         try {
-          const userId = 'demo-user';
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user) return;
+
+          setUserEmail(session.user.email || '');
+          if (session.user.created_at) {
+            setMemberSince(new Date(session.user.created_at).toLocaleDateString('en-US', {
+              year: 'numeric', month: 'long', day: 'numeric'
+            }));
+          }
+
           const { data, error } = await supabase
             .from('user_profiles')
-            .select('*')
-            .eq('user_id', userId)
+            .select('first_name, last_name, profile_photo_url')
+            .eq('user_id', session.user.id)
             .maybeSingle();
 
           if (error) throw error;
 
           if (data) {
-            setFirstName(data.first_name);
-            setLastName(data.last_name);
+            setFirstName(data.first_name || '');
+            setLastName(data.last_name || '');
             setProfilePhoto(data.profile_photo_url);
             setImageUrl(data.profile_photo_url || '');
           }
@@ -157,16 +171,31 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
               darkMode ? 'text-stone-400' : 'text-stone-600'
             }`}>Manage your account information and preferences</p>
           </div>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${
-              darkMode
-                ? 'hover:bg-stone-800 text-stone-400'
-                : 'hover:bg-stone-200 text-stone-600'
-            }`}
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  darkMode
+                    ? 'text-red-400 hover:bg-red-400/10 border border-red-400/20'
+                    : 'text-red-600 hover:bg-red-50 border border-red-200'
+                }`}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                Sign Out
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode
+                  ? 'hover:bg-stone-800 text-stone-400'
+                  : 'hover:bg-stone-200 text-stone-600'
+              }`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -197,7 +226,7 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
                     }`}>
                       <span className={`text-3xl font-bold ${
                         darkMode ? 'text-stone-300' : 'text-stone-700'
-                      }`}>TM</span>
+                      }`}>{(firstName?.[0] || '') + (lastName?.[0] || '') || '?'}</span>
                     </div>
                   )}
                   <button
@@ -217,12 +246,12 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
                 </div>
                 <p className={`text-sm font-semibold mt-4 ${
                   darkMode ? 'text-white' : 'text-stone-900'
-                }`}>Timothy McGuire</p>
+                }`}>{firstName || lastName ? `${firstName} ${lastName}`.trim() : '—'}</p>
                 <p className={`text-xs flex items-center gap-1.5 mt-1 ${
                   darkMode ? 'text-stone-400' : 'text-stone-600'
                 }`}>
                   <Mail className="w-3 h-3" />
-                  godesigngo@gmail.com
+                  {userEmail}
                 </p>
                 <p className={`text-xs flex items-center gap-1.5 mt-1 ${
                   darkMode ? 'text-stone-400' : 'text-stone-600'
@@ -370,7 +399,7 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
               <div className="flex items-center justify-between">
                 <p className={`text-sm font-medium ${
                   darkMode ? 'text-stone-300' : 'text-stone-700'
-                }`}>godesigngo@gmail.com</p>
+                }`}>{userEmail}</p>
                 <span className={`text-xs flex items-center gap-1 ${
                   darkMode ? 'text-emerald-400' : 'text-emerald-600'
                 }`}>
@@ -404,7 +433,7 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
               </div>
               <p className={`text-sm font-medium ${
                 darkMode ? 'text-stone-300' : 'text-stone-700'
-              }`}>October 8, 2025</p>
+              }`}>{memberSince || '—'}</p>
             </div>
           </div>
 

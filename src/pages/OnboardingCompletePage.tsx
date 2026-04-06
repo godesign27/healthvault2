@@ -51,6 +51,31 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
           .eq('user_id', userId);
 
         if (error) throw error;
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('first_name')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        try {
+          await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/welcome-email`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: session.user.email,
+                firstName: profile?.first_name || '',
+              }),
+            }
+          );
+        } catch {
+          // Non-blocking: email failure should not prevent dashboard access
+        }
       } catch (error) {
         console.error('Failed to complete onboarding:', error);
       } finally {
