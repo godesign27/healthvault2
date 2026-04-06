@@ -1,7 +1,72 @@
-import { useState } from 'react';
-import { Send, CheckCircle, AlertCircle, Mail, X, FlaskConical, ScanLine, Microscope, Stethoscope, FileText, Loader2, Clock, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Send, CheckCircle, AlertCircle, Mail, X, FlaskConical, ScanLine, Microscope, Stethoscope, FileText, Loader2, Clock, ShieldCheck } from 'lucide-react';
 import { RecordKind } from '../../lib/records/types';
 import { createRecordRequest } from '../../lib/records/requests-api';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+
+async function fetchPatientIdentity(): Promise<{ dateOfBirth: string; phone: string; email: string }> {
+  const result = { dateOfBirth: '', phone: '', email: '' };
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}&select=date_of_birth,phone,email`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows.length > 0) {
+        result.dateOfBirth = rows[0].date_of_birth || '';
+        result.phone = rows[0].phone || '';
+        result.email = rows[0].email || '';
+      }
+    }
+  } catch {}
+  if (!result.dateOfBirth || !result.phone || !result.email) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/patient_profiles?user_id=eq.${DEMO_USER_ID}&select=birth_date,contact_phone,contact_email`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length > 0) {
+          if (!result.dateOfBirth) result.dateOfBirth = rows[0].birth_date || '';
+          if (!result.phone) result.phone = rows[0].contact_phone || '';
+          if (!result.email) result.email = rows[0].contact_email || '';
+        }
+      }
+    } catch {}
+  }
+  return result;
+}
+
+async function saveIdentityFields(fields: { dateOfBirth?: string; phone?: string; email?: string }): Promise<boolean> {
+  try {
+    const body: Record<string, string> = {};
+    if (fields.dateOfBirth) body.date_of_birth = fields.dateOfBirth;
+    if (fields.phone) body.phone = fields.phone;
+    if (fields.email) body.email = fields.email;
+    if (Object.keys(body).length === 0) return true;
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 const RECORD_TYPES = [
   { kind: RecordKind.Lab, label: 'Lab Results', icon: FlaskConical },
@@ -27,20 +92,49 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [editDob, setEditDob] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [savedProfile, setSavedProfile] = useState({ dateOfBirth: '', phone: '', email: '' });
+
+  useEffect(() => {
+    fetchPatientIdentity().then(p => {
+      setSavedProfile(p);
+      setEditDob(p.dateOfBirth);
+      setEditPhone(p.phone);
+      setEditEmail(p.email);
+      setProfileLoaded(true);
+    });
+  }, []);
+
   const toggleType = (kind: RecordKind) => {
     setSelectedTypes(prev =>
       prev.includes(kind) ? prev.filter(k => k !== kind) : [...prev, kind]
     );
   };
 
-  const canSubmit = providerName.trim() && providerEmail.trim() && selectedTypes.length > 0;
+  const identityComplete = editDob && editPhone && editEmail;
+  const canSubmit = providerName.trim() && providerEmail.trim() && selectedTypes.length > 0 && identityComplete;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    if (!identityComplete) {
+      setError('Please complete your identity information before sending.');
+      return;
+    }
     setSubmitting(true);
     setError('');
 
     try {
+      const updates: { dateOfBirth?: string; phone?: string; email?: string } = {};
+      if (editDob && editDob !== savedProfile.dateOfBirth) updates.dateOfBirth = editDob;
+      if (editPhone && editPhone !== savedProfile.phone) updates.phone = editPhone;
+      if (editEmail && editEmail !== savedProfile.email) updates.email = editEmail;
+      if (Object.keys(updates).length > 0) {
+        await saveIdentityFields(updates);
+      }
+
       const result = await createRecordRequest({
         providerName: providerName.trim(),
         providerEmail: providerEmail.trim(),
@@ -173,6 +267,80 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
             placeholder="Any details to help locate your records..."
             className={`${inputClasses} resize-none`}
           />
+        </div>
+
+        <div className={`rounded-xl border overflow-hidden ${
+          identityComplete
+            ? 'border-emerald-200 bg-emerald-50/30'
+            : 'border-amber-200 bg-amber-50/30'
+        }`}>
+          <div className={`px-3 py-2.5 flex items-center gap-2 border-b ${
+            identityComplete ? 'border-emerald-200/60' : 'border-amber-200/60'
+          }`}>
+            <ShieldCheck className={`w-4 h-4 ${identityComplete ? 'text-emerald-600' : 'text-amber-600'}`} />
+            <span className={`text-[11px] font-semibold uppercase tracking-wider ${
+              identityComplete ? 'text-emerald-700' : 'text-amber-700'
+            }`}>
+              {identityComplete ? 'Identity Verification Ready' : 'Complete Your Identity Info'}
+            </span>
+          </div>
+          <div className="px-3 py-3 space-y-2.5">
+            {!profileLoaded ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-400" />
+                <span className="text-xs text-stone-500">Loading verification info...</span>
+              </div>
+            ) : (
+              <>
+                {identityComplete ? (
+                  <p className="text-xs text-stone-500">
+                    Your date of birth, phone, and email will be included to help verify your identity.
+                  </p>
+                ) : (
+                  <p className="text-xs text-amber-700">
+                    The provider needs this information to verify your identity. Please complete any missing fields.
+                  </p>
+                )}
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Date of Birth</label>
+                    <input
+                      type="date"
+                      value={editDob}
+                      onChange={(e) => setEditDob(e.target.value)}
+                      className={`${inputClasses} !py-2`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="(555) 555-5555"
+                      className={`${inputClasses} !py-2`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className={`${inputClasses} !py-2`}
+                    />
+                  </div>
+                </div>
+                {identityComplete && (
+                  <div className="flex items-center gap-1.5 pt-0.5 text-emerald-600">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium">All verification fields complete</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {error && (
