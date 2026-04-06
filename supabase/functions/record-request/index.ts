@@ -463,6 +463,16 @@ async function handleSubmitRecords(
       (requestedKind ? kindToTitle[requestedKind] : null) ||
       "Health Record";
 
+    let previewUrl: string | null = null;
+    if (file.storage_path) {
+      const { data: signedData } = await supabase.storage
+        .from("record-request-files")
+        .createSignedUrl(file.storage_path, 60 * 60 * 24 * 365);
+      if (signedData?.signedUrl) {
+        previewUrl = signedData.signedUrl;
+      }
+    }
+
     await supabase.from("health_records").insert({
       user_id: request.user_id,
       kind: resolvedKind,
@@ -471,6 +481,7 @@ async function handleSubmitRecords(
       source: "shared",
       file_type: file.file_type,
       file_size_bytes: file.file_size_bytes,
+      preview_url: previewUrl,
       ai_summary: file.provider_notes || null,
       tags: [resolvedKind, "requested"],
       received_at: new Date().toISOString(),

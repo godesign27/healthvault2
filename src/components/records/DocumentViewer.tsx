@@ -158,28 +158,84 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
           )}
 
           {activeTab === 'document' && (
-            <div className={`flex flex-col items-center justify-center py-12 ${
-              darkMode ? 'text-stone-400' : 'text-stone-500'
-            }`}>
-              <FileText className="w-16 h-16 mb-4" />
-              {record.fileType === 'dicom' ? (
-                <>
-                  <p className="text-center mb-4">DICOM viewer integration coming soon</p>
-                  <button className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                    darkMode
-                      ? 'bg-stone-800 hover:bg-stone-700 text-white'
-                      : 'bg-stone-100 hover:bg-stone-200 text-stone-900'
-                  }`}>
-                    <ExternalLink className="w-4 h-4" />
-                    Open in External Viewer
-                  </button>
-                </>
+            <div>
+              {record.previewUrl ? (
+                <div className="space-y-3">
+                  {['jpg', 'png'].includes(record.fileType) ? (
+                    <img
+                      src={record.previewUrl}
+                      alt={record.title}
+                      className="w-full rounded-lg border border-stone-200"
+                    />
+                  ) : record.fileType === 'pdf' ? (
+                    <iframe
+                      src={record.previewUrl}
+                      title={record.title}
+                      className="w-full rounded-lg border border-stone-200"
+                      style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
+                    />
+                  ) : (
+                    <div className={`flex flex-col items-center justify-center py-12 ${
+                      darkMode ? 'text-stone-400' : 'text-stone-500'
+                    }`}>
+                      <FileText className="w-16 h-16 mb-4" />
+                      <p className="text-center mb-4">Preview not available for {record.fileType.toUpperCase()} files</p>
+                      <a
+                        href={record.previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                          darkMode
+                            ? 'bg-stone-800 hover:bg-stone-700 text-white'
+                            : 'bg-stone-100 hover:bg-stone-200 text-stone-900'
+                        }`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Download File
+                      </a>
+                    </div>
+                  )}
+                  <div className="flex justify-end">
+                    <a
+                      href={record.previewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                        darkMode
+                          ? 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'
+                          : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Open in new tab
+                    </a>
+                  </div>
+                </div>
               ) : (
-                <p className="text-center">
-                  Document preview available for {record.fileType.toUpperCase()} files
-                  <br />
-                  <span className="text-sm">(Integration coming soon)</span>
-                </p>
+                <div className={`flex flex-col items-center justify-center py-12 ${
+                  darkMode ? 'text-stone-400' : 'text-stone-500'
+                }`}>
+                  <FileText className="w-16 h-16 mb-4" />
+                  {record.fileType === 'dicom' ? (
+                    <>
+                      <p className="text-center mb-4">DICOM viewer integration coming soon</p>
+                      <button className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                        darkMode
+                          ? 'bg-stone-800 hover:bg-stone-700 text-white'
+                          : 'bg-stone-100 hover:bg-stone-200 text-stone-900'
+                      }`}>
+                        <ExternalLink className="w-4 h-4" />
+                        Open in External Viewer
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-center">
+                      No document file attached to this record.
+                      <br />
+                      <span className="text-sm">Files uploaded by providers will appear here.</span>
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           )}
