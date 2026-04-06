@@ -78,9 +78,31 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${
+    <div className={`min-h-screen ${
       darkMode ? 'bg-stone-950' : 'bg-stone-50'
     }`}>
+      <header className={`sticky top-0 z-50 border-b ${
+        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-14">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden">
+                <img
+                  src={darkMode ? "/hv_logo-dark.png" : "/hv_logo-light.png"}
+                  alt="Health Vault"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <span className={`text-sm font-bold ${
+                darkMode ? 'text-white' : 'text-stone-900'
+              }`}>Health Vault</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 57px)' }}>
       <div className="max-w-6xl w-full mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -221,7 +243,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
 
               <button
                 onClick={onGoToDashboard}
-                className="w-full px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors"
+                className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
               >
                 Go to Dashboard
               </button>
@@ -238,6 +260,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
             />
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

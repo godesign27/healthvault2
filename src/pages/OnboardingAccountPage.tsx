@@ -113,6 +113,7 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
     <OnboardingLayout
       currentStep={1}
       darkMode={darkMode}
+      onBack={onBack}
       assistant={
         <OnboardingAssistantPanel
           step="1 of 5"
@@ -258,7 +259,7 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Creating Account...' : 'Continue'}
             </button>

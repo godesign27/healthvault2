@@ -147,6 +147,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
     <OnboardingLayout
       currentStep={3}
       darkMode={darkMode}
+      onBack={onBack}
       assistant={
         <OnboardingAssistantPanel
           step="3 of 5"
@@ -369,7 +370,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Continue'}
             </button>

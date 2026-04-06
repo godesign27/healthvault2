@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
 
 interface OnboardingLayoutProps {
   children: ReactNode;
   assistant: ReactNode;
   currentStep: number;
   darkMode?: boolean;
+  onBack?: () => void;
 }
 
 const steps = [
@@ -20,12 +21,48 @@ export function OnboardingLayout({
   children,
   assistant,
   currentStep,
-  darkMode = false
+  darkMode = false,
+  onBack
 }: OnboardingLayoutProps) {
   return (
     <div className={`min-h-screen ${
       darkMode ? 'bg-stone-950' : 'bg-stone-50'
     }`}>
+      <header className={`sticky top-0 z-50 border-b ${
+        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                    darkMode
+                      ? 'hover:bg-stone-800 text-stone-400'
+                      : 'hover:bg-stone-100 text-stone-500'
+                  }`}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden">
+                  <img
+                    src={darkMode ? "/hv_logo-dark.png" : "/hv_logo-light.png"}
+                    alt="Health Vault"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <span className={`text-sm font-bold ${
+                  darkMode ? 'text-white' : 'text-stone-900'
+                }`}>Health Vault</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-center mb-8">

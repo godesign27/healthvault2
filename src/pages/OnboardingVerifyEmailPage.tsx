@@ -145,6 +145,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
     <OnboardingLayout
       currentStep={1}
       darkMode={darkMode}
+      onBack={onBack}
       assistant={
         <OnboardingAssistantPanel
           step="1 of 5"

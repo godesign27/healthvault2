@@ -290,7 +290,7 @@ function App() {
     if (currentView === 'onboarding') {
       switch (onboardingStep) {
         case 'start':
-          return <OnboardingStartPage onNext={() => setOnboardingStep('account')} />;
+          return <OnboardingStartPage onNext={() => setOnboardingStep('account')} onBack={() => setCurrentView('marketing')} />;
         case 'account':
           return <OnboardingAccountPage
             onNext={(email) => {
@@ -333,7 +333,7 @@ function App() {
             }}
           />;
         default:
-          return <OnboardingStartPage onNext={() => setOnboardingStep('account')} />;
+          return <OnboardingStartPage onNext={() => setOnboardingStep('account')} onBack={() => setCurrentView('marketing')} />;
       }
     }
 

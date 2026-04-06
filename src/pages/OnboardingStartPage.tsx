@@ -1,12 +1,13 @@
-import { Heart, Shield, FileText, Sparkles } from 'lucide-react';
+import { Heart, Shield, FileText, Sparkles, ArrowLeft } from 'lucide-react';
 import { OnboardingAssistantPanel, QuickAction } from '../components/OnboardingAssistantPanel';
 
 interface OnboardingStartPageProps {
   darkMode?: boolean;
   onNext: () => void;
+  onBack?: () => void;
 }
 
-export function OnboardingStartPage({ darkMode = false, onNext }: OnboardingStartPageProps) {
+export function OnboardingStartPage({ darkMode = false, onNext, onBack }: OnboardingStartPageProps) {
 
   const quickActions: QuickAction[] = [
     {
@@ -24,9 +25,45 @@ export function OnboardingStartPage({ darkMode = false, onNext }: OnboardingStar
   ];
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${
+    <div className={`min-h-screen ${
       darkMode ? 'bg-stone-950' : 'bg-stone-50'
     }`}>
+      <header className={`sticky top-0 z-50 border-b ${
+        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                    darkMode
+                      ? 'hover:bg-stone-800 text-stone-400'
+                      : 'hover:bg-stone-100 text-stone-500'
+                  }`}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden">
+                  <img
+                    src={darkMode ? "/hv_logo-dark.png" : "/hv_logo-light.png"}
+                    alt="Health Vault"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <span className={`text-sm font-bold ${
+                  darkMode ? 'text-white' : 'text-stone-900'
+                }`}>Health Vault</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 57px)' }}>
       <div className="max-w-6xl w-full mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -118,7 +155,7 @@ export function OnboardingStartPage({ darkMode = false, onNext }: OnboardingStar
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={onNext}
-                  className="flex-1 px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors"
+                  className="flex-1 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
                 >
                   Get Started
                 </button>
@@ -146,6 +183,7 @@ export function OnboardingStartPage({ darkMode = false, onNext }: OnboardingStar
             />
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
