@@ -1,6 +1,7 @@
 import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu, CheckCircle } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
+import { supabase } from '../lib/supabase';
 import { MedicalIDCard } from '../components/MedicalIDCard';
 import { HealthStatsCard } from '../components/HealthStatsCard';
 import { RecentActivityItem } from '../components/RecentActivityItem';
@@ -62,6 +63,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
   const [providerConnectionRequested, setProviderConnectionRequested] = useState(false);
   const [receivedRequests, setReceivedRequests] = useState<RecordRequestRow[]>([]);
+  const [userFirstName, setUserFirstName] = useState<string | null>(null);
+  const [dashboardStats, setDashboardStats] = useState({ records: 0, medications: 0, appointments: 0 });
   const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem('dismissedRecordBanners');
@@ -79,6 +82,29 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     fetchRecordRequests()
       .then(data => setReceivedRequests(data.filter(r => r.status === 'received')))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+      const userId = session.user.id;
+
+      const [profileRes, recordsRes, medsRes, apptRes] = await Promise.all([
+        supabase.from('user_profiles').select('first_name').eq('user_id', userId).maybeSingle(),
+        supabase.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+        supabase.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'scheduled'),
+      ]);
+
+      if (profileRes.data?.first_name) setUserFirstName(profileRes.data.first_name);
+      setDashboardStats({
+        records: recordsRes.count ?? 0,
+        medications: medsRes.count ?? 0,
+        appointments: apptRes.count ?? 0,
+      });
+    };
+    loadUserData().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -174,7 +200,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             Dashboard
           </h1>
           <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
-            Welcome back, Timothy! Here's your health overview.
+            Welcome back{userFirstName ? `, ${userFirstName}` : ''}! Here's your health overview.
           </p>
         </div>
 
@@ -236,8 +262,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <HealthStatsCard
               icon={<FileText className="w-5 h-5" />}
               title="Health Records"
-              value="24"
-              subtitle="+3 this month"
+              value={String(dashboardStats.records)}
+              subtitle={dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`}
               iconBgColor="bg-indigo-50"
               iconColor="text-indigo-600"
               darkMode={darkMode}
@@ -247,9 +273,9 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           <div className="md:col-span-3 lg:col-span-3">
             <HealthStatsCard
               icon={<Activity className="w-5 h-5" />}
-              title="Forms Completed"
-              value="18"
-              subtitle="Out of 18 total"
+              title="Medical Forms"
+              value="—"
+              subtitle="View in Medical Forms"
               iconBgColor="bg-emerald-50"
               iconColor="text-emerald-600"
               darkMode={darkMode}
@@ -260,8 +286,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <HealthStatsCard
               icon={<Calendar className="w-5 h-5" />}
               title="Appointments"
-              value="2"
-              subtitle="Next: Dec 15"
+              value={String(dashboardStats.appointments)}
+              subtitle={dashboardStats.appointments === 0 ? 'None scheduled' : 'Upcoming'}
               iconBgColor="bg-amber-50"
               iconColor="text-amber-600"
               darkMode={darkMode}
@@ -272,8 +298,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <HealthStatsCard
               icon={<Pill className="w-5 h-5" />}
               title="Medications"
-              value="3"
-              subtitle="All active"
+              value={String(dashboardStats.medications)}
+              subtitle={dashboardStats.medications === 0 ? 'None on file' : 'On file'}
               iconBgColor="bg-rose-50"
               iconColor="text-rose-600"
               darkMode={darkMode}

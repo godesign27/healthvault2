@@ -18,12 +18,16 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
   const [coverages, setCoverages] = useState<CoverageWithProvider[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  const userId = '00000000-0000-0000-0000-000000000000'; // Demo UUID
+  const [userId, setUserId] = useState<string | null>(null);
   const [analytics] = useState(() => new InsuranceAnalytics());
 
   useEffect(() => {
-    loadCoverages();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      if (uid) loadCoverages(uid);
+      else setLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -35,7 +39,9 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
     }
   }, [actionsRef]);
 
-  const loadCoverages = async () => {
+  const loadCoverages = async (uid?: string) => {
+    const activeUserId = uid ?? userId;
+    if (!activeUserId) return;
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -44,7 +50,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
           *,
           provider:insurance_providers(*)
         `)
-        .eq('user_id', userId)
+        .eq('user_id', activeUserId)
         .order('is_primary', { ascending: false })
         .order('created_at', { ascending: false });
 

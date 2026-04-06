@@ -27,27 +27,29 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
   const fetchAllData = async () => {
-    console.log('MedicalProfilePage: fetchAllData called');
     setIsLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) {
+        setConditions([]);
+        setMedications([]);
+        setAllergies([]);
+        setImmunizations([]);
+        setIsLoading(false);
+        return;
+      }
       const [conditionsRes, medicationsRes, allergiesRes, immunizationsRes] = await Promise.all([
-        supabase.from('conditions').select('*').order('created_at', { ascending: false }),
-        supabase.from('medications').select('*').order('created_at', { ascending: false }),
-        supabase.from('allergies').select('*').order('created_at', { ascending: false }),
-        supabase.from('immunizations').select('*').order('created_at', { ascending: false }),
+        supabase.from('conditions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('medications').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('allergies').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('immunizations').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
       ]);
 
       if (conditionsRes.error) throw conditionsRes.error;
       if (medicationsRes.error) throw medicationsRes.error;
       if (allergiesRes.error) throw allergiesRes.error;
       if (immunizationsRes.error) throw immunizationsRes.error;
-
-      console.log('MedicalProfilePage: Data fetched:', {
-        conditions: conditionsRes.data?.length,
-        medications: medicationsRes.data?.length,
-        allergies: allergiesRes.data?.length,
-        immunizations: immunizationsRes.data?.length
-      });
 
       setConditions(conditionsRes.data || []);
       setMedications(medicationsRes.data || []);
