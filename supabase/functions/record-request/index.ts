@@ -620,6 +620,9 @@ function generateRequestEmailHtml(params: {
           <!-- Header -->
           <tr>
             <td style="padding:32px;text-align:center;background-color:#ffffff;">
+              <div style="margin:0 auto 16px;text-align:center;">
+                <span style="display:inline-block;padding:3px 10px;background-color:#fef3c7;color:#92400e;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Beta</span>
+              </div>
               <img src="https://sgwekxjlvadvdosyudgj.supabase.co/storage/v1/object/public/profile-images/hv_logo-light.png" alt="Health Vault" style="width:80px;height:80px;margin:0 auto 16px;" />
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#1c1917;">Health Records Request</h1>
               <div>${urgencyBadge}</div>
