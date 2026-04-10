@@ -206,7 +206,7 @@ async function handleCreateRequest(
 
   const secureToken = crypto.randomUUID();
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 30);
+  expiresAt.setDate(expiresAt.getDate() + 10);
 
   const { data: request, error: insertError } = await supabase
     .from("health_record_requests")
