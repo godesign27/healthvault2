@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import {
   X, Building2, Mail, Clock, CheckCircle, AlertCircle, Eye,
   FileText, FlaskConical, ScanLine, Microscope, Stethoscope,
-  ExternalLink, Send, Copy, AlertTriangle, Loader2, Trash2,
+  ExternalLink, Send, Copy, AlertTriangle, Loader2, Trash2, RefreshCw,
 } from 'lucide-react';
-import { type RecordRequestRow } from '../../lib/records/requests-api';
+import { type RecordRequestRow, resendRecordRequest } from '../../lib/records/requests-api';
 
 interface RecordRequestFile {
   id: string;
@@ -58,6 +58,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
   const [copied, setCopied] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
   const [liveRequest, setLiveRequest] = useState<RecordRequestRow | null>(null);
   const isOpen = !!request;
 
@@ -162,8 +164,28 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
     }
   };
 
+  const handleResend = async () => {
+    if (!displayReq) return;
+    setResending(true);
+    try {
+      await resendRecordRequest(displayReq.id);
+      setResendDone(true);
+      setTimeout(() => setResendDone(false), 3000);
+      await refreshRequest(displayReq.id);
+    } catch (err) {
+      console.error('Failed to resend request:', err);
+    } finally {
+      setResending(false);
+    }
+  };
+
   const displayReq = liveRequest || request;
   if (!displayReq) return null;
+
+  const isExpired =
+    displayReq.status !== 'received' &&
+    !!displayReq.expires_at &&
+    new Date(displayReq.expires_at) < new Date();
 
   const timeline = [
     { label: 'Request Created', time: displayReq.created_at, icon: FileText, done: true },
@@ -189,9 +211,11 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
               displayReq.status === 'received'
                 ? 'bg-emerald-100 text-emerald-600'
-                : displayReq.status === 'sent'
-                  ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
-                  : darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
+                : isExpired
+                  ? darkMode ? 'bg-orange-900/30 text-orange-400' : 'bg-orange-100 text-orange-600'
+                  : displayReq.status === 'sent'
+                    ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
+                    : darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
             }`}>
               <Building2 className="w-5 h-5" />
             </div>
@@ -218,7 +242,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
-            <StatusSection request={displayReq} darkMode={darkMode} />
+            <StatusSection request={displayReq} darkMode={darkMode} isExpired={isExpired} />
             <RecordTypesSection request={displayReq} darkMode={darkMode} />
             {displayReq.message && <MessageSection message={displayReq.message} darkMode={darkMode} />}
             <TimelineSection timeline={timeline} darkMode={darkMode} />
@@ -235,40 +259,71 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
           darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-white'
         }`}>
           <div className="flex gap-3">
-            <button
-              onClick={handleCopyLink}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
-                darkMode
-                  ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-              }`}
-            >
-              {copied ? (
-                <>
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  Copied
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                  Copy Link
-                </>
-              )}
-            </button>
-            <button
-              onClick={() => {
-                const link = `${window.location.origin}/record-request/${displayReq.id}`;
-                window.open(link, '_blank');
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
-                darkMode
-                  ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-              }`}
-            >
-              <ExternalLink className="w-4 h-4" />
-              View Portal
-            </button>
+            {isExpired ? (
+              <button
+                onClick={handleResend}
+                disabled={resending || resendDone}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors disabled:opacity-60 ${
+                  resendDone
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {resending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Resending...
+                  </>
+                ) : resendDone ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Sent
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Resend Request
+                  </>
+                )}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleCopyLink}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
+                    darkMode
+                      ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 text-emerald-500" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copy Link
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    const link = `${window.location.origin}/record-request/${displayReq.id}`;
+                    window.open(link, '_blank');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
+                    darkMode
+                      ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                  }`}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Portal
+                </button>
+              </>
+            )}
             {onDelete && (
               <div className="relative">
                 <button
@@ -326,7 +381,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
   );
 }
 
-function StatusSection({ request, darkMode }: { request: RecordRequestRow; darkMode: boolean }) {
+function StatusSection({ request, darkMode, isExpired }: { request: RecordRequestRow; darkMode: boolean; isExpired: boolean }) {
   const statusConfig: Record<string, { label: string; color: string; bgColor: string; borderColor: string; icon: typeof CheckCircle }> = {
     sent: {
       label: 'Email Sent to Provider',
@@ -356,9 +411,17 @@ function StatusSection({ request, darkMode }: { request: RecordRequestRow; darkM
       borderColor: darkMode ? 'border-red-800' : 'border-red-200',
       icon: AlertCircle,
     },
+    expired: {
+      label: 'Request Expired',
+      color: darkMode ? 'text-orange-300' : 'text-orange-700',
+      bgColor: darkMode ? 'bg-orange-900/20' : 'bg-orange-50',
+      borderColor: darkMode ? 'border-orange-800' : 'border-orange-200',
+      icon: Clock,
+    },
   };
 
-  const cfg = statusConfig[request.status] || statusConfig.pending;
+  const effectiveStatus = isExpired ? 'expired' : request.status;
+  const cfg = statusConfig[effectiveStatus] || statusConfig.pending;
   const Icon = cfg.icon;
 
   return (
@@ -366,12 +429,17 @@ function StatusSection({ request, darkMode }: { request: RecordRequestRow; darkM
       <Icon className={`w-5 h-5 shrink-0 ${cfg.color}`} />
       <div>
         <p className={`text-sm font-semibold ${cfg.color}`}>{cfg.label}</p>
-        {request.status === 'sent' && !request.opened_at && (
+        {isExpired && (
+          <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+            The provider link is no longer valid. Use Resend Request to issue a new one.
+          </p>
+        )}
+        {!isExpired && request.status === 'sent' && !request.opened_at && (
           <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
             Waiting for provider to open the link
           </p>
         )}
-        {request.status === 'sent' && request.opened_at && (
+        {!isExpired && request.status === 'sent' && request.opened_at && (
           <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
             Provider opened the link -- awaiting file submission
           </p>

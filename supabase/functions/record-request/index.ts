@@ -61,6 +61,14 @@ Deno.serve(async (req: Request) => {
       return await handleSubmitRecords(pathParts[0], req, supabase);
     }
 
+    if (
+      req.method === "POST" &&
+      pathParts.length === 2 &&
+      pathParts[1] === "resend"
+    ) {
+      return await handleResendRequest(pathParts[0], req, supabase, supabaseUrl);
+    }
+
     return jsonResponse({ error: "Not found" }, 404);
   } catch (error: any) {
     console.error("Error:", error);
@@ -301,6 +309,131 @@ async function handleCreateRequest(
   return jsonResponse({
     id: request.id,
     status: request.status,
+    emailSent,
+    emailError,
+    submitUrl,
+  });
+}
+
+async function handleResendRequest(
+  requestId: string,
+  req: Request,
+  supabase: any,
+  supabaseUrl: string
+) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
+  const { data: request, error } = await supabase
+    .from("health_record_requests")
+    .select("*")
+    .eq("id", requestId)
+    .single();
+
+  if (error || !request) {
+    return jsonResponse({ error: "Request not found" }, 404);
+  }
+
+  if (request.status === "received") {
+    return jsonResponse({ error: "Records already received for this request" }, 400);
+  }
+
+  const newToken = crypto.randomUUID();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 10);
+
+  const { error: updateError } = await supabase
+    .from("health_record_requests")
+    .update({
+      secure_token: newToken,
+      expires_at: expiresAt.toISOString(),
+      status: "sent",
+      opened_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requestId);
+
+  if (updateError) throw updateError;
+
+  const appUrl =
+    Deno.env.get("APP_URL") || req.headers.get("origin") || supabaseUrl;
+  const submitUrl = `${appUrl}/record-request/${requestId}?token=${newToken}`;
+
+  let emailSent = false;
+  let emailError = null;
+
+  const patient: PatientIdentity = {
+    fullName: request.patient_name,
+    dateOfBirth: null,
+    phone: null,
+    email: null,
+    healthVaultId: null,
+    address: null,
+  };
+
+  if (request.user_id) {
+    const enriched = await fetchPatientIdentity(supabase, request.user_id, request.patient_name);
+    Object.assign(patient, enriched);
+  }
+
+  try {
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      emailError = "RESEND_API_KEY not configured";
+    } else {
+      const typeLabels = (request.record_types as string[])
+        .map((t: string) => KIND_LABELS[t] || t)
+        .join(", ");
+
+      const emailHtml = generateRequestEmailHtml({
+        providerName: request.doctor_name || request.provider_name,
+        patient,
+        recordTypeLabels: typeLabels,
+        recordTypes: request.record_types as string[],
+        message: request.message || "",
+        notes: request.notes || "",
+        urgency: request.urgency || "routine",
+        submitUrl,
+        expiryDate: expiresAt.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        requestDate: formatRequestDate(new Date().toISOString()),
+        dateRangeStart: request.date_range_start || null,
+        dateRangeEnd: request.date_range_end || null,
+      });
+
+      const emailResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Health Vault <noreply@healthvault27.com>",
+          to: [request.provider_email],
+          subject: `${patient.fullName} is re-sending a health records request via Health Vault`,
+          html: emailHtml,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        const responseText = await emailResponse.text();
+        emailError = `Email send failed: ${emailResponse.status} ${responseText}`;
+      } else {
+        emailSent = true;
+      }
+    }
+  } catch (err: any) {
+    emailError = err.message || "Unknown email error";
+  }
+
+  return jsonResponse({
+    id: requestId,
+    status: "sent",
     emailSent,
     emailError,
     submitUrl,

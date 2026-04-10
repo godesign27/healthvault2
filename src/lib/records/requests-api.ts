@@ -84,6 +84,33 @@ export async function createRecordRequest(
   return res.json();
 }
 
+export interface ResendRequestResult {
+  id: string;
+  status: string;
+  emailSent: boolean;
+  emailError: string | null;
+}
+
+export async function resendRecordRequest(requestId: string): Promise<ResendRequestResult> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error('Not authenticated');
+
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/record-request/${requestId}/resend`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || 'Failed to resend request');
+  }
+
+  return res.json();
+}
+
 export async function fetchRecordRequests(): Promise<RecordRequestRow[]> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user) return [];
