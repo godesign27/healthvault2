@@ -2,10 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle, ShieldCheck, User } from 'lucide-react';
 import { RecordKind } from '../../lib/records/types';
 import { createRecordRequest } from '../../lib/records/requests-api';
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+import { supabase } from '../../lib/supabase';
 
 interface PatientProfileSnapshot {
   dateOfBirth: string;
@@ -16,59 +13,41 @@ interface PatientProfileSnapshot {
 async function fetchPatientProfile(): Promise<PatientProfileSnapshot> {
   const result: PatientProfileSnapshot = { dateOfBirth: '', phone: '', email: '' };
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}&select=date_of_birth,phone,email`,
-      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
-    );
-    if (res.ok) {
-      const rows = await res.json();
-      if (rows.length > 0) {
-        result.dateOfBirth = rows[0].date_of_birth || '';
-        result.phone = rows[0].phone || '';
-        result.email = rows[0].email || '';
-      }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return result;
+
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('date_of_birth, phone, email')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (data) {
+      result.dateOfBirth = data.date_of_birth || '';
+      result.phone = data.phone || '';
+      result.email = data.email || session.user.email || '';
     }
   } catch {}
-  if (!result.dateOfBirth || !result.phone || !result.email) {
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/patient_profiles?user_id=eq.${DEMO_USER_ID}&select=birth_date,contact_phone,contact_email`,
-        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
-      );
-      if (res.ok) {
-        const rows = await res.json();
-        if (rows.length > 0) {
-          if (!result.dateOfBirth) result.dateOfBirth = rows[0].birth_date || '';
-          if (!result.phone) result.phone = rows[0].contact_phone || '';
-          if (!result.email) result.email = rows[0].contact_email || '';
-        }
-      }
-    } catch {}
-  }
   return result;
 }
 
 async function saveProfileFields(fields: Partial<PatientProfileSnapshot>): Promise<boolean> {
   try {
-    const body: Record<string, string> = {};
-    if (fields.dateOfBirth) body.date_of_birth = fields.dateOfBirth;
-    if (fields.phone) body.phone = fields.phone;
-    if (fields.email) body.email = fields.email;
-    if (Object.keys(body).length === 0) return true;
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/user_profiles?user_id=eq.${DEMO_USER_ID}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify(body),
-      }
-    );
-    return res.ok;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return false;
+
+    const update: Record<string, string> = {};
+    if (fields.dateOfBirth) update.date_of_birth = fields.dateOfBirth;
+    if (fields.phone) update.phone = fields.phone;
+    if (fields.email) update.email = fields.email;
+    if (Object.keys(update).length === 0) return true;
+
+    const { error } = await supabase
+      .from('user_profiles')
+      .update(update)
+      .eq('user_id', session.user.id);
+
+    return !error;
   } catch {
     return false;
   }

@@ -1,7 +1,6 @@
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { supabase } from '../supabase';
 
-const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export interface RecordRequestInput {
   providerName: string;
@@ -43,20 +42,33 @@ export interface CreateRequestResult {
 export async function createRecordRequest(
   input: RecordRequestInput
 ): Promise<CreateRequestResult> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error('Not authenticated');
+
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('first_name, last_name')
+    .eq('user_id', session.user.id)
+    .maybeSingle();
+
+  const patientName = input.patientName ||
+    (profile ? `${profile.first_name} ${profile.last_name}`.trim() : '') ||
+    session.user.email || '';
+
   const res = await fetch(`${SUPABASE_URL}/functions/v1/record-request`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Authorization': `Bearer ${session.access_token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      userId: DEMO_USER_ID,
+      userId: session.user.id,
       providerName: input.providerName,
       providerEmail: input.providerEmail,
       doctorName: input.doctorName,
       recordTypes: input.recordTypes,
       message: input.message,
-      patientName: input.patientName || 'Timothy McGuire',
+      patientName,
       urgency: input.urgency || 'routine',
       notes: input.notes,
       dateRangeStart: input.dateRangeStart,
@@ -73,20 +85,15 @@ export async function createRecordRequest(
 }
 
 export async function fetchRecordRequests(): Promise<RecordRequestRow[]> {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/health_record_requests?user_id=eq.${DEMO_USER_ID}&order=created_at.desc&select=*`,
-    {
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-    }
-  );
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return [];
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Failed to fetch requests: ${res.status} ${text}`);
-  }
+  const { data, error } = await supabase
+    .from('health_record_requests')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
 
-  return res.json();
+  if (error) throw new Error(`Failed to fetch requests: ${error.message}`);
+  return (data || []) as RecordRequestRow[];
 }

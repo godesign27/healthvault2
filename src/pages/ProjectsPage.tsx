@@ -52,14 +52,15 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
     }
 
     try {
-      const demoUserId = 'demo-user';
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id || 'demo-user';
 
       const { data, error } = await supabase
         .from('projects')
         .insert({
           name: newProjectName,
           description: newProjectDescription,
-          user_id: demoUserId,
+          user_id: userId,
           image_url: newProjectImage
         })
         .select()
@@ -80,14 +81,15 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
 
   const handleDuplicateProject = async (project: Project) => {
     try {
-      const demoUserId = 'demo-user';
+      const { data: { session } } = await supabase.auth.getSession();
+      const dupUserId = session?.user?.id || 'demo-user';
 
       const { data: newProject, error: projectError } = await supabase
         .from('projects')
         .insert({
           name: `${project.name} (Copy)`,
           description: project.description,
-          user_id: demoUserId,
+          user_id: dupUserId,
           duplicated_from: project.id,
           image_url: project.image_url
         })
