@@ -1564,6 +1564,235 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       }
     },
   },
+
+  getEHRConnections: {
+    confirmationRequired: false,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'getEHRConnections',
+        description:
+          'Returns the patient\'s active EHR connections configured for automatic record fetching via Keragon. Call this first when the user asks to get or sync their health records from a provider system.',
+        parameters: { type: 'object', properties: {} },
+      },
+    },
+    execute: async (_args, userId, sb) => {
+      try {
+        const { data, error: dbErr } = await sb
+          .from('provider_connections')
+          .select(`
+            id,
+            ehr_source,
+            fhir_patient_id,
+            ehr_department_id,
+            status,
+            last_synced_at,
+            created_at,
+            provider_organizations (name, ehr_vendor)
+          `)
+          .eq('user_id', userId)
+          .eq('connection_method', 'keragon')
+          .order('created_at', { ascending: false });
+
+        if (dbErr) return error(`Database error: ${dbErr.message}`);
+
+        const connections = (data || []).map((row: any) => ({
+          id: row.id,
+          ehrSource: row.ehr_source,
+          ehrPatientId: row.fhir_patient_id,
+          ehrDepartmentId: row.ehr_department_id,
+          providerName: row.provider_organizations?.name || row.ehr_source,
+          status: row.status,
+          lastSyncedAt: row.last_synced_at,
+        }));
+
+        if (!connections.length) {
+          return success(
+            { connections: [] },
+            'No EHR connections found. Ask the patient which EHR system they use so you can set one up.'
+          );
+        }
+
+        return success(
+          { connections },
+          `Found ${connections.length} EHR connection${connections.length !== 1 ? 's' : ''}.`
+        );
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
+
+  connectEHRProvider: {
+    confirmationRequired: true,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'connectEHRProvider',
+        description:
+          'Saves a new EHR connection for the patient and triggers an immediate record fetch via Keragon. Use after the patient has provided their EHR source and patient ID. Requires confirmation.',
+        parameters: {
+          type: 'object',
+          properties: {
+            ehrSource: {
+              type: 'string',
+              enum: ['athenahealth', 'elation', 'charmhealth', 'openemr', 'eclinicalworks', 'nextech', 'healthgorilla'],
+              description: 'The EHR system the patient uses.',
+            },
+            ehrPatientId: {
+              type: 'string',
+              description: 'The patient\'s ID in that EHR system.',
+            },
+            ehrDepartmentId: {
+              type: 'string',
+              description: 'Department ID — required for athenahealth only.',
+            },
+            providerName: {
+              type: 'string',
+              description: 'Human-readable name of the provider organization (e.g., "Riverside Medical Center").',
+            },
+            confirmed: {
+              type: 'boolean',
+              description: 'Must be true to save the connection.',
+            },
+          },
+          required: ['ehrSource', 'ehrPatientId', 'providerName', 'confirmed'],
+        },
+      },
+    },
+    execute: async (args, userId, sb) => {
+      try {
+        if (!args.confirmed) return error('Connecting an EHR provider requires confirmation.');
+
+        const ehrSource = args.ehrSource as string;
+        const ehrPatientId = args.ehrPatientId as string;
+        const ehrDepartmentId = args.ehrDepartmentId as string | undefined;
+
+        if (ehrSource === 'athenahealth' && !ehrDepartmentId) {
+          return error('department_id is required for Athena Health. Please ask the patient for their Athena department ID.');
+        }
+
+        // Upsert the connection
+        const { data: conn, error: insertErr } = await sb
+          .from('provider_connections')
+          .insert({
+            user_id: userId,
+            provider_organization_id: null,
+            connection_method: 'keragon',
+            status: 'active',
+            ehr_source: ehrSource,
+            fhir_patient_id: ehrPatientId,
+            ehr_department_id: ehrDepartmentId || null,
+          })
+          .select('id')
+          .single();
+
+        if (insertErr) return error(`Failed to save connection: ${insertErr.message}`);
+
+        // Trigger the record fetch immediately
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+        const fetchRes = await fetch(`${supabaseUrl}/functions/v1/trigger-ehr-fetch`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({
+            connectionId: conn.id,
+            _userId: userId,
+          }),
+        });
+
+        const fetchBody = await fetchRes.json().catch(() => ({}));
+        const fetchTriggered = fetchRes.ok;
+
+        return success(
+          {
+            connectionId: conn.id,
+            ehrSource,
+            fetchTriggered,
+            fetchMessage: fetchBody.message || null,
+          },
+          fetchTriggered
+            ? `Connected to ${args.providerName} and triggered a record fetch. Your records will appear in your vault within a few minutes.`
+            : `Connected to ${args.providerName}. Record fetch could not be started automatically — you can retry by asking me to sync your records.`
+        );
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
+
+  triggerEHRRecordFetch: {
+    confirmationRequired: false,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'triggerEHRRecordFetch',
+        description:
+          'Triggers an immediate record fetch from a connected EHR system via Keragon. Use when the patient already has a connection and wants to sync or refresh their records.',
+        parameters: {
+          type: 'object',
+          properties: {
+            connectionId: {
+              type: 'string',
+              description: 'ID of the EHR connection to sync (from getEHRConnections).',
+            },
+          },
+          required: ['connectionId'],
+        },
+      },
+    },
+    execute: async (args, userId, sb) => {
+      try {
+        // Verify the connection belongs to this user
+        const { data: conn, error: connErr } = await sb
+          .from('provider_connections')
+          .select('id, ehr_source, fhir_patient_id, provider_organizations(name)')
+          .eq('id', args.connectionId)
+          .eq('user_id', userId)
+          .eq('connection_method', 'keragon')
+          .maybeSingle();
+
+        if (connErr || !conn) {
+          return error('EHR connection not found.');
+        }
+
+        if (!conn.fhir_patient_id || !conn.ehr_source) {
+          return error('Connection is missing required EHR details. Please reconnect your provider.');
+        }
+
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+        const fetchRes = await fetch(`${supabaseUrl}/functions/v1/trigger-ehr-fetch`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({ connectionId: args.connectionId, _userId: userId }),
+        });
+
+        const body = await fetchRes.json().catch(() => ({}));
+
+        if (!fetchRes.ok) {
+          return error(body.error || `Record fetch failed (${fetchRes.status}).`);
+        }
+
+        const providerName = (conn.provider_organizations as any)?.name || conn.ehr_source;
+
+        return success(
+          { connectionId: args.connectionId, ehrSource: conn.ehr_source, triggered: true },
+          `Syncing records from ${providerName}. New records will appear in your vault within a few minutes.`
+        );
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
 };
 
 export function getToolDefinitions() {
