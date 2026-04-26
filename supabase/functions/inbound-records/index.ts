@@ -211,6 +211,27 @@ async function handleIngest(
     );
   }
 
+  // Keragon Path B: provider not connected — update connection status and acknowledge
+  if (body.status === "pending_auth") {
+    const ehrSource = body.ehr_source as string | undefined;
+
+    if (ehrSource && patientId) {
+      await supabase
+        .from("provider_connections")
+        .update({ status: "pending", updated_at: new Date().toISOString() })
+        .eq("user_id", patientId)
+        .eq("ehr_source", ehrSource)
+        .eq("connection_method", "keragon");
+    }
+
+    return jsonResponse({
+      received: 0,
+      status: "pending_auth",
+      patientId,
+      message: "Patient authorization pending. Status updated.",
+    });
+  }
+
   let normalized: NormalizedRecord[] = [];
 
   // FHIR Bundle path

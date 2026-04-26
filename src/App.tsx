@@ -40,6 +40,7 @@ import DashboardPage from './pages/DashboardPage';
 import { MarketingSitePage } from './pages/MarketingSitePage';
 import SecureShareLanding from './pages/SecureShareLanding';
 import ProviderRecordSubmitPage from './pages/ProviderRecordSubmitPage';
+import EhrConnectPage from './pages/EhrConnectPage';
 import { LoginPage } from './pages/LoginPage';
 import { OnboardingStartPage } from './pages/OnboardingStartPage';
 import { OnboardingAccountPage } from './pages/OnboardingAccountPage';
@@ -453,6 +454,11 @@ function App() {
   const isRecordRequestRoute = window.location.pathname.startsWith('/record-request/');
   if (isRecordRequestRoute) {
     return <ProviderRecordSubmitPage />;
+  }
+
+  const isEhrConnectRoute = window.location.pathname.startsWith('/ehr-connect');
+  if (isEhrConnectRoute) {
+    return <EhrConnectPage />;
   }
 
   const subdomainInfo = parseSubdomain();
