@@ -7,7 +7,7 @@ import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
-import { sendAssistantMessage } from '../lib/openai/client';
+import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 
 interface Message {
@@ -94,7 +94,6 @@ export function AIAssistantPanel({
   const [collectingProfileData, setCollectingProfileData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [collectedData, setCollectedData] = useState<any>({});
-  const [lastResponseId, setLastResponseId] = useState<string | undefined>(undefined);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,7 +118,6 @@ export function AIAssistantPanel({
     setCollectingProfileData(false);
     setCurrentFieldIndex(0);
     setCollectedData({});
-    setLastResponseId(undefined);
   }, [currentPage]);
 
   useEffect(() => {
@@ -260,14 +258,13 @@ export function AIAssistantPanel({
     setIsLoading(true);
 
     try {
-      const data = await sendAssistantMessage({
+      const data = await sendChatMessage({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: messages.map(m => ({ role: m.type as 'user' | 'assistant', content: m.message })),
       });
 
-      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -324,14 +321,13 @@ export function AIAssistantPanel({
     }
 
     try {
-      const data = await sendAssistantMessage({
+      const data = await sendChatMessage({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: messages.map(m => ({ role: m.type as 'user' | 'assistant', content: m.message })),
       });
 
-      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
