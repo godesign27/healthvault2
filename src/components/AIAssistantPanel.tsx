@@ -1,4 +1,4 @@
-import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, MessageCircle, ClipboardCheck, SendHorizontal, RefreshCw, ArrowRight } from 'lucide-react';
+import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, MessageCircle, ClipboardCheck, SendHorizontal } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { ProviderRecordConnectionFlow } from './records/ProviderRecordConnectionFlow';
 import { InlineRecordRequestForm } from './records/InlineRecordRequestForm';
@@ -7,7 +7,7 @@ import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
-import { sendChatMessage } from '../lib/openai/client';
+import { sendAssistantMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 
 interface Message {
@@ -94,6 +94,7 @@ export function AIAssistantPanel({
   const [collectingProfileData, setCollectingProfileData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [collectedData, setCollectedData] = useState<any>({});
+  const [lastResponseId, setLastResponseId] = useState<string | undefined>(undefined);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,6 +119,7 @@ export function AIAssistantPanel({
     setCollectingProfileData(false);
     setCurrentFieldIndex(0);
     setCollectedData({});
+    setLastResponseId(undefined);
   }, [currentPage]);
 
   useEffect(() => {
@@ -258,13 +260,14 @@ export function AIAssistantPanel({
     setIsLoading(true);
 
     try {
-      const data = await sendChatMessage({
+      const data = await sendAssistantMessage({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        conversationHistory: messages.map(m => ({ role: m.type as 'user' | 'assistant', content: m.message })),
+        previousResponseId: lastResponseId,
       });
 
+      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -321,13 +324,14 @@ export function AIAssistantPanel({
     }
 
     try {
-      const data = await sendChatMessage({
+      const data = await sendAssistantMessage({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        conversationHistory: messages.map(m => ({ role: m.type as 'user' | 'assistant', content: m.message })),
+        previousResponseId: lastResponseId,
       });
 
+      setLastResponseId(data.responseId);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -941,7 +945,7 @@ export function AIAssistantPanel({
         'Connect my provider to import records',
         'Request health records manually',
         'Show my lab results',
-        'Upload a new record',
+        'Upload a new record'
       ];
     }
     return [
@@ -1341,23 +1345,6 @@ export function AIAssistantPanel({
                       </p>
                       <p className="text-sm text-stone-500 mt-2">Just now</p>
                     </div>
-
-                    {currentPage === 'health-records' && (
-                      <button
-                        onClick={() => handleQuickAction('Get my recent health records')}
-                        disabled={isLoading}
-                        className="w-full flex items-center gap-4 px-5 py-4 bg-stone-900 text-white rounded-xl hover:bg-stone-800 active:scale-[0.98] transition-all group disabled:opacity-50"
-                      >
-                        <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <RefreshCw className="w-4 h-4 text-white group-hover:rotate-180 transition-transform duration-500" />
-                        </div>
-                        <div className="text-left flex-1 min-w-0">
-                          <p className="text-sm font-semibold leading-tight">Get My Recent Records</p>
-                          <p className="text-xs text-white/55 mt-0.5 truncate">Fetch records from your connected EHR</p>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-white/40 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    )}
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
