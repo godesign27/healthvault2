@@ -20,6 +20,17 @@ interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  dashboard: 'Dashboard',
+  care: 'Care History',
+  'medical-forms': 'Medical Forms',
+  'medical-profile': 'Medical Profile',
+  network: 'Care Network',
+  insurance: 'Insurance',
+  'health-records': 'Health Records',
+  vitals: 'Vitals',
+};
+
 export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
@@ -159,7 +170,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
     if (currentPage === 'vitals') {
       return (
-        <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
+        <div className="w-full p-6 sm:p-8 lg:p-12 pt-14 lg:pt-12">
           <div className="mb-8">
             <h1 className={`text-2xl font-bold ${
               darkMode ? 'text-white' : 'text-stone-900'
@@ -191,7 +202,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     return (
-      <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
+      <div className="w-full p-6 sm:p-8 lg:p-12 pt-14 lg:pt-12 relative">
         <div className="mb-8">
           <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
             darkMode ? 'text-white' : 'text-stone-900'
@@ -449,18 +460,25 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             ? 'bg-gradient-to-br from-stone-950 via-stone-950 to-stone-900'
             : 'bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50'
         }`}>
-          {/* Mobile hamburger menu button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className={`lg:hidden fixed top-4 left-4 z-30 p-3 rounded-xl shadow-lg transition-all active:scale-95 ${
-              darkMode
-                ? 'bg-stone-800 text-white hover:bg-stone-700'
-                : 'bg-white text-stone-900 hover:bg-stone-50'
-            }`}
-            aria-label="Open navigation menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {/* Mobile top bar — hamburger + page title */}
+          <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center gap-3 px-3 h-14 border-b backdrop-blur-sm ${
+            darkMode
+              ? 'bg-stone-950/95 border-stone-800'
+              : 'bg-white/95 border-stone-200'
+          }`}>
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className={`p-2.5 rounded-xl transition-all active:scale-95 ${
+                darkMode ? 'text-white hover:bg-stone-800' : 'text-stone-700 hover:bg-stone-100'
+              }`}
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              {PAGE_TITLES[currentPage] ?? 'Dashboard'}
+            </span>
+          </div>
 
           {renderMainContent()}
         </main>

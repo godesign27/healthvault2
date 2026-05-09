@@ -296,7 +296,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
   const completedSelectedCount = getCompletedSelectedCount();
 
   return (
-    <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
+    <div className="w-full p-6 sm:p-8 lg:p-12 pt-14 lg:pt-12">
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
