@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Calendar, Edit2, Share2, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Calendar, CreditCard as Edit2, Share2, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { Provider } from '../../types/network';
 
 interface ProviderCardProps {
@@ -36,9 +36,9 @@ export function ProviderCard({
       }`}
       onClick={() => onView?.(provider)}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className={`text-lg font-semibold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex-1 min-w-0">
+          <h3 className={`text-lg font-semibold mb-1 truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
             {provider.name}
           </h3>
           {provider.specialty && (

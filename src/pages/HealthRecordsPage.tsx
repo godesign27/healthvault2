@@ -131,36 +131,36 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
-      <div className="mb-8 flex items-start justify-between gap-4">
-        <div>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="min-w-0">
           <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
             darkMode ? 'text-white' : 'text-stone-900'
           }`}>
-            <FileText className="w-7 h-7" />
+            <FileText className="w-7 h-7 shrink-0" />
             Health Records
           </h1>
           <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
             Your labs, scans, and medical documents — all in one place.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={onConnectProvider}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-colors shadow-sm"
           >
             <Link2 className="w-4 h-4" />
-            Connect Provider
+            <span className="hidden sm:inline">Connect Provider</span>
           </button>
           <button
             onClick={() => setRequestDrawerOpen(true)}
-            className={`relative inline-flex items-center gap-2 px-5 py-2.5 border rounded-xl font-medium transition-colors shadow-sm ${
+            className={`relative inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 border rounded-xl font-medium transition-colors shadow-sm ${
               darkMode
                 ? 'border-stone-700 text-stone-300 hover:bg-stone-800'
                 : 'border-stone-300 text-stone-700 hover:bg-stone-50'
             }`}
           >
             <SendHorizonal className="w-4 h-4" />
-            Request Manually
+            <span className="hidden sm:inline">Request Manually</span>
             {pendingCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {pendingCount}

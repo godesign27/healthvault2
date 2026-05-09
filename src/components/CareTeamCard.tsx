@@ -44,7 +44,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h3 className={`font-semibold ${
+              <h3 className={`font-semibold truncate ${
                 darkMode ? 'text-white' : 'text-stone-900'
               }`}>
                 {member.title ? `${member.title} ${member.name}` : member.name}
@@ -58,7 +58,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
               )}
             </div>
             {member.is_primary && (
-              <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+              <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 whitespace-nowrap shrink-0">
                 Primary
               </span>
             )}
@@ -111,7 +111,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
         </div>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <button
           onClick={() => onViewProfile?.(member)}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -125,7 +125,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
         </button>
         <button
           onClick={() => onShareRecords?.(member)}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
         >
           <Share2 className="w-4 h-4" />
           Share Records

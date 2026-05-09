@@ -219,10 +219,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
+              <p className={`text-sm font-semibold truncate ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
                 Records received from {req.doctor_name || req.provider_name}
               </p>
-              <p className={`text-xs mt-0.5 ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
+              <p className={`text-xs mt-0.5 hidden sm:block ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
                 Your requested health records are now available.
               </p>
             </div>
