@@ -19,7 +19,7 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
     <>
       {/* Floating Action Button Group */}
       <div
-        className="fixed bottom-6 right-6 z-30 lg:z-40"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 lg:z-40"
         onMouseEnter={() => setIsHoveringGroup(true)}
         onMouseLeave={() => setIsHoveringGroup(false)}
       >
@@ -31,7 +31,7 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
           - Transition ensures smooth state changes
         */}
         <div className={`
-          relative flex items-center gap-3 p-2
+          relative flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2
           bg-stone-900/95 backdrop-blur-sm
           rounded-full
           shadow-2xl shadow-stone-900/50
@@ -44,7 +44,7 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
             onClick={() => setShowVoice(true)}
             className={`
               group
-              relative flex items-center gap-3 px-6 py-3
+              relative flex items-center gap-2 sm:gap-3 p-3 sm:px-6 sm:py-3
               text-white
               rounded-full
               shadow-lg shadow-orange-500/30
@@ -102,8 +102,9 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
               drop-shadow-lg
             " />
 
-            {/* Text label */}
+            {/* Text label — hidden on mobile, visible on sm+ */}
             <span className="
+              hidden sm:inline
               font-semibold text-base
               relative z-20
               drop-shadow-lg
@@ -118,7 +119,7 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
             className={`
               group
               relative flex items-center justify-center
-              w-14 h-14
+              w-11 h-11 sm:w-14 sm:h-14
               bg-white text-stone-700
               rounded-full
               border-2 border-white/20
@@ -144,7 +145,7 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
 
             {/* Icon with smooth rotation on hover */}
             <MessageCircle className="
-              w-6 h-6
+              w-5 h-5 sm:w-6 sm:h-6
               relative z-10
               transition-transform duration-300
               group-hover:rotate-12
