@@ -475,9 +475,11 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-              {PAGE_TITLES[currentPage] ?? 'Dashboard'}
-            </span>
+            <img
+              src={darkMode ? '/hv_logo-dark.png' : '/hv_logo-light.png'}
+              alt="Logo"
+              className="h-7 w-auto object-contain"
+            />
           </div>
 
           {renderMainContent()}
