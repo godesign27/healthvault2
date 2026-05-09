@@ -18,7 +18,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Monorepo package aliases */
+    "paths": {
+      "@health-vault/types": ["./packages/types/src/index.ts"],
+      "@health-vault/api-client": ["./packages/api-client/src/index.ts"],
+      "@health-vault/config": ["./packages/config/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

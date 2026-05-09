@@ -1,0 +1,382 @@
+{
+  "info": {
+    "_postman_id": "health-vault-api-collection",
+    "name": "Health Vault API",
+    "description": "Complete API collection for the Health Vault patient portal. Uses Supabase Auth, PostgREST, and Edge Functions.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://your-project.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "recordId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (email + password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('authToken', json.access_token);",
+                  "  console.log('Access token saved to authToken variable');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your-password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/v1/token?grant_type=password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "v1", "token"],
+              "query": [{ "key": "grant_type", "value": "password" }]
+            },
+            "description": "Sign in with email and password. Automatically saves access_token to authToken collection variable."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('authToken', json.access_token);",
+                  "  console.log('Refreshed access token saved to authToken variable');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"your-refresh-token\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/v1/token?grant_type=refresh_token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "v1", "token"],
+              "query": [{ "key": "grant_type", "value": "refresh_token" }]
+            },
+            "description": "Refresh an expired access token using a refresh token."
+          }
+        },
+        {
+          "name": "Sign Out",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 204 || pm.response.status === 200) {",
+                  "  pm.collectionVariables.set('authToken', '');",
+                  "  console.log('Signed out — authToken cleared');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/v1/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "v1", "logout"]
+            },
+            "description": "Sign out the current user. Clears the authToken variable on success."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Records (PostgREST)",
+      "item": [
+        {
+          "name": "List Health Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Prefer", "value": "return=representation" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rest/v1/health_records?select=*&order=created_at.desc&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["rest", "v1", "health_records"],
+              "query": [
+                { "key": "select", "value": "*" },
+                { "key": "order", "value": "created_at.desc" },
+                { "key": "limit", "value": "50" },
+                { "key": "kind", "value": "eq.lab", "disabled": true },
+                { "key": "source", "value": "eq.uploaded", "disabled": true }
+              ]
+            },
+            "description": "List all health records for the authenticated user. Optionally filter by kind or source (uncomment query params)."
+          }
+        },
+        {
+          "name": "Get Single Health Record",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Prefer", "value": "return=representation" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rest/v1/health_records?id=eq.{{recordId}}&select=*&limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["rest", "v1", "health_records"],
+              "query": [
+                { "key": "id", "value": "eq.{{recordId}}" },
+                { "key": "select", "value": "*" },
+                { "key": "limit", "value": "1" }
+              ]
+            },
+            "description": "Fetch a single health record by ID. Set the recordId collection variable first."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Edge Functions",
+      "item": [
+        {
+          "name": "Analyze Record (AI Summary)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure authToken is set before calling this endpoint",
+                  "const token = pm.collectionVariables.get('authToken');",
+                  "if (!token) {",
+                  "  console.warn('authToken is not set — run Login first');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recordId\": \"{{recordId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/analyze-record",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "analyze-record"]
+            },
+            "description": "Generate an AI summary for a health record. Returns { recordId, summary }. Uses GPT-4o-mini if OPENAI_API_KEY is configured, falls back to a rule-based summary."
+          }
+        },
+        {
+          "name": "Share Record",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('authToken');",
+                  "if (!token) {",
+                  "  console.warn('authToken is not set — run Login first');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recordId\": \"{{recordId}}\",\n  \"recipientEmail\": \"doctor@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/share",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "share"]
+            },
+            "description": "Share a health record with another user or provider by email. Returns { shared, shareId }."
+          }
+        },
+        {
+          "name": "Request Records from Provider",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('authToken');",
+                  "if (!token) {",
+                  "  console.warn('authToken is not set — run Login first');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerName\": \"City Medical Centre\",\n  \"providerEmail\": \"records@citymedical.com\",\n  \"doctorName\": \"Dr. Jane Smith\",\n  \"recordTypes\": [\"lab\", \"imaging\"],\n  \"message\": \"Please send my recent blood panel and chest X-ray results.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/record-request",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "record-request"]
+            },
+            "description": "Send an email request to a provider asking them to share records. Returns { requestId, emailSent }."
+          }
+        },
+        {
+          "name": "Trigger EHR Sync",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('authToken');",
+                  "if (!token) {",
+                  "  console.warn('authToken is not set — run Login first');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"connectionId\": \"your-connection-uuid\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/trigger-ehr-fetch",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "trigger-ehr-fetch"]
+            },
+            "description": "Trigger a manual EHR sync via Keragon for an existing provider connection. Returns { triggered, message }."
+          }
+        },
+        {
+          "name": "Get Vault Stats",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get('authToken');",
+                  "if (!token) {",
+                  "  console.warn('authToken is not set — run Login first');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/vault-stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "vault-stats"]
+            },
+            "description": "Returns dashboard stats: { totalRecords, connectedProviders, pendingRequests, lastSyncedAt }."
+          }
+        },
+        {
+          "name": "Ingest Records (API Key Auth)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{supabaseServiceRoleKey}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-uuid\",\n  \"records\": [\n    {\n      \"title\": \"Blood Panel – Full CBC\",\n      \"kind\": \"lab\",\n      \"providerName\": \"City Medical Centre\",\n      \"serviceDate\": \"2024-03-15\",\n      \"source\": \"connected\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/inbound-records",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "inbound-records"]
+            },
+            "description": "Ingest records from an external system (e.g. Keragon webhook). Uses service role key (not user JWT). For file uploads use multipart/form-data to /inbound-records/upload."
+          }
+        }
+      ]
+    }
+  ]
+}

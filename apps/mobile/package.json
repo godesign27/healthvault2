@@ -1,0 +1,16 @@
+{
+  "name": "@health-vault/mobile",
+  "version": "0.1.0",
+  "description": "Health Vault mobile app (React Native / Expo) — placeholder",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios"
+  },
+  "dependencies": {
+    "@health-vault/types": "*",
+    "@health-vault/api-client": "*"
+  },
+  "notes": "Scaffold this app using Expo. Use @health-vault/api-client to connect to the Supabase backend."
+}

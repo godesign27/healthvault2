@@ -1,0 +1,11 @@
+{
+  "name": "@health-vault/config",
+  "version": "1.0.0",
+  "description": "Shared environment validation for Health Vault services",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "peerDependencies": {
+    "zod": ">=3.0.0"
+  }
+}
