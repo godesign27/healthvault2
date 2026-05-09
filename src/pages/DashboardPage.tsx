@@ -460,8 +460,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             ? 'bg-gradient-to-br from-stone-950 via-stone-950 to-stone-900'
             : 'bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50'
         }`}>
-          {/* Mobile top bar — hamburger + page title */}
-          <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center gap-3 px-3 h-14 border-b backdrop-blur-sm ${
+          {/* Mobile top bar — hamburger + centered logo */}
+          <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b backdrop-blur-sm ${
             darkMode
               ? 'bg-stone-950/95 border-stone-800'
               : 'bg-white/95 border-stone-200'
@@ -475,11 +475,13 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <img
-              src={darkMode ? '/hv_logo-dark.png' : '/hv_logo-light.png'}
-              alt="Logo"
-              className="h-7 w-auto object-contain"
-            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <img
+                src={darkMode ? '/hv_logo-dark.png' : '/hv_logo-light.png'}
+                alt="Logo"
+                className="h-7 w-auto object-contain"
+              />
+            </div>
           </div>
 
           {renderMainContent()}
