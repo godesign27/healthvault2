@@ -170,7 +170,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
     if (currentPage === 'vitals') {
       return (
-        <div className="w-full p-6 sm:p-8 lg:p-12 pt-14 lg:pt-12">
+        <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
           <div className="mb-8">
             <h1 className={`text-2xl font-bold ${
               darkMode ? 'text-white' : 'text-stone-900'
@@ -202,7 +202,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     return (
-      <div className="w-full p-6 sm:p-8 lg:p-12 pt-14 lg:pt-12 relative">
+      <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
         <div className="mb-8">
           <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
             darkMode ? 'text-white' : 'text-stone-900'
