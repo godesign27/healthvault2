@@ -1,0 +1,28 @@
+/* ─── Component: Badge / Tag ─────────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Background */
+  --hv-component-badge-background-neutral:  var(--hv-color-surface-sunken);
+  --hv-component-badge-background-primary:  var(--hv-color-action-primary-subtle);
+  --hv-component-badge-background-success:  var(--hv-color-surface-feedback-success);
+  --hv-component-badge-background-warning:  var(--hv-color-surface-feedback-warning);
+  --hv-component-badge-background-error:    var(--hv-color-surface-feedback-error);
+  --hv-component-badge-background-info:     var(--hv-color-surface-feedback-info);
+
+  /* Text */
+  --hv-component-badge-text-neutral:  var(--hv-color-text-secondary);
+  --hv-component-badge-text-primary:  var(--hv-color-action-primary-default);
+  --hv-component-badge-text-success:  var(--hv-color-text-feedback-success);
+  --hv-component-badge-text-warning:  var(--hv-color-text-feedback-warning);
+  --hv-component-badge-text-error:    var(--hv-color-text-feedback-error);
+  --hv-component-badge-text-info:     var(--hv-color-text-feedback-info);
+
+  /* Border (for outline variant) */
+  --hv-component-badge-border-neutral:  var(--hv-color-border-subtle);
+  --hv-component-badge-border-primary:  var(--hv-color-action-primary-default);
+  --hv-component-badge-border-success:  var(--hv-color-border-feedback-success);
+  --hv-component-badge-border-warning:  var(--hv-color-border-feedback-warning);
+  --hv-component-badge-border-error:    var(--hv-color-border-feedback-error);
+  --hv-component-badge-border-info:     var(--hv-color-border-feedback-info);
+}

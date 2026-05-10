@@ -1,0 +1,8 @@
+/* ─── Theme: Default (Light) ────────────────────────────────────────────────
+   Standard light UI. Applied on :root — no selector override needed.
+   This is the baseline. All other themes override these global values only.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* The default theme values are already set in the global token files.
+   This file documents that :root is the default theme context.
+   No overrides needed — :root is inherently the "default" surface. */

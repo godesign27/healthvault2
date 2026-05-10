@@ -1,4 +1,5 @@
 import { Info, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export type ValidationType = 'info' | 'negative' | 'positive' | 'warning';
 export type ValidationSize = 'normal' | 'small';
@@ -13,126 +14,59 @@ interface ValidationProps {
   className?: string;
 }
 
-export function Validation({
-  type,
-  title,
-  message,
-  size = 'normal',
-  layout = 'text',
-  className = ''
-}: ValidationProps) {
-  const getTypeStyles = () => {
-    switch (type) {
-      case 'info':
-        return {
-          bg: 'bg-[#EFF6FF]',
-          border: 'border-[#3B82F6]',
-          text: 'text-[#1E3A8A]',
-          iconColor: 'text-[#3B82F6]'
-        };
-      case 'negative':
-        return {
-          bg: 'bg-[#FEF2F2]',
-          border: 'border-[#EF4444]',
-          text: 'text-[#7F1D1D]',
-          iconColor: 'text-[#EF4444]'
-        };
-      case 'positive':
-        return {
-          bg: 'bg-[#F0FDF4]',
-          border: 'border-[#10B981]',
-          text: 'text-[#064E3B]',
-          iconColor: 'text-[#10B981]'
-        };
-      case 'warning':
-        return {
-          bg: 'bg-[#FEFCE8]',
-          border: 'border-[#EAB308]',
-          text: 'text-[#713F12]',
-          iconColor: 'text-[#EAB308]'
-        };
-    }
-  };
+const typeMap = {
+  info:     { bg: 'bg-surface-feedback-info',    border: 'border-content-feedback-info',    text: 'text-content-feedback-info',    icon: Info },
+  negative: { bg: 'bg-surface-feedback-error',   border: 'border-content-feedback-error',   text: 'text-content-feedback-error',   icon: AlertTriangle },
+  positive: { bg: 'bg-surface-feedback-success', border: 'border-content-feedback-success', text: 'text-content-feedback-success', icon: CheckCircle },
+  warning:  { bg: 'bg-surface-feedback-warning', border: 'border-content-feedback-warning', text: 'text-content-feedback-warning', icon: AlertCircle },
+} as const;
 
-  const getIcon = () => {
-    const iconSize = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
-
-    switch (type) {
-      case 'info':
-        return <Info className={iconSize} />;
-      case 'negative':
-        return <AlertTriangle className={iconSize} />;
-      case 'positive':
-        return <CheckCircle className={iconSize} />;
-      case 'warning':
-        return <AlertCircle className={iconSize} />;
-    }
-  };
-
-  const styles = getTypeStyles();
+export function Validation({ type, title, message, size = 'normal', layout = 'text', className = '' }: ValidationProps) {
+  const { bg, border, text, icon: Icon } = typeMap[type];
+  const iconSize = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
   const fontSize = size === 'small' ? 'text-sm' : 'text-base';
-  const padding = size === 'small' ? 'p-3' : 'p-4';
+  const subFont  = size === 'small' ? 'text-xs'  : 'text-sm';
+  const padding  = size === 'small' ? 'p-3' : 'p-4';
 
-  const renderContent = () => {
-    switch (layout) {
-      case 'text':
-        return (
-          <div className={`${styles.bg} ${styles.border} border-l-4 ${padding} ${className}`}>
-            <p className={`${styles.text} ${fontSize} font-medium`}>
-              {title || message}
-            </p>
-          </div>
-        );
+  const base = cn(bg, `border-l-4 ${border}`, padding, className);
 
-      case 'icon-left':
-        return (
-          <div className={`${styles.bg} ${styles.border} border-l-4 ${padding} flex items-start gap-3 ${className}`}>
-            <div className={`${styles.iconColor} flex-shrink-0 mt-0.5`}>
-              {getIcon()}
-            </div>
-            <p className={`${styles.text} ${fontSize} font-medium`}>
-              {title || message}
-            </p>
-          </div>
-        );
+  if (layout === 'text') {
+    return (
+      <div className={base}>
+        <p className={cn(text, fontSize, 'font-medium')}>{title || message}</p>
+      </div>
+    );
+  }
 
-      case 'title':
-        return (
-          <div className={`${styles.bg} ${styles.border} border-l-4 ${padding} ${className}`}>
-            <h4 className={`${styles.text} ${fontSize} font-bold mb-1`}>
-              {title}
-            </h4>
-            <p className={`${styles.text} ${fontSize === 'text-sm' ? 'text-xs' : 'text-sm'}`}>
-              {message}
-            </p>
-          </div>
-        );
+  if (layout === 'icon-left') {
+    return (
+      <div className={cn(base, 'flex items-start gap-3')}>
+        <Icon className={cn(iconSize, text, 'shrink-0 mt-0.5')} />
+        <p className={cn(text, fontSize, 'font-medium')}>{title || message}</p>
+      </div>
+    );
+  }
 
-      case 'title-icon':
-        return (
-          <div className={`${styles.bg} ${styles.border} border-l-4 ${padding} ${className}`}>
-            <div className="flex items-start gap-3">
-              <div className={`${styles.iconColor} flex-shrink-0 mt-0.5`}>
-                {getIcon()}
-              </div>
-              <div className="flex-1">
-                <h4 className={`${styles.text} ${fontSize} font-bold mb-1`}>
-                  {title}
-                </h4>
-                <p className={`${styles.text} ${fontSize === 'text-sm' ? 'text-xs' : 'text-sm'}`}>
-                  {message}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+  if (layout === 'title') {
+    return (
+      <div className={base}>
+        <h4 className={cn(text, fontSize, 'font-bold mb-1')}>{title}</h4>
+        <p className={cn(text, subFont)}>{message}</p>
+      </div>
+    );
+  }
 
-      default:
-        return null;
-    }
-  };
-
-  return renderContent();
+  return (
+    <div className={base}>
+      <div className="flex items-start gap-3">
+        <Icon className={cn(iconSize, text, 'shrink-0 mt-0.5')} />
+        <div className="flex-1">
+          <h4 className={cn(text, fontSize, 'font-bold mb-1')}>{title}</h4>
+          <p className={cn(text, subFont)}>{message}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 interface ValidationMessageProps {
@@ -144,14 +78,7 @@ interface ValidationMessageProps {
   className?: string;
 }
 
-export function ValidationMessage({
-  title,
-  message,
-  type,
-  size = 'normal',
-  showIcon = false,
-  className = ''
-}: ValidationMessageProps) {
+export function ValidationMessage({ title, message, type, size = 'normal', showIcon = false, className = '' }: ValidationMessageProps) {
   return (
     <Validation
       type={type}

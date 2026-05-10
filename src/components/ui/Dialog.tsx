@@ -1,17 +1,26 @@
-import React from 'react';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import { X, ExternalLink, AlertTriangle, Info } from 'lucide-react';
+import { ReactNode } from 'react';
+import { cn } from '../../lib/utils';
+
+const sizeMap = {
+  small:  'max-w-md',
+  medium: 'max-w-lg',
+  large:  'max-w-2xl',
+  full:   'max-w-5xl',
+} as const;
 
 interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   variant?: 'light' | 'dark';
-  size?: 'small' | 'medium' | 'large' | 'full';
+  size?: keyof typeof sizeMap;
   showIcon?: boolean;
   iconType?: 'warning' | 'info';
-  footerContent?: React.ReactNode;
-  headerAction?: React.ReactNode;
+  footerContent?: ReactNode;
+  headerAction?: ReactNode;
 }
 
 export function Dialog({
@@ -24,56 +33,74 @@ export function Dialog({
   showIcon = false,
   iconType = 'warning',
   footerContent,
-  headerAction
+  headerAction,
 }: DialogProps) {
-  if (!isOpen) return null;
-
-  const sizeClasses = {
-    small: 'max-w-md',
-    medium: 'max-w-lg',
-    large: 'max-w-2xl',
-    full: 'max-w-5xl'
-  };
-
   const isDark = variant === 'dark';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-
-      <div className={`relative ${sizeClasses[size]} w-full bg-white rounded-lg shadow-xl max-h-[90vh] flex flex-col`}>
-        <div className={`flex items-center justify-between px-6 py-4 border-b ${isDark ? 'bg-slate-800 text-white border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center gap-3">
-            {showIcon && iconType === 'warning' && (
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+    <RadixDialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/50 animate-fade-in" />
+        <RadixDialog.Content
+          className={cn(
+            'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+            sizeMap[size], 'w-[calc(100%-2rem)]',
+            'bg-surface-overlay rounded-lg shadow-xl max-h-[90vh] flex flex-col',
+            'animate-fade-in',
+            'focus-visible:outline-none',
+          )}
+        >
+          {/* Header */}
+          <div
+            className={cn(
+              'flex items-center justify-between px-6 py-4 border-b',
+              isDark
+                ? 'bg-hv-neutral-800 text-hv-neutral-0 border-hv-neutral-700'
+                : 'border-stroke-subtle',
             )}
-            {showIcon && iconType === 'info' && (
-              <Info className="w-5 h-5 text-blue-500" />
-            )}
-            <h2 className="text-lg font-semibold">{title}</h2>
+          >
+            <div className="flex items-center gap-3">
+              {showIcon && iconType === 'warning' && (
+                <AlertTriangle className="w-5 h-5 text-content-feedback-error" />
+              )}
+              {showIcon && iconType === 'info' && (
+                <Info className="w-5 h-5 text-content-feedback-info" />
+              )}
+              <RadixDialog.Title className="text-lg font-semibold text-content-primary">
+                {title}
+              </RadixDialog.Title>
+            </div>
+            <div className="flex items-center gap-2">
+              {headerAction}
+              <RadixDialog.Close asChild>
+                <button
+                  className={cn(
+                    'p-1 rounded transition-colors',
+                    isDark
+                      ? 'hover:bg-hv-neutral-700 text-hv-neutral-200'
+                      : 'hover:bg-action-secondary text-content-secondary',
+                  )}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </RadixDialog.Close>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {headerAction}
-            <button
-              onClick={onClose}
-              className={`p-1 rounded hover:bg-slate-100 ${isDark ? 'hover:bg-slate-700' : ''}`}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          {children}
-        </div>
-
-        {footerContent && (
-          <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-2">
-            {footerContent}
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            {children}
           </div>
-        )}
-      </div>
-    </div>
+
+          {/* Footer */}
+          {footerContent && (
+            <div className="px-6 py-4 border-t border-stroke-subtle flex justify-end gap-2">
+              {footerContent}
+            </div>
+          )}
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 }
 
@@ -84,18 +111,22 @@ interface DialogIconButtonProps {
 }
 
 export function DialogIconButton({ icon, onClick, variant = 'primary' }: DialogIconButtonProps) {
-  const Icon = icon === 'external' ? ExternalLink : icon === 'close' ? X : icon === 'warning' ? AlertTriangle : Info;
+  const Icon =
+    icon === 'external' ? ExternalLink
+    : icon === 'close'   ? X
+    : icon === 'warning' ? AlertTriangle
+    : Info;
 
-  const colorClasses = {
-    primary: 'text-blue-600 hover:bg-blue-50',
-    danger: 'text-red-600 hover:bg-red-50',
-    warning: 'text-amber-600 hover:bg-amber-50'
+  const colorMap = {
+    primary: 'text-action-primary hover:bg-action-primary-subtle',
+    danger:  'text-content-feedback-error hover:bg-surface-feedback-error',
+    warning: 'text-content-feedback-warning hover:bg-surface-feedback-warning',
   };
 
   return (
     <button
       onClick={onClick}
-      className={`p-2 rounded transition-colors ${colorClasses[variant]}`}
+      className={cn('p-2 rounded transition-colors', colorMap[variant])}
     >
       <Icon className="w-4 h-4" />
     </button>

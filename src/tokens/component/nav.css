@@ -1,0 +1,21 @@
+/* ─── Component: Navigation ─────────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-component-nav-background-default:        var(--hv-color-surface-raised);
+  --hv-component-nav-border-default:            var(--hv-color-border-subtle);
+
+  --hv-component-nav-item-background-hover:     var(--hv-color-action-secondary-default);
+  --hv-component-nav-item-background-active:    var(--hv-color-action-primary-subtle);
+  --hv-component-nav-item-background-selected:  var(--hv-color-action-primary-subtle);
+
+  --hv-component-nav-item-text-default:         var(--hv-color-text-secondary);
+  --hv-component-nav-item-text-hover:           var(--hv-color-text-primary);
+  --hv-component-nav-item-text-active:          var(--hv-color-text-primary);
+
+  --hv-component-nav-item-icon-default:         var(--hv-color-text-tertiary);
+  --hv-component-nav-item-icon-hover:           var(--hv-color-text-secondary);
+  --hv-component-nav-item-icon-active:          var(--hv-color-action-primary-default);
+
+  --hv-component-nav-item-indicator-active:     var(--hv-color-action-primary-default);
+}

@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, MoreHorizontal, Download, Trash2, Edit } from 'lucide-react';
+import { ChevronDown, ChevronUp, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '../../lib/utils';
+import { Spinner } from './Spinner';
 
 export interface TableColumn<T = any> {
   key: string;
@@ -31,6 +33,12 @@ export interface TableProps<T = any> {
   className?: string;
 }
 
+const actionVariantClass = {
+  default: 'text-content-secondary hover:bg-action-secondary',
+  primary: 'text-action-primary hover:bg-action-primary-subtle',
+  danger:  'text-content-feedback-error hover:bg-surface-feedback-error',
+} as const;
+
 export function Table<T extends Record<string, any>>({
   columns,
   data,
@@ -44,7 +52,7 @@ export function Table<T extends Record<string, any>>({
   maxHeight,
   emptyMessage = 'No data available',
   loading = false,
-  className = ''
+  className = '',
 }: TableProps<T>) {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -53,8 +61,7 @@ export function Table<T extends Record<string, any>>({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIndices = new Set(data.map((_, index) => index));
-      setSelectedRows(allIndices);
+      setSelectedRows(new Set(data.map((_, i) => i)));
       onRowSelect?.(data);
     } else {
       setSelectedRows(new Set());
@@ -63,46 +70,34 @@ export function Table<T extends Record<string, any>>({
   };
 
   const handleRowSelect = (index: number, checked: boolean) => {
-    const newSelected = new Set(selectedRows);
-    if (checked) {
-      newSelected.add(index);
-    } else {
-      newSelected.delete(index);
-    }
-    setSelectedRows(newSelected);
-    const selectedData = data.filter((_, idx) => newSelected.has(idx));
-    onRowSelect?.(selectedData);
+    const next = new Set(selectedRows);
+    checked ? next.add(index) : next.delete(index);
+    setSelectedRows(next);
+    onRowSelect?.(data.filter((_, i) => next.has(i)));
   };
 
   const handleSort = (column: TableColumn<T>) => {
     if (!column.sortable) return;
-
-    const newDirection = sortColumn === column.key && sortDirection === 'asc' ? 'desc' : 'asc';
+    const dir = sortColumn === column.key && sortDirection === 'asc' ? 'desc' : 'asc';
     setSortColumn(column.key);
-    setSortDirection(newDirection);
-    onSort?.(column.key, newDirection);
+    setSortDirection(dir);
+    onSort?.(column.key, dir);
   };
 
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'striped':
-        return 'table-striped';
-      case 'bordered':
-        return 'table-bordered';
-      case 'compact':
-        return 'table-compact';
-      default:
-        return '';
-    }
-  };
-
-  const containerClasses = `overflow-x-auto ${maxHeight ? 'overflow-y-auto' : ''} ${className}`;
-  const tableClasses = `min-w-full ${getVariantClasses()}`;
+  const colSpan = columns.length + (selectable ? 1 : 0) + (actions?.length ? 1 : 0);
 
   return (
-    <div className={containerClasses} style={{ maxHeight }}>
-      <table className={tableClasses}>
-        <thead className={`bg-[#F9FAFB] border-b border-gray-200 ${stickyHeader ? 'sticky top-0 z-10' : ''}`}>
+    <div
+      className={cn('overflow-x-auto', maxHeight && 'overflow-y-auto', className)}
+      style={{ maxHeight }}
+    >
+      <table className="min-w-full">
+        <thead
+          className={cn(
+            'bg-surface-sunken border-b border-stroke-subtle',
+            stickyHeader && 'sticky top-0 z-10',
+          )}
+        >
           <tr>
             {selectable && (
               <th className="px-4 py-3 text-left w-12">
@@ -110,57 +105,56 @@ export function Table<T extends Record<string, any>>({
                   type="checkbox"
                   checked={selectedRows.size === data.length && data.length > 0}
                   onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="w-4 h-4 text-[indigo-600] border-gray-300 rounded focus:ring-[indigo-600]"
+                  className="w-4 h-4 rounded border-stroke-default accent-action-primary"
                 />
               </th>
             )}
-            {columns.map((column) => (
+            {columns.map((col) => (
               <th
-                key={column.key}
-                className={`px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider ${
-                  column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
-                } ${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''}`}
-                style={{ width: column.width }}
-                onClick={() => column.sortable && handleSort(column)}
+                key={col.key}
+                style={{ width: col.width }}
+                onClick={() => col.sortable && handleSort(col)}
+                className={cn(
+                  'px-4 py-3 text-xs font-semibold text-content-secondary uppercase tracking-wider',
+                  col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
+                  col.sortable && 'cursor-pointer select-none hover:bg-action-secondary transition-colors',
+                )}
               >
-                <div className="flex items-center gap-2">
-                  <span>{column.label}</span>
-                  {column.sortable && (
-                    <span className="inline-flex flex-col">
-                      {sortColumn === column.key ? (
-                        sortDirection === 'asc' ? (
-                          <ChevronUp className="w-4 h-4 text-[indigo-600]" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-[indigo-600]" />
-                        )
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
-                      )}
-                    </span>
+                <div className="flex items-center gap-1.5">
+                  <span>{col.label}</span>
+                  {col.sortable && (
+                    sortColumn === col.key ? (
+                      sortDirection === 'asc'
+                        ? <ChevronUp className="w-3.5 h-3.5 text-action-primary" />
+                        : <ChevronDown className="w-3.5 h-3.5 text-action-primary" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-content-tertiary" />
+                    )
                   )}
                 </div>
               </th>
             ))}
-            {actions && actions.length > 0 && (
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
+            {actions?.length ? (
+              <th className="px-4 py-3 text-center text-xs font-semibold text-content-secondary uppercase tracking-wider w-24">
                 Actions
               </th>
-            )}
+            ) : null}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+
+        <tbody className="bg-surface-raised divide-y divide-stroke-subtle">
           {loading ? (
             <tr>
-              <td colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={colSpan} className="px-4 py-8 text-center text-content-secondary">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-[indigo-600] rounded-full animate-spin"></div>
+                  <Spinner size="sm" />
                   <span>Loading...</span>
                 </div>
               </td>
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={colSpan} className="px-4 py-8 text-center text-content-tertiary">
                 {emptyMessage}
               </td>
             </tr>
@@ -168,9 +162,13 @@ export function Table<T extends Record<string, any>>({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`${hover ? 'hover:bg-gray-50' : ''} ${
-                  variant === 'striped' && rowIndex % 2 === 1 ? 'bg-gray-50' : ''
-                } ${selectedRows.has(rowIndex) ? 'bg-blue-50' : ''} transition-colors`}
+                className={cn(
+                  'transition-colors',
+                  hover && 'hover:bg-action-secondary',
+                  variant === 'striped' && rowIndex % 2 === 1 && 'bg-surface-sunken',
+                  selectedRows.has(rowIndex) && 'bg-action-primary-subtle',
+                  variant === 'compact' && 'text-sm',
+                )}
               >
                 {selectable && (
                   <td className="px-4 py-3">
@@ -178,28 +176,31 @@ export function Table<T extends Record<string, any>>({
                       type="checkbox"
                       checked={selectedRows.has(rowIndex)}
                       onChange={(e) => handleRowSelect(rowIndex, e.target.checked)}
-                      className="w-4 h-4 text-[indigo-600] border-gray-300 rounded focus:ring-[indigo-600]"
+                      className="w-4 h-4 rounded border-stroke-default accent-action-primary"
                     />
                   </td>
                 )}
-                {columns.map((column) => (
+                {columns.map((col) => (
                   <td
-                    key={column.key}
-                    className={`px-4 py-3 text-sm text-gray-900 ${
-                      column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
-                    } ${variant === 'compact' ? 'py-2' : ''}`}
+                    key={col.key}
+                    className={cn(
+                      'px-4 text-sm text-content-primary',
+                      variant === 'compact' ? 'py-2' : 'py-3',
+                      variant === 'bordered' && 'border-x border-stroke-subtle',
+                      col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
+                    )}
                   >
-                    {column.render ? column.render(row[column.key], row, rowIndex) : row[column.key]}
+                    {col.render ? col.render(row[col.key], row, rowIndex) : row[col.key]}
                   </td>
                 ))}
-                {actions && actions.length > 0 && (
+                {actions?.length ? (
                   <td className="px-4 py-3 text-center">
                     <div className="relative inline-block">
                       <button
                         onClick={() => setExpandedActions(expandedActions === rowIndex ? null : rowIndex)}
-                        className="p-1 hover:bg-gray-200 rounded transition-colors"
+                        className="p-1 hover:bg-action-secondary rounded transition-colors"
                       >
-                        <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                        <MoreHorizontal className="w-5 h-5 text-content-secondary" />
                       </button>
                       {expandedActions === rowIndex && (
                         <>
@@ -207,20 +208,15 @@ export function Table<T extends Record<string, any>>({
                             className="fixed inset-0 z-10"
                             onClick={() => setExpandedActions(null)}
                           />
-                          <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
-                            {actions.map((action, actionIndex) => (
+                          <div className="absolute right-0 mt-1 w-48 bg-surface-overlay border border-stroke-default rounded shadow-lg z-20 py-1">
+                            {actions.map((action, ai) => (
                               <button
-                                key={actionIndex}
-                                onClick={() => {
-                                  action.onClick(row);
-                                  setExpandedActions(null);
-                                }}
-                                className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left hover:bg-gray-100 transition-colors ${
-                                  actionIndex === 0 ? 'rounded-t-md' : ''
-                                } ${actionIndex === actions.length - 1 ? 'rounded-b-md' : ''} ${
-                                  action.variant === 'danger' ? 'text-red-600 hover:bg-red-50' :
-                                  action.variant === 'primary' ? 'text-[indigo-600]' : 'text-gray-700'
-                                }`}
+                                key={ai}
+                                onClick={() => { action.onClick(row); setExpandedActions(null); }}
+                                className={cn(
+                                  'w-full flex items-center gap-2 px-4 py-2 text-sm text-left transition-colors',
+                                  actionVariantClass[action.variant ?? 'default'],
+                                )}
                               >
                                 {action.icon}
                                 {action.label}
@@ -231,7 +227,7 @@ export function Table<T extends Record<string, any>>({
                       )}
                     </div>
                   </td>
-                )}
+                ) : null}
               </tr>
             ))
           )}
@@ -243,22 +239,22 @@ export function Table<T extends Record<string, any>>({
 
 export function TableBadge({
   children,
-  variant = 'default'
+  variant = 'default',
 }: {
   children: React.ReactNode;
-  variant?: 'default' | 'completed' | 'success' | 'warning' | 'error' | 'info'
+  variant?: 'default' | 'completed' | 'success' | 'warning' | 'error' | 'info';
 }) {
   const variantClasses = {
-    default: 'bg-gray-700 text-white',
-    completed: 'bg-gray-900 text-white',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-amber-100 text-amber-800',
-    error: 'bg-red-100 text-red-800',
-    info: 'bg-blue-100 text-blue-800'
+    default:   'bg-hv-neutral-700 text-hv-neutral-0',
+    completed: 'bg-hv-neutral-900 text-hv-neutral-0',
+    success:   'bg-surface-feedback-success text-content-feedback-success',
+    warning:   'bg-surface-feedback-warning text-content-feedback-warning',
+    error:     'bg-surface-feedback-error text-content-feedback-error',
+    info:      'bg-surface-feedback-info text-content-feedback-info',
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variantClasses[variant]}`}>
+    <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', variantClasses[variant])}>
       {children}
     </span>
   );

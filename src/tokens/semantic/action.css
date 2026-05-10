@@ -1,0 +1,29 @@
+/* ─── Semantic: Action Tokens ───────────────────────────────────────────────
+   References global tokens only. Defines interactive/CTA color intent.
+   Redefined per surface theme and dark mode.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Primary action — main brand blue */
+  --hv-color-action-primary-default:  var(--hv-color-brand-600);
+  --hv-color-action-primary-hover:    var(--hv-color-brand-700);
+  --hv-color-action-primary-active:   var(--hv-color-brand-800);
+  --hv-color-action-primary-disabled: var(--hv-color-neutral-300);
+  --hv-color-action-primary-subtle:   var(--hv-color-brand-100);
+
+  /* Secondary action — neutral */
+  --hv-color-action-secondary-default:  var(--hv-color-neutral-100);
+  --hv-color-action-secondary-hover:    var(--hv-color-neutral-200);
+  --hv-color-action-secondary-active:   var(--hv-color-neutral-300);
+  --hv-color-action-secondary-disabled: var(--hv-color-neutral-100);
+
+  /* Destructive action — error red */
+  --hv-color-action-destructive-default:  var(--hv-color-error-600);
+  --hv-color-action-destructive-hover:    var(--hv-color-error-700);
+  --hv-color-action-destructive-active:   var(--hv-color-error-800);
+  --hv-color-action-destructive-disabled: var(--hv-color-neutral-300);
+  --hv-color-action-destructive-subtle:   var(--hv-color-error-50);
+
+  /* Ghost action */
+  --hv-color-action-ghost-hover:  var(--hv-color-neutral-100);
+  --hv-color-action-ghost-active: var(--hv-color-neutral-200);
+}

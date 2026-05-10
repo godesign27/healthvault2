@@ -1,0 +1,37 @@
+/* ─── Token Index ────────────────────────────────────────────────────────────
+   Import order MUST be: Global → Semantic → Component → Themes
+   Themes override globals only; semantics reference globals; components
+   reference semantics. Never import in any other order.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Tier 1: Global (raw hex values) */
+@import './global/brand.css';
+@import './global/neutral.css';
+@import './global/teal.css';
+@import './global/feedback.css';
+@import './global/orange.css';
+@import './global/datavis.css';
+
+/* Tier 2: Semantic (references globals) */
+@import './semantic/action.css';
+@import './semantic/surface.css';
+@import './semantic/text.css';
+@import './semantic/border.css';
+
+/* Tier 3: Component (references semantics) */
+@import './component/button.css';
+@import './component/input.css';
+@import './component/card.css';
+@import './component/badge.css';
+@import './component/nav.css';
+@import './component/table.css';
+@import './component/dialog.css';
+@import './component/drawer.css';
+@import './component/misc.css';
+
+/* Themes (override globals per surface/mode context) */
+@import './themes/theme.default.css';
+@import './themes/theme.dark.css';
+@import './themes/theme.bold.css';
+@import './themes/theme.subdued.css';
+@import './themes/theme.overlay.css';

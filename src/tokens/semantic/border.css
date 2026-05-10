@@ -1,0 +1,15 @@
+/* ─── Semantic: Border Tokens ───────────────────────────────────────────────
+   References global tokens only. Edge/divider color intent.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-border-subtle:  var(--hv-color-neutral-200);
+  --hv-color-border-default: var(--hv-color-neutral-300);
+  --hv-color-border-strong:  var(--hv-color-neutral-400);
+  --hv-color-border-focus:   var(--hv-color-brand-600);
+
+  /* Feedback borders */
+  --hv-color-border-feedback-error:   var(--hv-color-error-500);
+  --hv-color-border-feedback-success: var(--hv-color-success-500);
+  --hv-color-border-feedback-warning: var(--hv-color-warning-500);
+  --hv-color-border-feedback-info:    var(--hv-color-info-500);
+}

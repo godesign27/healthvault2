@@ -1,4 +1,10 @@
-import { useState } from 'react';
+import * as RadioGroup from '@radix-ui/react-radio-group';
+import { cn } from '../../lib/utils';
+
+const sizeMap = {
+  '14px': { box: 'w-3.5 h-3.5', dot: 'w-1.5 h-1.5' },
+  '16px': { box: 'w-4 h-4',     dot: 'w-2 h-2' },
+} as const;
 
 interface RadioButtonProps {
   label?: string;
@@ -7,6 +13,7 @@ interface RadioButtonProps {
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   name?: string;
+  value?: string;
 }
 
 export function RadioButton({
@@ -15,64 +22,47 @@ export function RadioButton({
   disabled = false,
   checked = false,
   onChange,
-  name
+  name,
+  value = 'radio',
 }: RadioButtonProps) {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const sizeClasses = {
-    '14px': 'w-3.5 h-3.5',
-    '16px': 'w-4 h-4'
-  };
-
-  const handleChange = () => {
-    if (!disabled && onChange) {
-      onChange(!checked);
-    }
-  };
+  const { box, dot } = sizeMap[size];
 
   return (
-    <label className={`flex items-center gap-2 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-      <div className="relative">
-        <input
-          type="radio"
-          name={name}
-          checked={checked}
-          disabled={disabled}
-          onChange={handleChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          className="sr-only"
-        />
-        <div
-          className={`
-            ${sizeClasses[size]}
-            rounded-full border-2 transition-all
-            ${checked
-              ? 'border-[indigo-600] bg-white'
-              : 'border-gray-400 bg-white'
-            }
-            ${disabled && checked ? 'border-gray-400' : ''}
-            ${isFocused && !disabled ? 'ring-2 ring-[#3B9CFF] ring-offset-2' : ''}
-            ${!disabled && !checked ? 'hover:border-[indigo-600]' : ''}
-          `}
-        >
-          {checked && (
-            <div
-              className={`
-                absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-                rounded-full bg-[indigo-600]
-                ${size === '14px' ? 'w-1.5 h-1.5' : 'w-2 h-2'}
-                ${disabled ? 'bg-gray-400' : ''}
-              `}
-            />
+    <RadioGroup.Root
+      value={checked ? value : ''}
+      onValueChange={(v) => onChange?.(v === value)}
+      name={name}
+      disabled={disabled}
+    >
+      <label className={cn('flex items-center gap-2', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer')}>
+        <RadioGroup.Item
+          value={value}
+          className={cn(
+            box,
+            'rounded-full border-2 bg-surface-raised transition-all relative',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
+            checked
+              ? 'border-action-primary'
+              : 'border-stroke-default hover:border-action-primary',
+            disabled && 'cursor-not-allowed border-stroke-subtle',
           )}
-        </div>
-      </div>
-      {label && (
-        <span className={`text-sm ${disabled ? 'text-gray-400' : 'text-gray-700'}`}>
-          {label}
-        </span>
-      )}
-    </label>
+        >
+          <RadioGroup.Indicator className="flex items-center justify-center absolute inset-0">
+            <div
+              className={cn(
+                dot,
+                'rounded-full',
+                disabled ? 'bg-hv-neutral-400' : 'bg-action-primary',
+              )}
+            />
+          </RadioGroup.Indicator>
+        </RadioGroup.Item>
+        {label && (
+          <span className={cn('text-sm select-none', disabled ? 'text-content-disabled' : 'text-content-secondary')}>
+            {label}
+          </span>
+        )}
+      </label>
+    </RadioGroup.Root>
   );
 }

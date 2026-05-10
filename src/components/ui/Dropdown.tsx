@@ -1,5 +1,7 @@
-import { ChevronDown, Check, X, ChevronRight } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import * as Select from '@radix-ui/react-select';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ChevronDown, ChevronRight, Check, X, ChevronUp } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export type DropdownSize = 'normal' | 'small' | 'xsmall';
 export type DropdownVariant = 'outline' | 'filled';
@@ -23,6 +25,18 @@ interface DropdownProps {
   className?: string;
 }
 
+const sizeTrigger = {
+  xsmall: 'px-2 py-1 text-xs',
+  small:  'px-3 py-1.5 text-sm',
+  normal: 'px-4 py-2 text-sm',
+} as const;
+
+const sizeItem = {
+  xsmall: 'px-2 py-1 text-xs',
+  small:  'px-3 py-1.5 text-sm',
+  normal: 'px-4 py-2 text-sm',
+} as const;
+
 export function Dropdown({
   options,
   value,
@@ -32,164 +46,143 @@ export function Dropdown({
   variant = 'outline',
   disabled = false,
   showCheckmark = false,
-  className = ''
+  className = '',
 }: DropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [hoveredSubmenu, setHoveredSubmenu] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const selectedOption = options.find(opt => opt.value === value);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setIsFocused(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const getSizeClasses = () => {
-    switch (size) {
-      case 'xsmall':
-        return 'px-2 py-1 text-xs';
-      case 'small':
-        return 'px-3 py-1.5 text-sm';
-      case 'normal':
-      default:
-        return 'px-4 py-2 text-sm';
-    }
-  };
-
-  const getButtonClasses = () => {
-    const baseClasses = `flex items-center justify-between transition-all ${getSizeClasses()}`;
-
-    if (disabled) {
-      return `${baseClasses} bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed`;
-    }
-
-    if (variant === 'filled') {
-      if (isFocused) {
-        return `${baseClasses} bg-white text-gray-900 border border-[indigo-600]`;
-      }
-      if (value) {
-        return `${baseClasses} bg-gray-50 text-gray-900 border border-[#5B5864] hover:bg-gray-100`;
-      }
-      return `${baseClasses} bg-gray-50 text-gray-500 border border-[#5B5864] hover:bg-gray-100`;
-    }
-
-    if (isFocused) {
-      return `${baseClasses} bg-white text-gray-900 border border-[indigo-600]`;
-    }
-    if (value) {
-      return `${baseClasses} bg-white text-gray-900 border border-[#5B5864] hover:border-gray-400`;
-    }
-    return `${baseClasses} bg-white text-gray-500 border border-[#5B5864] hover:border-gray-400`;
-  };
-
-  const handleSelect = (optionValue: string) => {
-    onChange?.(optionValue);
-    setIsOpen(false);
-    setIsFocused(false);
-  };
-
-  const renderOption = (option: DropdownOption) => {
-    const isSelected = option.value === value;
-    const hasSubmenu = option.submenu && option.submenu.length > 0;
-    const isHovered = hoveredSubmenu === option.value;
-    const isDisabled = option.disabled || false;
-
-    return (
-      <div
-        key={option.value}
-        className="relative"
-        onMouseEnter={() => hasSubmenu && !isDisabled && setHoveredSubmenu(option.value)}
-        onMouseLeave={() => hasSubmenu && setHoveredSubmenu(null)}
-      >
-        <button
-          onClick={() => !hasSubmenu && !isDisabled && handleSelect(option.value)}
-          disabled={isDisabled}
-          className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors ${
-            isDisabled
-              ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-              : isSelected
-              ? 'bg-[#0D4B56] text-white'
-              : 'text-gray-700 hover:bg-[#0D4B56] hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-2">
-            {showCheckmark && isSelected && <Check className="w-4 h-4" />}
-            {option.label}
-          </span>
-          {hasSubmenu && <ChevronRight className="w-4 h-4" />}
-        </button>
-
-        {hasSubmenu && isHovered && (
-          <div className="absolute left-full top-0 ml-1 bg-white border border-[#5B5864] shadow-lg z-50 min-w-[160px]">
-            {option.submenu!.map(subOption => (
-              <button
-                key={subOption.value}
-                onClick={() => handleSelect(subOption.value)}
-                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                  subOption.value === value
-                    ? 'bg-[#0D4B56] text-white'
-                    : 'text-gray-700 hover:bg-[#0D4B56] hover:text-white'
-                }`}
-              >
-                {subOption.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+  const triggerPadding = sizeTrigger[size];
 
   return (
-    <div ref={dropdownRef} className={`relative ${className}`}>
-      <button
-        onClick={() => {
-          if (!disabled) {
-            setIsOpen(!isOpen);
-            setIsFocused(!isOpen);
-          }
-        }}
-        onFocus={() => !disabled && setIsFocused(true)}
-        className={`${getButtonClasses()} w-full`}
-        disabled={disabled}
+    <Select.Root value={value} onValueChange={onChange} disabled={disabled}>
+      <Select.Trigger
+        className={cn(
+          triggerPadding,
+          'inline-flex items-center justify-between gap-2 w-full rounded transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus',
+          variant === 'outline'
+            ? cn(
+                'border border-stroke-default bg-surface-raised',
+                disabled
+                  ? 'text-content-disabled cursor-not-allowed'
+                  : value
+                    ? 'text-content-primary hover:border-stroke-strong'
+                    : 'text-content-placeholder hover:border-stroke-strong',
+              )
+            : cn(
+                'border border-stroke-default bg-surface-sunken',
+                disabled
+                  ? 'text-content-disabled cursor-not-allowed'
+                  : value
+                    ? 'text-content-primary hover:bg-action-secondary'
+                    : 'text-content-placeholder hover:bg-action-secondary',
+              ),
+          className,
+        )}
       >
-        <span className="truncate">
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
-        <div className="flex items-center gap-1 ml-2">
-          {showCheckmark && value && <Check className="w-4 h-4 text-[indigo-600]" />}
+        <Select.Value placeholder={placeholder} />
+        <div className="flex items-center gap-1 shrink-0">
           {!disabled && value && variant === 'outline' && (
-            <button
-              onClick={(e) => {
+            <span
+              role="button"
+              tabIndex={0}
+              onPointerDown={(e) => {
                 e.stopPropagation();
                 onChange?.('');
               }}
-              className="hover:bg-[indigo-600] hover:text-white rounded-full p-0.5 transition-colors"
+              onKeyDown={(e) => e.key === 'Enter' && onChange?.('')}
+              className="hover:bg-action-secondary rounded-full p-0.5 transition-colors"
             >
               <X className="w-3 h-3" />
-            </button>
+            </span>
           )}
-          <ChevronDown
-            className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
+          <Select.Icon asChild>
+            <ChevronDown className="w-4 h-4 text-content-secondary" />
+          </Select.Icon>
         </div>
-      </button>
+      </Select.Trigger>
 
-      {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-[#5B5864] shadow-lg z-40 max-h-60 overflow-y-auto w-full">
-          {options.map(renderOption)}
-        </div>
+      <Select.Portal>
+        <Select.Content
+          position="popper"
+          sideOffset={4}
+          className={cn(
+            'z-50 w-[--radix-select-trigger-width] overflow-hidden',
+            'bg-surface-overlay border border-stroke-default rounded shadow-lg',
+            'data-[state=open]:animate-fade-in',
+            'max-h-60 overflow-y-auto',
+          )}
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center py-1 text-content-secondary">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+
+          <Select.Viewport>
+            {options.map((option) => (
+              <SelectItem
+                key={option.value}
+                option={option}
+                showCheckmark={showCheckmark}
+                itemSize={size}
+              />
+            ))}
+          </Select.Viewport>
+
+          <Select.ScrollDownButton className="flex items-center justify-center py-1 text-content-secondary">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
+}
+
+function SelectItem({
+  option,
+  showCheckmark,
+  itemSize,
+}: {
+  option: DropdownOption;
+  showCheckmark: boolean;
+  itemSize: DropdownSize;
+}) {
+  if (option.submenu?.length) {
+    return (
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild>
+          <div
+            className={cn(
+              sizeItem[itemSize],
+              'flex items-center justify-between cursor-pointer transition-colors',
+              option.disabled
+                ? 'text-content-disabled bg-surface-sunken cursor-not-allowed'
+                : 'text-content-primary hover:bg-action-primary hover:text-content-on-action',
+            )}
+          >
+            <span>{option.label}</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </DropdownMenu.Trigger>
+      </DropdownMenu.Root>
+    );
+  }
+
+  return (
+    <Select.Item
+      value={option.value}
+      disabled={option.disabled}
+      className={cn(
+        sizeItem[itemSize],
+        'flex items-center gap-2 cursor-pointer transition-colors outline-none',
+        option.disabled
+          ? 'text-content-disabled bg-surface-sunken cursor-not-allowed'
+          : 'text-content-primary hover:bg-action-primary hover:text-content-on-action data-[highlighted]:bg-action-primary data-[highlighted]:text-content-on-action',
       )}
-    </div>
+    >
+      {showCheckmark && (
+        <Select.ItemIndicator>
+          <Check className="w-4 h-4" />
+        </Select.ItemIndicator>
+      )}
+      <Select.ItemText>{option.label}</Select.ItemText>
+    </Select.Item>
   );
 }
 
@@ -208,14 +201,14 @@ export function SimpleDropdown({
   size = 'normal',
   variant = 'outline',
   disabled = false,
-  className = ''
+  className = '',
 }: SimpleDropdownProps) {
   const options: DropdownOption[] = [
     { value: '1', label: 'Menu item 1' },
     { value: '2', label: 'Menu item 2' },
     { value: '3', label: 'Menu item 3' },
     { value: '4', label: 'Menu item 4' },
-    { value: '5', label: 'Menu item 5' }
+    { value: '5', label: 'Menu item 5' },
   ];
 
   return (
@@ -236,7 +229,7 @@ export function DropdownWithSubmenu({
   onChange,
   size = 'normal',
   showCheckmark = false,
-  className = ''
+  className = '',
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -255,10 +248,10 @@ export function DropdownWithSubmenu({
       submenu: [
         { value: 'sub1', label: 'Submenu item 1' },
         { value: 'sub2', label: 'Submenu item 2' },
-        { value: 'sub3', label: 'Submenu item 3' }
-      ]
+        { value: 'sub3', label: 'Submenu item 3' },
+      ],
     },
-    { value: '5', label: 'Menu item 5' }
+    { value: '5', label: 'Menu item 5' },
   ];
 
   return (

@@ -1,4 +1,5 @@
 import { X, Info, AlertTriangle, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface ToastProps {
   message: string;
@@ -7,71 +8,63 @@ interface ToastProps {
   onClose?: () => void;
 }
 
-export function Toast({
-  message,
-  variant = 'info',
-  style = 'inline',
-  onClose
-}: ToastProps) {
-  const icons = {
-    info: Info,
-    error: AlertCircle,
-    success: CheckCircle,
-    warning: AlertTriangle,
-    loading: Loader2
-  };
+const icons = {
+  info:    Info,
+  error:   AlertCircle,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  loading: Loader2,
+} as const;
 
+const inlineBorder = {
+  info:    'border-l-4 border-content-feedback-info',
+  error:   'border-l-4 border-content-feedback-error',
+  success: 'border-l-4 border-content-feedback-success',
+  warning: 'border-l-4 border-content-feedback-warning',
+  loading: 'border-l-4 border-stroke-default',
+} as const;
+
+const solidBg = {
+  info:    'bg-surface-feedback-info',
+  error:   'bg-surface-feedback-error',
+  success: 'bg-surface-feedback-success',
+  warning: 'bg-surface-feedback-warning',
+  loading: 'bg-surface-sunken',
+} as const;
+
+const inlineIconColor = {
+  info:    'text-content-feedback-info',
+  error:   'text-content-feedback-error',
+  success: 'text-content-feedback-success',
+  warning: 'text-content-feedback-warning',
+  loading: 'text-content-tertiary',
+} as const;
+
+export function Toast({ message, variant = 'info', style = 'inline', onClose }: ToastProps) {
   const Icon = icons[variant];
-
-  const variantStyles = {
-    inline: {
-      info: 'bg-white border-l-4 border-[#3B9CFF] text-gray-800',
-      error: 'bg-white border-l-4 border-[#C81E1E] text-gray-800',
-      success: 'bg-white border-l-4 border-[#0B8457] text-gray-800',
-      warning: 'bg-white border-l-4 border-[#8B6914] text-gray-800',
-      loading: 'bg-white border-l-4 border-gray-400 text-gray-800'
-    },
-    solid: {
-      info: 'bg-[#3B9CFF] text-white',
-      error: 'bg-[#C81E1E] text-white',
-      success: 'bg-[#0B8457] text-white',
-      warning: 'bg-[#8B6914] text-white',
-      loading: 'bg-gray-700 text-white'
-    }
-  };
-
-  const iconColors = {
-    inline: {
-      info: 'text-[#3B9CFF]',
-      error: 'text-[#C81E1E]',
-      success: 'text-[#0B8457]',
-      warning: 'text-[#8B6914]',
-      loading: 'text-gray-400'
-    },
-    solid: {
-      info: 'text-white',
-      error: 'text-white',
-      success: 'text-white',
-      warning: 'text-white',
-      loading: 'text-white'
-    }
-  };
+  const isInline = style === 'inline';
 
   return (
     <div
-      className={`
-        flex items-center gap-3 px-4 py-3 rounded shadow-lg min-w-[300px] max-w-md
-        ${variantStyles[style][variant]}
-      `}
+      className={cn(
+        'flex items-center gap-3 px-4 py-3 rounded shadow-lg min-w-[300px] max-w-md',
+        isInline
+          ? cn('bg-surface-overlay text-content-primary', inlineBorder[variant])
+          : cn(solidBg[variant], 'text-content-primary'),
+      )}
     >
       <Icon
-        className={`flex-shrink-0 w-5 h-5 ${iconColors[style][variant]} ${variant === 'loading' ? 'animate-spin' : ''}`}
+        className={cn(
+          'shrink-0 w-5 h-5',
+          isInline ? inlineIconColor[variant] : 'text-content-primary',
+          variant === 'loading' && 'animate-spin',
+        )}
       />
       <span className="flex-1 text-sm font-medium">{message}</span>
       {onClose && (
         <button
           onClick={onClose}
-          className={`flex-shrink-0 p-1 rounded hover:bg-black/10 transition-colors ${style === 'solid' ? 'text-white' : 'text-gray-500'}`}
+          className="shrink-0 p-1 rounded hover:bg-black/10 transition-colors text-content-secondary"
         >
           <X className="w-4 h-4" />
         </button>

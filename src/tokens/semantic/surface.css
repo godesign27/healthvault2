@@ -1,0 +1,17 @@
+/* ─── Semantic: Surface Tokens ──────────────────────────────────────────────
+   References global tokens only. Defines layered surface backgrounds.
+   Redefined per surface theme context (default/bold/subdued/overlay).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Base page canvas */
+  --hv-color-surface-page:    var(--hv-color-neutral-50);
+  --hv-color-surface-raised:  var(--hv-color-neutral-0);
+  --hv-color-surface-sunken:  var(--hv-color-neutral-100);
+  --hv-color-surface-overlay: var(--hv-color-neutral-0);
+
+  /* Feedback surfaces */
+  --hv-color-surface-feedback-error:   var(--hv-color-error-50);
+  --hv-color-surface-feedback-success: var(--hv-color-success-50);
+  --hv-color-surface-feedback-warning: var(--hv-color-warning-50);
+  --hv-color-surface-feedback-info:    var(--hv-color-info-50);
+}

@@ -1,7 +1,15 @@
+/* ── 1. Radix UI Themes base styles ────────────────────────────────────────── */
+@import '@radix-ui/themes/styles.css';
+
+/* ── 2. HV Design Token System ─────────────────────────────────────────────── */
+@import './tokens/index.css';
+
+/* ── 3. Tailwind ─────────────────────────────────────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── 4. Base resets ──────────────────────────────────────────────────────────── */
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
@@ -13,6 +21,8 @@
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--hv-color-surface-page);
+    color: var(--hv-color-text-primary);
   }
 
   * {
@@ -32,31 +42,82 @@
   }
 }
 
+/* ── 5. Utilities ─────────────────────────────────────────────────────────────── */
 @layer utilities {
   @keyframes slide-in {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
   }
 
-  .animate-slide-in {
-    animation: slide-in 0.3s ease-out;
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
   }
 
-  .touch-pan-y {
-    touch-action: pan-y;
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
   }
 
-  .touch-pan-x {
-    touch-action: pan-x;
+  @keyframes slide-out-right {
+    from { transform: translateX(0);    opacity: 1; }
+    to   { transform: translateX(100%); opacity: 0; }
   }
 
-  .touch-none {
-    touch-action: none;
+  @keyframes slide-out-left {
+    from { transform: translateX(0);     opacity: 1; }
+    to   { transform: translateX(-100%); opacity: 0; }
   }
+
+  @keyframes slide-in-top {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+
+  @keyframes slide-out-top {
+    from { transform: translateY(0);     opacity: 1; }
+    to   { transform: translateY(-100%); opacity: 0; }
+  }
+
+  @keyframes slide-in-bottom {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  @keyframes slide-out-bottom {
+    from { transform: translateY(0);    opacity: 1; }
+    to   { transform: translateY(100%); opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to   { height: var(--radix-accordion-content-height); }
+  }
+
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to   { height: 0; }
+  }
+
+  .animate-slide-in           { animation: slide-in-right 0.3s ease-out; }
+  .animate-slide-in-left      { animation: slide-in-left 0.3s ease-out; }
+  .animate-slide-in-right     { animation: slide-in-right 0.3s ease-out; }
+  .animate-slide-out-right    { animation: slide-out-right 0.3s ease-out; }
+  .animate-slide-out-left     { animation: slide-out-left 0.3s ease-out; }
+  .animate-slide-in-top       { animation: slide-in-top 0.3s ease-out; }
+  .animate-slide-out-top      { animation: slide-out-top 0.3s ease-out; }
+  .animate-slide-in-bottom    { animation: slide-in-bottom 0.3s ease-out; }
+  .animate-slide-out-bottom   { animation: slide-out-bottom 0.3s ease-out; }
+  .animate-fade-in            { animation: fade-in 0.2s ease-out; }
+  .animate-accordion-down     { animation: accordion-down 0.2s ease-out; }
+  .animate-accordion-up       { animation: accordion-up 0.2s ease-out; }
+
+  .touch-pan-y  { touch-action: pan-y; }
+  .touch-pan-x  { touch-action: pan-x; }
+  .touch-none   { touch-action: none; }
 }

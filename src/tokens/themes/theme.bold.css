@@ -1,0 +1,36 @@
+/* ─── Theme: Bold (Dark Brand Surface) ─────────────────────────────────────
+   Applied via data-surface="bold" on a container element.
+   Used for: hero sections, primary CTAs, top navigation in brand context.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface="bold"] {
+  /* Invert neutral scale for dark brand surface */
+  --hv-color-surface-page:    var(--hv-color-neutral-900);
+  --hv-color-surface-raised:  var(--hv-color-neutral-800);
+  --hv-color-surface-sunken:  var(--hv-color-neutral-950);
+  --hv-color-surface-overlay: var(--hv-color-neutral-800);
+
+  /* Text on dark brand background */
+  --hv-color-text-primary:     var(--hv-color-neutral-0);
+  --hv-color-text-secondary:   var(--hv-color-neutral-300);
+  --hv-color-text-tertiary:    var(--hv-color-neutral-400);
+  --hv-color-text-placeholder: var(--hv-color-neutral-500);
+  --hv-color-text-disabled:    var(--hv-color-neutral-600);
+  --hv-color-text-inverse:     var(--hv-color-neutral-900);
+  --hv-color-text-link:        var(--hv-color-brand-300);
+  --hv-color-text-link-hover:  var(--hv-color-brand-200);
+
+  /* Borders on dark surface */
+  --hv-color-border-subtle:  var(--hv-color-neutral-700);
+  --hv-color-border-default: var(--hv-color-neutral-600);
+  --hv-color-border-strong:  var(--hv-color-neutral-500);
+
+  /* Brighter brand action for visibility on dark */
+  --hv-color-action-primary-default:  var(--hv-color-brand-400);
+  --hv-color-action-primary-hover:    var(--hv-color-brand-300);
+  --hv-color-action-primary-subtle:   rgba(59, 156, 255, 0.15);
+
+  /* Secondary action on dark */
+  --hv-color-action-secondary-default: rgba(255, 255, 255, 0.08);
+  --hv-color-action-secondary-hover:   rgba(255, 255, 255, 0.14);
+  --hv-color-action-ghost-hover:       rgba(255, 255, 255, 0.08);
+}

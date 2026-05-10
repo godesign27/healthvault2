@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export type StepStatus = 'pending' | 'active' | 'success' | 'disabled' | 'info' | 'warning' | 'danger';
 
@@ -16,84 +17,49 @@ interface StepperProps {
   className?: string;
 }
 
-const statusColors = {
-  pending: {
-    bg: 'bg-gray-200',
-    border: 'border-gray-300',
-    text: 'text-gray-500',
-    line: 'bg-gray-300'
-  },
-  active: {
-    bg: 'bg-[indigo-600]',
-    border: 'border-[indigo-600]',
-    text: 'text-white',
-    line: 'bg-[indigo-600]'
-  },
-  success: {
-    bg: 'bg-[indigo-600]',
-    border: 'border-[indigo-600]',
-    text: 'text-white',
-    line: 'bg-[indigo-600]'
-  },
-  disabled: {
-    bg: 'bg-gray-100',
-    border: 'border-gray-300',
-    text: 'text-gray-400',
-    line: 'bg-gray-200'
-  },
-  info: {
-    bg: 'bg-blue-500',
-    border: 'border-blue-500',
-    text: 'text-white',
-    line: 'bg-blue-500'
-  },
-  warning: {
-    bg: 'bg-yellow-500',
-    border: 'border-yellow-500',
-    text: 'text-white',
-    line: 'bg-yellow-500'
-  },
-  danger: {
-    bg: 'bg-red-500',
-    border: 'border-red-500',
-    text: 'text-white',
-    line: 'bg-red-500'
-  }
-};
+const statusStyle = {
+  pending:  { circle: 'bg-surface-sunken border-stroke-default text-content-tertiary',       line: 'bg-stroke-default' },
+  active:   { circle: 'bg-action-primary border-action-primary text-content-on-action',       line: 'bg-action-primary' },
+  success:  { circle: 'bg-action-primary border-action-primary text-content-on-action',       line: 'bg-action-primary' },
+  disabled: { circle: 'bg-surface-sunken border-stroke-subtle text-content-disabled',         line: 'bg-stroke-subtle' },
+  info:     { circle: 'bg-surface-feedback-info border-content-feedback-info text-content-feedback-info',       line: 'bg-content-feedback-info' },
+  warning:  { circle: 'bg-surface-feedback-warning border-content-feedback-warning text-content-feedback-warning', line: 'bg-content-feedback-warning' },
+  danger:   { circle: 'bg-surface-feedback-error border-content-feedback-error text-content-feedback-error',     line: 'bg-content-feedback-error' },
+} as const;
+
+function StepCircle({ step, index }: { step: Step; index: number }) {
+  const s = statusStyle[step.status];
+  return (
+    <div className={cn('w-10 h-10 rounded-full border-2 flex items-center justify-center font-semibold', s.circle)}>
+      {step.status === 'success' ? (
+        <Check className="w-5 h-5" />
+      ) : (
+        <span className="text-sm">{index + 1}</span>
+      )}
+    </div>
+  );
+}
 
 export function Stepper({ steps, orientation = 'horizontal', variant = 'default', className = '' }: StepperProps) {
   if (orientation === 'vertical') {
     return (
-      <div className={`flex flex-col ${className}`}>
+      <div className={cn('flex flex-col', className)}>
         {steps.map((step, index) => {
-          const colors = statusColors[step.status];
           const isLast = index === steps.length - 1;
+          const s      = statusStyle[step.status];
 
           return (
             <div key={step.id} className="flex gap-4">
               <div className="flex flex-col items-center">
-                <div
-                  className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${colors.bg} ${colors.border} ${colors.text} font-semibold`}
-                >
-                  {step.status === 'success' ? (
-                    <Check className="w-5 h-5" />
-                  ) : (
-                    <span className="text-sm">{index + 1}</span>
-                  )}
-                </div>
-                {!isLast && (
-                  <div className={`w-0.5 h-16 ${colors.line} my-2`} />
-                )}
+                <StepCircle step={step} index={index} />
+                {!isLast && <div className={cn('w-0.5 h-16 my-2', s.line)} />}
               </div>
-
               <div className="flex-1 pb-8">
-                <div className={`font-semibold ${step.status === 'disabled' ? 'text-gray-400' : 'text-gray-900'}`}>
+                <div className={cn('font-semibold', step.status === 'disabled' ? 'text-content-disabled' : 'text-content-primary')}>
                   {step.title}
                 </div>
                 {step.description && variant === 'default' && (
-                  <div className="text-sm text-gray-600 mt-1">
-                    {step.description}
-                  </div>
+                  <div className="text-sm text-content-secondary mt-1">{step.description}</div>
                 )}
               </div>
             </div>
@@ -104,36 +70,23 @@ export function Stepper({ steps, orientation = 'horizontal', variant = 'default'
   }
 
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={cn('flex items-center', className)}>
       {steps.map((step, index) => {
-        const colors = statusColors[step.status];
         const isLast = index === steps.length - 1;
+        const s      = statusStyle[step.status];
 
         return (
           <div key={step.id} className="flex items-center flex-1">
             <div className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${colors.bg} ${colors.border} ${colors.text} font-semibold`}
-              >
-                {step.status === 'success' ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="text-sm">{index + 1}</span>
-                )}
-              </div>
-              <div className={`text-center mt-2 ${step.status === 'disabled' ? 'text-gray-400' : 'text-gray-900'}`}>
+              <StepCircle step={step} index={index} />
+              <div className={cn('text-center mt-2', step.status === 'disabled' ? 'text-content-disabled' : 'text-content-primary')}>
                 <div className="font-medium text-sm">{step.title}</div>
                 {step.description && variant === 'default' && (
-                  <div className="text-xs text-gray-600 mt-1">
-                    {step.description}
-                  </div>
+                  <div className="text-xs text-content-secondary mt-1">{step.description}</div>
                 )}
               </div>
             </div>
-
-            {!isLast && (
-              <div className={`flex-1 h-0.5 ${colors.line} mx-4`} />
-            )}
+            {!isLast && <div className={cn('flex-1 h-0.5 mx-4 mb-8', s.line)} />}
           </div>
         );
       })}

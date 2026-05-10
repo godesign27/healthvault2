@@ -1,0 +1,15 @@
+/* ─── Component: Table ──────────────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-component-table-header-background-default: var(--hv-color-surface-sunken);
+  --hv-component-table-header-text-default:       var(--hv-color-text-secondary);
+
+  --hv-component-table-row-background-default:   var(--hv-color-surface-raised);
+  --hv-component-table-row-background-alternate: var(--hv-color-surface-sunken);
+  --hv-component-table-row-background-hover:     var(--hv-color-action-primary-subtle);
+  --hv-component-table-row-background-selected:  var(--hv-color-action-primary-subtle);
+
+  --hv-component-table-border-default: var(--hv-color-border-subtle);
+  --hv-component-table-text-default:   var(--hv-color-text-primary);
+}

@@ -1,7 +1,16 @@
+import * as RadixCheckbox from '@radix-ui/react-checkbox';
 import { Check, Minus } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export type CheckboxSize = '20px' | '18px' | '16px' | '14px';
 export type CheckboxVariant = 'primary' | 'error';
+
+const sizeMap = {
+  '20px': { box: 'w-5 h-5',           icon: 'w-4 h-4' },
+  '18px': { box: 'w-[18px] h-[18px]', icon: 'w-3.5 h-3.5' },
+  '16px': { box: 'w-4 h-4',           icon: 'w-3 h-3' },
+  '14px': { box: 'w-3.5 h-3.5',       icon: 'w-2.5 h-2.5' },
+} as const;
 
 interface CheckboxProps {
   checked?: boolean;
@@ -22,103 +31,53 @@ export function Checkbox({
   variant = 'primary',
   size = '20px',
   label,
-  className = ''
+  className = '',
 }: CheckboxProps) {
-  const getSizeClasses = () => {
-    switch (size) {
-      case '20px':
-        return 'w-5 h-5';
-      case '18px':
-        return 'w-[18px] h-[18px]';
-      case '16px':
-        return 'w-4 h-4';
-      case '14px':
-        return 'w-3.5 h-3.5';
-      default:
-        return 'w-5 h-5';
-    }
-  };
-
-  const getIconSize = () => {
-    switch (size) {
-      case '20px':
-        return 'w-4 h-4';
-      case '18px':
-        return 'w-3.5 h-3.5';
-      case '16px':
-        return 'w-3 h-3';
-      case '14px':
-        return 'w-2.5 h-2.5';
-      default:
-        return 'w-4 h-4';
-    }
-  };
-
-  const getCheckboxClasses = () => {
-    const baseClasses = `${getSizeClasses()} rounded border-2 flex items-center justify-center transition-all cursor-pointer`;
-
-    if (disabled) {
-      if (checked || indeterminate) {
-        if (variant === 'error') {
-          return `${baseClasses} bg-[#8B1F1F] border-[#8B1F1F] cursor-not-allowed`;
-        }
-        return `${baseClasses} bg-stone-400 border-stone-400 cursor-not-allowed`;
-      }
-      return `${baseClasses} bg-gray-100 border-gray-300 cursor-not-allowed`;
-    }
-
-    if (checked || indeterminate) {
-      if (variant === 'error') {
-        return `${baseClasses} bg-[#C1292E] border-[#C1292E] hover:bg-[#A01F23]`;
-      }
-      return `${baseClasses} bg-stone-900 border-stone-900 hover:bg-stone-800`;
-    }
-
-    if (variant === 'error') {
-      return `${baseClasses} bg-white border-[#C1292E] hover:border-[#A01F23]`;
-    }
-
-    return `${baseClasses} bg-white border-stone-400 hover:border-indigo-600`;
-  };
-
-  const getFocusClasses = () => {
-    return 'focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2';
-  };
-
-  const handleClick = () => {
-    if (!disabled) {
-      onChange?.(!checked);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      handleClick();
-    }
-  };
+  const { box, icon } = sizeMap[size];
+  const isError = variant === 'error';
 
   return (
-    <label className={`inline-flex items-center gap-2 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${className}`}>
-      <div className={getFocusClasses()}>
-        <div
-          role="checkbox"
-          aria-checked={indeterminate ? 'mixed' : checked}
-          aria-disabled={disabled}
-          tabIndex={disabled ? -1 : 0}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          className={getCheckboxClasses()}
-        >
+    <label
+      className={cn(
+        'inline-flex items-center gap-2',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+        className
+      )}
+    >
+      <RadixCheckbox.Root
+        checked={indeterminate ? 'indeterminate' : checked}
+        onCheckedChange={(val) => {
+          if (!disabled) onChange?.(val === true);
+        }}
+        disabled={disabled}
+        className={cn(
+          box,
+          'rounded border-2 flex items-center justify-center transition-all',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
+          // unchecked
+          !checked && !indeterminate && !isError && 'bg-surface-raised border-stroke-default hover:border-stroke-strong',
+          !checked && !indeterminate && isError  && 'bg-surface-raised border-stroke-feedback-error',
+          // checked/indeterminate primary
+          (checked || indeterminate) && !isError && 'bg-hv-neutral-900 border-hv-neutral-900 hover:bg-hv-neutral-800',
+          // checked/indeterminate error
+          (checked || indeterminate) && isError  && 'bg-action-destructive border-action-destructive hover:bg-action-destructive-hover',
+          // disabled unchecked
+          disabled && !checked && !indeterminate && 'bg-surface-sunken border-stroke-subtle cursor-not-allowed',
+          // disabled checked
+          disabled && (checked || indeterminate) && 'bg-hv-neutral-400 border-hv-neutral-400 cursor-not-allowed',
+        )}
+      >
+        <RadixCheckbox.Indicator>
           {indeterminate ? (
-            <Minus className={`${getIconSize()} text-white`} strokeWidth={3} />
-          ) : checked ? (
-            <Check className={`${getIconSize()} text-white`} strokeWidth={3} />
-          ) : null}
-        </div>
-      </div>
+            <Minus className={cn(icon, 'text-white')} strokeWidth={3} />
+          ) : (
+            <Check className={cn(icon, 'text-white')} strokeWidth={3} />
+          )}
+        </RadixCheckbox.Indicator>
+      </RadixCheckbox.Root>
+
       {label && (
-        <span className={`text-sm ${disabled ? 'text-gray-400' : 'text-gray-700'}`}>
+        <span className={cn('text-sm select-none', disabled ? 'text-content-disabled' : 'text-content-secondary')}>
           {label}
         </span>
       )}
@@ -143,19 +102,18 @@ export function CheckboxGroup({
   variant = 'primary',
   size = '16px',
   disabled = false,
-  className = ''
+  className = '',
 }: CheckboxGroupProps) {
   const handleChange = (optionValue: string, isChecked: boolean) => {
-    if (isChecked) {
-      onChange([...value, optionValue]);
-    } else {
-      onChange(value.filter(v => v !== optionValue));
-    }
+    onChange(isChecked
+      ? [...value, optionValue]
+      : value.filter((v) => v !== optionValue)
+    );
   };
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      {options.map(option => (
+    <div className={cn('space-y-2', className)}>
+      {options.map((option) => (
         <Checkbox
           key={option.value}
           checked={value.includes(option.value)}

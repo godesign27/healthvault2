@@ -1,0 +1,52 @@
+/* ─── Global: Feedback Scales ───────────────────────────────────────────────
+   Raw hex values only. Status/feedback palettes: error, success, warning, info.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Error — red */
+  --hv-color-error-50:  #FEF2F2;
+  --hv-color-error-100: #FEE2E2;
+  --hv-color-error-200: #FECACA;
+  --hv-color-error-300: #FCA5A5;
+  --hv-color-error-400: #F87171;
+  --hv-color-error-500: #EF4444;
+  --hv-color-error-600: #C1292E;
+  --hv-color-error-700: #A01F23;
+  --hv-color-error-800: #7F1D1D;
+  --hv-color-error-900: #450A0A;
+
+  /* Success — green */
+  --hv-color-success-50:  #F0FDF4;
+  --hv-color-success-100: #DCFCE7;
+  --hv-color-success-200: #BBF7D0;
+  --hv-color-success-300: #86EFAC;
+  --hv-color-success-400: #4ADE80;
+  --hv-color-success-500: #22C55E;
+  --hv-color-success-600: #16A34A;
+  --hv-color-success-700: #0B8457;
+  --hv-color-success-800: #065F46;
+  --hv-color-success-900: #052E16;
+
+  /* Warning — yellow/amber */
+  --hv-color-warning-50:  #FEFCE8;
+  --hv-color-warning-100: #FEF9C3;
+  --hv-color-warning-200: #FEF08A;
+  --hv-color-warning-300: #FDE047;
+  --hv-color-warning-400: #FACC15;
+  --hv-color-warning-500: #EAB308;
+  --hv-color-warning-600: #CA8A04;
+  --hv-color-warning-700: #854D0E;
+  --hv-color-warning-800: #713F12;
+  --hv-color-warning-900: #422006;
+
+  /* Info — blue */
+  --hv-color-info-50:  #EFF6FF;
+  --hv-color-info-100: #DBEAFE;
+  --hv-color-info-200: #BFDBFE;
+  --hv-color-info-300: #93C5FD;
+  --hv-color-info-400: #60A5FA;
+  --hv-color-info-500: #3B82F6;
+  --hv-color-info-600: #2563EB;
+  --hv-color-info-700: #1D4ED8;
+  --hv-color-info-800: #1E40AF;
+  --hv-color-info-900: #1E3A8A;
+}

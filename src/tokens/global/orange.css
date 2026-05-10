@@ -1,0 +1,15 @@
+/* ─── Global: Orange Scale ──────────────────────────────────────────────────
+   Raw hex values only. Replaces legacy --zsorange-80.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-orange-50:  #FFF7ED;
+  --hv-color-orange-100: #FFEDD5;
+  --hv-color-orange-200: #FED7AA;
+  --hv-color-orange-300: #FDBA74;
+  --hv-color-orange-400: #FB923C;
+  --hv-color-orange-500: #F97316;
+  --hv-color-orange-600: #EC7200;
+  --hv-color-orange-700: #FF7D00;
+  --hv-color-orange-800: #9A3412;
+  --hv-color-orange-900: #7C2D12;
+}

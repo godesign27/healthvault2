@@ -1,0 +1,11 @@
+/* ─── Component: Drawer ─────────────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-component-drawer-background-default: var(--hv-color-surface-overlay);
+  --hv-component-drawer-border-default:     var(--hv-color-border-subtle);
+  --hv-component-drawer-text-title:         var(--hv-color-text-primary);
+  --hv-component-drawer-overlay-background: rgba(0, 0, 0, 0.5);
+
+  --hv-component-drawer-handle-background:  var(--hv-color-border-default);
+}

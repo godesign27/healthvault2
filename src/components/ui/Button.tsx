@@ -1,15 +1,65 @@
-import { ReactNode } from 'react';
+import { ReactNode, ButtonHTMLAttributes } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../lib/utils';
 
-interface ButtonProps {
-  children: ReactNode;
-  variant?: 'solid' | 'outline' | 'link';
-  size?: 'normal' | 'small' | 'x-small';
-  shape?: 'rectangle' | 'circle' | 'square';
-  disabled?: boolean;
+const buttonVariants = cva(
+  'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 disabled:pointer-events-none select-none',
+  {
+    variants: {
+      variant: {
+        solid:
+          'bg-action-primary text-content-on-action hover:bg-action-primary-hover active:bg-action-primary-active disabled:bg-action-primary-disabled',
+        outline:
+          'border border-stroke-default bg-transparent text-content-primary hover:bg-action-secondary active:bg-action-secondary-hover disabled:border-stroke-subtle disabled:text-content-disabled',
+        ghost:
+          'bg-transparent text-content-primary hover:bg-action-ghost-hover active:bg-action-ghost-active disabled:text-content-disabled',
+        link:
+          'bg-transparent text-content-link underline-offset-4 hover:underline hover:text-content-link-hover disabled:text-content-disabled',
+        destructive:
+          'bg-action-destructive text-content-on-action hover:bg-action-destructive-hover disabled:bg-action-primary-disabled',
+      },
+      size: {
+        'x-small': 'text-[10px] gap-1',
+        small:     'text-xs gap-1.5',
+        normal:    'text-sm gap-2',
+      },
+      shape: {
+        rectangle: 'rounded-lg',
+        circle:    'rounded-full',
+        square:    'rounded-none',
+      },
+    },
+    compoundVariants: [
+      { size: 'x-small', shape: 'rectangle', class: 'px-2 py-1' },
+      { size: 'x-small', shape: 'circle',    class: 'p-1.5' },
+      { size: 'x-small', shape: 'square',    class: 'p-1.5' },
+      { size: 'small',   shape: 'rectangle', class: 'px-3 py-1.5' },
+      { size: 'small',   shape: 'circle',    class: 'p-2' },
+      { size: 'small',   shape: 'square',    class: 'p-2' },
+      { size: 'normal',  shape: 'rectangle', class: 'px-4 py-2' },
+      { size: 'normal',  shape: 'circle',    class: 'p-2.5' },
+      { size: 'normal',  shape: 'square',    class: 'p-2.5' },
+    ],
+    defaultVariants: {
+      variant: 'solid',
+      size:    'normal',
+      shape:   'rectangle',
+    },
+  }
+);
+
+const iconSizeMap = {
+  'x-small': 'w-3 h-3',
+  small:     'w-3.5 h-3.5',
+  normal:    'w-4 h-4',
+} as const;
+
+export interface ButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
+    VariantProps<typeof buttonVariants> {
+  children?: ReactNode;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  onClick?: () => void;
-  className?: string;
 }
 
 export function Button({
@@ -20,82 +70,29 @@ export function Button({
   disabled = false,
   leftIcon,
   rightIcon,
-  onClick,
-  className = ''
+  className,
+  ...props
 }: ButtonProps) {
-  const sizeClasses = {
-    'x-small': {
-      text: 'text-[10px]',
-      padding: shape === 'rectangle' ? 'px-2 py-1' : 'p-1.5',
-      icon: 'w-3 h-3',
-      gap: 'gap-1'
-    },
-    'small': {
-      text: 'text-xs',
-      padding: shape === 'rectangle' ? 'px-3 py-1.5' : 'p-2',
-      icon: 'w-3.5 h-3.5',
-      gap: 'gap-1.5'
-    },
-    'normal': {
-      text: 'text-sm',
-      padding: shape === 'rectangle' ? 'px-4 py-2' : 'p-2.5',
-      icon: 'w-4 h-4',
-      gap: 'gap-2'
-    }
-  };
-
-  const getVariantClasses = () => {
-    if (disabled) {
-      if (variant === 'outline') {
-        return 'border border-gray-300 bg-white text-gray-400 cursor-not-allowed';
-      } else if (variant === 'link') {
-        return 'text-gray-400 cursor-not-allowed underline';
-      }
-      return 'bg-gray-400 text-white cursor-not-allowed';
-    }
-
-    switch (variant) {
-      case 'solid':
-        return 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800';
-      case 'outline':
-        return 'border border-indigo-600 bg-white text-indigo-600 hover:bg-indigo-600 hover:text-white active:bg-indigo-700';
-      case 'link':
-        return 'text-indigo-600 hover:text-indigo-700 active:text-indigo-800 underline';
-      default:
-        return '';
-    }
-  };
-
-  const getShapeClasses = () => {
-    switch (shape) {
-      case 'circle':
-        return 'rounded-full';
-      case 'square':
-        return 'rounded-none';
-      default:
-        return 'rounded-lg';
-    }
-  };
-
-  const baseClasses = `
-    inline-flex items-center justify-center font-medium transition-colors
-    ${sizeClasses[size].text}
-    ${sizeClasses[size].padding}
-    ${sizeClasses[size].gap}
-    ${getVariantClasses()}
-    ${getShapeClasses()}
-    ${className}
-  `.trim().replace(/\s+/g, ' ');
+  const iconSize = iconSizeMap[size ?? 'normal'];
 
   return (
     <button
-      onClick={onClick}
       disabled={disabled}
-      className={baseClasses}
+      className={cn(buttonVariants({ variant, size, shape }), className)}
+      {...props}
     >
-      {leftIcon && <span className={`inline-flex items-center justify-center ${sizeClasses[size].icon}`}>{leftIcon}</span>}
+      {leftIcon && (
+        <span className={cn('inline-flex items-center justify-center', iconSize)}>
+          {leftIcon}
+        </span>
+      )}
       {shape === 'rectangle' && children}
-      {rightIcon && <span className={`inline-flex items-center justify-center ${sizeClasses[size].icon}`}>{rightIcon}</span>}
+      {shape !== 'rectangle' && !leftIcon && children}
+      {rightIcon && (
+        <span className={cn('inline-flex items-center justify-center', iconSize)}>
+          {rightIcon}
+        </span>
+      )}
     </button>
   );
 }

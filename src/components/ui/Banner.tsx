@@ -1,4 +1,5 @@
 import { X, Info, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface BannerProps {
   message: string;
@@ -7,78 +8,52 @@ interface BannerProps {
   onClose?: () => void;
 }
 
-export function Banner({
-  message,
-  variant = 'info',
-  style = 'solid',
-  onClose
-}: BannerProps) {
-  const icons = {
-    info: Info,
-    error: AlertCircle,
-    success: CheckCircle,
-    warning: AlertTriangle
-  };
+const icons = {
+  info:    Info,
+  error:   AlertCircle,
+  success: CheckCircle,
+  warning: AlertTriangle,
+} as const;
 
+const outlineBorder = {
+  info:    'border border-content-feedback-info',
+  error:   'border border-content-feedback-error',
+  success: 'border border-content-feedback-success',
+  warning: 'border border-content-feedback-warning',
+} as const;
+
+const solidBg = {
+  info:    'bg-surface-feedback-info',
+  error:   'bg-surface-feedback-error',
+  success: 'bg-surface-feedback-success',
+  warning: 'bg-surface-feedback-warning',
+} as const;
+
+const iconColor = {
+  info:    'text-content-feedback-info',
+  error:   'text-content-feedback-error',
+  success: 'text-content-feedback-success',
+  warning: 'text-content-feedback-warning',
+} as const;
+
+export function Banner({ message, variant = 'info', style = 'solid', onClose }: BannerProps) {
   const Icon = icons[variant];
-
-  const variantStyles = {
-    outline: {
-      info: 'bg-white border border-[#3B9CFF] text-gray-800',
-      error: 'bg-white border border-[#C81E1E] text-gray-800',
-      success: 'bg-white border border-[#0B8457] text-gray-800',
-      warning: 'bg-white border border-[#8B6914] text-gray-800'
-    },
-    solid: {
-      info: 'bg-[#3B9CFF] text-white',
-      error: 'bg-[#C81E1E] text-white',
-      success: 'bg-[#0B8457] text-white',
-      warning: 'bg-[#8B6914] text-white'
-    },
-    light: {
-      info: 'bg-blue-50 border border-blue-200 text-blue-800',
-      error: 'bg-red-50 border border-red-200 text-red-800',
-      success: 'bg-green-50 border border-green-200 text-green-800',
-      warning: 'bg-yellow-50 border border-yellow-200 text-yellow-800'
-    }
-  };
-
-  const iconColors = {
-    outline: {
-      info: 'text-[#3B9CFF]',
-      error: 'text-[#C81E1E]',
-      success: 'text-[#0B8457]',
-      warning: 'text-[#8B6914]'
-    },
-    solid: {
-      info: 'text-white',
-      error: 'text-white',
-      success: 'text-white',
-      warning: 'text-white'
-    },
-    light: {
-      info: 'text-blue-600',
-      error: 'text-red-600',
-      success: 'text-green-600',
-      warning: 'text-yellow-600'
-    }
-  };
 
   return (
     <div
-      className={`
-        flex items-center gap-3 px-4 py-3 rounded w-full
-        ${variantStyles[style][variant]}
-      `}
+      className={cn(
+        'flex items-center gap-3 px-4 py-3 rounded w-full',
+        style === 'outline' && cn('bg-surface-raised text-content-primary', outlineBorder[variant]),
+        style === 'solid'   && cn(solidBg[variant], 'text-content-primary'),
+        style === 'light'   && cn(solidBg[variant], 'text-content-primary'),
+      )}
     >
-      <Icon
-        className={`flex-shrink-0 w-5 h-5 ${iconColors[style][variant]}`}
-      />
+      <Icon className={cn('shrink-0 w-5 h-5', iconColor[variant])} />
       <span className="flex-1 text-sm font-medium">{message}</span>
       {onClose && (
         <button
           onClick={onClose}
-          className={`flex-shrink-0 p-1 rounded hover:bg-black/10 transition-colors`}
+          className="shrink-0 p-1 rounded hover:bg-black/10 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>

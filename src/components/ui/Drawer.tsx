@@ -1,5 +1,7 @@
-import { X, Menu, Image } from 'lucide-react';
-import { ReactNode, useEffect } from 'react';
+import * as RadixDialog from '@radix-ui/react-dialog';
+import { X, Menu } from 'lucide-react';
+import { type ReactNode } from 'react';
+import { cn } from '../../lib/utils';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -13,6 +15,13 @@ interface DrawerProps {
   className?: string;
 }
 
+const positionClasses = {
+  left:   'left-0 top-0 h-full data-[state=open]:animate-slide-in-left data-[state=closed]:animate-slide-out-left',
+  right:  'right-0 top-0 h-full data-[state=open]:animate-slide-in-right data-[state=closed]:animate-slide-out-right',
+  top:    'top-0 left-0 w-full data-[state=open]:animate-slide-in-top data-[state=closed]:animate-slide-out-top',
+  bottom: 'bottom-0 left-0 w-full data-[state=open]:animate-slide-in-bottom data-[state=closed]:animate-slide-out-bottom',
+} as const;
+
 export function Drawer({
   isOpen,
   onClose,
@@ -22,111 +31,63 @@ export function Drawer({
   footer,
   showFooter = false,
   size = 'default',
-  className = ''
+  className = '',
 }: DrawerProps) {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  const getDrawerClasses = () => {
-    const baseClasses = 'fixed bg-white shadow-2xl transition-transform duration-300 ease-in-out z-50';
-    const desktopSizeClasses = size === 'large' ? 'md:w-96' : 'md:w-80';
-
-    switch (position) {
-      case 'left':
-        return `${baseClasses} w-full ${desktopSizeClasses} top-0 left-0 h-full ${isOpen ? 'translate-x-0' : '-translate-x-full'}`;
-      case 'right':
-        return `${baseClasses} w-full ${desktopSizeClasses} top-0 right-0 h-full ${isOpen ? 'translate-x-0' : 'translate-x-full'}`;
-      case 'top':
-        return `${baseClasses} w-full h-80 md:h-96 top-0 left-0 ${isOpen ? 'translate-y-0' : '-translate-y-full'}`;
-      case 'bottom':
-        return `${baseClasses} w-full h-80 md:h-96 bottom-0 left-0 ${isOpen ? 'translate-y-0' : 'translate-y-full'}`;
-      default:
-        return baseClasses;
-    }
-  };
-
-  const getScrollbarClasses = () => {
-    if (position === 'left') {
-      return 'border-r-4 border-gray-300';
-    }
-    if (position === 'right') {
-      return 'border-l-4 border-gray-300';
-    }
-    if (position === 'top') {
-      return 'border-b-4 border-gray-300';
-    }
-    if (position === 'bottom') {
-      return 'border-t-4 border-gray-300';
-    }
-    return '';
-  };
-
-  const defaultContent = (
-    <div className="flex items-center justify-center py-12 text-gray-400">
-      <div className="text-center">
-        <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
-        <p className="text-sm">Replace Me</p>
-      </div>
-    </div>
-  );
+  const isVertical = position === 'left' || position === 'right';
+  const sizeClass = isVertical
+    ? (size === 'large' ? 'w-full md:w-96' : 'w-full md:w-80')
+    : 'h-80 md:h-96';
 
   return (
-    <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 z-40"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-
-      <div className={`${getDrawerClasses()} ${className}`}>
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-            <button
-              onClick={onClose}
-              className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+    <RadixDialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-fade-in" />
+        <RadixDialog.Content
+          className={cn(
+            'fixed z-50 bg-surface-overlay shadow-2xl flex flex-col',
+            'focus-visible:outline-none',
+            sizeClass,
+            positionClasses[position],
+            className,
+          )}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-4 border-b border-stroke-subtle shrink-0">
+            <RadixDialog.Title className="text-lg font-semibold text-content-primary">
+              {title}
+            </RadixDialog.Title>
+            <RadixDialog.Close asChild>
+              <button className="p-1 text-content-secondary hover:text-content-primary hover:bg-action-secondary rounded transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </RadixDialog.Close>
           </div>
 
-          <div className={`flex-1 overflow-y-auto p-4 ${getScrollbarClasses()}`}>
-            {children || defaultContent}
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {children}
           </div>
 
+          {/* Footer */}
           {showFooter && (
-            <div className="p-4 border-t-2 border-gray-200">
+            <div className="px-4 py-4 border-t border-stroke-subtle shrink-0">
               {footer || (
                 <div className="flex gap-2 justify-end">
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
-                  >
+                  <RadixDialog.Close asChild>
+                    <button className="px-4 py-2 text-sm font-medium text-content-primary bg-surface-raised border border-stroke-default rounded hover:bg-action-secondary transition-colors">
+                      Cancel
+                    </button>
+                  </RadixDialog.Close>
+                  <button className="px-4 py-2 text-sm font-medium text-content-on-action bg-action-primary rounded hover:bg-action-primary-hover transition-colors">
                     Save
                   </button>
                 </div>
               )}
             </div>
           )}
-        </div>
-      </div>
-    </>
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 }
 
@@ -140,7 +101,7 @@ export function DrawerTrigger({ onClick, children, className = '' }: DrawerTrigg
   return (
     <button
       onClick={onClick}
-      className={`p-2 text-gray-700 hover:bg-gray-100 rounded transition-colors ${className}`}
+      className={cn('p-2 text-content-secondary hover:bg-action-secondary rounded transition-colors', className)}
     >
       {children || <Menu className="w-6 h-6" />}
     </button>
@@ -155,11 +116,11 @@ interface DrawerHeaderProps {
 
 export function DrawerHeader({ title, onClose, className = '' }: DrawerHeaderProps) {
   return (
-    <div className={`flex items-center justify-between p-4 border-b-2 border-gray-200 ${className}`}>
-      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+    <div className={cn('flex items-center justify-between px-4 py-4 border-b border-stroke-subtle', className)}>
+      <h2 className="text-lg font-semibold text-content-primary">{title}</h2>
       <button
         onClick={onClose}
-        className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+        className="p-1 text-content-secondary hover:text-content-primary hover:bg-action-secondary rounded transition-colors"
       >
         <X className="w-5 h-5" />
       </button>
@@ -173,25 +134,9 @@ interface DrawerContentProps {
   className?: string;
 }
 
-export function DrawerContent({ children, position = 'left', className = '' }: DrawerContentProps) {
-  const getScrollbarClasses = () => {
-    if (position === 'left') {
-      return 'border-r-4 border-gray-300';
-    }
-    if (position === 'right') {
-      return 'border-l-4 border-gray-300';
-    }
-    if (position === 'top') {
-      return 'border-b-4 border-gray-300';
-    }
-    if (position === 'bottom') {
-      return 'border-t-4 border-gray-300';
-    }
-    return '';
-  };
-
+export function DrawerContent({ children, className = '' }: DrawerContentProps) {
   return (
-    <div className={`flex-1 overflow-y-auto p-4 ${getScrollbarClasses()} ${className}`}>
+    <div className={cn('flex-1 overflow-y-auto p-4', className)}>
       {children}
     </div>
   );
@@ -206,18 +151,18 @@ interface DrawerFooterProps {
 
 export function DrawerFooter({ children, onCancel, onSave, className = '' }: DrawerFooterProps) {
   return (
-    <div className={`p-4 border-t-2 border-gray-200 ${className}`}>
+    <div className={cn('px-4 py-4 border-t border-stroke-subtle', className)}>
       {children || (
         <div className="flex gap-2 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-content-primary bg-surface-raised border border-stroke-default rounded hover:bg-action-secondary transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
+            className="px-4 py-2 text-sm font-medium text-content-on-action bg-action-primary rounded hover:bg-action-primary-hover transition-colors"
           >
             Save
           </button>

@@ -1,0 +1,24 @@
+/* ─── Global: Data Visualization ────────────────────────────────────────────
+   Raw hex values only. 6-series color palette for charts and graphs.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-datavis-series-1: #2364C7;
+  --hv-color-datavis-series-2: #3D9199;
+  --hv-color-datavis-series-3: #EC7200;
+  --hv-color-datavis-series-4: #22C55E;
+  --hv-color-datavis-series-5: #A855F7;
+  --hv-color-datavis-series-6: #EAB308;
+
+  --hv-color-datavis-positive: #0B8457;
+  --hv-color-datavis-negative: #C1292E;
+  --hv-color-datavis-neutral:  #64748B;
+
+  --hv-color-datavis-axis-line:           #CBD5E1;
+  --hv-color-datavis-axis-label:          #64748B;
+  --hv-color-datavis-gridline:            #E2E8F0;
+  --hv-color-datavis-tooltip-background:  #1C2938;
+  --hv-color-datavis-tooltip-border:      #334155;
+  --hv-color-datavis-tooltip-text:        #F8FAFC;
+  --hv-color-datavis-selection-highlight: #DBEAFE;
+  --hv-color-datavis-selection-border:    #2364C7;
+}

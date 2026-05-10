@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, Plus, Edit2 } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import * as RadixAccordion from '@radix-ui/react-accordion';
+import { ChevronDown, Plus, Edit2 } from 'lucide-react';
+import { type ReactNode } from 'react';
+import { cn } from '../../lib/utils';
 
 interface AccordionItemProps {
   title: string;
@@ -24,53 +26,43 @@ export function AccordionItem({
   showButton = false,
   buttonLabel = 'Button',
   showIcons = true,
-  className = ''
+  className = '',
 }: AccordionItemProps) {
   const isDisabled = state === 'disabled';
-  const isFocused = state === 'focus';
-
-  const getHeaderClasses = () => {
-    const base = 'flex items-center justify-between px-8 py-4 cursor-pointer transition-colors border-t border-b border-gray-200';
-
-    if (isDisabled) {
-      return `${base} opacity-50 cursor-not-allowed bg-gray-50`;
-    }
-
-    return `${base} bg-white`;
-  };
-
-  const getContentClasses = () => {
-    if (variant === 'border') {
-      return 'border-t border-gray-200 bg-[#FEF6E8] px-8 py-4';
-    }
-    return '';
-  };
 
   return (
-    <div className={`${className}`}>
+    <div className={className}>
       <div
-        className={getHeaderClasses()}
+        role="button"
+        tabIndex={isDisabled ? -1 : 0}
+        aria-expanded={isExpanded}
         onClick={() => !isDisabled && onToggle?.()}
+        onKeyDown={(e) => e.key === 'Enter' && !isDisabled && onToggle?.()}
+        className={cn(
+          'flex items-center justify-between px-6 py-4 transition-colors',
+          variant === 'border' && 'border-t border-b border-stroke-subtle',
+          isDisabled
+            ? 'opacity-50 cursor-not-allowed bg-surface-sunken'
+            : 'bg-surface-raised hover:bg-action-secondary cursor-pointer',
+        )}
       >
         <div className="flex items-center gap-3 flex-1">
           {showIcons && (
-            isExpanded ? (
-              <ChevronUp className="w-4 h-4 text-[indigo-600]" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-[indigo-600]" />
-            )
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 text-action-primary transition-transform duration-200',
+                isExpanded && 'rotate-180',
+              )}
+            />
           )}
-          <span className="text-sm font-medium text-gray-900">{title}</span>
+          <span className="text-sm font-medium text-content-primary">{title}</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           {showButton && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
               disabled={isDisabled}
-              className="px-3 py-1 text-xs font-medium text-[indigo-600] border border-[indigo-600] rounded hover:bg-[indigo-600] hover:text-white transition-colors disabled:opacity-50"
+              className="px-3 py-1 text-xs font-medium text-action-primary border border-action-primary rounded hover:bg-action-primary hover:text-content-on-action transition-colors disabled:opacity-50"
             >
               {buttonLabel}
             </button>
@@ -78,20 +70,14 @@ export function AccordionItem({
           {showIcons && (
             <>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
                 disabled={isDisabled}
-                className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors disabled:opacity-50"
+                className="p-1 text-content-secondary hover:text-action-primary transition-colors disabled:opacity-50"
               >
                 <Plus className="w-4 h-4" />
               </button>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
                 disabled={isDisabled}
-                className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors disabled:opacity-50"
+                className="p-1 text-content-secondary hover:text-action-primary transition-colors disabled:opacity-50"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
@@ -101,7 +87,12 @@ export function AccordionItem({
       </div>
 
       {isExpanded && content && (
-        <div className={getContentClasses()}>
+        <div
+          className={cn(
+            'px-6 py-4',
+            variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken',
+          )}
+        >
           {content}
         </div>
       )}
@@ -110,10 +101,7 @@ export function AccordionItem({
 }
 
 interface AccordionProps {
-  items: Array<{
-    title: string;
-    content?: ReactNode;
-  }>;
+  items: Array<{ title: string; content?: ReactNode }>;
   variant?: 'border' | 'borderless';
   defaultExpanded?: number[];
   allowMultiple?: boolean;
@@ -131,49 +119,80 @@ export function Accordion({
   showButtons = false,
   buttonLabel = 'Button',
   showIcons = true,
-  className = ''
+  className = '',
 }: AccordionProps) {
-  const [expandedItems, setExpandedItems] = useState<number[]>(defaultExpanded);
-
-  const handleToggle = (index: number) => {
-    if (allowMultiple) {
-      setExpandedItems(prev =>
-        prev.includes(index)
-          ? prev.filter(i => i !== index)
-          : [...prev, index]
-      );
-    } else {
-      setExpandedItems(prev =>
-        prev.includes(index) ? [] : [index]
-      );
-    }
-  };
+  const defaultValue = defaultExpanded.map(String);
 
   return (
-    <div className={className}>
+    <RadixAccordion.Root
+      type={allowMultiple ? 'multiple' : 'single'}
+      defaultValue={allowMultiple ? defaultValue : (defaultValue[0] ?? undefined)}
+      collapsible={!allowMultiple ? true : undefined}
+      className={className}
+    >
       {items.map((item, index) => (
-        <AccordionItem
-          key={index}
-          title={item.title}
-          content={item.content}
-          isExpanded={expandedItems.includes(index)}
-          onToggle={() => handleToggle(index)}
-          variant={variant}
-          showButton={showButtons}
-          buttonLabel={buttonLabel}
-          showIcons={showIcons}
-        />
+        <RadixAccordion.Item key={index} value={String(index)}>
+          <RadixAccordion.Header>
+            <RadixAccordion.Trigger
+              className={cn(
+                'flex items-center justify-between w-full px-6 py-4 transition-colors group',
+                variant === 'border' && 'border-t border-b border-stroke-subtle',
+                'bg-surface-raised hover:bg-action-secondary',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
+              )}
+            >
+              <div className="flex items-center gap-3 flex-1">
+                {showIcons && (
+                  <ChevronDown className="w-4 h-4 text-action-primary transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                )}
+                <span className="text-sm font-medium text-content-primary">{item.title}</span>
+              </div>
+
+              {(showButtons || showIcons) && (
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  {showButtons && (
+                    <button className="px-3 py-1 text-xs font-medium text-action-primary border border-action-primary rounded hover:bg-action-primary hover:text-content-on-action transition-colors">
+                      {buttonLabel}
+                    </button>
+                  )}
+                  {showIcons && (
+                    <>
+                      <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                      <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </RadixAccordion.Trigger>
+          </RadixAccordion.Header>
+          <RadixAccordion.Content
+            className={cn(
+              'overflow-hidden',
+              'data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up',
+            )}
+          >
+            <div
+              className={cn(
+                'px-6 py-4',
+                variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken',
+              )}
+            >
+              {item.content}
+            </div>
+          </RadixAccordion.Content>
+        </RadixAccordion.Item>
       ))}
-    </div>
+    </RadixAccordion.Root>
   );
 }
 
 interface NestedAccordionProps {
   title: string;
-  nestedItems: Array<{
-    title: string;
-    content?: ReactNode;
-  }>;
+  nestedItems: Array<{ title: string; content?: ReactNode }>;
   isExpanded?: boolean;
   onToggle?: () => void;
   variant?: 'border' | 'borderless';
@@ -190,69 +209,47 @@ export function NestedAccordion({
   variant = 'border',
   state = 'default',
   showIcons = true,
-  className = ''
+  className = '',
 }: NestedAccordionProps) {
-  const [expandedNested, setExpandedNested] = useState<number[]>([]);
-
-  const handleNestedToggle = (index: number) => {
-    setExpandedNested(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
-
-  const isFocused = state === 'focus';
-
-  const getHeaderClasses = () => {
-    const base = 'flex items-center justify-between p-4 cursor-pointer transition-colors';
-
-    if (variant === 'border') {
-      if (isFocused) {
-        return `${base} border-2 border-[indigo-600] bg-white`;
-      }
-      return `${base} border-2 border-gray-300 bg-white hover:border-gray-400`;
-    }
-
-    if (isFocused) {
-      return `${base} bg-gray-100`;
-    }
-    return `${base} bg-white hover:bg-gray-50`;
-  };
-
   return (
     <div className={className}>
       <div
-        className={getHeaderClasses()}
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
+        onKeyDown={(e) => e.key === 'Enter' && onToggle?.()}
+        className={cn(
+          'flex items-center justify-between p-4 cursor-pointer transition-colors',
+          variant === 'border'
+            ? cn(
+                'border-2 bg-surface-raised',
+                state === 'focus'
+                  ? 'border-action-primary'
+                  : 'border-stroke-default hover:border-stroke-strong',
+              )
+            : cn(
+                state === 'focus' ? 'bg-action-secondary' : 'bg-surface-raised hover:bg-action-secondary',
+              ),
+        )}
       >
         <div className="flex items-center gap-3">
           {showIcons && (
-            isExpanded ? (
-              <ChevronUp className="w-4 h-4 text-gray-600" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-600" />
-            )
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 text-content-secondary transition-transform duration-200',
+                isExpanded && 'rotate-180',
+              )}
+            />
           )}
-          <span className="text-sm font-medium text-gray-900">{title}</span>
+          <span className="text-sm font-medium text-content-primary">{title}</span>
         </div>
 
         {showIcons && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors"
-            >
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
               <Plus className="w-4 h-4" />
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors"
-            >
+            <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
               <Edit2 className="w-4 h-4" />
             </button>
           </div>
@@ -260,53 +257,49 @@ export function NestedAccordion({
       </div>
 
       {isExpanded && (
-        <div className={variant === 'border' ? 'border-2 border-t-0 border-gray-300' : ''}>
-          {nestedItems.map((item, index) => (
-            <div key={index} className={variant === 'border' ? 'border-t-2 border-gray-300' : 'border-t-2 border-gray-200'}>
-              <div
-                className="flex items-center justify-between p-4 pl-12 cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                onClick={() => handleNestedToggle(index)}
-              >
-                <div className="flex items-center gap-3">
-                  {showIcons && (
-                    expandedNested.includes(index) ? (
-                      <ChevronUp className="w-4 h-4 text-gray-600" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-600" />
-                    )
-                  )}
-                  <span className="text-sm text-gray-900">{item.title}</span>
-                </div>
-
-                {showIcons && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      className="p-1 text-gray-500 hover:text-[indigo-600] transition-colors"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                  </div>
+        <div className={variant === 'border' ? 'border-2 border-t-0 border-stroke-default' : ''}>
+          <RadixAccordion.Root type="multiple" className="">
+            {nestedItems.map((item, index) => (
+              <RadixAccordion.Item
+                key={index}
+                value={String(index)}
+                className={cn(
+                  variant === 'border' ? 'border-t-2 border-stroke-default' : 'border-t-2 border-stroke-subtle',
                 )}
-              </div>
-
-              {expandedNested.includes(index) && item.content && (
-                <div className="bg-[#FEF6E8] p-4 pl-12">
-                  {item.content}
-                </div>
-              )}
-            </div>
-          ))}
+              >
+                <RadixAccordion.Header>
+                  <RadixAccordion.Trigger
+                    className={cn(
+                      'flex items-center justify-between w-full p-4 pl-12 bg-surface-raised hover:bg-action-secondary transition-colors group',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {showIcons && (
+                        <ChevronDown className="w-4 h-4 text-content-secondary transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                      )}
+                      <span className="text-sm text-content-primary">{item.title}</span>
+                    </div>
+                    {showIcons && (
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                          <Plus className="w-4 h-4" />
+                        </button>
+                        <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </RadixAccordion.Trigger>
+                </RadixAccordion.Header>
+                <RadixAccordion.Content className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                  <div className="bg-surface-sunken p-4 pl-12">
+                    {item.content}
+                  </div>
+                </RadixAccordion.Content>
+              </RadixAccordion.Item>
+            ))}
+          </RadixAccordion.Root>
         </div>
       )}
     </div>

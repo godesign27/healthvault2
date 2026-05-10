@@ -1,5 +1,7 @@
+import * as RadixToolbar from '@radix-ui/react-toolbar';
 import { Home, Calendar, Search, Palette, Maximize2, ChevronDown } from 'lucide-react';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { cn } from '../../lib/utils';
 
 interface ToolbarAction {
   id: string;
@@ -25,87 +27,55 @@ export function Toolbar({
   variant = 'light',
   size = 'default',
   showLabels = true,
-  className = ''
+  className = '',
 }: ToolbarProps) {
-  const isLight = variant === 'light';
+  const isDark    = variant === 'dark';
   const isCompact = size === 'compact';
 
-  const baseButtonClass = `
-    flex items-center gap-2 rounded transition-colors
-    ${isCompact ? 'p-2' : 'px-4 py-2'}
-    ${isLight
-      ? 'text-gray-700 hover:bg-gray-100 disabled:text-gray-400'
-      : 'text-white bg-[#1C2938] hover:bg-[#253847] disabled:text-gray-500'
-    }
-    disabled:cursor-not-allowed
-  `;
+  const containerClass = cn(
+    'rounded-lg p-1',
+    orientation === 'vertical' ? 'flex flex-col gap-1 p-2' : 'flex items-center gap-1',
+    isDark ? 'bg-hv-neutral-900' : 'bg-surface-raised border border-stroke-subtle',
+    className,
+  );
 
-  if (orientation === 'vertical') {
-    return (
-      <div className={`flex flex-col gap-1 ${isLight ? 'bg-white' : 'bg-[#1C2938]'} rounded-lg p-2 ${className}`}>
-        {actions.map((action) => (
-          <button
-            key={action.id}
-            onClick={action.onClick}
-            disabled={action.disabled}
-            className={`${baseButtonClass} ${!showLabels ? 'justify-center' : ''}`}
-          >
-            {action.icon}
-            {showLabels && <span className="text-sm font-medium">{action.label}</span>}
-            {action.variant === 'dropdown' && <ChevronDown className="w-4 h-4 ml-auto" />}
-          </button>
-        ))}
-      </div>
-    );
-  }
+  const buttonClass = cn(
+    'flex items-center gap-2 rounded transition-colors',
+    isCompact ? 'p-2' : 'px-3 py-2',
+    isDark
+      ? 'text-hv-neutral-100 hover:bg-hv-neutral-700 disabled:text-hv-neutral-500'
+      : 'text-content-secondary hover:bg-action-secondary hover:text-content-primary disabled:text-content-disabled',
+    'disabled:cursor-not-allowed',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
+  );
 
   return (
-    <div className={`flex items-center gap-1 ${isLight ? 'bg-white' : 'bg-[#1C2938]'} rounded-lg p-1 ${className}`}>
+    <RadixToolbar.Root
+      orientation={orientation}
+      className={containerClass}
+    >
       {actions.map((action) => (
-        <button
+        <RadixToolbar.Button
           key={action.id}
           onClick={action.onClick}
           disabled={action.disabled}
-          className={baseButtonClass}
+          className={cn(buttonClass, !showLabels && 'justify-center')}
         >
           {action.icon}
           {showLabels && <span className="text-sm font-medium">{action.label}</span>}
-          {action.variant === 'dropdown' && <ChevronDown className="w-4 h-4" />}
-        </button>
+          {action.variant === 'dropdown' && (
+            <ChevronDown className={cn('w-4 h-4', orientation === 'vertical' ? 'ml-auto' : '')} />
+          )}
+        </RadixToolbar.Button>
       ))}
-    </div>
+    </RadixToolbar.Root>
   );
 }
 
 export const defaultToolbarActions: ToolbarAction[] = [
-  {
-    id: 'home',
-    label: 'Home',
-    icon: <Home className="w-5 h-5" />,
-    onClick: () => console.log('Home clicked')
-  },
-  {
-    id: 'calendar',
-    label: 'Calendar',
-    icon: <Calendar className="w-5 h-5" />,
-    onClick: () => console.log('Calendar clicked')
-  },
-  {
-    id: 'search',
-    label: 'Search',
-    icon: <Search className="w-5 h-5" />,
-    onClick: () => console.log('Search clicked')
-  },
-  {
-    id: 'palette',
-    label: 'Palette',
-    icon: <Palette className="w-5 h-5" />,
-    onClick: () => console.log('Palette clicked')
-  },
-  {
-    id: 'territory',
-    label: 'Territory',
-    icon: <Maximize2 className="w-5 h-5" />,
-    onClick: () => console.log('Territory clicked')
-  }
+  { id: 'home',      label: 'Home',      icon: <Home className="w-5 h-5" />,      onClick: () => {} },
+  { id: 'calendar',  label: 'Calendar',  icon: <Calendar className="w-5 h-5" />,  onClick: () => {} },
+  { id: 'search',    label: 'Search',    icon: <Search className="w-5 h-5" />,    onClick: () => {} },
+  { id: 'palette',   label: 'Palette',   icon: <Palette className="w-5 h-5" />,   onClick: () => {} },
+  { id: 'territory', label: 'Territory', icon: <Maximize2 className="w-5 h-5" />, onClick: () => {} },
 ];

@@ -1,0 +1,50 @@
+/* ─── Theme: Dark Mode ──────────────────────────────────────────────────────
+   Applied via .dark or .dark-theme class on <html> (next-themes + Radix convention).
+   Overrides global token values for dark surfaces.
+   ─────────────────────────────────────────────────────────────────────────── */
+.dark,
+.dark-theme {
+  /* ── Global: Neutral overrides ── */
+  --hv-color-neutral-0:   #0F172A;
+  --hv-color-neutral-50:  #1C2938;
+  --hv-color-neutral-100: #1E293B;
+  --hv-color-neutral-200: #334155;
+  --hv-color-neutral-300: #475569;
+  --hv-color-neutral-400: #64748B;
+  --hv-color-neutral-500: #94A3B8;
+  --hv-color-neutral-600: #CBD5E1;
+  --hv-color-neutral-700: #E2E8F0;
+  --hv-color-neutral-800: #F1F5F9;
+  --hv-color-neutral-900: #F8FAFC;
+  --hv-color-neutral-950: #FFFFFF;
+
+  /* ── Global: Brand overrides (slightly brighter for dark backgrounds) ── */
+  --hv-color-brand-600: #3B9CFF;
+  --hv-color-brand-700: #60A5FA;
+  --hv-color-brand-800: #93C5FD;
+
+  /* ── Semantic: Surface overrides ── */
+  --hv-color-surface-page:    #0F172A;
+  --hv-color-surface-raised:  #1C2938;
+  --hv-color-surface-sunken:  #111827;
+  --hv-color-surface-overlay: #1E293B;
+
+  /* ── Semantic: Text overrides ── */
+  --hv-color-text-primary:     #F8FAFC;
+  --hv-color-text-secondary:   #CBD5E1;
+  --hv-color-text-tertiary:    #94A3B8;
+  --hv-color-text-placeholder: #64748B;
+  --hv-color-text-disabled:    #475569;
+  --hv-color-text-inverse:     #0F172A;
+
+  /* ── Semantic: Border overrides ── */
+  --hv-color-border-subtle:  #334155;
+  --hv-color-border-default: #475569;
+  --hv-color-border-strong:  #64748B;
+
+  /* ── Semantic: Feedback surface overrides (subtler in dark mode) ── */
+  --hv-color-surface-feedback-error:   rgba(193, 41, 46, 0.15);
+  --hv-color-surface-feedback-success: rgba(11, 132, 87, 0.15);
+  --hv-color-surface-feedback-warning: rgba(234, 179, 8, 0.15);
+  --hv-color-surface-feedback-info:    rgba(59, 130, 246, 0.15);
+}

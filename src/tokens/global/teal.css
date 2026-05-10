@@ -1,0 +1,17 @@
+/* ─── Global: Teal Scale ────────────────────────────────────────────────────
+   Raw hex values only. Secondary accent palette — replaces legacy --zsteal-*
+   variables. Used for nav rail, secondary surfaces, and accent moments.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-teal-50:  #DFF1F2;
+  --hv-color-teal-100: #BDE3E6;
+  --hv-color-teal-200: #9BD5D9;
+  --hv-color-teal-300: #73BAC0;
+  --hv-color-teal-400: #599CA4;
+  --hv-color-teal-500: #407D88;
+  --hv-color-teal-600: #3D9199;
+  --hv-color-teal-700: #27504A;
+  --hv-color-teal-800: #0D4B56;
+  --hv-color-teal-900: #0D3B44;
+  --hv-color-teal-950: #071F25;
+}

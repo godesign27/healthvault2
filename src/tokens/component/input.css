@@ -1,0 +1,33 @@
+/* ─── Component: Input / Action Field ───────────────────────────────────────
+   References semantic tokens only.
+   Structure: component.input.[property].[variant].[state]
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Background */
+  --hv-component-input-background-default:  var(--hv-color-surface-raised);
+  --hv-component-input-background-disabled: var(--hv-color-surface-sunken);
+  --hv-component-input-background-readonly: var(--hv-color-surface-sunken);
+
+  /* Border */
+  --hv-component-input-border-default:  var(--hv-color-border-default);
+  --hv-component-input-border-hover:    var(--hv-color-border-strong);
+  --hv-component-input-border-focus:    var(--hv-color-border-focus);
+  --hv-component-input-border-error:    var(--hv-color-border-feedback-error);
+  --hv-component-input-border-success:  var(--hv-color-border-feedback-success);
+  --hv-component-input-border-warning:  var(--hv-color-border-feedback-warning);
+  --hv-component-input-border-disabled: var(--hv-color-border-subtle);
+
+  /* Text */
+  --hv-component-input-text-default:     var(--hv-color-text-primary);
+  --hv-component-input-text-disabled:    var(--hv-color-text-disabled);
+  --hv-component-input-text-readonly:    var(--hv-color-text-secondary);
+  --hv-component-input-text-placeholder: var(--hv-color-text-placeholder);
+  --hv-component-input-text-error:       var(--hv-color-text-feedback-error);
+
+  /* Label / Helper */
+  --hv-component-input-label-default:  var(--hv-color-text-secondary);
+  --hv-component-input-helper-default: var(--hv-color-text-tertiary);
+  --hv-component-input-helper-error:   var(--hv-color-text-feedback-error);
+  --hv-component-input-helper-success: var(--hv-color-text-feedback-success);
+  --hv-component-input-helper-warning: var(--hv-color-text-feedback-warning);
+}

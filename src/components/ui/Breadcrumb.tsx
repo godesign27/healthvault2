@@ -1,4 +1,5 @@
 import { ChevronRight, Home } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export interface BreadcrumbItem {
   label: string;
@@ -15,101 +16,88 @@ interface BreadcrumbProps {
   onBackClick?: () => void;
 }
 
+const sizeMap = {
+  'x-small': { text: 'text-[10px]', icon: 'w-3 h-3',   gap: 'gap-1.5' },
+  'small':   { text: 'text-xs',     icon: 'w-3.5 h-3.5', gap: 'gap-2' },
+  'normal':  { text: 'text-sm',     icon: 'w-4 h-4',    gap: 'gap-2' },
+} as const;
+
+const themeMap = {
+  light: {
+    active:    'text-content-primary font-semibold',
+    previous:  'text-action-link italic hover:text-action-primary transition-colors',
+    separator: 'text-content-tertiary',
+    back:      'text-action-link hover:text-action-primary transition-colors',
+  },
+  dark: {
+    active:    'text-hv-neutral-0 font-semibold',
+    previous:  'text-hv-neutral-400 italic hover:text-hv-neutral-0 transition-colors',
+    separator: 'text-hv-neutral-600',
+    back:      'text-hv-neutral-0 hover:text-hv-neutral-300 transition-colors',
+  },
+} as const;
+
 export function Breadcrumb({
   items,
   size = 'normal',
   theme = 'light',
   showHomeIcon = false,
   showBackLink = false,
-  onBackClick
+  onBackClick,
 }: BreadcrumbProps) {
-  const sizeClasses = {
-    'x-small': {
-      text: 'text-[10px]',
-      icon: 'w-3 h-3',
-      gap: 'gap-2',
-      padding: 'px-2 py-0.5'
-    },
-    'small': {
-      text: 'text-xs',
-      icon: 'w-4 h-4',
-      gap: 'gap-2',
-      padding: 'px-2.5 py-1'
-    },
-    'normal': {
-      text: 'text-base',
-      icon: 'w-6 h-6',
-      gap: 'gap-2',
-      padding: 'px-3 py-1.5'
-    }
-  };
-
-  const themeClasses = {
-    light: {
-      active: 'text-gray-900 font-bold',
-      previous: 'text-[indigo-700] italic font-normal hover:text-[indigo-900]',
-      separator: 'text-[#5B5864]',
-      back: 'text-[indigo-600] hover:text-[indigo-700]'
-    },
-    dark: {
-      active: 'text-white font-bold',
-      previous: 'text-gray-400 italic hover:text-white',
-      separator: 'text-gray-600',
-      back: 'text-white hover:text-gray-300'
-    }
-  };
-
-  const sizes = sizeClasses[size];
-  const colors = themeClasses[theme];
+  const s = sizeMap[size];
+  const t = themeMap[theme];
 
   return (
-    <nav className="flex flex-col gap-2">
-      <div className={`flex items-center ${sizes.gap}`}>
+    <nav className="flex flex-col gap-2" aria-label="Breadcrumb">
+      <ol className={cn('flex items-center flex-wrap', s.gap)}>
         {showHomeIcon && (
           <>
-            <button
-              onClick={items[0]?.onClick}
-              className={`inline-flex items-center ${colors.previous} transition-colors`}
-              aria-label="Home"
-            >
-              <Home className={sizes.icon} />
-            </button>
-            <ChevronRight className={`${sizes.icon} ${colors.separator}`} />
+            <li>
+              <button
+                onClick={items[0]?.onClick}
+                className={cn('inline-flex items-center', t.previous)}
+                aria-label="Home"
+              >
+                <Home className={s.icon} />
+              </button>
+            </li>
+            <li aria-hidden><ChevronRight className={cn(s.icon, t.separator)} /></li>
           </>
         )}
 
         {items.map((item, index) => {
-          const isLast = index === items.length - 1;
+          const isLast   = index === items.length - 1;
           const isActive = item.isActive || isLast;
 
           return (
-            <div key={index} className={`flex items-center ${sizes.gap}`}>
+            <li key={index} className={cn('flex items-center', s.gap)}>
               {isActive ? (
-                <span className={`${sizes.text} ${colors.active} tracking-tight`}>
+                <span className={cn(s.text, t.active, 'tracking-tight')} aria-current="page">
                   {item.label}
                 </span>
               ) : (
                 <>
                   <button
                     onClick={item.onClick}
-                    className={`${sizes.text} ${colors.previous} transition-colors cursor-pointer tracking-tight`}
+                    className={cn(s.text, t.previous, 'tracking-tight cursor-pointer')}
                   >
                     {item.label}
                   </button>
-                  <ChevronRight className={`${sizes.icon} ${colors.separator}`} />
+                  <ChevronRight aria-hidden className={cn(s.icon, t.separator)} />
                 </>
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
       {showBackLink && (
         <button
           onClick={onBackClick}
-          className={`inline-flex items-center ${sizes.gap} ${sizes.text} ${colors.back} transition-colors w-fit`}
+          className={cn('inline-flex items-center', s.gap, s.text, t.back, 'w-fit')}
         >
-          <ChevronRight className={`${sizes.icon} rotate-180`} />
+          <ChevronRight className={cn(s.icon, 'rotate-180')} />
           <span>Back to page</span>
         </button>
       )}
@@ -134,57 +122,27 @@ export function BreadcrumbLink({
   isIconOnly = false,
   size = 'normal',
   theme = 'light',
-  onClick
+  onClick,
 }: BreadcrumbLinkProps) {
-  const sizeClasses = {
-    'x-small': {
-      text: 'text-[10px]',
-      icon: 'w-2.5 h-2.5',
-      padding: 'px-2 py-0.5'
-    },
-    'small': {
-      text: 'text-xs',
-      icon: 'w-3 h-3',
-      padding: 'px-2.5 py-1'
-    },
-    'normal': {
-      text: 'text-sm',
-      icon: 'w-4 h-4',
-      padding: 'px-3 py-1.5'
-    }
-  };
+  const s = sizeMap[size];
 
-  const sizes = sizeClasses[size];
+  const base = cn('inline-flex items-center justify-center gap-1.5 rounded transition-colors', s.text, 'px-2.5 py-1');
 
-  const getClasses = () => {
-    const base = `inline-flex items-center justify-center gap-1.5 rounded transition-colors ${sizes.text} ${sizes.padding}`;
-
-    if (theme === 'dark') {
-      if (isActive) {
-        return `${base} bg-[indigo-600] text-white border-2 border-[indigo-600]`;
-      } else if (isPrevious) {
-        return `${base} border-2 border-gray-600 text-gray-400`;
-      } else {
-        return `${base} border-2 border-transparent text-gray-400`;
-      }
-    } else {
-      if (isActive) {
-        return `${base} bg-white text-[indigo-600] border-2 border-[indigo-600]`;
-      } else if (isPrevious) {
-        return `${base} border-2 border-gray-300 text-gray-600`;
-      } else {
-        return `${base} border-2 border-transparent text-gray-600`;
-      }
-    }
-  };
+  const cls = theme === 'dark'
+    ? isActive    ? cn(base, 'bg-action-primary text-content-on-action border-2 border-action-primary')
+      : isPrevious ? cn(base, 'border-2 border-stroke-strong text-content-secondary')
+                   : cn(base, 'border-2 border-transparent text-content-secondary')
+    : isActive    ? cn(base, 'bg-surface-raised text-action-primary border-2 border-action-primary')
+      : isPrevious ? cn(base, 'border-2 border-stroke-default text-content-secondary')
+                   : cn(base, 'border-2 border-transparent text-content-secondary');
 
   return (
-    <button onClick={onClick} className={getClasses()}>
+    <button onClick={onClick} className={cls}>
       {isIconOnly ? (
-        <Home className={sizes.icon} />
+        <Home className={s.icon} />
       ) : (
         <>
-          <Home className={sizes.icon} />
+          <Home className={s.icon} />
           <span>{label}</span>
         </>
       )}
@@ -197,17 +155,8 @@ interface BreadcrumbSeparatorProps {
   theme?: 'light' | 'dark';
 }
 
-export function BreadcrumbSeparator({
-  size = 'normal',
-  theme = 'light'
-}: BreadcrumbSeparatorProps) {
-  const sizeClasses = {
-    'x-small': 'w-2.5 h-2.5',
-    'small': 'w-3 h-3',
-    'normal': 'w-4 h-4'
-  };
-
-  const colorClass = theme === 'dark' ? 'text-gray-600' : 'text-gray-400';
-
-  return <ChevronRight className={`${sizeClasses[size]} ${colorClass}`} />;
+export function BreadcrumbSeparator({ size = 'normal', theme = 'light' }: BreadcrumbSeparatorProps) {
+  const iconClass = sizeMap[size].icon;
+  const color = theme === 'dark' ? 'text-hv-neutral-600' : 'text-content-tertiary';
+  return <ChevronRight aria-hidden className={cn(iconClass, color)} />;
 }

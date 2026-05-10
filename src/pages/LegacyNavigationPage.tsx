@@ -1,4 +1,4 @@
-import { PrimaryNavigation } from '../components/ui/legacy_navigation';
+import { PrimaryNavigation } from '../components/ui/PrimaryNavigation';
 import { Home } from 'lucide-react';
 
 export function LegacyNavigationPage() {
@@ -170,21 +170,21 @@ export function LegacyNavigationPage() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Dark Theme</h3>
                 <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                  <PrimaryNavigation theme="dark" />
+                  <PrimaryNavigation variant="expanded" />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Light Theme</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Collapsed Variant</h3>
                 <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                  <PrimaryNavigation theme="light" />
+                  <PrimaryNavigation variant="collapsed" />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Dark Nav with Mixed Drawer (Dark Header + White Body)</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Sidebar Variant</h3>
                 <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                  <PrimaryNavigation theme="dark" drawerVariant="mixed" />
+                  <PrimaryNavigation variant="sidebar" />
                 </div>
               </div>
             </div>

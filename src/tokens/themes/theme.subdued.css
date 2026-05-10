@@ -1,0 +1,34 @@
+/* ─── Theme: Subdued (Recessed Panel Surface) ───────────────────────────────
+   Applied via data-surface="subdued" on a container element.
+   Used for: sidebar navigation, background panels, secondary regions.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface="subdued"] {
+  --hv-color-surface-page:    var(--hv-color-neutral-100);
+  --hv-color-surface-raised:  var(--hv-color-neutral-50);
+  --hv-color-surface-sunken:  var(--hv-color-neutral-200);
+  --hv-color-surface-overlay: var(--hv-color-neutral-50);
+
+  /* Slightly recessed text */
+  --hv-color-text-primary:   var(--hv-color-neutral-800);
+  --hv-color-text-secondary: var(--hv-color-neutral-600);
+  --hv-color-text-tertiary:  var(--hv-color-neutral-500);
+
+  /* Slightly stronger borders for definition */
+  --hv-color-border-subtle:  var(--hv-color-neutral-200);
+  --hv-color-border-default: var(--hv-color-neutral-300);
+}
+
+/* Dark mode subdued surface */
+.dark [data-surface="subdued"],
+.dark-theme [data-surface="subdued"] {
+  --hv-color-surface-page:    #111827;
+  --hv-color-surface-raised:  #1C2938;
+  --hv-color-surface-sunken:  #0F172A;
+
+  --hv-color-text-primary:   #E2E8F0;
+  --hv-color-text-secondary: #94A3B8;
+  --hv-color-text-tertiary:  #64748B;
+
+  --hv-color-border-subtle:  #1E293B;
+  --hv-color-border-default: #334155;
+}

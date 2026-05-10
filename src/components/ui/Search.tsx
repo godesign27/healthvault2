@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search as SearchIcon, X } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface SearchProps {
   placeholder?: string;
@@ -12,65 +13,84 @@ interface SearchProps {
   disabled?: boolean;
 }
 
+const sizeClass = {
+  small:  'px-3 py-1.5 text-sm pl-9',
+  medium: 'px-4 py-2 text-sm pl-10',
+  large:  'px-4 py-3 text-base pl-11',
+} as const;
+
+const iconSize = {
+  small:  'w-4 h-4',
+  medium: 'w-4 h-4',
+  large:  'w-5 h-5',
+} as const;
+
+const iconLeft = {
+  small:  'left-2.5',
+  medium: 'left-3',
+  large:  'left-3',
+} as const;
+
+const variantClass = {
+  default:  'border-0 bg-surface-sunken focus:bg-surface-raised focus:ring-1 focus:ring-stroke-focus',
+  outlined: 'border border-stroke-default bg-surface-raised focus:border-action-primary focus:ring-1 focus:ring-action-primary',
+  filled:   'border-0 bg-surface-sunken focus:bg-action-secondary',
+} as const;
+
 export function Search({
   placeholder = 'Search...',
-  value = '',
+  value,
   onChange,
   onClear,
   variant = 'outlined',
   size = 'medium',
   showClearButton = false,
-  disabled = false
+  disabled = false,
 }: SearchProps) {
-  const [internalValue, setInternalValue] = useState(value);
+  const [internal, setInternal] = useState(value ?? '');
+  const controlled = value !== undefined;
+  const current    = controlled ? value : internal;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInternalValue(newValue);
-    onChange?.(newValue);
+    if (!controlled) setInternal(e.target.value);
+    onChange?.(e.target.value);
   };
 
   const handleClear = () => {
-    setInternalValue('');
+    if (!controlled) setInternal('');
     onChange?.('');
     onClear?.();
   };
 
-  const sizeClasses = {
-    small: 'px-3 py-1.5 text-sm',
-    medium: 'px-4 py-2 text-base',
-    large: 'px-4 py-3 text-lg'
-  };
-
-  const variantClasses = {
-    default: 'border-0 bg-slate-100 focus:bg-white focus:ring-2 focus:ring-teal-500',
-    outlined: 'border border-slate-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500',
-    filled: 'border-0 bg-slate-100 focus:bg-slate-200'
-  };
-
   return (
     <div className="relative w-full">
-      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+      <SearchIcon
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2 text-content-tertiary pointer-events-none',
+          iconLeft[size],
+          iconSize[size],
+        )}
+      />
       <input
         type="text"
-        value={internalValue}
+        value={current}
         onChange={handleChange}
         placeholder={placeholder}
         disabled={disabled}
-        className={`
-          w-full pl-10 rounded-md outline-none transition-all
-          ${sizeClasses[size]}
-          ${variantClasses[variant]}
-          ${showClearButton && internalValue ? 'pr-10' : 'pr-4'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+        className={cn(
+          'w-full rounded outline-none transition-all text-content-primary placeholder:text-content-placeholder',
+          sizeClass[size],
+          variantClass[variant],
+          showClearButton && current ? 'pr-10' : 'pr-4',
+          disabled && 'opacity-50 cursor-not-allowed',
+        )}
       />
-      {showClearButton && internalValue && (
+      {showClearButton && current && (
         <button
           onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-200 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-action-secondary transition-colors"
         >
-          <X className="w-4 h-4 text-slate-500" />
+          <X className={cn(iconSize[size], 'text-content-secondary')} />
         </button>
       )}
     </div>
@@ -82,11 +102,7 @@ interface SearchWithButtonProps extends SearchProps {
   onSearch?: () => void;
 }
 
-export function SearchWithButton({
-  buttonText = 'Button',
-  onSearch,
-  ...searchProps
-}: SearchWithButtonProps) {
+export function SearchWithButton({ buttonText = 'Search', onSearch, ...searchProps }: SearchWithButtonProps) {
   return (
     <div className="flex gap-2 w-full">
       <div className="flex-1">
@@ -94,7 +110,7 @@ export function SearchWithButton({
       </div>
       <button
         onClick={onSearch}
-        className="px-6 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors font-medium whitespace-nowrap"
+        className="px-5 py-2 bg-action-primary text-content-on-action rounded hover:bg-action-primary-hover transition-colors font-medium whitespace-nowrap text-sm"
       >
         {buttonText}
       </button>
@@ -109,8 +125,8 @@ interface SearchWithDropdownProps extends SearchProps {
 }
 
 export function SearchWithDropdown({
-  dropdownOptions = ['Select an option'],
-  selectedOption = 'Select an option',
+  dropdownOptions = ['All'],
+  selectedOption = 'All',
   onSelectOption,
   ...searchProps
 }: SearchWithDropdownProps) {
@@ -119,12 +135,10 @@ export function SearchWithDropdown({
       <select
         value={selectedOption}
         onChange={(e) => onSelectOption?.(e.target.value)}
-        className="px-4 py-2 border border-slate-300 rounded-md bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500 outline-none"
+        className="px-3 py-2 border border-stroke-default rounded bg-surface-raised text-content-primary focus:border-action-primary focus:ring-1 focus:ring-action-primary outline-none text-sm"
       >
-        {dropdownOptions.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
+        {dropdownOptions.map((opt, i) => (
+          <option key={i} value={opt}>{opt}</option>
         ))}
       </select>
       <div className="flex-1">
@@ -134,29 +148,21 @@ export function SearchWithDropdown({
   );
 }
 
-interface SearchStackedProps extends SearchProps {
-  dropdownOptions?: string[];
-  selectedOption?: string;
-  onSelectOption?: (option: string) => void;
-}
-
 export function SearchStacked({
-  dropdownOptions = ['Select an option'],
-  selectedOption = 'Select an option',
+  dropdownOptions = ['All'],
+  selectedOption = 'All',
   onSelectOption,
   ...searchProps
-}: SearchStackedProps) {
+}: SearchWithDropdownProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
       <select
         value={selectedOption}
         onChange={(e) => onSelectOption?.(e.target.value)}
-        className="px-4 py-2 border border-slate-300 rounded-md bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500 outline-none"
+        className="px-3 py-2 border border-stroke-default rounded bg-surface-raised text-content-primary focus:border-action-primary focus:ring-1 focus:ring-action-primary outline-none text-sm"
       >
-        {dropdownOptions.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
+        {dropdownOptions.map((opt, i) => (
+          <option key={i} value={opt}>{opt}</option>
         ))}
       </select>
       <Search {...searchProps} />
@@ -165,21 +171,12 @@ export function SearchStacked({
 }
 
 export function SearchIconOnly({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) {
-  const sizeClasses = {
-    small: 'w-8 h-8',
-    medium: 'w-10 h-10',
-    large: 'w-12 h-12'
-  };
-
-  const iconSizes = {
-    small: 'w-4 h-4',
-    medium: 'w-5 h-5',
-    large: 'w-6 h-6'
-  };
+  const btn = { small: 'w-8 h-8', medium: 'w-10 h-10', large: 'w-12 h-12' };
+  const ico = { small: 'w-4 h-4', medium: 'w-5 h-5', large: 'w-6 h-6' };
 
   return (
-    <button className={`${sizeClasses[size]} flex items-center justify-center border border-slate-300 rounded-md bg-white hover:bg-slate-50 transition-colors`}>
-      <SearchIcon className={`${iconSizes[size]} text-slate-600`} />
+    <button className={cn(btn[size], 'flex items-center justify-center border border-stroke-default rounded bg-surface-raised hover:bg-action-secondary transition-colors')}>
+      <SearchIcon className={cn(ico[size], 'text-content-secondary')} />
     </button>
   );
 }

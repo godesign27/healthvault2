@@ -1,0 +1,17 @@
+/* ─── Component: Card ───────────────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-component-card-background-default:  var(--hv-color-surface-raised);
+  --hv-component-card-background-sunken:   var(--hv-color-surface-sunken);
+  --hv-component-card-background-selected: var(--hv-color-action-primary-subtle);
+  --hv-component-card-background-disabled: var(--hv-color-surface-sunken);
+
+  --hv-component-card-border-default:   var(--hv-color-border-subtle);
+  --hv-component-card-border-hover:     var(--hv-color-border-strong);
+  --hv-component-card-border-selected:  var(--hv-color-action-primary-default);
+  --hv-component-card-border-disabled:  var(--hv-color-border-subtle);
+
+  --hv-component-card-text-title:       var(--hv-color-text-primary);
+  --hv-component-card-text-description: var(--hv-color-text-secondary);
+}

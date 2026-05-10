@@ -1,0 +1,17 @@
+/* ─── Global: Brand Scale ───────────────────────────────────────────────────
+   Raw hex values only. Never reference other tokens here.
+   Primary blue palette used throughout HV interfaces.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-brand-50:  #EFF7FF;
+  --hv-color-brand-100: #DBEAFE;
+  --hv-color-brand-200: #BFDBFE;
+  --hv-color-brand-300: #93C5FD;
+  --hv-color-brand-400: #60A5FA;
+  --hv-color-brand-500: #3B9CFF;
+  --hv-color-brand-600: #2364C7;
+  --hv-color-brand-700: #1D4ED8;
+  --hv-color-brand-800: #1E40AF;
+  --hv-color-brand-900: #1E2B50;
+  --hv-color-brand-950: #0F172A;
+}

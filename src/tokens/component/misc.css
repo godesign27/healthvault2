@@ -1,0 +1,147 @@
+/* ─── Component: Tooltip, Tabs, Accordion, Checkbox, Slider, Switch,
+       Progress, Stepper, Breadcrumb, Banner, Validation, Toolbar,
+       SegmentedControl, DatePicker ─────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Tooltip */
+  --hv-component-tooltip-background-default: var(--hv-color-neutral-900);
+  --hv-component-tooltip-background-inverse: var(--hv-color-surface-raised);
+  --hv-component-tooltip-text-default:       var(--hv-color-neutral-0);
+  --hv-component-tooltip-text-inverse:       var(--hv-color-text-primary);
+  --hv-component-tooltip-border-default:     transparent;
+  --hv-component-tooltip-border-inverse:     var(--hv-color-border-subtle);
+
+  /* Tabs */
+  --hv-component-tabs-background-default:   var(--hv-color-surface-sunken);
+  --hv-component-tabs-border-default:       var(--hv-color-border-subtle);
+  --hv-component-tabs-item-text-default:    var(--hv-color-text-secondary);
+  --hv-component-tabs-item-text-active:     var(--hv-color-action-primary-default);
+  --hv-component-tabs-item-background-active: var(--hv-color-surface-raised);
+  --hv-component-tabs-item-indicator-active: var(--hv-color-action-primary-default);
+
+  /* Accordion */
+  --hv-component-accordion-background-default: var(--hv-color-surface-raised);
+  --hv-component-accordion-background-expanded: var(--hv-color-surface-sunken);
+  --hv-component-accordion-border-default:      var(--hv-color-border-subtle);
+  --hv-component-accordion-text-default:        var(--hv-color-text-primary);
+  --hv-component-accordion-icon-default:        var(--hv-color-text-secondary);
+
+  /* Checkbox */
+  --hv-component-checkbox-background-default:  var(--hv-color-surface-raised);
+  --hv-component-checkbox-background-checked:  var(--hv-color-action-primary-default);
+  --hv-component-checkbox-background-disabled: var(--hv-color-surface-sunken);
+  --hv-component-checkbox-border-default:      var(--hv-color-border-default);
+  --hv-component-checkbox-border-checked:      var(--hv-color-action-primary-default);
+  --hv-component-checkbox-border-error:        var(--hv-color-border-feedback-error);
+  --hv-component-checkbox-border-disabled:     var(--hv-color-border-subtle);
+  --hv-component-checkbox-check-default:       var(--hv-color-neutral-0);
+
+  /* Radio */
+  --hv-component-radio-background-default:  var(--hv-color-surface-raised);
+  --hv-component-radio-background-checked:  var(--hv-color-action-primary-default);
+  --hv-component-radio-background-disabled: var(--hv-color-surface-sunken);
+  --hv-component-radio-border-default:      var(--hv-color-border-default);
+  --hv-component-radio-border-checked:      var(--hv-color-action-primary-default);
+  --hv-component-radio-dot-default:         var(--hv-color-neutral-0);
+
+  /* Switch / Toggle */
+  --hv-component-switch-background-off:      var(--hv-color-neutral-300);
+  --hv-component-switch-background-on:       var(--hv-color-action-primary-default);
+  --hv-component-switch-background-disabled: var(--hv-color-neutral-200);
+  --hv-component-switch-thumb-default:       var(--hv-color-neutral-0);
+
+  /* Slider */
+  --hv-component-slider-track-background:  var(--hv-color-neutral-200);
+  --hv-component-slider-fill-default:      var(--hv-color-action-primary-default);
+  --hv-component-slider-fill-disabled:     var(--hv-color-neutral-300);
+  --hv-component-slider-thumb-default:     var(--hv-color-neutral-0);
+  --hv-component-slider-thumb-border:      var(--hv-color-action-primary-default);
+  --hv-component-slider-fill-error:        var(--hv-color-action-destructive-default);
+
+  /* Progress */
+  --hv-component-progress-track-background:  var(--hv-color-neutral-200);
+  --hv-component-progress-fill-default:      var(--hv-color-action-primary-default);
+  --hv-component-progress-fill-success:      var(--hv-color-action-destructive-default);
+  --hv-component-progress-fill-error:        var(--hv-color-action-destructive-default);
+  --hv-component-progress-fill-warning:      var(--hv-color-warning-500);
+  --hv-component-progress-text-default:      var(--hv-color-text-secondary);
+
+  /* Stepper */
+  --hv-component-stepper-step-background-pending:  var(--hv-color-surface-sunken);
+  --hv-component-stepper-step-background-active:   var(--hv-color-action-primary-default);
+  --hv-component-stepper-step-background-success:  var(--hv-color-success-600);
+  --hv-component-stepper-step-background-error:    var(--hv-color-action-destructive-default);
+  --hv-component-stepper-step-background-warning:  var(--hv-color-warning-500);
+  --hv-component-stepper-step-background-disabled: var(--hv-color-neutral-200);
+  --hv-component-stepper-step-text-default:        var(--hv-color-neutral-0);
+  --hv-component-stepper-step-text-pending:        var(--hv-color-text-tertiary);
+  --hv-component-stepper-connector-default:        var(--hv-color-border-default);
+  --hv-component-stepper-connector-complete:       var(--hv-color-success-600);
+  --hv-component-stepper-label-default:            var(--hv-color-text-secondary);
+  --hv-component-stepper-label-active:             var(--hv-color-text-primary);
+
+  /* Breadcrumb */
+  --hv-component-breadcrumb-text-default:    var(--hv-color-text-secondary);
+  --hv-component-breadcrumb-text-active:     var(--hv-color-text-primary);
+  --hv-component-breadcrumb-text-hover:      var(--hv-color-text-link);
+  --hv-component-breadcrumb-separator-color: var(--hv-color-text-tertiary);
+
+  /* Banner / Callout */
+  --hv-component-banner-background-info:    var(--hv-color-surface-feedback-info);
+  --hv-component-banner-background-success: var(--hv-color-surface-feedback-success);
+  --hv-component-banner-background-warning: var(--hv-color-surface-feedback-warning);
+  --hv-component-banner-background-error:   var(--hv-color-surface-feedback-error);
+  --hv-component-banner-border-info:        var(--hv-color-border-feedback-info);
+  --hv-component-banner-border-success:     var(--hv-color-border-feedback-success);
+  --hv-component-banner-border-warning:     var(--hv-color-border-feedback-warning);
+  --hv-component-banner-border-error:       var(--hv-color-border-feedback-error);
+  --hv-component-banner-text-info:          var(--hv-color-text-feedback-info);
+  --hv-component-banner-text-success:       var(--hv-color-text-feedback-success);
+  --hv-component-banner-text-warning:       var(--hv-color-text-feedback-warning);
+  --hv-component-banner-text-error:         var(--hv-color-text-feedback-error);
+  --hv-component-banner-icon-info:          var(--hv-color-info-500);
+  --hv-component-banner-icon-success:       var(--hv-color-success-600);
+  --hv-component-banner-icon-warning:       var(--hv-color-warning-500);
+  --hv-component-banner-icon-error:         var(--hv-color-error-600);
+
+  /* Validation */
+  --hv-component-validation-text-info:    var(--hv-color-text-feedback-info);
+  --hv-component-validation-text-success: var(--hv-color-text-feedback-success);
+  --hv-component-validation-text-warning: var(--hv-color-text-feedback-warning);
+  --hv-component-validation-text-error:   var(--hv-color-text-feedback-error);
+  --hv-component-validation-icon-info:    var(--hv-color-info-500);
+  --hv-component-validation-icon-success: var(--hv-color-success-600);
+  --hv-component-validation-icon-warning: var(--hv-color-warning-500);
+  --hv-component-validation-icon-error:   var(--hv-color-error-600);
+
+  /* Toolbar */
+  --hv-component-toolbar-background-light: var(--hv-color-surface-raised);
+  --hv-component-toolbar-background-dark:  var(--hv-color-neutral-900);
+  --hv-component-toolbar-border-light:     var(--hv-color-border-subtle);
+  --hv-component-toolbar-border-dark:      var(--hv-color-neutral-800);
+  --hv-component-toolbar-text-light:       var(--hv-color-text-primary);
+  --hv-component-toolbar-text-dark:        var(--hv-color-neutral-0);
+  --hv-component-toolbar-item-hover-light: var(--hv-color-action-secondary-default);
+  --hv-component-toolbar-item-hover-dark:  var(--hv-color-neutral-800);
+
+  /* Segmented Control */
+  --hv-component-segmented-background-default: var(--hv-color-surface-sunken);
+  --hv-component-segmented-background-active:  var(--hv-color-surface-raised);
+  --hv-component-segmented-border-default:     var(--hv-color-border-subtle);
+  --hv-component-segmented-text-default:       var(--hv-color-text-secondary);
+  --hv-component-segmented-text-active:        var(--hv-color-text-primary);
+
+  /* Date Picker */
+  --hv-component-datepicker-background-default:     var(--hv-color-surface-raised);
+  --hv-component-datepicker-background-overlay:     var(--hv-color-surface-overlay);
+  --hv-component-datepicker-day-background-selected: var(--hv-color-action-primary-default);
+  --hv-component-datepicker-day-background-today:   var(--hv-color-action-primary-subtle);
+  --hv-component-datepicker-day-background-hover:   var(--hv-color-action-secondary-default);
+  --hv-component-datepicker-day-text-selected:      var(--hv-color-text-on-action);
+  --hv-component-datepicker-day-text-default:       var(--hv-color-text-primary);
+  --hv-component-datepicker-day-text-disabled:      var(--hv-color-text-disabled);
+  --hv-component-datepicker-day-text-today:         var(--hv-color-action-primary-default);
+  --hv-component-datepicker-border-default:         var(--hv-color-border-subtle);
+  --hv-component-datepicker-header-text:            var(--hv-color-text-primary);
+}

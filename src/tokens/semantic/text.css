@@ -1,0 +1,22 @@
+/* ─── Semantic: Text Tokens ─────────────────────────────────────────────────
+   References global tokens only. Typography color intent.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-color-text-primary:     var(--hv-color-neutral-900);
+  --hv-color-text-secondary:   var(--hv-color-neutral-600);
+  --hv-color-text-tertiary:    var(--hv-color-neutral-500);
+  --hv-color-text-placeholder: var(--hv-color-neutral-400);
+  --hv-color-text-disabled:    var(--hv-color-neutral-400);
+  --hv-color-text-inverse:     var(--hv-color-neutral-0);
+  --hv-color-text-on-action:   var(--hv-color-neutral-0);
+
+  /* Feedback text */
+  --hv-color-text-feedback-error:   var(--hv-color-error-700);
+  --hv-color-text-feedback-success: var(--hv-color-success-700);
+  --hv-color-text-feedback-warning: var(--hv-color-warning-700);
+  --hv-color-text-feedback-info:    var(--hv-color-info-700);
+
+  /* Link text */
+  --hv-color-text-link:       var(--hv-color-brand-600);
+  --hv-color-text-link-hover: var(--hv-color-brand-700);
+}

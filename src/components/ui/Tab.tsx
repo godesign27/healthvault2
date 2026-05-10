@@ -1,5 +1,7 @@
+import * as RadixTabs from '@radix-ui/react-tabs';
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '../../lib/utils';
 
 export type TabSize = 'normal' | 'small';
 export type TabStyle = 'solid' | 'outline';
@@ -26,136 +28,119 @@ interface TabsProps {
 
 export function Tabs({
   tabs,
-  activeTab: controlledActiveTab,
+  activeTab,
   onTabChange,
   onTabClose,
   size = 'normal',
   style = 'solid',
   orientation = 'horizontal',
-  className = ''
+  className = '',
 }: TabsProps) {
-  const [internalActiveTab, setInternalActiveTab] = useState(tabs[0]?.id || '');
-  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const [internalActive, setInternalActive] = useState(tabs[0]?.id ?? '');
+  const controlled = activeTab !== undefined;
+  const current = controlled ? activeTab : internalActive;
 
-  const handleTabClick = (tabId: string, disabled?: boolean) => {
-    if (disabled) return;
-    if (controlledActiveTab === undefined) {
-      setInternalActiveTab(tabId);
-    }
-    onTabChange?.(tabId);
+  const handleChange = (id: string) => {
+    if (!controlled) setInternalActive(id);
+    onTabChange?.(id);
   };
 
-  const handleClose = (e: React.MouseEvent, tabId: string) => {
-    e.stopPropagation();
-    onTabClose?.(tabId);
-  };
+  const tabPadding = size === 'small' ? 'px-4 py-2 text-sm' : 'px-6 py-3 text-base';
+  const iconSize   = size === 'small' ? 'w-3 h-3' : 'w-4 h-4';
 
-  const getSizeClasses = () => {
-    if (size === 'small') {
-      return {
-        tab: 'px-4 py-2 text-sm',
-        icon: 'w-3 h-3'
-      };
-    }
-    return {
-      tab: 'px-6 py-3 text-base',
-      icon: 'w-4 h-4'
-    };
-  };
-
-  const getTabClasses = (tab: Tab) => {
-    const sizes = getSizeClasses();
-    const isActive = activeTab === tab.id;
-    const isDisabled = tab.disabled;
-
-    const baseClasses = `${sizes.tab} font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap`;
-
-    if (isDisabled) {
-      if (style === 'solid') {
-        return `${baseClasses} bg-gray-100 text-gray-400 cursor-not-allowed`;
-      }
-      return `${baseClasses} text-gray-400 cursor-not-allowed border-b-2 border-transparent`;
-    }
-
-    if (style === 'solid') {
-      if (isActive) {
-        return `${baseClasses} bg-white text-[indigo-600] border-b-2 border-[indigo-600]`;
-      }
-      return `${baseClasses} bg-gray-100 text-gray-600 hover:bg-gray-200`;
-    }
-
-    if (isActive) {
-      return `${baseClasses} text-[indigo-600] border-b-2 border-[indigo-600]`;
-    }
-    return `${baseClasses} text-gray-600 hover:text-gray-900 border-b-2 border-transparent`;
-  };
-
-  const activeTabContent = tabs.find(tab => tab.id === activeTab)?.content;
+  const triggerClass = (tab: Tab) =>
+    cn(
+      tabPadding,
+      'font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap border-b-2 -mb-px',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
+      tab.disabled
+        ? 'text-content-disabled cursor-not-allowed border-transparent bg-surface-sunken'
+        : style === 'solid'
+          ? cn(
+              'border-transparent',
+              'data-[state=active]:bg-surface-raised data-[state=active]:text-action-primary data-[state=active]:border-action-primary',
+              'data-[state=inactive]:bg-surface-sunken data-[state=inactive]:text-content-secondary data-[state=inactive]:hover:bg-action-secondary',
+            )
+          : cn(
+              'bg-transparent',
+              'data-[state=active]:text-action-primary data-[state=active]:border-action-primary',
+              'data-[state=inactive]:text-content-secondary data-[state=inactive]:border-transparent data-[state=inactive]:hover:text-content-primary',
+            )
+    );
 
   if (orientation === 'vertical') {
     return (
-      <div className={`flex gap-0 ${className}`}>
-        <div className="flex flex-col border-r border-gray-200">
-          {tabs.map(tab => (
-            <button
+      <RadixTabs.Root
+        value={current}
+        onValueChange={handleChange}
+        orientation="vertical"
+        className={cn('flex gap-0', className)}
+      >
+        <RadixTabs.List className="flex flex-col border-r border-stroke-subtle">
+          {tabs.map((tab) => (
+            <RadixTabs.Trigger
               key={tab.id}
-              onClick={() => handleTabClick(tab.id, tab.disabled)}
+              value={tab.id}
               disabled={tab.disabled}
-              className={`${getTabClasses(tab)} border-b-0 border-r-2 justify-start ${
-                activeTab === tab.id
-                  ? 'border-r-[indigo-600]'
-                  : 'border-r-transparent'
-              }`}
+              className={cn(
+                triggerClass(tab),
+                'border-b-0 border-r-2 -mr-px justify-start',
+                'data-[state=active]:border-r-action-primary data-[state=inactive]:border-r-transparent',
+              )}
             >
               <span>{tab.label}</span>
               {tab.closeable && !tab.disabled && (
                 <button
-                  onClick={(e) => handleClose(e, tab.id)}
-                  className="ml-auto hover:bg-gray-200 rounded p-1"
+                  onClick={(e) => { e.stopPropagation(); onTabClose?.(tab.id); }}
+                  className="ml-auto hover:bg-action-secondary rounded p-1"
                 >
-                  <X className={getSizeClasses().icon} />
+                  <X className={iconSize} />
                 </button>
               )}
-            </button>
+            </RadixTabs.Trigger>
           ))}
-        </div>
-        {activeTabContent && (
-          <div className="flex-1 p-6">
-            {activeTabContent}
-          </div>
-        )}
-      </div>
+        </RadixTabs.List>
+        {tabs.map((tab) => (
+          <RadixTabs.Content key={tab.id} value={tab.id} className="flex-1 p-6">
+            {tab.content}
+          </RadixTabs.Content>
+        ))}
+      </RadixTabs.Root>
     );
   }
 
   return (
-    <div className={className}>
-      <div className="flex border-b border-gray-200 overflow-x-auto">
-        {tabs.map(tab => (
-          <button
+    <RadixTabs.Root
+      value={current}
+      onValueChange={handleChange}
+      className={className}
+    >
+      <RadixTabs.List className="flex border-b border-stroke-subtle overflow-x-auto">
+        {tabs.map((tab) => (
+          <RadixTabs.Trigger
             key={tab.id}
-            onClick={() => handleTabClick(tab.id, tab.disabled)}
+            value={tab.id}
             disabled={tab.disabled}
-            className={getTabClasses(tab)}
+            className={triggerClass(tab)}
           >
             <span>{tab.label}</span>
             {tab.closeable && !tab.disabled && (
               <button
-                onClick={(e) => handleClose(e, tab.id)}
-                className="hover:bg-gray-200 rounded p-1"
+                onClick={(e) => { e.stopPropagation(); onTabClose?.(tab.id); }}
+                className="hover:bg-action-secondary rounded p-1"
               >
-                <X className={getSizeClasses().icon} />
+                <X className={iconSize} />
               </button>
             )}
-          </button>
+          </RadixTabs.Trigger>
         ))}
-      </div>
-      {activeTabContent && (
-        <div className="p-6">
-          {activeTabContent}
-        </div>
-      )}
-    </div>
+      </RadixTabs.List>
+      {tabs.map((tab) => (
+        <RadixTabs.Content key={tab.id} value={tab.id} className="p-6">
+          {tab.content}
+        </RadixTabs.Content>
+      ))}
+    </RadixTabs.Root>
   );
 }
 
@@ -181,94 +166,42 @@ export function SimpleTab({
   onClose,
   size = 'normal',
   style = 'solid',
-  state = 'default',
-  className = ''
+  className = '',
 }: SimpleTabProps) {
-  const getSizeClasses = () => {
-    if (size === 'small') {
-      return {
-        tab: 'px-4 py-2 text-sm',
-        icon: 'w-3 h-3'
-      };
-    }
-    return {
-      tab: 'px-6 py-3 text-base',
-      icon: 'w-4 h-4'
-    };
-  };
-
-  const sizes = getSizeClasses();
-  const baseClasses = `${sizes.tab} font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap border-b-2`;
-
-  const getStateClasses = () => {
-    if (disabled || state === 'disabled') {
-      if (style === 'solid') {
-        return 'bg-gray-100 text-gray-400 cursor-not-allowed border-transparent';
-      }
-      return 'text-gray-400 cursor-not-allowed border-transparent';
-    }
-
-    if (style === 'solid') {
-      if (active || state === 'active') {
-        if (state === 'focused') {
-          return 'bg-white text-[indigo-600] border-[indigo-600] ring-2 ring-[indigo-600] ring-offset-2';
-        }
-        if (state === 'pressed') {
-          return 'bg-white text-[indigo-700] border-[indigo-700]';
-        }
-        return 'bg-white text-[indigo-600] border-[indigo-600] cursor-pointer';
-      }
-      if (state === 'hover') {
-        return 'bg-gray-200 text-gray-600 border-transparent cursor-pointer';
-      }
-      if (state === 'pressed') {
-        return 'bg-gray-300 text-gray-700 border-transparent cursor-pointer';
-      }
-      if (state === 'focused') {
-        return 'bg-gray-100 text-gray-600 border-transparent ring-2 ring-[indigo-600] ring-offset-2 cursor-pointer';
-      }
-      return 'bg-gray-100 text-gray-600 border-transparent cursor-pointer';
-    }
-
-    if (active || state === 'active') {
-      if (state === 'focused') {
-        return 'text-[indigo-600] border-[indigo-600] ring-2 ring-[indigo-600] ring-offset-2 cursor-pointer';
-      }
-      if (state === 'pressed') {
-        return 'text-[indigo-700] border-[indigo-700] cursor-pointer';
-      }
-      return 'text-[indigo-600] border-[indigo-600] cursor-pointer';
-    }
-    if (state === 'hover') {
-      return 'text-gray-900 border-transparent cursor-pointer';
-    }
-    if (state === 'pressed') {
-      return 'text-gray-700 border-gray-300 cursor-pointer';
-    }
-    if (state === 'focused') {
-      return 'text-gray-600 border-transparent ring-2 ring-[indigo-600] ring-offset-2 cursor-pointer';
-    }
-    return 'text-gray-600 border-transparent cursor-pointer';
-  };
-
-  const handleClose = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onClose?.();
-  };
+  const padding  = size === 'small' ? 'px-4 py-2 text-sm' : 'px-6 py-3 text-base';
+  const iconSize = size === 'small' ? 'w-3 h-3' : 'w-4 h-4';
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${baseClasses} ${getStateClasses()} ${className}`}
+      className={cn(
+        padding,
+        'font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap border-b-2',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
+        disabled
+          ? 'text-content-disabled cursor-not-allowed border-transparent' + (style === 'solid' ? ' bg-surface-sunken' : '')
+          : active
+            ? cn(
+                'text-action-primary border-action-primary cursor-pointer',
+                style === 'solid' && 'bg-surface-raised',
+              )
+            : cn(
+                'text-content-secondary border-transparent cursor-pointer',
+                style === 'solid'
+                  ? 'bg-surface-sunken hover:bg-action-secondary'
+                  : 'hover:text-content-primary',
+              ),
+        className
+      )}
     >
       <span>{label}</span>
       {closeable && !disabled && (
         <button
-          onClick={handleClose}
-          className="hover:bg-gray-200 rounded p-1"
+          onClick={(e) => { e.stopPropagation(); onClose?.(); }}
+          className="hover:bg-action-secondary rounded p-1"
         >
-          <X className={sizes.icon} />
+          <X className={iconSize} />
         </button>
       )}
     </button>

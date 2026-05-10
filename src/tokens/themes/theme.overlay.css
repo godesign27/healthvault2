@@ -1,0 +1,36 @@
+/* ─── Theme: Overlay (Modals, Drawers, Popovers) ────────────────────────────
+   Applied via data-surface="overlay" on a container element.
+   Components in overlay contexts (Dialog, Drawer, Popover) automatically
+   receive this surface via the SurfaceProvider wrapper.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface="overlay"] {
+  --hv-color-surface-page:    var(--hv-color-neutral-0);
+  --hv-color-surface-raised:  var(--hv-color-neutral-0);
+  --hv-color-surface-sunken:  var(--hv-color-neutral-50);
+  --hv-color-surface-overlay: var(--hv-color-neutral-0);
+
+  /* Clean white text hierarchy for overlays */
+  --hv-color-text-primary:   var(--hv-color-neutral-900);
+  --hv-color-text-secondary: var(--hv-color-neutral-600);
+  --hv-color-text-tertiary:  var(--hv-color-neutral-500);
+
+  /* Crisp borders for definition on white overlay */
+  --hv-color-border-subtle:  var(--hv-color-neutral-200);
+  --hv-color-border-default: var(--hv-color-neutral-300);
+}
+
+/* Dark mode overlay surface */
+.dark [data-surface="overlay"],
+.dark-theme [data-surface="overlay"] {
+  --hv-color-surface-page:    #1E293B;
+  --hv-color-surface-raised:  #1E293B;
+  --hv-color-surface-sunken:  #1C2938;
+  --hv-color-surface-overlay: #1E293B;
+
+  --hv-color-text-primary:   #F1F5F9;
+  --hv-color-text-secondary: #CBD5E1;
+  --hv-color-text-tertiary:  #94A3B8;
+
+  --hv-color-border-subtle:  #334155;
+  --hv-color-border-default: #475569;
+}

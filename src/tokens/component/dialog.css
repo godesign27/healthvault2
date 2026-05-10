@@ -1,0 +1,13 @@
+/* ─── Component: Dialog / Modal ─────────────────────────────────────────────
+   References semantic tokens only.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --hv-component-dialog-background-default:   var(--hv-color-surface-overlay);
+  --hv-component-dialog-border-default:       var(--hv-color-border-subtle);
+  --hv-component-dialog-text-title:           var(--hv-color-text-primary);
+  --hv-component-dialog-text-body:            var(--hv-color-text-secondary);
+  --hv-component-dialog-overlay-background:   rgba(0, 0, 0, 0.5);
+  --hv-component-dialog-header-background:    var(--hv-color-surface-raised);
+  --hv-component-dialog-footer-background:    var(--hv-color-surface-raised);
+  --hv-component-dialog-footer-border:        var(--hv-color-border-subtle);
+}
