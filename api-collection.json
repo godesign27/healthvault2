@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "health-vault-api-collection",
     "name": "Health Vault API",
-    "description": "Complete API collection for the Health Vault patient portal. Uses Supabase Auth, PostgREST, and Edge Functions.",
+    "description": "Complete API collection for the Health Vault patient portal. Uses Supabase Auth, PostgREST, and Edge Functions. Mobile clients should include X-Platform: mobile on all requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -17,7 +17,17 @@
       "type": "string"
     },
     {
+      "key": "supabaseAnonKey",
+      "value": "your-anon-key",
+      "type": "string"
+    },
+    {
       "key": "recordId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "connectionId",
       "value": "",
       "type": "string"
     }
@@ -353,6 +363,202 @@
               "path": ["functions", "v1", "vault-stats"]
             },
             "description": "Returns dashboard stats: { totalRecords, connectedProviders, pendingRequests, lastSyncedAt }."
+          }
+        },
+        {
+          "name": "List Records (Edge Function — mobile-ready)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" },
+                { "key": "kind", "value": "lab", "disabled": true },
+                { "key": "source", "value": "uploaded", "disabled": true }
+              ]
+            },
+            "description": "List records with pagination. Returns PaginatedResponse<HealthRecord>. Supports ?kind=, ?source=, ?page=, ?pageSize=."
+          }
+        },
+        {
+          "name": "Get Single Record (Edge Function)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records/{{recordId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records", "{{recordId}}"]
+            },
+            "description": "Fetch a single HealthRecord by ID."
+          }
+        },
+        {
+          "name": "Create Record (Edge Function)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Blood Panel – Full CBC\",\n  \"kind\": \"lab\",\n  \"providerName\": \"City Medical Centre\",\n  \"serviceDate\": \"2024-03-15\",\n  \"tags\": [\"routine\", \"annual\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records"]
+            },
+            "description": "Create a new health record. Returns the created HealthRecord (201)."
+          }
+        },
+        {
+          "name": "Update Record (Edge Function)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Record Title\",\n  \"tags\": [\"reviewed\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records/{{recordId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records", "{{recordId}}"]
+            },
+            "description": "Update fields on an existing record. Only provided fields are changed."
+          }
+        },
+        {
+          "name": "Delete Record (Edge Function)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records/{{recordId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records", "{{recordId}}"]
+            },
+            "description": "Delete a record by ID. Returns { deleted: true }."
+          }
+        },
+        {
+          "name": "Import Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recordId\": \"{{recordId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/records-import",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "records-import"]
+            },
+            "description": "Mark a shared or pending record as imported into the user's vault. Returns { imported: true, recordId }."
+          }
+        },
+        {
+          "name": "List Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/providers",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "providers"]
+            },
+            "description": "List all EHR provider connections for the authenticated user."
+          }
+        },
+        {
+          "name": "Connect Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ehrSource\": \"epic\",\n  \"ehrPatientId\": \"patient-123\",\n  \"providerName\": \"City Medical Centre\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/providers",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "providers"]
+            },
+            "description": "Connect a new EHR provider. Triggers a Keragon sync if KERAGON_WEBHOOK_URL is configured. Returns { connectionId, fetchTriggered }."
+          }
+        },
+        {
+          "name": "Disconnect Provider",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/providers/{{connectionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "providers", "{{connectionId}}"]
+            },
+            "description": "Deactivate a provider connection. Returns { disconnected: true }."
+          }
+        },
+        {
+          "name": "Get Sync Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "apikey", "value": "{{supabaseAnonKey}}" },
+              { "key": "X-Platform", "value": "mobile" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/v1/sync-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "v1", "sync-status"]
+            },
+            "description": "Returns lastSyncedAt, overall status, and per-connection sync details."
           }
         },
         {

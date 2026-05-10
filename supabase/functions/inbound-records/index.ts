@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, X-Client-Info, Apikey, X-API-Key",
+    "Content-Type, Authorization, X-Client-Info, Apikey, X-API-Key, X-Platform",
 };
 
 function jsonResponse(body: unknown, status = 200) {

@@ -13,8 +13,17 @@ export const envSchema = z.object({
   // OpenAI (AI assistant)
   OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
 
-  // EHR integration
+  // EHR integration (Keragon webhook)
   KERAGON_WEBHOOK_URL: z.string().url().optional(),
+
+  // FHIR direct connection (optional — Keragon is used by default)
+  FHIR_BASE_URL: z.string().url().optional(),
+  FHIR_CLIENT_ID: z.string().optional(),
+  FHIR_CLIENT_SECRET: z.string().optional(),
+
+  // MCP integrations (feature flags)
+  GMAIL_MCP_ENABLED: z.coerce.boolean().default(false),
+  HEALTHEX_MCP_ENABLED: z.coerce.boolean().default(false),
 
   // App
   APP_URL: z.string().url().default("https://healthvault27.com"),

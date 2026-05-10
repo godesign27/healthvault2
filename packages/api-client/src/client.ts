@@ -168,6 +168,71 @@ export class HealthVaultClient {
     return this.fn("record-request", params);
   }
 
+  // ── Record mutations (mobile-first REST wrappers) ────────────────────────────
+
+  async createRecord(params: {
+    title: string;
+    kind: RecordKind;
+    providerName?: string;
+    serviceDate?: string;
+    tags?: string[];
+    notes?: string;
+  }): Promise<HealthRecord> {
+    const token = this.config.getAccessToken();
+    const res = await fetch(`${this.fnBase}/records`, {
+      method: "POST",
+      headers: {
+        ...this.authHeaders(),
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(params),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error ?? `createRecord failed (${res.status})`);
+    return json as HealthRecord;
+  }
+
+  async updateRecord(id: string, params: Partial<{
+    title: string;
+    kind: RecordKind;
+    providerName: string;
+    serviceDate: string;
+    tags: string[];
+  }>): Promise<HealthRecord> {
+    const token = this.config.getAccessToken();
+    const res = await fetch(`${this.fnBase}/records/${id}`, {
+      method: "PUT",
+      headers: {
+        ...this.authHeaders(),
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(params),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error ?? `updateRecord failed (${res.status})`);
+    return json as HealthRecord;
+  }
+
+  async deleteRecord(id: string): Promise<{ deleted: boolean }> {
+    const token = this.config.getAccessToken();
+    const res = await fetch(`${this.fnBase}/records/${id}`, {
+      method: "DELETE",
+      headers: {
+        ...this.authHeaders(),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error ?? `deleteRecord failed (${res.status})`);
+    return json as { deleted: boolean };
+  }
+
+  async importRecord(id: string): Promise<{ imported: boolean }> {
+    return this.fn("records-import", { recordId: id });
+  }
+
   // ── EHR / Sync ────────────────────────────────────────────────────────────────
 
   async listEHRConnections(): Promise<EHRConnection[]> {
@@ -196,6 +261,39 @@ export class HealthVaultClient {
     providerName: string;
   }): Promise<{ connectionId: string; fetchTriggered: boolean }> {
     return this.fn("trigger-ehr-fetch", params);
+  }
+
+  // ── Providers (mobile-first aliases) ─────────────────────────────────────────
+
+  async listProviders(): Promise<EHRConnection[]> {
+    return this.fn("providers", undefined, "GET");
+  }
+
+  async connectProvider(params: {
+    ehrSource: string;
+    ehrPatientId: string;
+    ehrDepartmentId?: string;
+    providerName: string;
+  }): Promise<{ connectionId: string; fetchTriggered: boolean }> {
+    return this.fn("providers", params);
+  }
+
+  async disconnectProvider(id: string): Promise<{ disconnected: boolean }> {
+    const token = this.config.getAccessToken();
+    const res = await fetch(`${this.fnBase}/providers/${id}`, {
+      method: "DELETE",
+      headers: {
+        ...this.authHeaders(),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error ?? `disconnectProvider failed (${res.status})`);
+    return json as { disconnected: boolean };
+  }
+
+  async getSyncStatus(): Promise<{ lastSyncedAt: string | null; status: string }> {
+    return this.fn("sync-status", undefined, "GET");
   }
 
   // ── Stats ─────────────────────────────────────────────────────────────────────
