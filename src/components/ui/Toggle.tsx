@@ -1,3 +1,4 @@
+import * as Switch from '@radix-ui/react-switch';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -34,12 +35,10 @@ export function Toggle({
             {label}
           </span>
         )}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={checked}
+        <Switch.Root
+          checked={checked}
+          onCheckedChange={onChange}
           disabled={disabled}
-          onClick={() => !disabled && onChange?.(!checked)}
           className={cn(
             'relative inline-flex items-center rounded-full transition-colors duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
@@ -50,7 +49,7 @@ export function Toggle({
             disabled && 'cursor-not-allowed',
           )}
         >
-          <span
+          <Switch.Thumb
             className={cn(
               'block rounded-full bg-white shadow transition-transform duration-200',
               isSmall ? 'w-4 h-4' : 'w-5 h-5',
@@ -59,7 +58,7 @@ export function Toggle({
                 : checked ? 'translate-x-5' : 'translate-x-0.5',
             )}
           />
-        </button>
+        </Switch.Root>
       </div>
 
       {error && errorMessage && (

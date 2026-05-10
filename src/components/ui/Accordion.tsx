@@ -1,5 +1,6 @@
-import { ChevronDown, Plus, CreditCard as Edit2 } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import * as RadixAccordion from '@radix-ui/react-accordion';
+import { ChevronDown, Plus, Edit2 } from 'lucide-react';
+import { type ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 
 interface AccordionItemProps {
@@ -120,32 +121,21 @@ export function Accordion({
   showIcons = true,
   className = '',
 }: AccordionProps) {
-  const [openItems, setOpenItems] = useState<Set<number>>(new Set(defaultExpanded));
-
-  const toggle = (index: number) => {
-    setOpenItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
-      } else {
-        if (!allowMultiple) next.clear();
-        next.add(index);
-      }
-      return next;
-    });
-  };
+  const defaultValue = defaultExpanded.map(String);
 
   return (
-    <div className={className}>
-      {items.map((item, index) => {
-        const isOpen = openItems.has(index);
-        return (
-          <div key={index}>
-            <button
-              type="button"
-              onClick={() => toggle(index)}
+    <RadixAccordion.Root
+      type={allowMultiple ? 'multiple' : 'single'}
+      defaultValue={allowMultiple ? defaultValue : (defaultValue[0] ?? undefined)}
+      collapsible={!allowMultiple ? true : undefined}
+      className={className}
+    >
+      {items.map((item, index) => (
+        <RadixAccordion.Item key={index} value={String(index)}>
+          <RadixAccordion.Header>
+            <RadixAccordion.Trigger
               className={cn(
-                'flex items-center justify-between w-full px-6 py-4 transition-colors',
+                'flex items-center justify-between w-full px-6 py-4 transition-colors group',
                 variant === 'border' && 'border-t border-b border-stroke-subtle',
                 'bg-surface-raised hover:bg-action-secondary',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
@@ -153,12 +143,7 @@ export function Accordion({
             >
               <div className="flex items-center gap-3 flex-1">
                 {showIcons && (
-                  <ChevronDown
-                    className={cn(
-                      'w-4 h-4 text-action-primary transition-transform duration-200',
-                      isOpen && 'rotate-180',
-                    )}
-                  />
+                  <ChevronDown className="w-4 h-4 text-action-primary transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 )}
                 <span className="text-sm font-medium text-content-primary">{item.title}</span>
               </div>
@@ -182,22 +167,26 @@ export function Accordion({
                   )}
                 </div>
               )}
-            </button>
-
-            {isOpen && (
-              <div
-                className={cn(
-                  'px-6 py-4',
-                  variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken',
-                )}
-              >
-                {item.content}
-              </div>
+            </RadixAccordion.Trigger>
+          </RadixAccordion.Header>
+          <RadixAccordion.Content
+            className={cn(
+              'overflow-hidden',
+              'data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up',
             )}
-          </div>
-        );
-      })}
-    </div>
+          >
+            <div
+              className={cn(
+                'px-6 py-4',
+                variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken',
+              )}
+            >
+              {item.content}
+            </div>
+          </RadixAccordion.Content>
+        </RadixAccordion.Item>
+      ))}
+    </RadixAccordion.Root>
   );
 }
 
@@ -222,16 +211,6 @@ export function NestedAccordion({
   showIcons = true,
   className = '',
 }: NestedAccordionProps) {
-  const [openItems, setOpenItems] = useState<Set<number>>(new Set());
-
-  const toggle = (index: number) => {
-    setOpenItems((prev) => {
-      const next = new Set(prev);
-      next.has(index) ? next.delete(index) : next.add(index);
-      return next;
-    });
-  };
-
   return (
     <div className={className}>
       <div
@@ -279,54 +258,48 @@ export function NestedAccordion({
 
       {isExpanded && (
         <div className={variant === 'border' ? 'border-2 border-t-0 border-stroke-default' : ''}>
-          {nestedItems.map((item, index) => {
-            const isOpen = openItems.has(index);
-            return (
-              <div
+          <RadixAccordion.Root type="multiple" className="">
+            {nestedItems.map((item, index) => (
+              <RadixAccordion.Item
                 key={index}
+                value={String(index)}
                 className={cn(
                   variant === 'border' ? 'border-t-2 border-stroke-default' : 'border-t-2 border-stroke-subtle',
                 )}
               >
-                <button
-                  type="button"
-                  onClick={() => toggle(index)}
-                  className={cn(
-                    'flex items-center justify-between w-full p-4 pl-12 bg-surface-raised hover:bg-action-secondary transition-colors',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    {showIcons && (
-                      <ChevronDown
-                        className={cn(
-                          'w-4 h-4 text-content-secondary transition-transform duration-200',
-                          isOpen && 'rotate-180',
-                        )}
-                      />
+                <RadixAccordion.Header>
+                  <RadixAccordion.Trigger
+                    className={cn(
+                      'flex items-center justify-between w-full p-4 pl-12 bg-surface-raised hover:bg-action-secondary transition-colors group',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
                     )}
-                    <span className="text-sm text-content-primary">{item.title}</span>
-                  </div>
-                  {showIcons && (
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
-                        <Plus className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
+                  >
+                    <div className="flex items-center gap-3">
+                      {showIcons && (
+                        <ChevronDown className="w-4 h-4 text-content-secondary transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                      )}
+                      <span className="text-sm text-content-primary">{item.title}</span>
                     </div>
-                  )}
-                </button>
-
-                {isOpen && (
+                    {showIcons && (
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                          <Plus className="w-4 h-4" />
+                        </button>
+                        <button className="p-1 text-content-secondary hover:text-action-primary transition-colors">
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </RadixAccordion.Trigger>
+                </RadixAccordion.Header>
+                <RadixAccordion.Content className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
                   <div className="bg-surface-sunken p-4 pl-12">
                     {item.content}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                </RadixAccordion.Content>
+              </RadixAccordion.Item>
+            ))}
+          </RadixAccordion.Root>
         </div>
       )}
     </div>

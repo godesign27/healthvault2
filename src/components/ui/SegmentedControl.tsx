@@ -1,3 +1,4 @@
+import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { cn } from '../../lib/utils';
 
 interface SegmentedControlProps {
@@ -26,18 +27,21 @@ export function SegmentedControl({
   const padding = sizePadding[size];
 
   return (
-    <div className="inline-flex rounded overflow-hidden">
+    <ToggleGroup.Root
+      type="single"
+      value={value}
+      onValueChange={(v) => v && onChange?.(v)}
+      disabled={disabled}
+      className="inline-flex rounded overflow-hidden"
+    >
       {options.map((option, i) => {
-        const isFirst    = i === 0;
-        const isLast     = i === options.length - 1;
-        const isSelected = value === option;
+        const isFirst = i === 0;
+        const isLast  = i === options.length - 1;
 
         return (
-          <button
+          <ToggleGroup.Item
             key={option}
-            type="button"
-            disabled={disabled}
-            onClick={() => !disabled && onChange?.(option)}
+            value={option}
             className={cn(
               padding,
               'font-medium transition-colors',
@@ -45,26 +49,24 @@ export function SegmentedControl({
               isFirst && 'rounded-l',
               isLast  && 'rounded-r',
               variant === 'solid' ? cn(
-                isSelected
-                  ? 'bg-action-primary text-content-on-action'
-                  : disabled
-                    ? 'bg-surface-sunken text-content-disabled cursor-not-allowed'
-                    : 'bg-surface-sunken text-content-secondary hover:bg-action-secondary',
+                'data-[state=on]:bg-action-primary data-[state=on]:text-content-on-action',
+                disabled
+                  ? 'bg-surface-sunken text-content-disabled cursor-not-allowed data-[state=on]:bg-hv-neutral-400'
+                  : 'bg-surface-sunken text-content-secondary hover:bg-action-secondary data-[state=off]:hover:bg-action-secondary',
               ) : cn(
                 'border border-stroke-default bg-surface-raised',
                 !isFirst && '-ml-px',
-                isSelected
-                  ? 'border-action-primary text-action-primary z-10'
-                  : disabled
-                    ? 'text-content-disabled cursor-not-allowed'
-                    : 'text-content-secondary hover:border-stroke-strong',
+                'data-[state=on]:border-action-primary data-[state=on]:text-action-primary data-[state=on]:z-10',
+                disabled
+                  ? 'text-content-disabled cursor-not-allowed'
+                  : 'text-content-secondary hover:border-stroke-strong',
               ),
             )}
           >
             {option}
-          </button>
+          </ToggleGroup.Item>
         );
       })}
-    </div>
+    </ToggleGroup.Root>
   );
 }

@@ -1,6 +1,6 @@
+import * as RadixDialog from '@radix-ui/react-dialog';
 import { X, Menu } from 'lucide-react';
-import { type ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { type ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 
 interface DrawerProps {
@@ -15,18 +15,11 @@ interface DrawerProps {
   className?: string;
 }
 
-const positionBase = {
-  left:   'left-0 top-0 h-full',
-  right:  'right-0 top-0 h-full',
-  top:    'top-0 left-0 w-full',
-  bottom: 'bottom-0 left-0 w-full',
-} as const;
-
-const translateClosed = {
-  left:   '-translate-x-full',
-  right:  'translate-x-full',
-  top:    '-translate-y-full',
-  bottom: 'translate-y-full',
+const positionClasses = {
+  left:   'left-0 top-0 h-full data-[state=open]:animate-slide-in-left data-[state=closed]:animate-slide-out-left',
+  right:  'right-0 top-0 h-full data-[state=open]:animate-slide-in-right data-[state=closed]:animate-slide-out-right',
+  top:    'top-0 left-0 w-full data-[state=open]:animate-slide-in-top data-[state=closed]:animate-slide-out-top',
+  bottom: 'bottom-0 left-0 w-full data-[state=open]:animate-slide-in-bottom data-[state=closed]:animate-slide-out-bottom',
 } as const;
 
 export function Drawer({
@@ -45,81 +38,56 @@ export function Drawer({
     ? (size === 'large' ? 'w-full md:w-96' : 'w-full md:w-80')
     : 'h-80 md:h-96';
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-
-  return createPortal(
-    <>
-      {/* Overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300',
-          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
-        )}
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <div
-        className={cn(
-          'fixed z-50 bg-surface-overlay shadow-2xl flex flex-col',
-          'transition-transform duration-300 ease-in-out',
-          sizeClass,
-          positionBase[position],
-          isOpen ? 'translate-x-0 translate-y-0' : translateClosed[position],
-          className,
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="drawer-title"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-stroke-subtle shrink-0">
-          <h2 id="drawer-title" className="text-lg font-semibold text-content-primary">
-            {title}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 text-content-secondary hover:text-content-primary hover:bg-action-secondary rounded transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {children}
-        </div>
-
-        {/* Footer */}
-        {showFooter && (
-          <div className="px-4 py-4 border-t border-stroke-subtle shrink-0">
-            {footer || (
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={onClose}
-                  className="px-4 py-2 text-sm font-medium text-content-primary bg-surface-raised border border-stroke-default rounded hover:bg-action-secondary transition-colors"
-                >
-                  Cancel
-                </button>
-                <button className="px-4 py-2 text-sm font-medium text-content-on-action bg-action-primary rounded hover:bg-action-primary-hover transition-colors">
-                  Save
-                </button>
-              </div>
-            )}
+  return (
+    <RadixDialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-fade-in" />
+        <RadixDialog.Content
+          className={cn(
+            'fixed z-50 bg-surface-overlay shadow-2xl flex flex-col',
+            'focus-visible:outline-none',
+            sizeClass,
+            positionClasses[position],
+            className,
+          )}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-4 border-b border-stroke-subtle shrink-0">
+            <RadixDialog.Title className="text-lg font-semibold text-content-primary">
+              {title}
+            </RadixDialog.Title>
+            <RadixDialog.Close asChild>
+              <button className="p-1 text-content-secondary hover:text-content-primary hover:bg-action-secondary rounded transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </RadixDialog.Close>
           </div>
-        )}
-      </div>
-    </>,
-    document.body,
+
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {children}
+          </div>
+
+          {/* Footer */}
+          {showFooter && (
+            <div className="px-4 py-4 border-t border-stroke-subtle shrink-0">
+              {footer || (
+                <div className="flex gap-2 justify-end">
+                  <RadixDialog.Close asChild>
+                    <button className="px-4 py-2 text-sm font-medium text-content-primary bg-surface-raised border border-stroke-default rounded hover:bg-action-secondary transition-colors">
+                      Cancel
+                    </button>
+                  </RadixDialog.Close>
+                  <button className="px-4 py-2 text-sm font-medium text-content-on-action bg-action-primary rounded hover:bg-action-primary-hover transition-colors">
+                    Save
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 }
 

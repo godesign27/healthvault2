@@ -1,23 +1,10 @@
-import { ReactNode, useState, useRef } from 'react';
+import * as RadixTooltip from '@radix-ui/react-tooltip';
+import { ReactNode, useState } from 'react';
 import { cn } from '../../lib/utils';
 
 export type TooltipPosition = 'top' | 'right' | 'bottom' | 'left';
 export type TooltipVariant = 'default' | 'inverse';
 export type TooltipSize = 'normal' | 'small';
-
-const positionClasses: Record<TooltipPosition, string> = {
-  top:    'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left:   'right-full top-1/2 -translate-y-1/2 mr-2',
-  right:  'left-full top-1/2 -translate-y-1/2 ml-2',
-};
-
-const arrowClasses: Record<TooltipPosition, string> = {
-  top:    'top-full left-1/2 -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-transparent',
-  bottom: 'bottom-full left-1/2 -translate-x-1/2 border-l-4 border-r-4 border-b-4 border-transparent',
-  left:   'left-full top-1/2 -translate-y-1/2 border-t-4 border-b-4 border-l-4 border-transparent',
-  right:  'right-full top-1/2 -translate-y-1/2 border-t-4 border-b-4 border-r-4 border-transparent',
-};
 
 interface TooltipProps {
   content: string;
@@ -36,48 +23,35 @@ export function Tooltip({
   children,
   className = '',
 }: TooltipProps) {
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const show = () => {
-    timerRef.current = setTimeout(() => setVisible(true), 300);
-  };
-  const hide = () => {
-    clearTimeout(timerRef.current);
-    setVisible(false);
-  };
-
-  const arrowColor = variant === 'inverse' ? 'border-t-surface-overlay' : 'border-t-hv-neutral-900';
-
   return (
-    <span
-      className={cn('inline-block relative', className)}
-      onMouseEnter={show}
-      onMouseLeave={hide}
-      onFocus={show}
-      onBlur={hide}
-    >
-      {children}
-      {visible && (
-        <span
-          role="tooltip"
-          className={cn(
-            'absolute z-[9999] rounded shadow-lg whitespace-nowrap pointer-events-none',
-            size === 'small' ? 'text-xs px-2 py-1' : 'text-sm px-3 py-2',
-            variant === 'inverse'
-              ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
-              : 'bg-hv-neutral-900 text-hv-neutral-0',
-            positionClasses[position],
-          )}
-        >
-          {content}
-          <span
-            aria-hidden="true"
-            className={cn('absolute w-0 h-0', arrowClasses[position], arrowColor)}
-          />
-        </span>
-      )}
-    </span>
+    <RadixTooltip.Provider delayDuration={300}>
+      <RadixTooltip.Root>
+        <RadixTooltip.Trigger asChild>
+          <span className={cn('inline-block', className)}>{children}</span>
+        </RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            side={position}
+            sideOffset={6}
+            className={cn(
+              'z-[9999] rounded shadow-lg whitespace-nowrap pointer-events-none',
+              'data-[state=delayed-open]:animate-fade-in',
+              size === 'small' ? 'text-xs px-2 py-1' : 'text-sm px-3 py-2',
+              variant === 'inverse'
+                ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
+                : 'bg-hv-neutral-900 text-hv-neutral-0',
+            )}
+          >
+            {content}
+            <RadixTooltip.Arrow
+              className={cn(
+                variant === 'inverse' ? 'fill-surface-overlay' : 'fill-hv-neutral-900'
+              )}
+            />
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
   );
 }
 
@@ -98,37 +72,35 @@ export function TooltipPopover({
   children,
   className = '',
 }: TooltipPopoverProps) {
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const show = () => { timerRef.current = setTimeout(() => setVisible(true), 300); };
-  const hide = () => { clearTimeout(timerRef.current); setVisible(false); };
-
   return (
-    <span
-      className={cn('inline-block relative', className)}
-      onMouseEnter={show}
-      onMouseLeave={hide}
-      onFocus={show}
-      onBlur={hide}
-    >
-      {children}
-      {visible && (
-        <span
-          role="tooltip"
-          className={cn(
-            'absolute z-[9999] rounded shadow-lg pointer-events-none p-4 max-w-xs',
-            variant === 'inverse'
-              ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
-              : 'bg-hv-neutral-900 text-hv-neutral-0',
-            positionClasses[position],
-          )}
-        >
-          <h4 className="font-bold text-sm mb-1">{title}</h4>
-          <p className="text-xs opacity-90">{description}</p>
-        </span>
-      )}
-    </span>
+    <RadixTooltip.Provider delayDuration={300}>
+      <RadixTooltip.Root>
+        <RadixTooltip.Trigger asChild>
+          <span className={cn('inline-block', className)}>{children}</span>
+        </RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            side={position}
+            sideOffset={6}
+            className={cn(
+              'z-[9999] rounded shadow-lg pointer-events-none p-4 max-w-xs',
+              'data-[state=delayed-open]:animate-fade-in',
+              variant === 'inverse'
+                ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
+                : 'bg-hv-neutral-900 text-hv-neutral-0',
+            )}
+          >
+            <h4 className="font-bold text-sm mb-1">{title}</h4>
+            <p className="text-xs opacity-90">{description}</p>
+            <RadixTooltip.Arrow
+              className={cn(
+                variant === 'inverse' ? 'fill-surface-overlay' : 'fill-hv-neutral-900'
+              )}
+            />
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
   );
 }
 
@@ -159,46 +131,56 @@ export function TooltipConfirmation({
   const handleCancel  = () => { onCancel();  setOpen(false); };
 
   return (
-    <span className={cn('inline-block relative', className)}>
-      <span onClick={() => setOpen((v) => !v)}>{children}</span>
-      {open && (
-        <span
-          className={cn(
-            'absolute z-[9999] rounded shadow-lg p-4 max-w-xs',
-            variant === 'inverse'
-              ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
-              : 'bg-hv-neutral-900 text-hv-neutral-0',
-            positionClasses[position],
-          )}
-        >
-          <div className="flex items-start gap-2 mb-3">
-            <span className="text-content-feedback-warning mt-0.5">⚠</span>
-            <div>
-              <h4 className="font-bold text-sm mb-1">{title}</h4>
-              <p className="text-xs opacity-90">{message}</p>
+    <RadixTooltip.Provider>
+      <RadixTooltip.Root open={open} onOpenChange={setOpen}>
+        <RadixTooltip.Trigger asChild>
+          <span className={cn('inline-block', className)}>{children}</span>
+        </RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            side={position}
+            sideOffset={6}
+            className={cn(
+              'z-[9999] rounded shadow-lg p-4 max-w-xs',
+              variant === 'inverse'
+                ? 'bg-surface-overlay text-content-primary border border-stroke-subtle'
+                : 'bg-hv-neutral-900 text-hv-neutral-0',
+            )}
+          >
+            <div className="flex items-start gap-2 mb-3">
+              <span className="text-content-feedback-warning mt-0.5">⚠</span>
+              <div>
+                <h4 className="font-bold text-sm mb-1">{title}</h4>
+                <p className="text-xs opacity-90">{message}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={handleCancel}
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={handleCancel}
+                className={cn(
+                  'px-3 py-1.5 text-xs rounded transition-colors',
+                  variant === 'inverse'
+                    ? 'bg-surface-sunken hover:bg-action-secondary-hover text-content-primary'
+                    : 'bg-hv-neutral-700 hover:bg-hv-neutral-600 text-white'
+                )}
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-3 py-1.5 text-xs rounded bg-action-primary hover:bg-action-primary-hover text-content-on-action transition-colors"
+              >
+                Yes
+              </button>
+            </div>
+            <RadixTooltip.Arrow
               className={cn(
-                'px-3 py-1.5 text-xs rounded transition-colors',
-                variant === 'inverse'
-                  ? 'bg-surface-sunken hover:bg-action-secondary-hover text-content-primary'
-                  : 'bg-hv-neutral-700 hover:bg-hv-neutral-600 text-white'
+                variant === 'inverse' ? 'fill-surface-overlay' : 'fill-hv-neutral-900'
               )}
-            >
-              No
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="px-3 py-1.5 text-xs rounded bg-action-primary hover:bg-action-primary-hover text-content-on-action transition-colors"
-            >
-              Yes
-            </button>
-          </div>
-        </span>
-      )}
-    </span>
+            />
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
   );
 }
