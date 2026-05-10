@@ -1,4 +1,3 @@
-import * as RadixToolbar from '@radix-ui/react-toolbar';
 import { Home, Calendar, Search, Palette, Maximize2, ChevronDown } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { cn } from '../../lib/utils';
@@ -50,13 +49,15 @@ export function Toolbar({
   );
 
   return (
-    <RadixToolbar.Root
-      orientation={orientation}
+    <div
+      role="toolbar"
+      aria-orientation={orientation}
       className={containerClass}
     >
       {actions.map((action) => (
-        <RadixToolbar.Button
+        <button
           key={action.id}
+          type="button"
           onClick={action.onClick}
           disabled={action.disabled}
           className={cn(buttonClass, !showLabels && 'justify-center')}
@@ -66,9 +67,9 @@ export function Toolbar({
           {action.variant === 'dropdown' && (
             <ChevronDown className={cn('w-4 h-4', orientation === 'vertical' ? 'ml-auto' : '')} />
           )}
-        </RadixToolbar.Button>
+        </button>
       ))}
-    </RadixToolbar.Root>
+    </div>
   );
 }
 
