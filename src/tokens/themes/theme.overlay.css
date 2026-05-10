@@ -20,8 +20,7 @@
 }
 
 /* Dark mode overlay surface */
-.dark [data-surface="overlay"],
-.dark-theme [data-surface="overlay"] {
+[data-theme="dark"] [data-surface="overlay"] {
   --hv-color-surface-page:    #1E293B;
   --hv-color-surface-raised:  #1E293B;
   --hv-color-surface-sunken:  #1C2938;

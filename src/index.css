@@ -1,15 +1,12 @@
-/* ── 1. Radix UI Themes base styles ────────────────────────────────────────── */
-@import '@radix-ui/themes/styles.css';
-
-/* ── 2. HV Design Token System ─────────────────────────────────────────────── */
+/* ── 1. HV Design Token System ─────────────────────────────────────────────── */
 @import './tokens/index.css';
 
-/* ── 3. Tailwind ─────────────────────────────────────────────────────────────── */
+/* ── 2. Tailwind ─────────────────────────────────────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── 4. Base resets ──────────────────────────────────────────────────────────── */
+/* ── 3. Base resets ──────────────────────────────────────────────────────────── */
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
@@ -42,7 +39,7 @@
   }
 }
 
-/* ── 5. Utilities ─────────────────────────────────────────────────────────────── */
+/* ── 4. Utilities ─────────────────────────────────────────────────────────────── */
 @layer utilities {
   @keyframes slide-in {
     from { transform: translateX(100%); opacity: 0; }

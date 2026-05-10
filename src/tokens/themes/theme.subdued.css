@@ -19,8 +19,7 @@
 }
 
 /* Dark mode subdued surface */
-.dark [data-surface="subdued"],
-.dark-theme [data-surface="subdued"] {
+[data-theme="dark"] [data-surface="subdued"] {
   --hv-color-surface-page:    #111827;
   --hv-color-surface-raised:  #1C2938;
   --hv-color-surface-sunken:  #0F172A;
