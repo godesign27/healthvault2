@@ -1,34 +1,28 @@
 import { ReactNode } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-const cardVariants = cva(
-  'border transition-all',
-  {
-    variants: {
-      state: {
-        default:        'bg-surface-raised border-stroke-subtle',
-        hover:          'bg-surface-raised border-stroke-strong',
-        selected:       'bg-action-primary-subtle border-action-primary',
-        'hover-selected': 'bg-action-primary-subtle border-action-primary',
-        disabled:       'bg-surface-sunken border-stroke-subtle opacity-60',
-      },
-      shadow: {
-        none:               '',
-        'flat-right':       'shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]',
-        'flat-angle-right': 'shadow-[6px_6px_0_0_rgba(0,0,0,0.06)]',
-        blur:               'shadow-[0_4px_12px_0_rgba(0,0,0,0.08)]',
-      },
-    },
-    defaultVariants: {
-      state:  'default',
-      shadow: 'flat-right',
-    },
-  }
-);
+export type CardState  = 'default' | 'hover' | 'selected' | 'hover-selected' | 'disabled';
+export type CardShadow = 'none' | 'flat-right' | 'flat-angle-right' | 'blur';
 
-interface CardProps extends VariantProps<typeof cardVariants> {
+const stateClasses: Record<CardState, string> = {
+  default:          'bg-surface-raised border-stroke-subtle',
+  hover:            'bg-surface-raised border-stroke-strong',
+  selected:         'bg-action-primary-subtle border-action-primary',
+  'hover-selected': 'bg-action-primary-subtle border-action-primary',
+  disabled:         'bg-surface-sunken border-stroke-subtle opacity-60',
+};
+
+const shadowClasses: Record<CardShadow, string> = {
+  none:               '',
+  'flat-right':       'shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]',
+  'flat-angle-right': 'shadow-[6px_6px_0_0_rgba(0,0,0,0.06)]',
+  blur:               'shadow-[0_4px_12px_0_rgba(0,0,0,0.08)]',
+};
+
+interface CardProps {
   children?: ReactNode;
+  state?: CardState;
+  shadow?: CardShadow;
   className?: string;
   onClick?: () => void;
   focusRing?: boolean;
@@ -43,14 +37,17 @@ export function Card({
   focusRing = false,
 }: CardProps) {
   const isDisabled = state === 'disabled';
-  const cursorClass = isDisabled ? 'cursor-not-allowed' : onClick ? 'cursor-pointer' : '';
-  const focusClass = focusRing
-    ? 'focus:outline-none focus:ring-2 focus:ring-stroke-focus focus:ring-offset-2'
-    : '';
 
   return (
     <div
-      className={cn(cardVariants({ state, shadow }), cursorClass, focusClass, className)}
+      className={cn(
+        'border transition-all',
+        stateClasses[state],
+        shadowClasses[shadow],
+        isDisabled ? 'cursor-not-allowed' : onClick ? 'cursor-pointer' : '',
+        focusRing ? 'focus:outline-none focus:ring-2 focus:ring-stroke-focus focus:ring-offset-2' : '',
+        className,
+      )}
       onClick={!isDisabled ? onClick : undefined}
       tabIndex={focusRing ? 0 : undefined}
     >
@@ -60,7 +57,7 @@ export function Card({
 }
 
 interface SkeletonCardProps {
-  shadow?: 'none' | 'flat-right' | 'flat-angle-right' | 'blur';
+  shadow?: CardShadow;
   className?: string;
 }
 
@@ -79,8 +76,8 @@ export function SkeletonCard({ shadow = 'flat-right', className = '' }: Skeleton
 }
 
 interface ContentCardProps {
-  shadow?: 'none' | 'flat-right' | 'flat-angle-right' | 'blur';
-  state?: 'default' | 'hover' | 'selected' | 'hover-selected' | 'disabled';
+  shadow?: CardShadow;
+  state?: CardState;
   title?: string;
   description?: string;
   footer?: ReactNode;

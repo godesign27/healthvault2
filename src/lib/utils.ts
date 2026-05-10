@@ -1,6 +1,5 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+type ClassInput = string | false | null | undefined | 0;
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+export function cn(...inputs: ClassInput[]): string {
+  return inputs.filter(Boolean).join(' ');
 }
