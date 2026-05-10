@@ -1,4 +1,3 @@
-import * as RadixTabs from '@radix-ui/react-tabs';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../../lib/utils';
@@ -48,8 +47,9 @@ export function Tabs({
   const tabPadding = size === 'small' ? 'px-4 py-2 text-sm' : 'px-6 py-3 text-base';
   const iconSize   = size === 'small' ? 'w-3 h-3' : 'w-4 h-4';
 
-  const triggerClass = (tab: Tab) =>
-    cn(
+  const triggerClass = (tab: Tab) => {
+    const isActive = current === tab.id;
+    return cn(
       tabPadding,
       'font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap border-b-2 -mb-px',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset',
@@ -58,34 +58,32 @@ export function Tabs({
         : style === 'solid'
           ? cn(
               'border-transparent',
-              'data-[state=active]:bg-surface-raised data-[state=active]:text-action-primary data-[state=active]:border-action-primary',
-              'data-[state=inactive]:bg-surface-sunken data-[state=inactive]:text-content-secondary data-[state=inactive]:hover:bg-action-secondary',
+              isActive
+                ? 'bg-surface-raised text-action-primary border-action-primary'
+                : 'bg-surface-sunken text-content-secondary hover:bg-action-secondary',
             )
           : cn(
               'bg-transparent',
-              'data-[state=active]:text-action-primary data-[state=active]:border-action-primary',
-              'data-[state=inactive]:text-content-secondary data-[state=inactive]:border-transparent data-[state=inactive]:hover:text-content-primary',
+              isActive
+                ? 'text-action-primary border-action-primary'
+                : 'text-content-secondary border-transparent hover:text-content-primary',
             )
     );
+  };
 
   if (orientation === 'vertical') {
     return (
-      <RadixTabs.Root
-        value={current}
-        onValueChange={handleChange}
-        orientation="vertical"
-        className={cn('flex gap-0', className)}
-      >
-        <RadixTabs.List className="flex flex-col border-r border-stroke-subtle">
+      <div className={cn('flex gap-0', className)}>
+        <div className="flex flex-col border-r border-stroke-subtle">
           {tabs.map((tab) => (
-            <RadixTabs.Trigger
+            <button
               key={tab.id}
-              value={tab.id}
+              onClick={() => !tab.disabled && handleChange(tab.id)}
               disabled={tab.disabled}
               className={cn(
                 triggerClass(tab),
                 'border-b-0 border-r-2 -mr-px justify-start',
-                'data-[state=active]:border-r-action-primary data-[state=inactive]:border-r-transparent',
+                current === tab.id ? 'border-r-action-primary' : 'border-r-transparent',
               )}
             >
               <span>{tab.label}</span>
@@ -97,29 +95,27 @@ export function Tabs({
                   <X className={iconSize} />
                 </button>
               )}
-            </RadixTabs.Trigger>
+            </button>
           ))}
-        </RadixTabs.List>
+        </div>
         {tabs.map((tab) => (
-          <RadixTabs.Content key={tab.id} value={tab.id} className="flex-1 p-6">
-            {tab.content}
-          </RadixTabs.Content>
+          current === tab.id && (
+            <div key={tab.id} className="flex-1 p-6">
+              {tab.content}
+            </div>
+          )
         ))}
-      </RadixTabs.Root>
+      </div>
     );
   }
 
   return (
-    <RadixTabs.Root
-      value={current}
-      onValueChange={handleChange}
-      className={className}
-    >
-      <RadixTabs.List className="flex border-b border-stroke-subtle overflow-x-auto">
+    <div className={className}>
+      <div className="flex border-b border-stroke-subtle overflow-x-auto">
         {tabs.map((tab) => (
-          <RadixTabs.Trigger
+          <button
             key={tab.id}
-            value={tab.id}
+            onClick={() => !tab.disabled && handleChange(tab.id)}
             disabled={tab.disabled}
             className={triggerClass(tab)}
           >
@@ -132,15 +128,17 @@ export function Tabs({
                 <X className={iconSize} />
               </button>
             )}
-          </RadixTabs.Trigger>
+          </button>
         ))}
-      </RadixTabs.List>
+      </div>
       {tabs.map((tab) => (
-        <RadixTabs.Content key={tab.id} value={tab.id} className="p-6">
-          {tab.content}
-        </RadixTabs.Content>
+        current === tab.id && (
+          <div key={tab.id} className="p-6">
+            {tab.content}
+          </div>
+        )
       ))}
-    </RadixTabs.Root>
+    </div>
   );
 }
 
