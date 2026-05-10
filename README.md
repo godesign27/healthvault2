@@ -20,6 +20,10 @@ health-vault/
 │   │   └── src/
 │   │       ├── client.ts         # HealthVaultClient class
 │   │       └── index.ts
+│   ├── auth/                     # @health-vault/auth
+│   │   └── src/
+│   │       ├── biometric.ts      # Biometric gate + PIN with lockout
+│   │       └── index.ts
 │   └── config/                   # @health-vault/config
 │       └── src/
 │           ├── env.ts            # Zod env validation schemas
@@ -86,6 +90,7 @@ These packages live in `packages/` and are consumed by the web app, mobile app, 
 |---------|---------|
 | `@health-vault/types` | Canonical TypeScript interfaces: `HealthRecord`, `PendingRequest`, `EHRConnection`, `VaultStats`, `UserProfile`, `ApiResponse<T>`, etc. |
 | `@health-vault/api-client` | `HealthVaultClient` — platform-agnostic fetch-based client for Supabase REST and Edge Functions. Works in React Native (no Node APIs). |
+| `@health-vault/auth` | Biometric gate (`authenticateWithVault`) + PIN management (`setPin`, `verifyPin`, `hasPin`) with 3-attempt lockout. Mobile only (`expo-local-authentication`, `expo-secure-store`). |
 | `@health-vault/config` | Zod schemas for validating environment variables (`envSchema` for edge functions, `clientEnvSchema` for the web/mobile frontend) |
 
 ### Using the API client
@@ -96,7 +101,13 @@ import { HealthVaultClient } from '@health-vault/api-client';
 const client = new HealthVaultClient({
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
   supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-  getAccessToken: () => supabase.auth.session()?.access_token ?? null,
+  getAccessToken: async () => {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token ?? null;
+  },
+  onTokenExpired: async () => {
+    await supabase.auth.refreshSession();
+  },
 });
 
 const { items } = await client.listRecords({ kind: 'lab', page: 1 });
@@ -275,6 +286,16 @@ Root governance: `AGENT_INSTRUCTIONS.md`
 ## API testing
 
 Import `api-collection.json` into Postman. Set the `baseUrl` collection variable to your Supabase project URL and run the **Login** request first — it automatically saves the access token for all subsequent requests.
+
+---
+
+## Changelog
+
+### 2026-05-10 — Mobile backend prep fixes
+
+- **`packages/api-client`** — `getAccessToken` is now `async () => Promise<string | null>` (Supabase JS v2 compatible). Added optional `onTokenExpired` callback. Added automatic 401 retry once (calls `onTokenExpired` if provided, then retries) in both `restGet` and `fn`. All inline token reads are now awaited.
+- **`packages/auth`** — New package `@health-vault/auth`. Exports `getBiometricSupport`, `promptBiometric`, `authenticateWithVault`, `setPin`, `hasPin`, `verifyPin`. PIN is SHA-256 hashed and stored in `expo-secure-store`. Failed PIN attempts lock the vault for 60 seconds after 3 failures.
+- **`packages/types`** — `RecordKind` is now the single source of truth. `RecordType` is retained as a `@deprecated` alias (`type RecordType = RecordKind`) to avoid breaking web/desktop imports.
 
 ---
 

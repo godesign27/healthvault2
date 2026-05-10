@@ -11,7 +11,8 @@ import type {
 export interface ClientConfig {
   supabaseUrl: string;
   supabaseAnonKey: string;
-  getAccessToken: () => string | null;
+  getAccessToken: () => Promise<string | null>;
+  onTokenExpired?: () => Promise<void>;
 }
 
 export class HealthVaultClient {
@@ -23,26 +24,32 @@ export class HealthVaultClient {
     this.fnBase = `${config.supabaseUrl}/functions/v1`;
   }
 
-  private authHeaders(): Record<string, string> {
-    const token = this.config.getAccessToken();
+  private async authHeaders(): Promise<Record<string, string>> {
+    const token = await this.config.getAccessToken();
     return {
       apikey: this.config.supabaseAnonKey,
       ...(token ? { Authorization: `Bearer ${token}` } : { Authorization: `Bearer ${this.config.supabaseAnonKey}` }),
     };
   }
 
-  private async restGet<T>(table: string, params: Record<string, string> = {}): Promise<T[]> {
+  private async restGet<T>(table: string, params: Record<string, string> = {}, isRetry = false): Promise<T[]> {
     const qs = new URLSearchParams({
       ...params,
       order: params.order ?? "created_at.desc",
     }).toString();
     const res = await fetch(`${this.restBase}/${table}?${qs}`, {
       headers: {
-        ...this.authHeaders(),
+        ...(await this.authHeaders()),
         "Content-Type": "application/json",
         Prefer: "return=representation",
       },
     });
+
+    if (res.status === 401 && !isRetry) {
+      await this.config.onTokenExpired?.();
+      return this.restGet<T>(table, params, true);
+    }
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message ?? `GET ${table} failed (${res.status})`);
@@ -50,15 +57,21 @@ export class HealthVaultClient {
     return res.json();
   }
 
-  private async fn<T>(name: string, body?: unknown, method = "POST"): Promise<T> {
+  private async fn<T>(name: string, body?: unknown, method = "POST", isRetry = false): Promise<T> {
     const res = await fetch(`${this.fnBase}/${name}`, {
       method,
       headers: {
-        ...this.authHeaders(),
+        ...(await this.authHeaders()),
         "Content-Type": "application/json",
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
+
+    if (res.status === 401 && !isRetry) {
+      await this.config.onTokenExpired?.();
+      return this.fn<T>(name, body, method, true);
+    }
+
     const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error ?? `${name} failed (${res.status})`);
     return json as T;
@@ -178,14 +191,10 @@ export class HealthVaultClient {
     tags?: string[];
     notes?: string;
   }): Promise<HealthRecord> {
-    const token = this.config.getAccessToken();
+    const headers = await this.authHeaders();
     const res = await fetch(`${this.fnBase}/records`, {
       method: "POST",
-      headers: {
-        ...this.authHeaders(),
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
     const json = await res.json().catch(() => ({}));
@@ -200,14 +209,10 @@ export class HealthVaultClient {
     serviceDate: string;
     tags: string[];
   }>): Promise<HealthRecord> {
-    const token = this.config.getAccessToken();
+    const headers = await this.authHeaders();
     const res = await fetch(`${this.fnBase}/records/${id}`, {
       method: "PUT",
-      headers: {
-        ...this.authHeaders(),
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
     const json = await res.json().catch(() => ({}));
@@ -216,13 +221,10 @@ export class HealthVaultClient {
   }
 
   async deleteRecord(id: string): Promise<{ deleted: boolean }> {
-    const token = this.config.getAccessToken();
+    const headers = await this.authHeaders();
     const res = await fetch(`${this.fnBase}/records/${id}`, {
       method: "DELETE",
-      headers: {
-        ...this.authHeaders(),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers,
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error ?? `deleteRecord failed (${res.status})`);
@@ -279,13 +281,10 @@ export class HealthVaultClient {
   }
 
   async disconnectProvider(id: string): Promise<{ disconnected: boolean }> {
-    const token = this.config.getAccessToken();
+    const headers = await this.authHeaders();
     const res = await fetch(`${this.fnBase}/providers/${id}`, {
       method: "DELETE",
-      headers: {
-        ...this.authHeaders(),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers,
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error ?? `disconnectProvider failed (${res.status})`);
@@ -310,7 +309,7 @@ export class HealthVaultClient {
     kind: RecordKind;
     title?: string;
   }): Promise<UploadedFile> {
-    const token = this.config.getAccessToken();
+    const token = await this.config.getAccessToken();
     const formData = new FormData();
     formData.append("file", params.file, params.fileName);
     formData.append("kind", params.kind);

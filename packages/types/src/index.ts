@@ -1,20 +1,14 @@
 // Canonical data model for all Health Vault clients (web, desktop, mobile)
 
-// RecordType is the spec-canonical alias; RecordKind is the internal name.
-// Both are identical — use whichever is more natural in your context.
-export type RecordType =
-  | "lab"
-  | "imaging"
-  | "pathology"
-  | "specialist_report"
-  | "other";
-
 export type RecordKind =
   | "lab"
   | "imaging"
   | "pathology"
   | "specialist_report"
   | "other";
+
+/** @deprecated Use RecordKind instead. Will be removed in a future version. */
+export type RecordType = RecordKind;
 
 export type RecordSource = "connected" | "shared" | "uploaded";
 

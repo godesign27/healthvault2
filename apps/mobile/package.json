@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@health-vault/types": "*",
-    "@health-vault/api-client": "*"
+    "@health-vault/api-client": "*",
+    "@health-vault/auth": "*"
   },
   "notes": "Scaffold this app using Expo. Use @health-vault/api-client to connect to the Supabase backend."
 }
