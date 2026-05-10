@@ -1,36 +1,37 @@
-import { ReactNode } from 'react';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { Theme } from '@radix-ui/themes';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-interface ThemeProviderProps {
-  children: ReactNode;
+type Theme = 'light' | 'dark' | 'system';
+
+interface ThemeContextValue {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
 }
 
-/**
- * Wraps the app in:
- *  1. next-themes ThemeProvider — applies .light/.dark class to <html> for
- *     class-based switching (compatible with Radix Themes convention).
- *  2. Radix <Theme> — wires Radix component variables. We deliberately do NOT
- *     pass appearance={resolvedTheme} to avoid flash-of-wrong-theme on load;
- *     class switching on <html> handles it instead.
- */
-export function ThemeProvider({ children }: ThemeProviderProps) {
+const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('system');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const resolved =
+      theme === 'system'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : theme;
+    root.setAttribute('data-theme', resolved);
+  }, [theme]);
+
   return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="light"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <Theme
-        accentColor="blue"
-        grayColor="slate"
-        panelBackground="solid"
-        radius="medium"
-        scaling="100%"
-      >
-        {children}
-      </Theme>
-    </NextThemesProvider>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
   );
+}
+
+export function useTheme(): ThemeContextValue {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
+  return ctx;
 }
