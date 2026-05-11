@@ -89,11 +89,11 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
   if (isCompleting) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${
-        darkMode ? 'bg-stone-950' : 'bg-stone-50'
+        darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
       }`}>
         <div className="text-center">
           <div className={`text-lg ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Completing setup...
           </div>
@@ -104,10 +104,10 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
 
   return (
     <div className={`min-h-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
+      darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
     }`}>
       <header className={`sticky top-0 z-50 border-b ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14">
@@ -120,7 +120,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                 />
               </div>
               <span className={`text-sm font-bold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>Health Vault</span>
             </div>
           </div>
@@ -132,19 +132,19 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <div className={`rounded-lg border p-8 ${
-              darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+              darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
             }`}>
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-4">
                   <CheckCircle className="w-12 h-12 text-emerald-600" />
                 </div>
                 <h1 className={`text-3xl font-bold mb-2 ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>
                   Your Health Vault is Ready
                 </h1>
                 <p className={`text-lg ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   You're all set to start managing your health information
                 </p>
@@ -159,12 +159,12 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Identity Verified
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Your identity has been verified and your account is secure.
                     </p>
@@ -177,26 +177,26 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                       ? 'bg-emerald-500/10 border border-emerald-500/20'
                       : 'bg-emerald-50 border border-emerald-200'
                     : darkMode
-                      ? 'bg-stone-800'
-                      : 'bg-stone-50'
+                      ? 'bg-surface-sunken'
+                      : 'bg-surface-sunken'
                 }`}>
                   <div className="flex-shrink-0">
                     {hasInsurance ? (
                       <CheckCircle className="w-6 h-6 text-emerald-600" />
                     ) : (
                       <Shield className={`w-6 h-6 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
+                        darkMode ? 'text-content-secondary' : 'text-content-secondary'
                       }`} />
                     )}
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Insurance
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {hasInsurance
                         ? 'Your insurance information has been added.'
@@ -211,26 +211,26 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                       ? 'bg-emerald-500/10 border border-emerald-500/20'
                       : 'bg-emerald-50 border border-emerald-200'
                     : darkMode
-                      ? 'bg-stone-800'
-                      : 'bg-stone-50'
+                      ? 'bg-surface-sunken'
+                      : 'bg-surface-sunken'
                 }`}>
                   <div className="flex-shrink-0">
                     {hasPreferences ? (
                       <CheckCircle className="w-6 h-6 text-emerald-600" />
                     ) : (
                       <Settings className={`w-6 h-6 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
+                        darkMode ? 'text-content-secondary' : 'text-content-secondary'
                       }`} />
                     )}
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Preferences
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {hasPreferences
                         ? 'Your health preferences have been saved.'
@@ -241,15 +241,15 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
               </div>
 
               <div className={`p-4 rounded-lg mb-6 ${
-                darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
               }`}>
                 <h3 className={`font-semibold mb-2 ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>
                   What's Next?
                 </h3>
                 <ul className={`space-y-2 text-sm ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   <li className="flex items-start gap-2">
                     <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />

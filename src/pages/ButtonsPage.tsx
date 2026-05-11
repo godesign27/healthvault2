@@ -3,22 +3,22 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 
 export function ButtonsPage() {
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Buttons</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Buttons</h1>
+          <p className="text-content-secondary">
             Master components for buttons with various sizes, variants, and states
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid Button - Normal (55px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - Normal (55px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="normal">+ Button</Button>
                   <Button variant="solid" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -28,7 +28,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="normal">+ Button</Button>
                   <Button variant="solid" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -38,7 +38,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="normal">+ Button</Button>
                   <Button variant="solid" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -48,7 +48,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="normal" disabled>+ Button</Button>
                   <Button variant="solid" size="normal" disabled leftIcon={<Plus />}>Button</Button>
@@ -59,12 +59,12 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid Button - Small (44px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - Small (44px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="small">+ Button</Button>
                   <Button variant="solid" size="small" leftIcon={<Plus />}>Button</Button>
@@ -74,7 +74,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="small">+ Button</Button>
                   <Button variant="solid" size="small" leftIcon={<Plus />}>Button</Button>
@@ -84,7 +84,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="small">+ Button</Button>
                   <Button variant="solid" size="small" leftIcon={<Plus />}>Button</Button>
@@ -94,7 +94,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="small" disabled>+ Button</Button>
                   <Button variant="solid" size="small" disabled leftIcon={<Plus />}>Button</Button>
@@ -105,12 +105,12 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid Button - X-Small (38px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="x-small">+ Button</Button>
                   <Button variant="solid" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -120,7 +120,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="x-small">+ Button</Button>
                   <Button variant="solid" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -130,7 +130,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="x-small">+ Button</Button>
                   <Button variant="solid" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -140,7 +140,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="solid" size="x-small" disabled>+ Button</Button>
                   <Button variant="solid" size="x-small" disabled leftIcon={<Plus />}>Button</Button>
@@ -151,12 +151,12 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline Button - Normal (55px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - Normal (55px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="normal">+ Button</Button>
                   <Button variant="outline" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -166,7 +166,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="normal">+ Button</Button>
                   <Button variant="outline" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -176,7 +176,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="normal">+ Button</Button>
                   <Button variant="outline" size="normal" leftIcon={<Plus />}>Button</Button>
@@ -186,7 +186,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="normal" disabled>+ Button</Button>
                   <Button variant="outline" size="normal" disabled leftIcon={<Plus />}>Button</Button>
@@ -197,12 +197,12 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline Button - Small (44px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - Small (44px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="small">+ Button</Button>
                   <Button variant="outline" size="small" leftIcon={<Plus />}>Button</Button>
@@ -212,7 +212,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="small">+ Button</Button>
                   <Button variant="outline" size="small" leftIcon={<Plus />}>Button</Button>
@@ -222,7 +222,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="small">+ Button</Button>
                   <Button variant="outline" size="small" leftIcon={<Plus />}>Button</Button>
@@ -232,7 +232,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="small" disabled>+ Button</Button>
                   <Button variant="outline" size="small" disabled leftIcon={<Plus />}>Button</Button>
@@ -243,12 +243,12 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline Button - X-Small (38px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="x-small">+ Button</Button>
                   <Button variant="outline" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -258,7 +258,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="x-small">+ Button</Button>
                   <Button variant="outline" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -268,7 +268,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="x-small">+ Button</Button>
                   <Button variant="outline" size="x-small" leftIcon={<Plus />}>Button</Button>
@@ -278,7 +278,7 @@ export function ButtonsPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="outline" size="x-small" disabled>+ Button</Button>
                   <Button variant="outline" size="x-small" disabled leftIcon={<Plus />}>Button</Button>
@@ -289,148 +289,148 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Link Button - Normal (55px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - Normal (55px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="normal">+ Button</Button>
                   <Button variant="link" size="normal" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="normal" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-sm text-gray-600">+</span>
+                  <span className="text-sm text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="normal">+ Button</Button>
                   <Button variant="link" size="normal" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="normal" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-sm text-gray-600">+</span>
+                  <span className="text-sm text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="normal">+ Button</Button>
                   <Button variant="link" size="normal" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="normal" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-sm text-gray-600">+</span>
+                  <span className="text-sm text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="normal" disabled>+ Button</Button>
                   <Button variant="link" size="normal" disabled leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="normal" disabled shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-sm text-gray-400">+</span>
+                  <span className="text-sm text-content-tertiary">+</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Link Button - Small (44px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - Small (44px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="small">+ Button</Button>
                   <Button variant="link" size="small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-xs text-gray-600">+</span>
+                  <span className="text-xs text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="small">+ Button</Button>
                   <Button variant="link" size="small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-xs text-gray-600">+</span>
+                  <span className="text-xs text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="small">+ Button</Button>
                   <Button variant="link" size="small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-xs text-gray-600">+</span>
+                  <span className="text-xs text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="small" disabled>+ Button</Button>
                   <Button variant="link" size="small" disabled leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="small" disabled shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-xs text-gray-400">+</span>
+                  <span className="text-xs text-content-tertiary">+</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Link Button - X-Small (38px)</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="x-small">+ Button</Button>
                   <Button variant="link" size="x-small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="x-small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-[10px] text-gray-600">+</span>
+                  <span className="text-[10px] text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="x-small">+ Button</Button>
                   <Button variant="link" size="x-small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="x-small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-[10px] text-gray-600">+</span>
+                  <span className="text-[10px] text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="x-small">+ Button</Button>
                   <Button variant="link" size="x-small" leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="x-small" shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-[10px] text-gray-600">+</span>
+                  <span className="text-[10px] text-content-secondary">+</span>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button variant="link" size="x-small" disabled>+ Button</Button>
                   <Button variant="link" size="x-small" disabled leftIcon={<Plus />}>Button</Button>
                   <Button variant="link" size="x-small" disabled shape="square" leftIcon={<Edit />}></Button>
-                  <span className="text-[10px] text-gray-400">+</span>
+                  <span className="text-[10px] text-content-tertiary">+</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

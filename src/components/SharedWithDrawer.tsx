@@ -56,7 +56,7 @@ export function SharedWithDrawer({
       case 'expired':
         return darkMode ? 'text-amber-400' : 'text-amber-600';
       default:
-        return darkMode ? 'text-stone-400' : 'text-stone-600';
+        return 'text-content-secondary';
     }
   };
 
@@ -80,17 +80,17 @@ export function SharedWithDrawer({
       position="right"
       size="large"
       title="Shared With"
-      className={`${darkMode ? 'bg-stone-900' : 'bg-white'} !max-w-2xl !w-full`}
+      className={`${'bg-surface-raised'} !max-w-2xl !w-full`}
     >
       <div className="space-y-4">
         {sharedForms.length === 0 ? (
-          <div className={`text-center py-12 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+          <div className={`text-center py-12 ${'text-content-secondary'}`}>
             <Mail className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">No forms have been shared yet</p>
           </div>
         ) : (
           <>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm ${'text-content-secondary'}`}>
               {sharedForms.length} {sharedForms.length === 1 ? 'form' : 'forms'} shared
             </p>
 
@@ -113,20 +113,20 @@ export function SharedWithDrawer({
                   key={event.id}
                   className={`rounded-lg border p-4 ${
                     darkMode
-                      ? 'border-stone-700 bg-stone-800'
-                      : 'border-stone-200 bg-white'
+                      ? 'border-stroke-default bg-surface-sunken'
+                      : 'border-stroke-subtle bg-white'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-start gap-3 flex-1">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-indigo-50'}`}>
-                        <FileText className={`w-4 h-4 ${darkMode ? 'text-stone-400' : 'text-indigo-600'}`} />
+                      <div className={`p-2 rounded-lg ${'bg-surface-sunken'}`}>
+                        <FileText className={`w-4 h-4 ${'text-content-secondary'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className={`font-medium text-sm mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                        <h3 className={`font-medium text-sm mb-1 ${'text-content-primary'}`}>
                           {event.formTitle}
                         </h3>
-                        <div className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-600'} space-y-0.5`}>
+                        <div className={`text-xs ${'text-content-secondary'} space-y-0.5`}>
                           <div>Shared with: <span className="font-medium">{event.recipientName}</span></div>
                           {event.recipientEmail && (
                             <div className="truncate">{event.recipientEmail}</div>
@@ -150,7 +150,7 @@ export function SharedWithDrawer({
                         size="small"
                         onClick={() => handleRevoke(event.id)}
                         disabled={revokingId === event.id}
-                        className={darkMode ? 'border-stone-700 text-stone-300' : ''}
+                        className={darkMode ? 'border-stroke-default text-content-primary' : ''}
                       >
                         {revokingId === event.id ? 'Revoking...' : 'Revoke'}
                       </Button>

@@ -163,14 +163,14 @@ export function TablesPage() {
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Tables</h1>
-        <p className="text-gray-600">Flexible table components with sorting, selection, and actions</p>
+        <h1 className="text-3xl font-bold text-content-primary mb-2">Tables</h1>
+        <p className="text-content-secondary">Flexible table components with sorting, selection, and actions</p>
       </div>
 
       <div className="space-y-12">
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Default Table</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Default Table</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={userColumns}
               data={userData}
@@ -180,8 +180,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Selectable Table with Actions</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Selectable Table with Actions</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={userColumns}
               data={userData}
@@ -216,15 +216,15 @@ export function TablesPage() {
             />
           </div>
           {selectedUsers.length > 0 && (
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-content-secondary">
               Selected {selectedUsers.length} user{selectedUsers.length !== 1 ? 's' : ''}
             </p>
           )}
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Striped Table</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Striped Table</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={productColumns}
               data={productData}
@@ -248,8 +248,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Compact Table</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Compact Table</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={compactColumns}
               data={compactData}
@@ -260,8 +260,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Sticky Header with Max Height</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Sticky Header with Max Height</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={userColumns}
               data={[...userData, ...userData, ...userData]}
@@ -273,8 +273,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Loading State</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Loading State</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={userColumns}
               data={[]}
@@ -284,8 +284,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Empty State</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Empty State</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
             <Table
               columns={userColumns}
               data={[]}
@@ -295,8 +295,8 @@ export function TablesPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Table Badges</h2>
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-2xl font-semibold text-content-primary mb-4">Table Badges</h2>
+          <div className="bg-surface-raised rounded-lg border border-stroke-subtle p-6">
             <div className="flex flex-wrap gap-4">
               <TableBadge variant="default">Default (Gray 70)</TableBadge>
               <TableBadge variant="completed">Completed (Gray 90)</TableBadge>

@@ -12,35 +12,35 @@ export function DrawersPage() {
 
   const sampleContent = (
     <div className="space-y-4">
-      <div className="flex items-center justify-center py-12 text-gray-400 bg-[#FEF6E8] rounded">
+      <div className="flex items-center justify-center py-12 text-content-tertiary bg-[#FEF6E8] rounded">
         <div className="text-center">
           <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Replace Me</p>
         </div>
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-content-secondary">
         This is sample drawer content. You can add any content here including forms, lists, or other components.
       </p>
     </div>
   );
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Drawers</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Drawers</h1>
+          <p className="text-content-secondary">
             Slide-in panels for displaying contextual information or forms
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Trigger Button</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Trigger Button</h3>
                 <div className="flex gap-4">
                   <DrawerTrigger onClick={() => {}}>
                     <Menu className="w-6 h-6" />
@@ -52,24 +52,24 @@ export function DrawersPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Sample Content Area</h3>
-                <div className="flex items-center justify-center py-8 bg-[#FEF6E8] rounded border-2 border-dashed border-gray-300">
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Sample Content Area</h3>
+                <div className="flex items-center justify-center py-8 bg-[#FEF6E8] rounded border-2 border-dashed border-stroke-default">
                   <div className="text-center">
-                    <Image className="w-10 h-10 mx-auto mb-2 opacity-50 text-gray-400" />
-                    <p className="text-xs text-gray-400">Replace Me</p>
+                    <Image className="w-10 h-10 mx-auto mb-2 opacity-50 text-content-tertiary" />
+                    <p className="text-xs text-content-tertiary">Replace Me</p>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Drawer Positions</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Drawer Positions</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Drawer Left (Left Shadow)</h3>
-                <p className="text-sm text-gray-600 mb-4">Drawers from Left or Right</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Drawer Left (Left Shadow)</h3>
+                <p className="text-sm text-content-secondary mb-4">Drawers from Left or Right</p>
                 <button
                   onClick={() => setLeftDrawerOpen(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -87,8 +87,8 @@ export function DrawersPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Drawer Right (Right Shadow)</h3>
-                <p className="text-sm text-gray-600 mb-4">Drawers from Left or Right</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Drawer Right (Right Shadow)</h3>
+                <p className="text-sm text-content-secondary mb-4">Drawers from Left or Right</p>
                 <button
                   onClick={() => setRightDrawerOpen(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -106,8 +106,8 @@ export function DrawersPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Drawer Top (Top Shadow)</h3>
-                <p className="text-sm text-gray-600 mb-4">Drawers from Top or Bottom</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Drawer Top (Top Shadow)</h3>
+                <p className="text-sm text-content-secondary mb-4">Drawers from Top or Bottom</p>
                 <button
                   onClick={() => setTopDrawerOpen(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -125,8 +125,8 @@ export function DrawersPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Drawer Bottom (Bottom Shadow)</h3>
-                <p className="text-sm text-gray-600 mb-4">Drawers from Top or Bottom</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Drawer Bottom (Bottom Shadow)</h3>
+                <p className="text-sm text-content-secondary mb-4">Drawers from Top or Bottom</p>
                 <button
                   onClick={() => setBottomDrawerOpen(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -145,13 +145,13 @@ export function DrawersPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Drawers with Footer</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Drawers with Footer</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Left Drawer with Footer</h3>
-                <p className="text-sm text-gray-600 mb-4">Action buttons at the bottom</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Left Drawer with Footer</h3>
+                <p className="text-sm text-content-secondary mb-4">Action buttons at the bottom</p>
                 <button
                   onClick={() => setLeftDrawerWithFooter(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -166,28 +166,28 @@ export function DrawersPage() {
                   showFooter={true}
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center justify-center py-12 text-gray-400 bg-[#FEF6E8] rounded">
+                    <div className="flex items-center justify-center py-12 text-content-tertiary bg-[#FEF6E8] rounded">
                       <div className="text-center">
                         <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Replace Me</p>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-content-secondary mb-2">
                         Input Field
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded focus:border-[indigo-600] focus:outline-none"
+                        className="w-full px-3 py-2 border-2 border-stroke-default rounded focus:border-[indigo-600] focus:outline-none"
                         placeholder="Enter text..."
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-content-secondary mb-2">
                         Textarea
                       </label>
                       <textarea
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded focus:border-[indigo-600] focus:outline-none"
+                        className="w-full px-3 py-2 border-2 border-stroke-default rounded focus:border-[indigo-600] focus:outline-none"
                         rows={4}
                         placeholder="Enter description..."
                       />
@@ -197,8 +197,8 @@ export function DrawersPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Right Drawer with Footer</h3>
-                <p className="text-sm text-gray-600 mb-4">Action buttons at the bottom</p>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Right Drawer with Footer</h3>
+                <p className="text-sm text-content-secondary mb-4">Action buttons at the bottom</p>
                 <button
                   onClick={() => setRightDrawerWithFooter(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-[indigo-600] rounded hover:bg-[indigo-700] transition-colors"
@@ -213,28 +213,28 @@ export function DrawersPage() {
                   showFooter={true}
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center justify-center py-12 text-gray-400 bg-[#FEF6E8] rounded">
+                    <div className="flex items-center justify-center py-12 text-content-tertiary bg-[#FEF6E8] rounded">
                       <div className="text-center">
                         <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Replace Me</p>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-content-secondary mb-2">
                         Input Field
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded focus:border-[indigo-600] focus:outline-none"
+                        className="w-full px-3 py-2 border-2 border-stroke-default rounded focus:border-[indigo-600] focus:outline-none"
                         placeholder="Enter text..."
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-content-secondary mb-2">
                         Textarea
                       </label>
                       <textarea
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded focus:border-[indigo-600] focus:outline-none"
+                        className="w-full px-3 py-2 border-2 border-stroke-default rounded focus:border-[indigo-600] focus:outline-none"
                         rows={4}
                         placeholder="Enter description..."
                       />
@@ -245,10 +245,10 @@ export function DrawersPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Structure</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Structure</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Header</h3>
                 <p className="text-sm mb-2">Contains the drawer title and close button</p>
@@ -283,10 +283,10 @@ export function DrawersPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

@@ -2,22 +2,22 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 
 export function SegmentedControlPage() {
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Segmented Control</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Segmented Control</h1>
+          <p className="text-content-secondary">
             Master components for segmented control with various states and configurations
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Left - Solid - Normal</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Left - Solid - Normal</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   position="left"
@@ -27,7 +27,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   position="left"
@@ -37,7 +37,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   position="left"
@@ -48,7 +48,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   position="left"
@@ -60,12 +60,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Middle - Solid - Normal</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Middle - Solid - Normal</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="middle"
@@ -75,7 +75,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="middle"
@@ -85,7 +85,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="middle"
@@ -96,7 +96,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="middle"
@@ -108,12 +108,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Right - Solid - Normal</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Right - Solid - Normal</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="right"
@@ -123,7 +123,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="right"
@@ -133,7 +133,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="right"
@@ -144,7 +144,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   position="right"
@@ -156,12 +156,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline - Normal</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - Normal</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -170,7 +170,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -179,7 +179,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -189,7 +189,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Disabled</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -200,12 +200,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid - Small</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid - Small</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -214,7 +214,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -223,7 +223,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -234,12 +234,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline - Small</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - Small</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -248,7 +248,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -257,7 +257,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -268,12 +268,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid - X-Small</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid - X-Small</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -282,7 +282,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -291,7 +291,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label', 'Label']}
                   variant="solid"
@@ -302,12 +302,12 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline - X-Small</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - X-Small</h2>
 
             <div className="space-y-6">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Default</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -316,7 +316,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Hover</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -325,7 +325,7 @@ export function SegmentedControlPage() {
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-3">Pressed</div>
+                <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
                   options={['Label', 'Label', 'Label']}
                   variant="outline"
@@ -336,10 +336,10 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

@@ -191,54 +191,38 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
 
   const EmptyState = ({ icon: Icon, title, description }: { icon: any; title: string; description: string }) => (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-        darkMode ? 'bg-stone-800' : 'bg-stone-100'
-      }`}>
-        <Icon className={`w-6 h-6 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`} />
+      <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-surface-sunken">
+        <Icon className="w-6 h-6 text-content-tertiary" />
       </div>
-      <p className={`font-medium mb-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>{title}</p>
-      <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>{description}</p>
+      <p className="font-medium mb-1 text-content-primary">{title}</p>
+      <p className="text-sm text-content-secondary">{description}</p>
     </div>
   );
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
       <div className="mb-8">
-        <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-          darkMode ? 'text-white' : 'text-stone-900'
-        }`}>
+        <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
           <Heart className="w-7 h-7" />
           Care Management
         </h1>
-        <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Track your medications, appointments, and medical history</p>
+        <p className="text-content-secondary">Track your medications, appointments, and medical history</p>
       </div>
 
       <section className="mb-8">
-        <h2 className={`text-xl font-semibold mb-4 ${
-          darkMode ? 'text-white' : 'text-stone-900'
-        }`}>Overview</h2>
+        <h2 className="text-xl font-semibold mb-4 text-content-primary">Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {statsCards.map((card) => {
             const Icon = card.icon;
             return (
-              <div key={card.title} className={`rounded-xl border p-6 transition-all ${
-                darkMode ? 'border-stone-800' : 'bg-white border-stone-200'
-              }`}>
+              <div key={card.title} className="rounded-xl border border-stroke-subtle bg-surface-raised p-6 transition-all">
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className={`text-sm font-medium ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
-                  }`}>{card.title}</h3>
-                  <div className={`p-2.5 rounded-lg ${
-                    darkMode ? 'bg-stone-700' : card.bgColor
-                  }`}>
-                    <Icon className={`w-5 h-5 ${
-                      darkMode ? 'text-indigo-400' : card.iconColor
-                    }`} />
+                  <h3 className="text-sm font-medium text-content-secondary">{card.title}</h3>
+                  <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : card.bgColor}`}>
+                    <Icon className={`w-5 h-5 ${darkMode ? 'text-indigo-400' : card.iconColor}`} />
                   </div>
                 </div>
-                <p className={`text-3xl font-bold ${
-                  darkMode ? 'text-white' : 'text-stone-900'
-                }`}>{isLoading ? '—' : card.count}</p>
+                <p className="text-3xl font-bold text-content-primary">{isLoading ? '—' : card.count}</p>
               </div>
             );
           })}
@@ -246,20 +230,14 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
       </section>
 
       <section className="mb-8">
-        <div className={`rounded-xl border p-6 ${
-          darkMode ? 'border-stone-800' : 'bg-white border-stone-200'
-        }`}>
+        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Calendar className={`w-5 h-5 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`} />
-            <h2 className={`text-lg font-semibold ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Upcoming Appointments</h2>
+            <Calendar className="w-5 h-5 text-content-secondary" />
+            <h2 className="text-lg font-semibold text-content-primary">Upcoming Appointments</h2>
           </div>
 
           {isLoading ? (
-            <div className={`h-24 rounded-lg animate-pulse ${darkMode ? 'bg-stone-800' : 'bg-stone-100'}`} />
+            <div className="h-24 rounded-lg animate-pulse bg-surface-sunken" />
           ) : appointments.length === 0 ? (
             <EmptyState
               icon={Calendar}
@@ -269,21 +247,13 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
           ) : (
             <div className="space-y-4">
               {appointments.map((apt) => (
-                <div key={apt.id} className={`pb-4 border-b last:border-0 last:pb-0 ${
-                  darkMode ? 'border-stone-700' : 'border-stone-200'
-                }`}>
+                <div key={apt.id} className="pb-4 border-b border-stroke-subtle last:border-0 last:pb-0">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className={`font-medium ${
-                        darkMode ? 'text-white' : 'text-stone-900'
-                      }`}>{apt.provider_name}</p>
-                      <p className={`text-sm ${
-                        darkMode ? 'text-stone-400' : 'text-stone-600'
-                      }`}>{apt.appointment_type}{apt.location ? ` · ${apt.location}` : ''}</p>
+                      <p className="font-medium text-content-primary">{apt.provider_name}</p>
+                      <p className="text-sm text-content-secondary">{apt.appointment_type}{apt.location ? ` · ${apt.location}` : ''}</p>
                     </div>
-                    <span className={`text-sm font-medium ${
-                      darkMode ? 'text-white' : 'text-stone-900'
-                    }`}>
+                    <span className="text-sm font-medium text-content-primary">
                       {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
@@ -295,20 +265,14 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
       </section>
 
       <section className="mb-8">
-        <div className={`rounded-xl border p-6 ${
-          darkMode ? 'border-stone-800' : 'bg-white border-stone-200'
-        }`}>
+        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Pill className={`w-5 h-5 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`} />
-            <h2 className={`text-lg font-semibold ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Medications</h2>
+            <Pill className="w-5 h-5 text-content-secondary" />
+            <h2 className="text-lg font-semibold text-content-primary">Medications</h2>
           </div>
 
           {isLoading ? (
-            <div className={`h-24 rounded-lg animate-pulse ${darkMode ? 'bg-stone-800' : 'bg-stone-100'}`} />
+            <div className="h-24 rounded-lg animate-pulse bg-surface-sunken" />
           ) : medications.length === 0 ? (
             <EmptyState
               icon={Pill}
@@ -317,40 +281,30 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
             />
           ) : (
             <>
-              <p className={`text-sm mb-6 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+              <p className="text-sm mb-6 text-content-secondary">
                 {medications.length} medication{medications.length !== 1 ? 's' : ''} on file
               </p>
               <div className="space-y-4">
                 {medications.map((rx) => (
-                  <div key={rx.id} className={`rounded-lg border p-4 ${
-                    darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-stone-50'
-                  }`}>
+                  <div key={rx.id} className="rounded-lg border border-stroke-subtle bg-surface-sunken p-4">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className={`font-semibold ${
-                        darkMode ? 'text-white' : 'text-stone-900'
-                      }`}>{rx.name}</h3>
+                      <h3 className="font-semibold text-content-primary">{rx.name}</h3>
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         rx.status === 'discontinued'
-                          ? 'bg-stone-100 text-stone-600'
+                          ? 'bg-surface-overlay text-content-secondary'
                           : 'bg-emerald-100 text-emerald-700'
                       }`}>
                         {rx.status === 'discontinued' ? 'Discontinued' : 'Active'}
                       </span>
                     </div>
                     {rx.condition && (
-                      <span className={`text-sm block mb-2 ${
-                        darkMode ? 'text-stone-400' : 'text-stone-600'
-                      }`}>{rx.condition}</span>
+                      <span className="text-sm block mb-2 text-content-secondary">{rx.condition}</span>
                     )}
                     {rx.dosage && (
-                      <p className={`text-sm mb-2 ${
-                        darkMode ? 'text-stone-300' : 'text-stone-700'
-                      }`}>{rx.dosage}{rx.frequency ? ` · ${rx.frequency}` : ''}</p>
+                      <p className="text-sm mb-2 text-content-primary">{rx.dosage}{rx.frequency ? ` · ${rx.frequency}` : ''}</p>
                     )}
                     {rx.prescribing_doctor && (
-                      <div className={`flex items-center gap-1 text-sm ${
-                        darkMode ? 'text-stone-400' : 'text-stone-600'
-                      }`}>
+                      <div className="flex items-center gap-1 text-sm text-content-secondary">
                         <Heart className="w-4 h-4" />
                         {rx.prescribing_doctor}
                       </div>
@@ -363,28 +317,18 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
         </div>
       </section>
 
-      <section className={`rounded-xl border p-6 ${
-        darkMode ? 'border-stone-800' : 'bg-white border-stone-200'
-      }`}>
+      <section className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className={`text-xl font-semibold mb-1 ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Care History</h2>
-            <p className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Complete timeline of your healthcare journey</p>
+            <h2 className="text-xl font-semibold mb-1 text-content-primary">Care History</h2>
+            <p className="text-sm text-content-secondary">Complete timeline of your healthcare journey</p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-                className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                  darkMode
-                    ? 'bg-stone-800 text-white hover:bg-stone-700 border border-stone-700'
-                    : 'bg-white text-stone-700 hover:bg-stone-50 border border-stone-200'
-                }`}
+                className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 bg-surface-sunken text-content-primary border border-stroke-subtle hover:bg-surface-overlay"
               >
                 <Calendar className="w-4 h-4" />
                 <span>
@@ -399,9 +343,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
               </button>
 
               {isTimeDropdownOpen && (
-                <div className={`absolute top-full left-0 mt-2 w-48 rounded-lg shadow-lg border z-10 ${
-                  darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
-                }`}>
+                <div className="absolute top-full left-0 mt-2 w-48 rounded-lg shadow-lg border border-stroke-subtle bg-surface-raised z-10">
                   {[
                     { id: 'all', label: 'All time' },
                     { id: '6months', label: 'Last 6 months' },
@@ -416,12 +358,8 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${
                         selectedTimeFilter === filter.id
-                          ? darkMode
-                            ? 'bg-stone-700 text-white font-medium'
-                            : 'bg-stone-900 text-white font-medium'
-                          : darkMode
-                            ? 'text-stone-300 hover:bg-stone-700'
-                            : 'text-stone-700 hover:bg-stone-50'
+                          ? 'bg-action-primary text-content-on-action font-medium'
+                          : 'text-content-secondary hover:bg-surface-sunken'
                       }`}
                     >
                       {filter.label}
@@ -435,18 +373,14 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
               {!isSearchExpanded ? (
                 <button
                   onClick={() => setIsSearchExpanded(true)}
-                  className={`p-2.5 rounded-lg transition-colors ${
-                    darkMode
-                      ? 'bg-stone-800 hover:bg-stone-700 border border-stone-700'
-                      : 'bg-white hover:bg-stone-50 border border-stone-200'
-                  }`}
+                  className="p-2.5 rounded-lg transition-colors bg-surface-sunken hover:bg-surface-overlay border border-stroke-subtle"
                   aria-label="Open search"
                 >
-                  <Search className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+                  <Search className="w-5 h-5 text-content-secondary" />
                 </button>
               ) : (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-tertiary" />
                   <input
                     type="text"
                     placeholder="Search care timeline..."
@@ -454,11 +388,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onBlur={() => { setIsSearchExpanded(false); setSearchQuery(''); }}
-                    className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all ${
-                      darkMode
-                        ? 'bg-stone-800 border-stone-700 text-white placeholder:text-stone-500'
-                        : 'bg-white border-stone-200'
-                    }`}
+                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all bg-surface-raised border-stroke-subtle text-content-primary placeholder:text-content-placeholder"
                     style={{ minWidth: '300px' }}
                   />
                 </div>
@@ -485,12 +415,8 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                 onClick={() => setSelectedSourceFilter(filter.id)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   selectedSourceFilter === filter.id
-                    ? darkMode
-                      ? 'bg-stone-700 text-white'
-                      : 'bg-stone-900 text-white'
-                    : darkMode
-                      ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
-                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    ? 'bg-action-primary text-content-on-action'
+                    : 'bg-surface-sunken text-content-secondary hover:bg-surface-overlay'
                 }`}
               >
                 {filter.label}
@@ -502,7 +428,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className={`h-24 rounded-lg animate-pulse ${darkMode ? 'bg-stone-800' : 'bg-stone-100'}`} />
+              <div key={i} className="h-24 rounded-lg animate-pulse bg-surface-sunken" />
             ))}
           </div>
         ) : searchFilteredHistory.length === 0 ? (
@@ -513,38 +439,26 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
           />
         ) : (
           <>
-            <p className={`text-sm mb-6 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Showing {searchFilteredHistory.length} of {careHistory.length} records</p>
+            <p className="text-sm mb-6 text-content-secondary">Showing {searchFilteredHistory.length} of {careHistory.length} records</p>
 
             <div className="space-y-4">
               {searchFilteredHistory.map((record, index) => (
-                <div key={index} className={`border rounded-lg p-5 hover:shadow-md transition-shadow ${
-                  darkMode ? 'border-stone-700' : 'bg-white border-stone-200'
-                }`}>
+                <div key={index} className="border border-stroke-subtle rounded-lg p-5 bg-surface-raised hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className={`px-3 py-1 text-xs font-medium rounded-full ${getTypeStyles(record.type)}`}>
                           {record.type}
                         </span>
-                        <span className={`text-sm font-medium ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>{record.date}</span>
+                        <span className="text-sm font-medium text-content-primary">{record.date}</span>
                       </div>
-                      <h3 className={`font-semibold mb-2 ${
-                        darkMode ? 'text-white' : 'text-stone-900'
-                      }`}>{record.title}</h3>
+                      <h3 className="font-semibold mb-2 text-content-primary">{record.title}</h3>
                       {record.description && (
-                        <p className={`text-sm mb-2 ${
-                          darkMode ? 'text-stone-400' : 'text-stone-600'
-                        }`}>{record.description}</p>
+                        <p className="text-sm mb-2 text-content-secondary">{record.description}</p>
                       )}
                     </div>
                     {record.location && (
-                      <span className={`text-sm ml-4 ${
-                        darkMode ? 'text-stone-400' : 'text-stone-600'
-                      }`}>{record.location}</span>
+                      <span className="text-sm ml-4 text-content-secondary">{record.location}</span>
                     )}
                   </div>
                 </div>

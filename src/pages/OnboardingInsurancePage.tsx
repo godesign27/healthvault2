@@ -135,12 +135,12 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
     errors[fieldName]
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
   } focus:outline-none focus:ring-2`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -159,16 +159,16 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
       }
     >
       <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Insurance Information
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             This step is optional. You can skip and add insurance later.
           </p>
@@ -261,12 +261,12 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
                 Card Front (Optional)
               </label>
               <div className={`border-2 border-dashed rounded-lg p-4 text-center ${
-                darkMode ? 'border-stone-700' : 'border-stone-300'
+                darkMode ? 'border-stroke-default' : 'border-stroke-default'
               }`}>
                 {cardFrontFile ? (
                   <div className="flex items-center justify-between">
                     <span className={`text-sm ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       {cardFrontFile.name}
                     </span>
@@ -281,10 +281,10 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
                 ) : (
                   <label className="cursor-pointer">
                     <Upload className={`w-8 h-8 mx-auto mb-2 ${
-                      darkMode ? 'text-stone-500' : 'text-stone-400'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`} />
                     <span className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Upload image
                     </span>
@@ -304,12 +304,12 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
                 Card Back (Optional)
               </label>
               <div className={`border-2 border-dashed rounded-lg p-4 text-center ${
-                darkMode ? 'border-stone-700' : 'border-stone-300'
+                darkMode ? 'border-stroke-default' : 'border-stroke-default'
               }`}>
                 {cardBackFile ? (
                   <div className="flex items-center justify-between">
                     <span className={`text-sm ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       {cardBackFile.name}
                     </span>
@@ -324,10 +324,10 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
                 ) : (
                   <label className="cursor-pointer">
                     <Upload className={`w-8 h-8 mx-auto mb-2 ${
-                      darkMode ? 'text-stone-500' : 'text-stone-400'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`} />
                     <span className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Upload image
                     </span>
@@ -349,8 +349,8 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
               onClick={onBack}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
               }`}
             >
               <ArrowLeft className="w-4 h-4" />
@@ -361,8 +361,8 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
               onClick={onSkip}
               className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'text-stone-400 hover:text-stone-300'
-                  : 'text-stone-600 hover:text-stone-700'
+                  ? 'text-content-secondary hover:text-content-primary'
+                  : 'text-content-secondary hover:text-content-primary'
               }`}
             >
               Skip for now

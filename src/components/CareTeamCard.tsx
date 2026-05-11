@@ -22,7 +22,7 @@ interface CareTeamCardProps {
 export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareRecords }: CareTeamCardProps) {
   return (
     <div className={`rounded-xl border p-6 transition-all ${
-      darkMode ? 'border-stone-800' : 'border-stone-200'
+      darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
     }`}>
       <div className="flex items-start gap-4 mb-4">
         {member.photo_url ? (
@@ -33,10 +33,10 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
           />
         ) : (
           <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-            darkMode ? 'bg-stone-700' : 'bg-stone-100'
+            darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
           }`}>
             <User className={`w-8 h-8 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
           </div>
         )}
@@ -45,13 +45,13 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h3 className={`font-semibold truncate ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 {member.title ? `${member.title} ${member.name}` : member.name}
               </h3>
               {member.specialty && (
                 <p className={`text-sm ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   {member.specialty}
                 </p>
@@ -66,7 +66,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
 
           {member.organization && (
             <p className={`text-sm mt-1 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               {member.organization}
             </p>
@@ -76,17 +76,17 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
 
       {(member.email || member.phone) && (
         <div className={`space-y-2 mb-4 pt-4 border-t ${
-          darkMode ? 'border-stone-700' : 'border-stone-200'
+          darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           {member.email && (
             <div className="flex items-center gap-2">
               <Mail className={`w-4 h-4 flex-shrink-0 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`} />
               <a
                 href={`mailto:${member.email}`}
                 className={`text-sm hover:underline ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
+                  darkMode ? 'text-content-primary' : 'text-content-primary'
                 }`}
               >
                 {member.email}
@@ -96,12 +96,12 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
           {member.phone && (
             <div className="flex items-center gap-2">
               <Phone className={`w-4 h-4 flex-shrink-0 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`} />
               <a
                 href={`tel:${member.phone}`}
                 className={`text-sm hover:underline ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
+                  darkMode ? 'text-content-primary' : 'text-content-primary'
                 }`}
               >
                 {member.phone}
@@ -116,8 +116,8 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
           onClick={() => onViewProfile?.(member)}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             darkMode
-              ? 'bg-stone-700 text-white hover:bg-stone-600'
-              : 'bg-stone-100 text-stone-900 hover:bg-stone-200'
+              ? 'bg-surface-sunken text-white hover:bg-surface-overlay'
+              : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
           }`}
         >
           <ExternalLink className="w-4 h-4" />

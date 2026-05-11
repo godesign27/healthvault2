@@ -135,16 +135,16 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
       }
     >
       <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             How can Health Vault help you?
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Choose what you'd like us to focus on. You can change this anytime.
           </p>
@@ -166,8 +166,8 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
                       ? 'border-emerald-500 bg-emerald-500/10'
                       : 'border-emerald-600 bg-emerald-50'
                     : darkMode
-                      ? 'border-stone-700 bg-stone-800 hover:border-stone-600'
-                      : 'border-stone-200 bg-white hover:border-stone-300'
+                      ? 'border-stroke-default bg-surface-sunken hover:border-stroke-default'
+                      : 'border-stroke-subtle bg-white hover:border-stroke-default'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -177,21 +177,21 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
                         ? 'bg-emerald-500/20'
                         : 'bg-emerald-100'
                       : darkMode
-                        ? 'bg-stone-700'
-                        : 'bg-stone-100'
+                        ? 'bg-surface-sunken'
+                        : 'bg-surface-sunken'
                   }`}>
                     <Icon className={`w-5 h-5 ${
                       isActive
                         ? 'text-emerald-600'
                         : darkMode
-                          ? 'text-stone-400'
-                          : 'text-stone-600'
+                          ? 'text-content-secondary'
+                          : 'text-content-secondary'
                     }`} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className={`font-semibold ${
-                        darkMode ? 'text-white' : 'text-stone-900'
+                        darkMode ? 'text-white' : 'text-content-primary'
                       }`}>
                         {item.title}
                       </h3>
@@ -199,8 +199,8 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
                         isActive
                           ? 'bg-emerald-600 border-emerald-600'
                           : darkMode
-                            ? 'border-stone-600'
-                            : 'border-stone-300'
+                            ? 'border-stroke-default'
+                            : 'border-stroke-default'
                       }`}>
                         {isActive && (
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -210,7 +210,7 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
                       </div>
                     </div>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {item.description}
                     </p>
@@ -226,8 +226,8 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
               onClick={onBack}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
               }`}
             >
               <ArrowLeft className="w-4 h-4" />
@@ -238,8 +238,8 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
               onClick={onSkip}
               className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'text-stone-400 hover:text-stone-300'
-                  : 'text-stone-600 hover:text-stone-700'
+                  ? 'text-content-secondary hover:text-content-primary'
+                  : 'text-content-secondary hover:text-content-primary'
               }`}
             >
               Skip for now

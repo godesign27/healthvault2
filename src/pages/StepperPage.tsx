@@ -64,29 +64,29 @@ export function StepperPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Stepper</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Stepper</h1>
+          <p className="text-content-secondary">
             Guide users through multi-step processes with clear progress indicators
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Interactive Examples</h2>
+        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8 mb-8">
+          <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive Examples</h2>
 
           <div className="space-y-12">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Horizontal Stepper</h3>
-              <div className="bg-gray-50 rounded-lg p-8">
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Horizontal Stepper</h3>
+              <div className="bg-surface-sunken rounded-lg p-8">
                 <Stepper steps={horizontalSteps} orientation="horizontal" />
 
                 <div className="flex gap-4 mt-8">
                   <button
                     onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                     disabled={currentStep === 0}
-                    className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-6 py-2 bg-surface-overlay text-content-secondary rounded-lg hover:bg-surface-overlay disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
@@ -102,48 +102,48 @@ export function StepperPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Vertical Stepper - All States</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Vertical Stepper - All States</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Default</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Default</h4>
                   <Stepper steps={verticalStepsDefault} orientation="vertical" />
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Disabled</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Disabled</h4>
                   <Stepper steps={verticalStepsDisabled} orientation="vertical" />
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Success</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Success</h4>
                   <Stepper steps={verticalStepsSuccess} orientation="vertical" />
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Variants</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Status Variants</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Info</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Info</h4>
                   <Stepper steps={verticalStepsInfo} orientation="vertical" />
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Warning</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Warning</h4>
                   <Stepper steps={verticalStepsWarning} orientation="vertical" />
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Danger</h4>
+                <div className="bg-surface-sunken rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-content-secondary mb-4">Danger</h4>
                   <Stepper steps={verticalStepsDanger} orientation="vertical" />
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Compact Variant</h3>
-              <div className="bg-gray-50 rounded-lg p-8">
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Compact Variant</h3>
+              <div className="bg-surface-sunken rounded-lg p-8">
                 <Stepper
                   steps={[
                     { id: '1', title: 'Account', status: 'success' as StepStatus },
@@ -158,44 +158,44 @@ export function StepperPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Section Labels</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Section Labels</h3>
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32">Pending Approval</span>
+                  <span className="text-sm font-medium text-content-secondary w-32">Pending Approval</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-blue-500 bg-white" />
+                    <div className="w-3 h-3 rounded-full border-2 border-blue-500 bg-surface-raised" />
                     <span className="text-sm text-blue-600 font-medium uppercase">PENDING APPROVAL</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32">Approved</span>
+                  <span className="text-sm font-medium text-content-secondary w-32">Approved</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-green-500 bg-white" />
+                    <div className="w-3 h-3 rounded-full border-2 border-green-500 bg-surface-raised" />
                     <span className="text-sm text-green-600 font-medium uppercase">APPROVED</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32">Rejected</span>
+                  <span className="text-sm font-medium text-content-secondary w-32">Rejected</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-red-500 bg-white" />
+                    <div className="w-3 h-3 rounded-full border-2 border-red-500 bg-surface-raised" />
                     <span className="text-sm text-red-600 font-medium uppercase">REJECTED</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32">Revision Requested</span>
+                  <span className="text-sm font-medium text-content-secondary w-32">Revision Requested</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-yellow-500 bg-white" />
+                    <div className="w-3 h-3 rounded-full border-2 border-yellow-500 bg-surface-raised" />
                     <span className="text-sm text-yellow-600 font-medium uppercase">REVISION REQUESTED</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32">Failed</span>
+                  <span className="text-sm font-medium text-content-secondary w-32">Failed</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-red-600 bg-white" />
+                    <div className="w-3 h-3 rounded-full border-2 border-red-600 bg-surface-raised" />
                     <span className="text-sm text-red-600 font-medium uppercase">FAILED</span>
                   </div>
                 </div>
@@ -204,19 +204,19 @@ export function StepperPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Usage Guidelines</h2>
+        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8">
+          <h2 className="text-2xl font-bold text-content-primary mb-4">Usage Guidelines</h2>
           <div className="prose max-w-none">
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">When to Use</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">When to Use</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>For multi-step processes like checkout, registration, or onboarding</li>
               <li>When users need to complete tasks in a specific order</li>
               <li>To show progress through a linear workflow</li>
               <li>When each step has dependencies on previous steps</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Best Practices</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">Best Practices</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>Keep step titles concise and descriptive</li>
               <li>Use 3-7 steps for optimal user experience</li>
               <li>Show clear visual distinction between completed, active, and pending steps</li>
@@ -225,8 +225,8 @@ export function StepperPage() {
               <li>Use appropriate status colors to convey meaning (success, warning, error)</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Accessibility</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">Accessibility</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>Provide clear labels for each step</li>
               <li>Use semantic HTML and ARIA labels</li>
               <li>Ensure color is not the only indicator of status</li>

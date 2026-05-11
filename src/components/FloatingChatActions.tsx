@@ -32,11 +32,11 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
         */}
         <div className={`
           relative flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2
-          bg-stone-900/95 backdrop-blur-sm
+          bg-surface-raised/95 backdrop-blur-sm
           rounded-full
-          shadow-2xl shadow-stone-900/50
+          shadow-2xl shadow-black/40
           transition-all duration-300 ease-out
-          ${isHoveringGroup ? 'bg-stone-950 shadow-2xl shadow-stone-900/70 scale-[1.02]' : ''}
+          ${isHoveringGroup ? 'bg-surface-page shadow-2xl shadow-black/50 scale-[1.02]' : ''}
         `}>
 
           {/* Talk Button - Primary Action with Eye-Catching Gradient */}
@@ -120,13 +120,13 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
               group
               relative flex items-center justify-center
               w-11 h-11 sm:w-14 sm:h-14
-              bg-white text-stone-700
+              bg-white text-content-primary
               rounded-full
               border-2 border-white/20
               shadow-lg shadow-black/20
               overflow-hidden
               transition-all duration-300 ease-out
-              hover:bg-stone-50
+              hover:bg-surface-sunken
               hover:border-orange-300
               hover:shadow-xl hover:shadow-orange-400/30
               hover:scale-105

@@ -132,16 +132,16 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-      <div className={`fixed right-0 top-0 h-full w-full max-w-2xl z-50 ${darkMode ? 'bg-stone-900' : 'bg-white'} shadow-xl overflow-y-auto`}>
-        <div className={`sticky top-0 z-10 flex items-center justify-between p-6 border-b ${darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}`}>
-          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+      <div className={`fixed right-0 top-0 h-full w-full max-w-2xl z-50 ${'bg-surface-raised'} shadow-xl overflow-y-auto`}>
+        <div className={`sticky top-0 z-10 flex items-center justify-between p-6 border-b ${'bg-surface-raised border-stroke-subtle'}`}>
+          <h2 className={`text-2xl font-bold ${'text-content-primary'}`}>
             {specialistMode ? 'Find Specialist' : 'Add Provider'}
           </h2>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'}`}
+            className={`p-2 rounded-lg transition-colors ${'hover:bg-surface-sunken'}`}
           >
-            <X className={`w-6 h-6 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <X className={`w-6 h-6 ${'text-content-secondary'}`} />
           </button>
         </div>
 
@@ -164,7 +164,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
         <div className="p-6">
           {step === 'mode' && (
             <div className="space-y-4">
-              <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+              <p className={'text-content-secondary'}>
                 How would you like to add this provider?
               </p>
 
@@ -177,14 +177,14 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                     }}
                     className={`w-full p-6 rounded-xl border-2 text-left transition-all ${
                       darkMode
-                        ? 'border-stone-700 hover:border-blue-600 hover:bg-stone-800'
-                        : 'border-stone-200 hover:border-blue-600 hover:bg-blue-50'
+                        ? 'border-stroke-default hover:border-blue-600 hover:bg-surface-sunken'
+                        : 'border-stroke-subtle hover:border-blue-600 hover:bg-blue-50'
                     }`}
                   >
-                    <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <h3 className={`font-semibold mb-2 ${'text-content-primary'}`}>
                       Search In-Network Providers
                     </h3>
-                    <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className={`text-sm ${'text-content-secondary'}`}>
                       Find providers covered by {insurance.name}
                     </p>
                   </button>
@@ -196,14 +196,14 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                     }}
                     className={`w-full p-6 rounded-xl border-2 text-left transition-all ${
                       darkMode
-                        ? 'border-stone-700 hover:border-blue-600 hover:bg-stone-800'
-                        : 'border-stone-200 hover:border-blue-600 hover:bg-blue-50'
+                        ? 'border-stroke-default hover:border-blue-600 hover:bg-surface-sunken'
+                        : 'border-stroke-subtle hover:border-blue-600 hover:bg-blue-50'
                     }`}
                   >
-                    <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <h3 className={`font-semibold mb-2 ${'text-content-primary'}`}>
                       Search All Providers
                     </h3>
-                    <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className={`text-sm ${'text-content-secondary'}`}>
                       Search the NPI registry
                     </p>
                   </button>
@@ -216,14 +216,14 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                   }}
                   className={`w-full p-6 rounded-xl border-2 text-left transition-all ${
                     darkMode
-                      ? 'border-stone-700 hover:border-blue-600 hover:bg-stone-800'
-                      : 'border-stone-200 hover:border-blue-600 hover:bg-blue-50'
+                      ? 'border-stroke-default hover:border-blue-600 hover:bg-surface-sunken'
+                      : 'border-stroke-subtle hover:border-blue-600 hover:bg-blue-50'
                   }`}
                 >
-                  <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`font-semibold mb-2 ${'text-content-primary'}`}>
                     Search Providers
                   </h3>
-                  <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <p className={`text-sm ${'text-content-secondary'}`}>
                     Search the NPI registry
                   </p>
                 </button>
@@ -233,14 +233,14 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                 onClick={() => setStep('manual')}
                 className={`w-full p-6 rounded-xl border-2 text-left transition-all ${
                   darkMode
-                    ? 'border-stone-700 hover:border-blue-600 hover:bg-stone-800'
-                    : 'border-stone-200 hover:border-blue-600 hover:bg-blue-50'
+                    ? 'border-stroke-default hover:border-blue-600 hover:bg-surface-sunken'
+                    : 'border-stroke-subtle hover:border-blue-600 hover:bg-blue-50'
                 }`}
               >
-                <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <h3 className={`font-semibold mb-2 ${'text-content-primary'}`}>
                   Enter Manually
                 </h3>
-                <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                <p className={`text-sm ${'text-content-secondary'}`}>
                   Add provider information yourself
                 </p>
               </button>
@@ -251,7 +251,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
             <div className="space-y-4">
               <div className="flex gap-2">
                 <div className="flex-1 relative">
-                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`} />
+                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${'text-content-secondary'}`} />
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -261,8 +261,8 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                     placeholder={specialistMode ? "Search by specialty (e.g., Cardiologist, Dermatologist)..." : "Search by name or specialty..."}
                     className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
                       darkMode
-                        ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                        : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                        ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                        : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                     }`}
                   />
                 </div>
@@ -277,7 +277,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
 
               {searchResults.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`font-semibold ${'text-content-primary'}`}>
                     Results
                   </h3>
                   {searchResults.map((result) => (
@@ -286,13 +286,13 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                       onClick={() => handleSelectResult(result)}
                       className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                         darkMode
-                          ? 'border-stone-700 hover:border-blue-600 hover:bg-stone-800'
-                          : 'border-stone-200 hover:border-blue-600 hover:bg-blue-50'
+                          ? 'border-stroke-default hover:border-blue-600 hover:bg-surface-sunken'
+                          : 'border-stroke-subtle hover:border-blue-600 hover:bg-blue-50'
                       }`}
                     >
                       <div className="font-semibold">{result.name}</div>
-                      {result.specialty && <div className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>{result.specialty}</div>}
-                      {result.clinic && <div className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>{result.clinic}</div>}
+                      {result.specialty && <div className={`text-sm ${'text-content-secondary'}`}>{result.specialty}</div>}
+                      {result.clinic && <div className={`text-sm ${'text-content-secondary'}`}>{result.clinic}</div>}
                     </button>
                   ))}
                 </div>
@@ -310,7 +310,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
           {step === 'manual' && (
             <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Provider Name *
                 </label>
                 <input
@@ -318,7 +318,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.name ? 'border-red-500' : darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'
+                    errors.name ? 'border-red-500' : darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'
                   }`}
                   placeholder="Dr. Jane Smith"
                 />
@@ -326,13 +326,13 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Relationship *
                 </label>
                 <select
                   value={formData.relationship || 'Primary'}
                   onChange={(e) => setFormData({ ...formData, relationship: e.target.value as ProviderRelationship })}
-                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                 >
                   <option value="Primary">Primary Care</option>
                   <option value="Specialist">Specialist</option>
@@ -344,66 +344,66 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Specialty
                 </label>
                 <input
                   type="text"
                   value={formData.specialty || ''}
                   onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                   placeholder="Cardiology"
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Clinic/Practice
                 </label>
                 <input
                   type="text"
                   value={formData.clinic || ''}
                   onChange={(e) => setFormData({ ...formData, clinic: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                   placeholder="Springfield Medical Center"
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Phone
                 </label>
                 <input
                   type="tel"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                   placeholder="(555) 123-4567"
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Address
                 </label>
                 <textarea
                   value={formData.address || ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   rows={3}
-                  className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                   placeholder="123 Main St, Springfield, IL 62701"
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                   Notes
                 </label>
                 <textarea
                   value={formData.notes || ''}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                   placeholder="Any additional information..."
                 />
               </div>
@@ -413,7 +413,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
                   type="button"
                   onClick={() => step === 'manual' && searchQuery ? setStep('search') : setStep('mode')}
                   className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors ${
-                    darkMode ? 'bg-stone-800 text-stone-300 hover:bg-stone-700' : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
+                    'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   Back

@@ -93,87 +93,87 @@ export default function SuperAdminPage() {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-stone-900' : 'bg-stone-50'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-surface-raised' : 'bg-surface-sunken'}`}>
       <div className="max-w-7xl mx-auto p-6 sm:p-8">
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <h1 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
             Super Admin Dashboard
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>
             Manage all organizations and system settings
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6 mb-8">
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stone-800 bg-stone-800' : 'border-stone-200 bg-white'}`}>
+          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-indigo-50">
                 <Building2 className="w-5 h-5 text-indigo-600" />
               </div>
-              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>Total Organizations</h3>
+              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Total Organizations</h3>
             </div>
-            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
               {stats.total_organizations}
             </p>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               {stats.active_organizations} active
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stone-800 bg-stone-800' : 'border-stone-200 bg-white'}`}>
+          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-emerald-50">
                 <Users className="w-5 h-5 text-emerald-600" />
               </div>
-              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>Total Patients</h3>
+              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Total Patients</h3>
             </div>
-            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
               {stats.total_patients}
             </p>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               Across all orgs
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stone-800 bg-stone-800' : 'border-stone-200 bg-white'}`}>
+          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-amber-50">
                 <Activity className="w-5 h-5 text-amber-600" />
               </div>
-              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>Admin Users</h3>
+              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Admin Users</h3>
             </div>
-            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
               {stats.total_admins}
             </p>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               Organization admins
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stone-800 bg-stone-800' : 'border-stone-200 bg-white'}`}>
+          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-rose-50">
                 <TrendingUp className="w-5 h-5 text-rose-600" />
               </div>
-              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>Growth</h3>
+              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Growth</h3>
             </div>
-            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
               +12%
             </p>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               This month
             </p>
           </div>
         </div>
 
-        <div className={`rounded-lg border ${darkMode ? 'border-stone-800 bg-stone-800' : 'border-stone-200 bg-white'}`}>
-          <div className="p-6 border-b border-stone-200">
+        <div className={`rounded-lg border ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+          <div className="p-6 border-b border-stroke-subtle">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   Organizations
                 </h2>
-                <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                   Manage all healthcare provider organizations
                 </p>
               </div>
@@ -186,44 +186,44 @@ export default function SuperAdminPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className={`border-b ${darkMode ? 'border-stone-700' : 'border-stone-200'}`}>
-                <tr className={darkMode ? 'bg-stone-900' : 'bg-stone-50'}>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+              <thead className={`border-b ${darkMode ? 'border-stroke-default' : 'border-stroke-subtle'}`}>
+                <tr className={darkMode ? 'bg-surface-raised' : 'bg-surface-sunken'}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Organization
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Subdomain
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Contact
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Status
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Plan
                   </th>
-                  <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${darkMode ? 'divide-stone-700' : 'divide-stone-200'}`}>
+              <tbody className={`divide-y ${darkMode ? 'divide-stroke-default' : 'divide-stroke-subtle'}`}>
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center">
-                      <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Loading...</div>
+                      <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>Loading...</div>
                     </td>
                   </tr>
                 ) : organizations.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center">
-                      <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>No organizations found</div>
+                      <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>No organizations found</div>
                     </td>
                   </tr>
                 ) : (
                   organizations.map((org) => (
-                    <tr key={org.id} className={`hover:${darkMode ? 'bg-stone-700' : 'bg-stone-50'} transition-colors`}>
+                    <tr key={org.id} className={`${darkMode ? 'hover:bg-surface-overlay' : 'hover:bg-surface-sunken'} transition-colors`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div
@@ -233,10 +233,10 @@ export default function SuperAdminPage() {
                             {org.name.substring(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <div className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                            <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                               {org.name}
                             </div>
-                            <div className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                            <div className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                               ID: {org.id.substring(0, 8)}
                             </div>
                           </div>
@@ -253,10 +253,10 @@ export default function SuperAdminPage() {
                         </a>
                       </td>
                       <td className="px-6 py-4">
-                        <div className={`text-sm ${darkMode ? 'text-stone-300' : 'text-stone-900'}`}>
+                        <div className={`text-sm ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                           {org.contact_email}
                         </div>
-                        <div className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                        <div className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                           {org.contact_phone}
                         </div>
                       </td>
@@ -265,20 +265,20 @@ export default function SuperAdminPage() {
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
                             org.status === 'active'
                               ? 'bg-emerald-50 text-emerald-700'
-                              : 'bg-stone-100 text-stone-700'
+                              : 'bg-surface-sunken text-content-primary'
                           }`}
                         >
                           {org.status}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-sm capitalize ${darkMode ? 'text-stone-300' : 'text-stone-900'}`}>
+                        <span className={`text-sm capitalize ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                           {org.subscription_tier}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className={`p-2 rounded-lg hover:${darkMode ? 'bg-stone-600' : 'bg-stone-100'} transition-colors`}>
-                          <Settings className={`w-4 h-4 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+                        <button className={`p-2 rounded-lg ${darkMode ? 'hover:bg-surface-overlay' : 'hover:bg-surface-sunken'} transition-colors`}>
+                          <Settings className={`w-4 h-4 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
                         </button>
                       </td>
                     </tr>

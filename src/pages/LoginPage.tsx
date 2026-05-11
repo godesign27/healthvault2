@@ -50,10 +50,10 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
-      darkMode ? 'bg-stone-900' : 'bg-stone-50'
+      darkMode ? 'bg-surface-raised' : 'bg-surface-sunken'
     }`}>
       <div className={`w-full max-w-md rounded-xl shadow-lg overflow-hidden ${
-        darkMode ? 'bg-stone-800' : 'bg-white'
+        darkMode ? 'bg-surface-sunken' : 'bg-white'
       }`}>
         <div className="p-8">
           <div className="flex justify-center mb-6">
@@ -67,12 +67,12 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
           </div>
 
           <h2 className={`text-2xl font-bold text-center mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             {isSignup ? 'Create Admin Account' : 'Admin Login'}
           </h2>
           <p className={`text-center mb-8 ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             {isSignup ? 'Sign up to create your admin account' : 'Sign in to access the Health Vault dashboard'}
           </p>
@@ -80,7 +80,7 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
-                darkMode ? 'text-stone-300' : 'text-stone-700'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>
                 Email
               </label>
@@ -92,8 +92,8 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
                 required
                 className={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
                   darkMode
-                    ? 'bg-stone-700 border-stone-600 text-white placeholder-stone-400 focus:border-indigo-500'
-                    : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400 focus:border-indigo-500'
+                    ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-indigo-500'
+                    : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
                 placeholder="admin@example.com"
               />
@@ -101,7 +101,7 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
 
             <div>
               <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
-                darkMode ? 'text-stone-300' : 'text-stone-700'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>
                 Password
               </label>
@@ -113,8 +113,8 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
                 required
                 className={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
                   darkMode
-                    ? 'bg-stone-700 border-stone-600 text-white placeholder-stone-400 focus:border-indigo-500'
-                    : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400 focus:border-indigo-500'
+                    ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-indigo-500'
+                    : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
                 placeholder="Enter your password"
               />
@@ -133,8 +133,8 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
                 disabled={loading}
                 className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   darkMode
-                    ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    ? 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
+                    : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                 } disabled:opacity-50`}
               >
                 Cancel
@@ -151,10 +151,10 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
           </form>
 
           <div className={`mt-6 pt-6 border-t text-center ${
-            darkMode ? 'border-stone-700' : 'border-stone-200'
+            darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
           }`}>
             <p className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               {isSignup ? 'Already have an account?' : "Don't have an account?"}
               {' '}

@@ -22,8 +22,8 @@ export function HealthStatsCard({
   return (
     <div className={`h-full rounded-xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg group ${
       darkMode
-        ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30 hover:border-stone-700'
-        : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50 hover:border-stone-300 hover:shadow-stone-200/50'
+        ? 'border-stroke-subtle bg-gradient-to-br from-surface-raised/50 to-surface-raised/30 hover:border-stroke-default'
+        : 'border-stroke-subtle bg-gradient-to-br from-surface-raised to-surface-sunken/50 hover:border-stroke-default hover:shadow-black/10'
     }`}>
       <div className="flex flex-col h-full">
         <div className="flex items-start justify-between mb-4">
@@ -33,13 +33,13 @@ export function HealthStatsCard({
         </div>
         <div className="mt-auto">
           <h3 className={`text-sm font-medium mb-2 ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>{title}</h3>
           <p className={`text-4xl font-bold mb-1 tracking-tight ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>{value}</p>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-500' : 'text-stone-500'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>{subtitle}</p>
         </div>
       </div>

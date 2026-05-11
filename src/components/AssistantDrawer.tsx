@@ -159,10 +159,10 @@ export function AssistantDrawer({
       />
 
       <div className={`fixed right-0 top-0 h-full w-full sm:w-[480px] z-50 shadow-2xl flex flex-col ${
-        darkMode ? 'bg-stone-900' : 'bg-white'
+        'bg-surface-raised'
       } transform transition-transform`}>
         <div className={`flex items-center justify-between p-6 border-b ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
+          'border-stroke-subtle'
         }`}>
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg">
@@ -170,21 +170,21 @@ export function AssistantDrawer({
             </div>
             <div>
               <h2 className={`text-lg font-bold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                'text-content-primary'
               }`}>{taskTitles[taskId]}</h2>
               <p className={`text-sm ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                'text-content-secondary'
               }`}>AI Health Assistant</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg hover:bg-stone-100 transition-colors ${
-              darkMode ? 'hover:bg-stone-800' : ''
+            className={`p-2 rounded-lg hover:bg-surface-sunken transition-colors ${
+              darkMode ? 'hover:bg-surface-sunken' : ''
             }`}
           >
             <X className={`w-5 h-5 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              'text-content-secondary'
             }`} />
           </button>
         </div>
@@ -202,10 +202,10 @@ export function AssistantDrawer({
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div className={`rounded-2xl rounded-tl-none px-4 py-3 ${
-                      darkMode ? 'bg-stone-800' : 'bg-stone-100'
+                      'bg-surface-sunken'
                     }`}>
                       <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                        darkMode ? 'text-stone-200' : 'text-stone-900'
+                        darkMode ? 'text-content-primary' : 'text-content-primary'
                       }`}>{msg.content}</p>
                     </div>
                   </div>
@@ -226,10 +226,10 @@ export function AssistantDrawer({
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
                   <div className={`rounded-2xl rounded-tl-none px-4 py-3 ${
-                    darkMode ? 'bg-stone-800' : 'bg-stone-100'
+                    'bg-surface-sunken'
                   }`}>
                     <Loader2 className={`w-4 h-4 animate-spin ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      'text-content-secondary'
                     }`} />
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export function AssistantDrawer({
         </div>
 
         <div className={`p-4 border-t ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
+          'border-stroke-subtle'
         }`}>
           <div className="flex gap-2">
             <input
@@ -252,8 +252,8 @@ export function AssistantDrawer({
               disabled={isLoading}
               className={`flex-1 px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent ${
                 darkMode
-                  ? 'bg-stone-800 border-stone-700 text-white placeholder:text-stone-500'
-                  : 'border-stone-200 placeholder:text-stone-400'
+                  ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-secondary'
+                  : 'border-stroke-subtle placeholder:text-content-secondary'
               } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             <button

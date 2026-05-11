@@ -24,30 +24,30 @@ export function ProviderCard({
     Dental: 'bg-teal-600',
     Vision: 'bg-amber-600',
     Therapy: 'bg-pink-600',
-    Other: 'bg-stone-600'
+    Other: 'bg-surface-overlay'
   };
 
-  const relationshipColor = provider.relationship ? relationshipColors[provider.relationship] : 'bg-stone-600';
+  const relationshipColor = provider.relationship ? relationshipColors[provider.relationship] : 'bg-surface-overlay';
 
   return (
     <div
       className={`rounded-xl border p-6 transition-all hover:shadow-lg cursor-pointer ${
-        darkMode ? 'border-stone-700 bg-stone-900 hover:border-stone-600' : 'border-stone-200 bg-white hover:border-stone-300'
+        darkMode ? 'border-stroke-default bg-surface-raised hover:border-stroke-default' : 'border-stroke-subtle bg-white hover:border-stroke-default'
       }`}
       onClick={() => onView?.(provider)}
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className={`text-lg font-semibold mb-1 truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <h3 className={`text-lg font-semibold mb-1 truncate ${darkMode ? 'text-white' : 'text-content-primary'}`}>
             {provider.name}
           </h3>
           {provider.specialty && (
-            <p className={`text-sm mb-2 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <p className={`text-sm mb-2 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               {provider.specialty}
             </p>
           )}
           {provider.clinic && (
-            <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>
+            <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               {provider.clinic}
             </p>
           )}
@@ -80,7 +80,7 @@ export function ProviderCard({
         </div>
       </div>
 
-      <div className={`space-y-2 mb-4 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+      <div className={`space-y-2 mb-4 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
         {provider.phone && (
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
@@ -108,7 +108,7 @@ export function ProviderCard({
       </div>
 
       <div
-        className={`flex items-center gap-2 pt-4 border-t ${darkMode ? 'border-stone-800' : 'border-stone-200'}`}
+        className={`flex items-center gap-2 pt-4 border-t ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {onEdit && (
@@ -116,8 +116,8 @@ export function ProviderCard({
             onClick={() => onEdit(provider)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               darkMode
-                ? 'text-stone-300 hover:bg-stone-800'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-content-primary hover:bg-surface-sunken'
+                : 'text-content-primary hover:bg-surface-sunken'
             }`}
           >
             <Edit2 className="w-4 h-4" />
@@ -129,8 +129,8 @@ export function ProviderCard({
             onClick={() => onShare(provider)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               darkMode
-                ? 'text-stone-300 hover:bg-stone-800'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-content-primary hover:bg-surface-sunken'
+                : 'text-content-primary hover:bg-surface-sunken'
             }`}
           >
             <Share2 className="w-4 h-4" />

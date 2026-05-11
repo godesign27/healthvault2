@@ -39,61 +39,61 @@ export function PrimaryNavigationPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Primary Navigation</h1>
-          <p className="text-gray-600">Sidebar navigation patterns for application layouts</p>
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Primary Navigation</h1>
+          <p className="text-content-secondary">Sidebar navigation patterns for application layouts</p>
         </div>
 
         <div className="space-y-12">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Navigation Variants</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Navigation Variants</h2>
 
             <div className="grid grid-cols-3 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Collapsed</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Collapsed</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden" style={{ height: '600px' }}>
                   <PrimaryNavigation variant="collapsed" items={navItems} />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Icon-only navigation for space-constrained layouts. Shows tooltips on hover.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Expanded</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Expanded</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden" style={{ height: '600px' }}>
                   <PrimaryNavigation variant="expanded" items={navItemsWithSubmenu} />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Full navigation with labels and expandable submenus for nested navigation.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Sidebar</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Sidebar</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden" style={{ height: '600px' }}>
                   <PrimaryNavigation variant="sidebar" items={navItems} />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Standard sidebar navigation without expandable submenus.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Interactive States</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive States</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Navigation Link States</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Navigation Link States</h3>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 px-4 py-3 rounded bg-gray-50">
-                      <Package className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-400">Default</span>
+                    <div className="flex items-center gap-3 px-4 py-3 rounded bg-surface-sunken">
+                      <Package className="w-5 h-5 text-content-tertiary" />
+                      <span className="text-sm text-content-tertiary">Default</span>
                     </div>
                     <div className="flex items-center gap-3 px-4 py-3 rounded bg-[#253847] text-white">
                       <Package className="w-5 h-5" />
@@ -103,14 +103,14 @@ export function PrimaryNavigationPage() {
                       <Package className="w-5 h-5" />
                       <span className="text-sm font-medium">Active</span>
                     </div>
-                    <div className="flex items-center gap-3 px-4 py-3 rounded bg-gray-50 opacity-50">
-                      <Package className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-400">Disabled</span>
+                    <div className="flex items-center gap-3 px-4 py-3 rounded bg-surface-sunken opacity-50">
+                      <Package className="w-5 h-5 text-content-tertiary" />
+                      <span className="text-sm text-content-tertiary">Disabled</span>
                     </div>
                   </div>
                   <div className="bg-[#1C2938] rounded-lg p-4">
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3 px-4 py-3 rounded text-gray-300">
+                      <div className="flex items-center gap-3 px-4 py-3 rounded text-content-tertiary">
                         <Package className="w-5 h-5" />
                         <span className="text-sm">Default</span>
                       </div>
@@ -122,7 +122,7 @@ export function PrimaryNavigationPage() {
                         <Package className="w-5 h-5" />
                         <span className="text-sm font-medium">Active</span>
                       </div>
-                      <div className="flex items-center gap-3 px-4 py-3 rounded text-gray-600">
+                      <div className="flex items-center gap-3 px-4 py-3 rounded text-content-secondary">
                         <Package className="w-5 h-5" />
                         <span className="text-sm">Disabled</span>
                       </div>
@@ -133,10 +133,10 @@ export function PrimaryNavigationPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -190,20 +190,20 @@ export function PrimaryNavigationPage() {
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Design Tokens</h3>
                 <div className="grid md:grid-cols-3 gap-4 mt-3">
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[#1C2938] rounded mb-2"></div>
                     <p className="text-xs font-medium">Background</p>
-                    <p className="text-xs text-gray-500 font-mono">#1C2938</p>
+                    <p className="text-xs text-content-secondary font-mono">#1C2938</p>
                   </div>
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[#3D9199] rounded mb-2"></div>
                     <p className="text-xs font-medium">Active State</p>
-                    <p className="text-xs text-gray-500 font-mono">#3D9199</p>
+                    <p className="text-xs text-content-secondary font-mono">#3D9199</p>
                   </div>
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[#253847] rounded mb-2"></div>
                     <p className="text-xs font-medium">Hover State</p>
-                    <p className="text-xs text-gray-500 font-mono">#253847</p>
+                    <p className="text-xs text-content-secondary font-mono">#253847</p>
                   </div>
                 </div>
               </div>

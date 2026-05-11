@@ -13,6 +13,7 @@ interface MedicalProfilePageProps {
     openAddMedication?: () => void;
     openAddAllergy?: () => void;
     openAddImmunization?: () => void;
+    refreshData?: () => void;
   }>;
 }
 
@@ -115,13 +116,11 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
     <>
       <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
         <div className="mb-8">
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <User className="w-7 h-7" />
             Medical Profile
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className="text-content-secondary">
             Your medical profile gives you and your healthcare providers a complete picture of your current health. Keep your conditions, medications, allergies, and immunizations organized in one secure place — always up to date and ready to share.
           </p>
         </div>
@@ -134,105 +133,89 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className={`h-full rounded-xl border p-6 bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
+            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
               <div className="flex items-start justify-between mb-3">
-                <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Conditions</h3>
-                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-blue-50'}`}>
-                  <Stethoscope className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-blue-600'}`} />
+                <h3 className="text-sm font-medium text-content-secondary">Conditions</h3>
+                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-blue-50'}`}>
+                  <Stethoscope className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-blue-600'}`} />
                 </div>
               </div>
-              <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <p className="text-3xl font-bold mb-1 text-content-primary">
                 {conditions.length}
               </p>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+              <p className="text-sm text-content-secondary">
                 {activeConditions.length} active
               </p>
             </div>
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className={`h-full rounded-xl border p-6 bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
+            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
               <div className="flex items-start justify-between mb-3">
-                <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Medications</h3>
-                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-emerald-50'}`}>
-                  <Pill className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-emerald-600'}`} />
+                <h3 className="text-sm font-medium text-content-secondary">Medications</h3>
+                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-emerald-50'}`}>
+                  <Pill className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-emerald-600'}`} />
                 </div>
               </div>
-              <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <p className="text-3xl font-bold mb-1 text-content-primary">
                 {medications.length}
               </p>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>{medications.length} active</p>
+              <p className="text-sm text-content-secondary">{medications.length} active</p>
             </div>
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className={`h-full rounded-xl border p-6 bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
+            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
               <div className="flex items-start justify-between mb-3">
-                <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Allergies</h3>
-                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-amber-50'}`}>
-                  <AlertTriangle className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-amber-600'}`} />
+                <h3 className="text-sm font-medium text-content-secondary">Allergies</h3>
+                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-amber-50'}`}>
+                  <AlertTriangle className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-amber-600'}`} />
                 </div>
               </div>
-              <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <p className="text-3xl font-bold mb-1 text-content-primary">
                 {allergies.length}
               </p>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+              <p className="text-sm text-content-secondary">
                 {allergies.filter(a => a.severity === 'Severe').length} severe
               </p>
             </div>
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className={`h-full rounded-xl border p-6 bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
+            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
               <div className="flex items-start justify-between mb-3">
-                <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Immunizations</h3>
-                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-rose-50'}`}>
-                  <Syringe className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-rose-600'}`} />
+                <h3 className="text-sm font-medium text-content-secondary">Immunizations</h3>
+                <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-rose-50'}`}>
+                  <Syringe className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-rose-600'}`} />
                 </div>
               </div>
-              <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <p className="text-3xl font-bold mb-1 text-content-primary">
                 {immunizations.length}
               </p>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Up to date</p>
+              <p className="text-sm text-content-secondary">Up to date</p>
             </div>
           </div>
         </div>
 
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>Current Health</h2>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Current Health</h2>
+            <p className="text-sm text-content-secondary">
               A summary of your active health conditions and ongoing issues. Add, update, or attach physician notes as your health changes.
             </p>
           </div>
 
           {isLoading ? (
-            <div className={`rounded-xl border p-8 text-center bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+              <p className="text-sm text-content-secondary">
                 Loading conditions...
               </p>
             </div>
           ) : conditions.length === 0 ? (
-            <div className={`rounded-xl border p-8 text-center bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
-              <Stethoscope className={`w-12 h-12 mx-auto mb-4 ${
-                darkMode ? 'text-stone-600' : 'text-stone-400'
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>No conditions added</h3>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+              <Stethoscope className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+              <h3 className="text-lg font-semibold mb-2 text-content-primary">No conditions added</h3>
+              <p className="text-sm text-content-secondary">
                 Use the AI Assistant to add known diagnoses and ongoing issues.
               </p>
             </div>
@@ -241,26 +224,22 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {conditions.map((condition) => (
                 <div
                   key={condition.id}
-                  className={`rounded-xl border p-6 bg-white ${
-                    darkMode ? 'border-stone-800' : 'border-stone-200'
-                  }`}
+                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-blue-50'}`}>
-                        <Stethoscope className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-blue-600'}`} />
+                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-blue-50'}`}>
+                        <Stethoscope className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-blue-600'}`} />
                       </div>
                       <div>
-                        <h3 className={`text-lg font-semibold ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>{condition.name}</h3>
+                        <h3 className="text-lg font-semibold text-content-primary">{condition.name}</h3>
                         {condition.status && (
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
                             condition.status === 'Active'
                               ? 'bg-emerald-100 text-emerald-700'
                               : condition.status === 'In remission'
                               ? 'bg-blue-100 text-blue-700'
-                              : 'bg-stone-100 text-stone-700'
+                              : 'bg-surface-sunken text-content-secondary'
                           }`}>
                             {condition.status}
                           </span>
@@ -270,9 +249,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   </div>
 
                   {(condition.diagnosedOn || condition.managingPhysician) && (
-                    <div className={`mt-4 space-y-2 text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
-                    }`}>
+                    <div className="mt-4 space-y-2 text-sm text-content-secondary">
                       {condition.diagnosedOn && (
                         <p>
                           <span className="font-medium">Diagnosed:</span> {new Date(condition.diagnosedOn).toLocaleDateString()}
@@ -287,7 +264,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   )}
 
                   {condition.notes && (
-                    <p className={`mt-3 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className="mt-3 text-sm text-content-secondary">
                       {condition.notes}
                     </p>
                   )}
@@ -299,22 +276,16 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
 
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>Medications</h2>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Medications</h2>
+            <p className="text-sm text-content-secondary">
               Track your prescriptions and supplements in one place. Stay on top of refills, dosages, and physician instructions.
             </p>
           </div>
           {medications.length === 0 ? (
-            <div className={`rounded-xl border p-8 text-center bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
-              <Pill className={`w-12 h-12 mx-auto mb-4 ${
-                darkMode ? 'text-stone-600' : 'text-stone-400'
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>No medications tracked</h3>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+              <Pill className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+              <h3 className="text-lg font-semibold mb-2 text-content-primary">No medications tracked</h3>
+              <p className="text-sm text-content-secondary">
                 Use the AI Assistant to add prescriptions and supplements.
               </p>
             </div>
@@ -323,21 +294,17 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {medications.map((med) => (
                 <div
                   key={med.id}
-                  className={`rounded-xl border p-6 bg-white ${
-                    darkMode ? 'border-stone-800' : 'border-stone-200'
-                  }`}
+                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-emerald-50'}`}>
-                        <Pill className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-emerald-600'}`} />
+                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-emerald-50'}`}>
+                        <Pill className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-emerald-600'}`} />
                       </div>
                       <div>
-                        <h3 className={`text-lg font-semibold ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>{med.name}</h3>
+                        <h3 className="text-lg font-semibold text-content-primary">{med.name}</h3>
                         {med.dosage && (
-                          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                          <p className="text-sm text-content-secondary">
                             {med.dosage}
                           </p>
                         )}
@@ -346,9 +313,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   </div>
 
                   {(med.frequency || med.prescribed_by || med.start_date) && (
-                    <div className={`mt-4 space-y-2 text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
-                    }`}>
+                    <div className="mt-4 space-y-2 text-sm text-content-secondary">
                       {med.frequency && (
                         <p>
                           <span className="font-medium">Frequency:</span> {med.frequency}
@@ -368,7 +333,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   )}
 
                   {med.notes && (
-                    <p className={`mt-3 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className="mt-3 text-sm text-content-secondary">
                       {med.notes}
                     </p>
                   )}
@@ -380,22 +345,16 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
 
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>Allergies</h2>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Allergies</h2>
+            <p className="text-sm text-content-secondary">
               List any allergies and their reactions to help avoid unwanted exposure and ensure safe treatment plans.
             </p>
           </div>
           {allergies.length === 0 ? (
-            <div className={`rounded-xl border p-8 text-center bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
-              <AlertTriangle className={`w-12 h-12 mx-auto mb-4 ${
-                darkMode ? 'text-stone-600' : 'text-stone-400'
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>No allergies listed</h3>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+              <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+              <h3 className="text-lg font-semibold mb-2 text-content-primary">No allergies listed</h3>
+              <p className="text-sm text-content-secondary">
                 Use the AI Assistant to record allergens and reactions.
               </p>
             </div>
@@ -404,19 +363,15 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {allergies.map((allergy) => (
                 <div
                   key={allergy.id}
-                  className={`rounded-xl border p-6 bg-white ${
-                    darkMode ? 'border-stone-800' : 'border-stone-200'
-                  }`}
+                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-amber-50'}`}>
-                        <AlertTriangle className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-amber-600'}`} />
+                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-amber-50'}`}>
+                        <AlertTriangle className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-amber-600'}`} />
                       </div>
                       <div>
-                        <h3 className={`text-lg font-semibold ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>{allergy.allergen}</h3>
+                        <h3 className="text-lg font-semibold text-content-primary">{allergy.allergen}</h3>
                         {allergy.severity && (
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
                             allergy.severity === 'Severe'
@@ -433,9 +388,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   </div>
 
                   {(allergy.reaction || allergy.diagnosed_on) && (
-                    <div className={`mt-4 space-y-2 text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
-                    }`}>
+                    <div className="mt-4 space-y-2 text-sm text-content-secondary">
                       {allergy.reaction && (
                         <p>
                           <span className="font-medium">Reaction:</span> {allergy.reaction}
@@ -450,7 +403,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   )}
 
                   {allergy.notes && (
-                    <p className={`mt-3 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className="mt-3 text-sm text-content-secondary">
                       {allergy.notes}
                     </p>
                   )}
@@ -462,22 +415,16 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
 
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>Immunizations</h2>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Immunizations</h2>
+            <p className="text-sm text-content-secondary">
               Record your vaccines and boosters for quick verification and reminders when something's due.
             </p>
           </div>
           {immunizations.length === 0 ? (
-            <div className={`rounded-xl border p-8 text-center bg-white ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
-            }`}>
-              <Syringe className={`w-12 h-12 mx-auto mb-4 ${
-                darkMode ? 'text-stone-600' : 'text-stone-400'
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>No immunizations recorded</h3>
-              <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+              <Syringe className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+              <h3 className="text-lg font-semibold mb-2 text-content-primary">No immunizations recorded</h3>
+              <p className="text-sm text-content-secondary">
                 Use the AI Assistant to log vaccines and boosters.
               </p>
             </div>
@@ -486,27 +433,21 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {immunizations.map((immunization) => (
                 <div
                   key={immunization.id}
-                  className={`rounded-xl border p-6 bg-white ${
-                    darkMode ? 'border-stone-800' : 'border-stone-200'
-                  }`}
+                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-rose-50'}`}>
-                        <Syringe className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-rose-600'}`} />
+                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-rose-50'}`}>
+                        <Syringe className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-rose-600'}`} />
                       </div>
                       <div>
-                        <h3 className={`text-lg font-semibold ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>{immunization.vaccine}</h3>
+                        <h3 className="text-lg font-semibold text-content-primary">{immunization.vaccine}</h3>
                       </div>
                     </div>
                   </div>
 
                   {(immunization.administered_on || immunization.provider || immunization.lot_number) && (
-                    <div className={`mt-4 space-y-2 text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
-                    }`}>
+                    <div className="mt-4 space-y-2 text-sm text-content-secondary">
                       {immunization.administered_on && (
                         <p>
                           <span className="font-medium">Administered:</span> {new Date(immunization.administered_on).toLocaleDateString()}
@@ -531,7 +472,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                   )}
 
                   {immunization.notes && (
-                    <p className={`mt-3 text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className="mt-3 text-sm text-content-secondary">
                       {immunization.notes}
                     </p>
                   )}
@@ -543,21 +484,15 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
 
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>Preventive Care</h2>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Preventive Care</h2>
+            <p className="text-sm text-content-secondary">
               Stay proactive with your health. Add screenings, checkups, or care reminders recommended by your provider or the Health Vault assistant.
             </p>
           </div>
-          <div className={`rounded-xl border p-8 text-center ${
-            darkMode ? 'border-stone-800' : 'border-stone-200'
-          }`}>
-            <CalendarCheck className={`w-12 h-12 mx-auto mb-4 ${
-              darkMode ? 'text-stone-600' : 'text-stone-400'
-            }`} />
-            <h3 className={`text-lg font-semibold mb-2 ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>No preventive care items</h3>
-            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+          <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <CalendarCheck className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+            <h3 className="text-lg font-semibold mb-2 text-content-primary">No preventive care items</h3>
+            <p className="text-sm text-content-secondary">
               Use the AI Assistant to add screenings and checkups.
             </p>
           </div>

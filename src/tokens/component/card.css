@@ -2,6 +2,9 @@
    References semantic tokens only.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
+  --hv-component-card-radius-default: 0.75rem;
+  --hv-component-card-shadow-default: 0 1px 3px rgba(0, 0, 0, 0.08);
+
   --hv-component-card-background-default:  var(--hv-color-surface-raised);
   --hv-component-card-background-sunken:   var(--hv-color-surface-sunken);
   --hv-component-card-background-selected: var(--hv-color-action-primary-subtle);

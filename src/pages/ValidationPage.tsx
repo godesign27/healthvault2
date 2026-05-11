@@ -2,19 +2,19 @@ import { Validation } from '../components/ui/Validation';
 
 export function ValidationPage() {
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Validation</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Validation</h1>
+          <p className="text-content-secondary">
             Feedback messages to inform users about validation states and outcomes
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Master Components <span className="text-base font-normal text-gray-500">(for UI Kit building only)</span>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-4">
+              Master Components <span className="text-base font-normal text-content-secondary">(for UI Kit building only)</span>
             </h2>
 
             <div className="grid grid-cols-2 gap-6">
@@ -52,17 +52,17 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Validation Messages</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Validation Messages</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-center font-semibold text-gray-700 mb-6 uppercase text-sm">Normal (16)</h3>
+                <h3 className="text-center font-semibold text-content-secondary mb-6 uppercase text-sm">Normal (16)</h3>
 
                 <div className="space-y-8">
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Text Only</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Text Only</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         message="Info Validation Title"
@@ -87,8 +87,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Icon Left</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Icon Left</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         message="Info Validation Title"
@@ -113,8 +113,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Title</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Title</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         title="Info Validation Title"
@@ -143,8 +143,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Title & Icon</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Title & Icon</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         title="Info Validation Title"
@@ -175,12 +175,12 @@ export function ValidationPage() {
               </div>
 
               <div>
-                <h3 className="text-center font-semibold text-gray-700 mb-6 uppercase text-sm">Small (14)</h3>
+                <h3 className="text-center font-semibold text-content-secondary mb-6 uppercase text-sm">Small (14)</h3>
 
                 <div className="space-y-8">
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Text Only</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Text Only</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         message="Info Validation Title"
@@ -209,8 +209,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Icon Left</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Icon Left</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         message="Info Validation Title"
@@ -239,8 +239,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Title</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Title</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         title="Info Validation Title"
@@ -273,8 +273,8 @@ export function ValidationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4 bg-gray-100 p-2">Title & Icon</h4>
-                    <div className="space-y-3 border-2 border-dashed border-gray-300 p-4">
+                    <h4 className="text-xs font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Title & Icon</h4>
+                    <div className="space-y-3 border-2 border-dashed border-stroke-default p-4">
                       <Validation
                         type="info"
                         title="Info Validation Title"
@@ -310,10 +310,10 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Specifications</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Sizes</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -367,10 +367,10 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

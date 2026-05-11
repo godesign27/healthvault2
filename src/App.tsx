@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
+import { DesignSystemDemoShell } from './components/DesignSystemDemoShell';
+import { Surface } from './providers/SurfaceProvider';
 import { AdminPage } from './pages/AdminPage';
 import { AccordionsPage } from './pages/AccordionsPage';
 import { ActionFieldsPage } from './pages/ActionFieldsPage';
@@ -57,6 +59,33 @@ type AppView = 'design-system' | 'projects' | 'health-vault' | 'marketing' | 'lo
 
 const SESSION_VIEW_KEY = 'hv-current-view';
 const SESSION_DEMO_KEY = 'hv-demo-mode';
+const SESSION_DS_SURFACE_KEY = 'hv-ds-surface-theme';
+
+type DesignSystemSurface = 'default' | 'bold' | 'steel';
+
+function getSavedDesignSystemSurface(): DesignSystemSurface {
+  try {
+    const v = sessionStorage.getItem(SESSION_DS_SURFACE_KEY);
+    if (v === 'bold' || v === 'default' || v === 'steel') return v;
+  } catch {}
+  return 'default';
+}
+
+// Runs at module load time so sessionStorage is set before any useState reads it
+const IS_DEMO_MODE = (() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('demo')) {
+      sessionStorage.setItem(SESSION_DEMO_KEY, 'true');
+      sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
+      window.history.replaceState({}, '', window.location.pathname);
+      return true;
+    }
+    return sessionStorage.getItem(SESSION_DEMO_KEY) === 'true';
+  } catch {
+    return false;
+  }
+})();
 
 function getSavedView(): AppView {
   try {
@@ -70,19 +99,17 @@ function getSavedView(): AppView {
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>(getSavedView);
+  const [designSystemSurface, setDesignSystemSurface] = useState<DesignSystemSurface>(getSavedDesignSystemSurface);
   const [currentPage, setCurrentPage] = useState<string>('accordions');
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete'>('start');
   const [onboardingEmail, setOnboardingEmail] = useState<string>('');
-  const [authState, setAuthState] = useState(() => {
-    const demoMode = sessionStorage.getItem(SESSION_DEMO_KEY) === 'true';
-    return {
-      isAuthenticated: false,
-      authChecked: false,
-      onboardingComplete: demoMode,
-      onboardingChecked: false
-    };
-  });
+  const [authState, setAuthState] = useState(() => ({
+    isAuthenticated: IS_DEMO_MODE,
+    authChecked: IS_DEMO_MODE,
+    onboardingComplete: IS_DEMO_MODE,
+    onboardingChecked: IS_DEMO_MODE
+  }));
 
   const initializingRef = useRef(false);
   const authSubscriptionRef = useRef<any>(null);
@@ -94,6 +121,13 @@ function App() {
   }, [currentView]);
 
   useEffect(() => {
+    try {
+      sessionStorage.setItem(SESSION_DS_SURFACE_KEY, designSystemSurface);
+    } catch {}
+  }, [designSystemSurface]);
+
+  useEffect(() => {
+    if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
     if (
       authState.authChecked &&
       !authState.isAuthenticated &&
@@ -108,6 +142,7 @@ function App() {
     initializingRef.current = true;
 
     const initialize = async () => {
+      if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
       const { data: { session } } = await supabase.auth.getSession();
       const authenticated = !!session;
 
@@ -138,6 +173,7 @@ function App() {
     initialize();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
       const authenticated = !!session;
 
       if (!authenticated) {
@@ -216,10 +252,12 @@ function App() {
 
   const handleDirectHealthVaultAccess = () => {
     try { sessionStorage.setItem(SESSION_DEMO_KEY, 'true'); } catch {}
-    setAuthState(prev => ({
-      ...prev,
-      onboardingComplete: true
-    }));
+    setAuthState({
+      isAuthenticated: true,
+      authChecked: true,
+      onboardingComplete: true,
+      onboardingChecked: true
+    });
     setCurrentView('health-vault');
   };
 
@@ -371,78 +409,82 @@ function App() {
       return <ProjectsPage onProjectOpen={handleProjectOpen} />;
     }
 
-    switch (currentPage) {
-      case 'accordions':
-        return <AccordionsPage />;
-      case 'action-fields':
-        return <ActionFieldsPage />;
-      case 'breadcrumbs':
-        return <BreadcrumbsPage />;
-      case 'buttons':
-        return <ButtonsPage />;
-      case 'cards':
-        return <CardsPage />;
-      case 'checkboxes':
-        return <CheckboxesPage />;
-      case 'colors':
-        return <ColorsPage />;
-      case 'date-picker':
-        return <DatePickerPage />;
-      case 'dialogs':
-        return <DialogsPage />;
-      case 'drawers':
-        return <DrawersPage />;
-      case 'dropdowns':
-        return <DropdownsPage />;
-      case 'headers':
-        return <HeadersPage />;
-      case 'icons':
-        return <IconsPage />;
-      case 'notifications':
-        return <NotificationsPage />;
-      case 'popup-menus':
-        return <PopupMenusPage />;
-      case 'primary-navigation':
-        return <PrimaryNavigationPage />;
-      case 'legacy-navigation':
-        return <LegacyNavigationPage />;
-      case 'progress-bars':
-        return <ProgressBarsPage />;
-      case 'radio-buttons':
-        return <RadioButtonsPage />;
-      case 'search':
-        return <SearchPage />;
-      case 'segmented-control':
-        return <SegmentedControlPage />;
-      case 'sliders':
-        return <SlidersPage />;
-      case 'spinners':
-        return <SpinnersPage />;
-      case 'stepper':
-        return <StepperPage />;
-      case 'tabs':
-        return <TabsPage />;
-      case 'tables':
-        return <TablesPage />;
-      case 'toolbars':
-        return <ToolbarsPage />;
-      case 'tags':
-        return <TagsPage />;
-      case 'toggles':
-        return <TogglesPage />;
-      case 'tooltips':
-        return <TooltipsPage />;
-      case 'typography':
-        return <TypographyPage />;
-      case 'validation':
-        return <ValidationPage />;
-      case 'wizards':
-        return <WizardsPage />;
-      case 'admin':
-        return <AdminPage />;
-      default:
-        return <AccordionsPage />;
-    }
+    const designSystemContent = (() => {
+      switch (currentPage) {
+        case 'accordions':
+          return <AccordionsPage />;
+        case 'action-fields':
+          return <ActionFieldsPage />;
+        case 'breadcrumbs':
+          return <BreadcrumbsPage />;
+        case 'buttons':
+          return <ButtonsPage />;
+        case 'cards':
+          return <CardsPage />;
+        case 'checkboxes':
+          return <CheckboxesPage />;
+        case 'colors':
+          return <ColorsPage />;
+        case 'date-picker':
+          return <DatePickerPage />;
+        case 'dialogs':
+          return <DialogsPage />;
+        case 'drawers':
+          return <DrawersPage />;
+        case 'dropdowns':
+          return <DropdownsPage />;
+        case 'headers':
+          return <HeadersPage />;
+        case 'icons':
+          return <IconsPage />;
+        case 'notifications':
+          return <NotificationsPage />;
+        case 'popup-menus':
+          return <PopupMenusPage />;
+        case 'primary-navigation':
+          return <PrimaryNavigationPage />;
+        case 'legacy-navigation':
+          return <LegacyNavigationPage />;
+        case 'progress-bars':
+          return <ProgressBarsPage />;
+        case 'radio-buttons':
+          return <RadioButtonsPage />;
+        case 'search':
+          return <SearchPage />;
+        case 'segmented-control':
+          return <SegmentedControlPage />;
+        case 'sliders':
+          return <SlidersPage />;
+        case 'spinners':
+          return <SpinnersPage />;
+        case 'stepper':
+          return <StepperPage />;
+        case 'tabs':
+          return <TabsPage />;
+        case 'tables':
+          return <TablesPage />;
+        case 'toolbars':
+          return <ToolbarsPage />;
+        case 'tags':
+          return <TagsPage />;
+        case 'toggles':
+          return <TogglesPage />;
+        case 'tooltips':
+          return <TooltipsPage />;
+        case 'typography':
+          return <TypographyPage />;
+        case 'validation':
+          return <ValidationPage />;
+        case 'wizards':
+          return <WizardsPage />;
+        case 'admin':
+          return <AdminPage />;
+        default:
+          return <AccordionsPage />;
+      }
+    })();
+
+    return <DesignSystemDemoShell>{designSystemContent}</DesignSystemDemoShell>;
   };
 
   const isShareRoute = window.location.pathname.startsWith('/share/');
@@ -464,18 +506,49 @@ function App() {
     return <ProviderAdminPage />;
   }
 
-  return (
-    <div className={currentView === 'health-vault' || currentView === 'marketing' || currentView === 'login' || currentView === 'onboarding' ? 'w-screen max-w-none' : 'flex min-h-screen bg-gray-50'}>
-      {currentView !== 'health-vault' && currentView !== 'marketing' && currentView !== 'login' && currentView !== 'onboarding' && !currentProjectId && (
+  const layoutShellClass =
+    currentView === 'health-vault' || currentView === 'marketing' || currentView === 'login' || currentView === 'onboarding'
+      ? 'w-screen max-w-none'
+      : 'flex min-h-screen min-w-0 w-full bg-surface-page';
+
+  const showSidebar =
+    currentView !== 'health-vault' &&
+    currentView !== 'marketing' &&
+    currentView !== 'login' &&
+    currentView !== 'onboarding' &&
+    !currentProjectId;
+
+  const shellInner = (
+    <>
+      {showSidebar && (
         <Sidebar
           currentPage={currentPage}
           currentView={currentView}
           onNavigate={setCurrentPage}
           onViewChange={handleViewChange}
+          designSystemSurface={designSystemSurface}
+          onDesignSystemSurfaceChange={setDesignSystemSurface}
         />
       )}
       {renderPage()}
-    </div>
+    </>
+  );
+
+  const steelSurfaceOutsideDesignSystem =
+    designSystemSurface === 'steel' &&
+    (currentView === 'health-vault' || (currentView === 'projects' && !currentProjectId));
+
+  const useSurfaceRoot = currentView === 'design-system' || steelSurfaceOutsideDesignSystem;
+
+  const rootSurfaceName =
+    currentView === 'design-system' ? designSystemSurface : 'steel';
+
+  return useSurfaceRoot ? (
+    <Surface name={rootSurfaceName} className={layoutShellClass}>
+      {shellInner}
+    </Surface>
+  ) : (
+    <div className={layoutShellClass}>{shellInner}</div>
   );
 }
 

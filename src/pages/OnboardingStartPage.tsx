@@ -26,10 +26,10 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
 
   return (
     <div className={`min-h-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
+      darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
     }`}>
       <header className={`sticky top-0 z-50 border-b ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
@@ -39,8 +39,8 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                   onClick={onBack}
                   className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
                     darkMode
-                      ? 'hover:bg-stone-800 text-stone-400'
-                      : 'hover:bg-stone-100 text-stone-500'
+                      ? 'hover:bg-surface-sunken text-content-secondary'
+                      : 'hover:bg-surface-sunken text-content-secondary'
                   }`}
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                   />
                 </div>
                 <span className={`text-sm font-bold ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>Health Vault</span>
               </div>
             </div>
@@ -68,7 +68,7 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <div className={`rounded-lg border p-8 ${
-              darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+              darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
             }`}>
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">
@@ -78,13 +78,13 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                     <Heart className="w-8 h-8 text-emerald-600" />
                   </div>
                   <h1 className={`text-3xl font-bold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>
                     Welcome to Health Vault
                   </h1>
                 </div>
                 <p className={`text-lg ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   In a few steps, we'll verify your identity, optionally add insurance, and personalize how we can help you manage your health information.
                 </p>
@@ -92,19 +92,19 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
 
               <div className="space-y-4 mb-8">
                 <div className={`flex items-start gap-4 p-4 rounded-lg ${
-                  darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                  darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
                 }`}>
                   <Shield className={`w-6 h-6 mt-0.5 ${
                     darkMode ? 'text-emerald-400' : 'text-emerald-600'
                   }`} />
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Identity Verification (Required)
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       We'll collect basic information to verify your identity and secure your health records.
                     </p>
@@ -112,19 +112,19 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                 </div>
 
                 <div className={`flex items-start gap-4 p-4 rounded-lg ${
-                  darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                  darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
                 }`}>
                   <FileText className={`w-6 h-6 mt-0.5 ${
-                    darkMode ? 'text-stone-500' : 'text-stone-400'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`} />
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Insurance Information (Optional)
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Add your insurance details to help manage coverage and claims. You can skip this and add it later.
                     </p>
@@ -132,19 +132,19 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                 </div>
 
                 <div className={`flex items-start gap-4 p-4 rounded-lg ${
-                  darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                  darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
                 }`}>
                   <Sparkles className={`w-6 h-6 mt-0.5 ${
-                    darkMode ? 'text-stone-500' : 'text-stone-400'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`} />
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Health Preferences (Optional)
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Choose how Health Vault can assist you with labs, forms, providers, and wellness.
                     </p>
@@ -163,8 +163,8 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
                   onClick={onNext}
                   className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                     darkMode
-                      ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                      ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                      : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
                   }`}
                 >
                   Do This Later

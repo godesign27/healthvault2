@@ -6,64 +6,64 @@ export function TogglesPage() {
   const [smallToggle, setSmallToggle] = useState(false);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Toggles</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Toggles</h1>
+          <p className="text-content-secondary">
             Binary switches for enabling or disabling settings
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-4 gap-6">
               <div className="text-center space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase">Off</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase">Off</h3>
                 <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 space-y-6">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">NORMAL</div>
+                    <div className="text-xs text-content-secondary">NORMAL</div>
                     <Toggle checked={false} onChange={() => {}} />
                   </div>
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">SMALL</div>
+                    <div className="text-xs text-content-secondary">SMALL</div>
                     <Toggle checked={false} onChange={() => {}} size="small" />
                   </div>
                 </div>
               </div>
 
               <div className="text-center space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase">On</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase">On</h3>
                 <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 space-y-6">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">NORMAL</div>
+                    <div className="text-xs text-content-secondary">NORMAL</div>
                     <Toggle checked={true} onChange={() => {}} />
                   </div>
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">SMALL</div>
+                    <div className="text-xs text-content-secondary">SMALL</div>
                     <Toggle checked={true} onChange={() => {}} size="small" />
                   </div>
                 </div>
               </div>
 
               <div className="text-center space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase">Label</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase">Label</h3>
                 <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 space-y-6">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">NORMAL</div>
+                    <div className="text-xs text-content-secondary">NORMAL</div>
                     <Toggle checked={normalToggle} onChange={setNormalToggle} label="Label" />
                   </div>
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xs text-gray-500">SMALL</div>
+                    <div className="text-xs text-content-secondary">SMALL</div>
                     <Toggle checked={smallToggle} onChange={setSmallToggle} label="Label" size="small" />
                   </div>
                 </div>
               </div>
 
               <div className="text-center space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase">Error Message</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase">Error Message</h3>
                 <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 space-y-6">
                   <div className="flex flex-col items-center gap-4">
                     <Toggle checked={false} onChange={() => {}} error errorMessage="Error message" />
@@ -73,25 +73,25 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Toggles: Without label</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: Without label</h2>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase"></th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Default</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Focused</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Default</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Focused</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Disabled</th>
+                  <tr className="border-b-2 border-stroke-default">
+                    <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase"></th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Default</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Focused</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Default</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Focused</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Disabled</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Normal</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Normal</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle checked={false} onChange={() => {}} />
@@ -128,8 +128,8 @@ export function TogglesPage() {
                     </td>
                   </tr>
 
-                  <tr className="bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Small</td>
+                  <tr className="bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Small</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle checked={false} onChange={() => {}} size="small" />
@@ -170,25 +170,25 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Toggles: With Label</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: With Label</h2>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase"></th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Default</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Focused</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Default</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Focused</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Disabled</th>
+                  <tr className="border-b-2 border-stroke-default">
+                    <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase"></th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Default</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Focused</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Default</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Focused</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Disabled</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Normal</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Normal</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle checked={false} onChange={() => {}} label="Label" />
@@ -197,7 +197,7 @@ export function TogglesPage() {
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <div className="ring-2 ring-[indigo-600] ring-offset-2 rounded-full inline-flex items-center gap-3">
-                          <span className="text-sm text-gray-700">Label</span>
+                          <span className="text-sm text-content-secondary">Label</span>
                           <Toggle checked={false} onChange={() => {}} />
                         </div>
                       </div>
@@ -215,7 +215,7 @@ export function TogglesPage() {
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <div className="ring-2 ring-[indigo-600] ring-offset-2 rounded-full inline-flex items-center gap-3">
-                          <span className="text-sm text-gray-700">Label</span>
+                          <span className="text-sm text-content-secondary">Label</span>
                           <Toggle checked={true} onChange={() => {}} />
                         </div>
                       </div>
@@ -227,8 +227,8 @@ export function TogglesPage() {
                     </td>
                   </tr>
 
-                  <tr className="bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Small</td>
+                  <tr className="bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Small</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle checked={false} onChange={() => {}} label="Label" size="small" />
@@ -237,7 +237,7 @@ export function TogglesPage() {
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <div className="ring-2 ring-[indigo-600] ring-offset-2 rounded-full inline-flex items-center gap-3">
-                          <span className="text-sm text-gray-700">Label</span>
+                          <span className="text-sm text-content-secondary">Label</span>
                           <Toggle checked={false} onChange={() => {}} size="small" />
                         </div>
                       </div>
@@ -255,7 +255,7 @@ export function TogglesPage() {
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <div className="ring-2 ring-[indigo-600] ring-offset-2 rounded-full inline-flex items-center gap-3">
-                          <span className="text-sm text-gray-700">Label</span>
+                          <span className="text-sm text-content-secondary">Label</span>
                           <Toggle checked={true} onChange={() => {}} size="small" />
                         </div>
                       </div>
@@ -271,21 +271,21 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Toggles: Error Mode</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: Error Mode</h2>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase"></th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Off-Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">On-Disabled</th>
+                  <tr className="border-b-2 border-stroke-default">
+                    <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase"></th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Off-Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">On-Disabled</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Normal<br/>With Label</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Normal<br/>With Label</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle
@@ -312,8 +312,8 @@ export function TogglesPage() {
                     </td>
                   </tr>
 
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Normal<br/>No Label</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Normal<br/>No Label</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle
@@ -338,8 +338,8 @@ export function TogglesPage() {
                     </td>
                   </tr>
 
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Small<br/>With Label</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Small<br/>With Label</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle
@@ -368,8 +368,8 @@ export function TogglesPage() {
                     </td>
                   </tr>
 
-                  <tr className="bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">Small<br/>No Label</td>
+                  <tr className="bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Small<br/>No Label</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Toggle
@@ -400,10 +400,10 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Specifications</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Sizes</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -437,10 +437,10 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

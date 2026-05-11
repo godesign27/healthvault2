@@ -134,12 +134,12 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
     errors[fieldName]
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
   } focus:outline-none focus:ring-2`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -158,16 +158,16 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
       }
     >
       <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Verify Your Identity
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             All fields marked with * are required
           </p>
@@ -341,8 +341,8 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
               onClick={onBack}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
               }`}
             >
               <ArrowLeft className="w-4 h-4" />

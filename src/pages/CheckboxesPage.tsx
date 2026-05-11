@@ -5,18 +5,18 @@ export function CheckboxesPage() {
   const [masterChecked, setMasterChecked] = useState(false);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Checkboxes</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Checkboxes</h1>
+          <p className="text-content-secondary">
             Multi-selection controls for forms and lists
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 inline-block">
               <div className="space-y-2">
@@ -36,33 +36,33 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Checkbox</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Checkbox</h2>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase">Check Mark</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Unselected</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Selected</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Indeterminate</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Hover</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Focus</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Selected-Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Indeterminate-Disabled</th>
+                  <tr className="border-b-2 border-stroke-default">
+                    <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase">Check Mark</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Unselected</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Selected</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Indeterminate</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Hover</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Focus</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Selected-Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Indeterminate-Disabled</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">20PX</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">20PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox size="20px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked size="20px" onChange={() => {}} />
                       </div>
@@ -72,7 +72,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate size="20px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox size="20px" />
                       </div>
@@ -84,7 +84,7 @@ export function CheckboxesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox disabled size="20px" />
                       </div>
@@ -94,21 +94,21 @@ export function CheckboxesPage() {
                         <Checkbox checked disabled size="20px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox indeterminate disabled size="20px" onChange={() => {}} />
                       </div>
                     </td>
                   </tr>
 
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">18PX</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">18PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox size="18px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked size="18px" onChange={() => {}} />
                       </div>
@@ -118,7 +118,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate size="18px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox size="18px" />
                       </div>
@@ -130,7 +130,7 @@ export function CheckboxesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox disabled size="18px" />
                       </div>
@@ -140,21 +140,21 @@ export function CheckboxesPage() {
                         <Checkbox checked disabled size="18px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox indeterminate disabled size="18px" onChange={() => {}} />
                       </div>
                     </td>
                   </tr>
 
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">16PX</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">16PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox size="16px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked size="16px" onChange={() => {}} />
                       </div>
@@ -164,7 +164,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate size="16px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox size="16px" />
                       </div>
@@ -176,7 +176,7 @@ export function CheckboxesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox disabled size="16px" />
                       </div>
@@ -186,21 +186,21 @@ export function CheckboxesPage() {
                         <Checkbox checked disabled size="16px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox indeterminate disabled size="16px" onChange={() => {}} />
                       </div>
                     </td>
                   </tr>
 
-                  <tr className="bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">14PX</td>
+                  <tr className="bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">14PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox size="14px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked size="14px" onChange={() => {}} />
                       </div>
@@ -210,7 +210,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate size="14px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox size="14px" />
                       </div>
@@ -222,7 +222,7 @@ export function CheckboxesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox disabled size="14px" />
                       </div>
@@ -232,7 +232,7 @@ export function CheckboxesPage() {
                         <Checkbox checked disabled size="14px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox indeterminate disabled size="14px" onChange={() => {}} />
                       </div>
@@ -241,28 +241,28 @@ export function CheckboxesPage() {
                 </tbody>
               </table>
 
-              <div className="mt-8 border-t-2 border-gray-300 pt-8">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">Error Variant</h3>
+              <div className="mt-8 border-t-2 border-stroke-default pt-8">
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Error Variant</h3>
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b-2 border-gray-300">
-                      <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase"></th>
-                      <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Unselected</th>
-                      <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Selected</th>
-                      <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Indeterminate</th>
-                      <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Hover</th>
-                      <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Focus</th>
+                    <tr className="border-b-2 border-stroke-default">
+                      <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase"></th>
+                      <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Unselected</th>
+                      <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Selected</th>
+                      <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Indeterminate</th>
+                      <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Hover</th>
+                      <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Focus</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-gray-200 bg-[#FEF2F2]">
-                      <td className="p-4 text-sm font-medium text-gray-700 bg-[#FED7D7]">20PX</td>
+                    <tr className="border-b border-stroke-subtle bg-[#FEF2F2]">
+                      <td className="p-4 text-sm font-medium text-content-secondary bg-[#FED7D7]">20PX</td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="20px" />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox checked variant="error" size="20px" onChange={() => {}} />
                         </div>
@@ -272,7 +272,7 @@ export function CheckboxesPage() {
                           <Checkbox indeterminate variant="error" size="20px" onChange={() => {}} />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="20px" />
                         </div>
@@ -286,14 +286,14 @@ export function CheckboxesPage() {
                       </td>
                     </tr>
 
-                    <tr className="border-b border-gray-200 bg-[#FEF2F2]">
-                      <td className="p-4 text-sm font-medium text-gray-700 bg-[#FED7D7]">18PX</td>
+                    <tr className="border-b border-stroke-subtle bg-[#FEF2F2]">
+                      <td className="p-4 text-sm font-medium text-content-secondary bg-[#FED7D7]">18PX</td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="18px" />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox checked variant="error" size="18px" onChange={() => {}} />
                         </div>
@@ -303,7 +303,7 @@ export function CheckboxesPage() {
                           <Checkbox indeterminate variant="error" size="18px" onChange={() => {}} />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="18px" />
                         </div>
@@ -317,14 +317,14 @@ export function CheckboxesPage() {
                       </td>
                     </tr>
 
-                    <tr className="border-b border-gray-200 bg-[#FEF2F2]">
-                      <td className="p-4 text-sm font-medium text-gray-700 bg-[#FED7D7]">16PX</td>
+                    <tr className="border-b border-stroke-subtle bg-[#FEF2F2]">
+                      <td className="p-4 text-sm font-medium text-content-secondary bg-[#FED7D7]">16PX</td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="16px" />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox checked variant="error" size="16px" onChange={() => {}} />
                         </div>
@@ -334,7 +334,7 @@ export function CheckboxesPage() {
                           <Checkbox indeterminate variant="error" size="16px" onChange={() => {}} />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="16px" />
                         </div>
@@ -349,13 +349,13 @@ export function CheckboxesPage() {
                     </tr>
 
                     <tr className="bg-[#FEF2F2]">
-                      <td className="p-4 text-sm font-medium text-gray-700 bg-[#FED7D7]">14PX</td>
+                      <td className="p-4 text-sm font-medium text-content-secondary bg-[#FED7D7]">14PX</td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="14px" />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox checked variant="error" size="14px" onChange={() => {}} />
                         </div>
@@ -365,7 +365,7 @@ export function CheckboxesPage() {
                           <Checkbox indeterminate variant="error" size="14px" onChange={() => {}} />
                         </div>
                       </td>
-                      <td className="p-4 text-center bg-white">
+                      <td className="p-4 text-center bg-surface-raised">
                         <div className="flex justify-center">
                           <Checkbox variant="error" size="14px" />
                         </div>
@@ -384,32 +384,32 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Checkbox + Text</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Checkbox + Text</h2>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left p-4 text-sm font-semibold text-gray-500 uppercase"></th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Unselected</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Selected</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Indeterminate</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Hover</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Selected-Disabled</th>
-                    <th className="text-center p-4 text-sm font-semibold text-gray-500 uppercase">Indeterminate-Disabled</th>
+                  <tr className="border-b-2 border-stroke-default">
+                    <th className="text-left p-4 text-sm font-semibold text-content-secondary uppercase"></th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Unselected</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Selected</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Indeterminate</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Hover</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Selected-Disabled</th>
+                    <th className="text-center p-4 text-sm font-semibold text-content-secondary uppercase">Indeterminate-Disabled</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">16PX</td>
+                  <tr className="border-b border-stroke-subtle bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">16PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox label="Checkbox" size="16px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked label="Checkbox" size="16px" onChange={() => {}} />
                       </div>
@@ -419,7 +419,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate label="Checkbox" size="16px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox label="Checkbox" size="16px" />
                       </div>
@@ -429,7 +429,7 @@ export function CheckboxesPage() {
                         <Checkbox disabled label="Checkbox" size="16px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked disabled label="Checkbox" size="16px" onChange={() => {}} />
                       </div>
@@ -441,14 +441,14 @@ export function CheckboxesPage() {
                     </td>
                   </tr>
 
-                  <tr className="bg-gray-50">
-                    <td className="p-4 text-sm font-medium text-gray-700 bg-gray-100">14PX</td>
+                  <tr className="bg-surface-sunken">
+                    <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">14PX</td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center">
                         <Checkbox label="Checkbox" size="14px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked label="Checkbox" size="14px" onChange={() => {}} />
                       </div>
@@ -458,7 +458,7 @@ export function CheckboxesPage() {
                         <Checkbox indeterminate label="Checkbox" size="14px" onChange={() => {}} />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox label="Checkbox" size="14px" />
                       </div>
@@ -468,7 +468,7 @@ export function CheckboxesPage() {
                         <Checkbox disabled label="Checkbox" size="14px" />
                       </div>
                     </td>
-                    <td className="p-4 text-center bg-white">
+                    <td className="p-4 text-center bg-surface-raised">
                       <div className="flex justify-center">
                         <Checkbox checked disabled label="Checkbox" size="14px" onChange={() => {}} />
                       </div>
@@ -484,10 +484,10 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Specifications</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Sizes</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -535,10 +535,10 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

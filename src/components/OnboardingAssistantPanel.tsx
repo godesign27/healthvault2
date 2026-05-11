@@ -23,8 +23,8 @@ export function OnboardingAssistantPanel({
   return (
     <div className={`rounded-lg border p-6 ${
       darkMode
-        ? 'bg-stone-800 border-stone-700'
-        : 'bg-white border-stone-200'
+        ? 'bg-surface-sunken border-stroke-default'
+        : 'bg-white border-stroke-subtle'
     }`}>
       <div className="flex items-start gap-3 mb-4">
         <div className={`p-2 rounded-lg ${
@@ -34,12 +34,12 @@ export function OnboardingAssistantPanel({
         </div>
         <div className="flex-1">
           <h3 className={`font-semibold mb-1 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             {title}
           </h3>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Step {step}
           </p>
@@ -47,7 +47,7 @@ export function OnboardingAssistantPanel({
       </div>
 
       <div className={`text-sm leading-relaxed mb-4 ${
-        darkMode ? 'text-stone-300' : 'text-stone-700'
+        darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
         {message}
       </div>
@@ -55,7 +55,7 @@ export function OnboardingAssistantPanel({
       {quickActions.length > 0 && (
         <div className="space-y-2">
           <div className={`flex items-center gap-2 text-xs font-medium mb-2 ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             <HelpCircle className="w-3.5 h-3.5" />
             Quick Actions
@@ -66,8 +66,8 @@ export function OnboardingAssistantPanel({
               onClick={action.onClick}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                 darkMode
-                  ? 'bg-stone-700 hover:bg-stone-600 text-stone-200'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               {action.label}

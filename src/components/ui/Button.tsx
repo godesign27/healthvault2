@@ -6,11 +6,11 @@ export type ButtonSize    = 'x-small' | 'small' | 'normal';
 export type ButtonShape   = 'rectangle' | 'circle' | 'square';
 
 const variantClasses: Record<ButtonVariant, string> = {
-  solid:       'bg-action-primary text-content-on-action hover:bg-action-primary-hover active:bg-action-primary-active disabled:bg-action-primary-disabled',
-  outline:     'border border-stroke-default bg-transparent text-content-primary hover:bg-action-secondary active:bg-action-secondary-hover disabled:border-stroke-subtle disabled:text-content-disabled',
-  ghost:       'bg-transparent text-content-primary hover:bg-action-ghost-hover active:bg-action-ghost-active disabled:text-content-disabled',
+  solid:       '[background:var(--hv-component-button-background-primary-default)] [color:var(--hv-component-button-text-primary-default)] hover:[background:var(--hv-component-button-background-primary-hover)] active:[background:var(--hv-component-button-background-primary-active)] disabled:[background:var(--hv-component-button-background-primary-disabled)]',
+  outline:     'border [border-color:var(--hv-component-button-border-secondary-default)] bg-transparent [color:var(--hv-component-button-text-secondary-default)] hover:[background:var(--hv-component-button-background-secondary-hover)] active:[background:var(--hv-component-button-background-secondary-active)] disabled:[border-color:var(--hv-color-border-subtle)] disabled:[color:var(--hv-component-button-text-secondary-disabled)]',
+  ghost:       'bg-transparent [color:var(--hv-component-button-text-ghost-default)] hover:[background:var(--hv-component-button-background-ghost-hover)] active:[background:var(--hv-component-button-background-ghost-active)] disabled:[color:var(--hv-color-text-disabled)]',
   link:        'bg-transparent text-content-link underline-offset-4 hover:underline hover:text-content-link-hover disabled:text-content-disabled',
-  destructive: 'bg-action-destructive text-content-on-action hover:bg-action-destructive-hover disabled:bg-action-primary-disabled',
+  destructive: '[background:var(--hv-component-button-background-destructive-default)] [color:var(--hv-component-button-text-destructive-default)] hover:[background:var(--hv-component-button-background-destructive-hover)] disabled:[background:var(--hv-component-button-background-destructive-disabled)]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -20,8 +20,8 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const shapeClasses: Record<ButtonShape, string> = {
-  rectangle: 'rounded-lg',
-  circle:    'rounded-full',
+  rectangle: 'rounded-hv-button',
+  circle:    'rounded-hv-button-pill',
   square:    'rounded-none',
 };
 
@@ -64,6 +64,7 @@ export function Button({
       disabled={disabled}
       className={cn(
         'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 disabled:pointer-events-none select-none',
+        'focus-visible:[--tw-ring-color:var(--hv-component-button-focus-ring-default)] focus-visible:[--tw-ring-offset-color:var(--hv-component-button-focus-ring-offset)]',
         variantClasses[variant],
         sizeClasses[size],
         shapeClasses[shape],

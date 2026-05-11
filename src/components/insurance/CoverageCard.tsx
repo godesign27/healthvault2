@@ -32,8 +32,8 @@ export function CoverageCard({
   return (
     <div className={`rounded-xl border p-6 ${
       isStopped
-        ? darkMode ? 'border-stone-800 bg-stone-900/50 opacity-75' : 'border-stone-300 bg-white/50 opacity-75'
-        : darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-white'
+        ? darkMode ? 'border-stroke-subtle bg-surface-raised/50 opacity-75' : 'border-stroke-default bg-white/50 opacity-75'
+        : darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-white'
     }`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
@@ -47,10 +47,10 @@ export function CoverageCard({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className={`font-semibold text-lg ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>{coverage.provider.name}</h3>
               {isStopped && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-stone-600 text-white text-xs font-medium rounded">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-overlay text-white text-xs font-medium rounded">
                   Stopped
                 </span>
               )}
@@ -62,7 +62,7 @@ export function CoverageCard({
               )}
             </div>
             <p className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>{coverage.planName}</p>
           </div>
         </div>
@@ -70,18 +70,18 @@ export function CoverageCard({
       </div>
 
       <div className={`grid grid-cols-2 gap-4 mb-4 ${
-        darkMode ? 'text-stone-300' : 'text-stone-700'
+        darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
         <div>
           <p className={`text-xs mb-1 ${
-            darkMode ? 'text-stone-500' : 'text-stone-500'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>Member ID</p>
           <p className="font-mono text-sm">{maskMemberId(coverage.memberId || '')}</p>
         </div>
         {coverage.groupNumber && (
           <div>
             <p className={`text-xs mb-1 ${
-              darkMode ? 'text-stone-500' : 'text-stone-500'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>Group Number</p>
             <p className="font-mono text-sm">{coverage.groupNumber}</p>
           </div>
@@ -89,7 +89,7 @@ export function CoverageCard({
         {coverage.bin && (
           <div>
             <p className={`text-xs mb-1 ${
-              darkMode ? 'text-stone-500' : 'text-stone-500'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>BIN</p>
             <p className="font-mono text-sm">{coverage.bin}</p>
           </div>
@@ -97,7 +97,7 @@ export function CoverageCard({
         {coverage.pcn && (
           <div>
             <p className={`text-xs mb-1 ${
-              darkMode ? 'text-stone-500' : 'text-stone-500'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>PCN</p>
             <p className="font-mono text-sm">{coverage.pcn}</p>
           </div>
@@ -105,14 +105,14 @@ export function CoverageCard({
       </div>
 
       <div className={`text-xs mb-4 ${
-        darkMode ? 'text-stone-500' : 'text-stone-500'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
         Effective: {new Date(coverage.effectiveStart).toLocaleDateString()}
         {effectiveEndDate && ` - ${effectiveEndDate.toLocaleDateString()}`}
       </div>
 
       {showActions && (
-        <div className="flex items-center gap-2 pt-4 border-t border-stone-700">
+        <div className="flex items-center gap-2 pt-4 border-t border-stroke-default">
           {!isStopped && (
             <>
               {!coverage.isPrimary && onSetPrimary && (
@@ -120,8 +120,8 @@ export function CoverageCard({
                   onClick={() => onSetPrimary(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-700 hover:bg-stone-200'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   <StarOff className="w-4 h-4" />
@@ -133,8 +133,8 @@ export function CoverageCard({
                   onClick={() => onRefreshVerification(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-700 hover:bg-stone-200'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -146,7 +146,7 @@ export function CoverageCard({
                   onClick={() => onStopCoverage(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-orange-400 hover:bg-stone-800'
+                      ? 'text-orange-400 hover:bg-surface-sunken'
                       : 'text-orange-600 hover:bg-orange-50'
                   }`}
                 >
@@ -161,7 +161,7 @@ export function CoverageCard({
               onClick={() => onResumeCoverage(coverage)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 darkMode
-                  ? 'text-green-400 hover:bg-stone-800'
+                  ? 'text-green-400 hover:bg-surface-sunken'
                   : 'text-green-600 hover:bg-green-50'
               }`}
             >

@@ -3,22 +3,22 @@ import { Search, Info } from 'lucide-react';
 
 export function ActionFieldsPage() {
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Action Fields</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Action Fields</h1>
+          <p className="text-content-secondary">
             Form input fields with various states, sizes, and validation options
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-3 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Left Icon</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Left Icon</h3>
                 <div className="space-y-4">
                   <ActionField
                     leftIcon={<Search className="w-4 h-4" />}
@@ -30,7 +30,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Right Icon</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Right Icon</h3>
                 <div className="space-y-4">
                   <ActionField
                     rightIcon={<Search className="w-4 h-4" />}
@@ -42,7 +42,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Left + Right Icon</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Left + Right Icon</h3>
                 <div className="space-y-4">
                   <ActionField
                     leftIcon={<Search className="w-4 h-4" />}
@@ -56,58 +56,58 @@ export function ActionFieldsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Single & Double Line - Not Recommended for Use</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Single & Double Line - Not Recommended for Use</h2>
 
             <div className="grid grid-cols-6 gap-6">
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Default Combination</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Default Combination</h3>
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" />
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" />
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="removable-tag" />
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Normal (without)</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Normal (without)</h3>
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} variant="search" />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} variant="removable-tag" />
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Small Combination</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Small Combination</h3>
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" size="small" />
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" size="small" />
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="removable-tag" size="small" />
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Small (without)</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Small (without)</h3>
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} size="small" />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} variant="search" size="small" />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} showHelper={false} variant="removable-tag" size="small" />
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Normal Combination</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Normal Combination</h3>
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} helperText="Helper text" />
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Small Combination</h3>
+                <h3 className="text-xs font-semibold text-content-secondary mb-2">Small Combination</h3>
                 <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" size="small" />
                 <ActionField placeholder="Input Nominal/ Nilai" showLabel={false} helperText="Helper text" size="small" />
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">All States - Default</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">All States - Default</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Default</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Default</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" />
@@ -116,7 +116,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Hover</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Hover</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="hover" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="hover" />
@@ -125,7 +125,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Focused</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Focused</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="focused" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="focused" />
@@ -134,7 +134,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Disabled</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Disabled</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="disabled" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="disabled" />
@@ -143,7 +143,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Read Only</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Read Only</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon value="Read only value" helperText="Helper text" state="readonly" />
                   <ActionField label="Label text" showInfoIcon value="Read only value" helperText="Helper text" variant="search" state="readonly" />
@@ -152,7 +152,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Error</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Error</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="error" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="error" />
@@ -161,7 +161,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Warning</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Warning</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="warning" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="warning" />
@@ -170,7 +170,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Success</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Success</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="success" />
                   <ActionField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" variant="search" state="success" />
@@ -180,12 +180,12 @@ export function ActionFieldsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Text Area Fields</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Text Area Fields</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Default</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Default</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" />
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="focused" />
@@ -194,7 +194,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Validation States</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Validation States</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="error" />
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" state="warning" />
@@ -203,7 +203,7 @@ export function ActionFieldsPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Small Size</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Small Size</h3>
                 <div className="grid grid-cols-3 gap-6">
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" size="small" />
                   <TextAreaField label="Label text" showInfoIcon placeholder="Input Nominal/ Nilai" helperText="Helper text" size="small" state="focused" />
@@ -213,8 +213,8 @@ export function ActionFieldsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Examples</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Examples</h2>
 
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
@@ -277,10 +277,10 @@ export function ActionFieldsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

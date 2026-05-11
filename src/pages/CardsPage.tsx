@@ -2,43 +2,42 @@ import { Card, ContentCard, SkeletonCard } from '../components/ui/Card';
 
 export function CardsPage() {
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="w-full max-w-7xl mx-auto p-8 space-y-12 min-h-0">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Cards</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-content-primary mb-2">Cards</h1>
+          <p className="text-content-secondary">
             Flexible container components with various shadow styles and states
           </p>
         </div>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Shadow Variations</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">Shadow Variations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">NO SHADOW</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">NO SHADOW</p>
               <Card shadow="none" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Default card</p>
+                <p className="text-sm text-content-secondary">Default card</p>
               </Card>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">FLAT RIGHT SHADOW</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">FLAT RIGHT SHADOW</p>
               <Card shadow="flat-right" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Default card</p>
+                <p className="text-sm text-content-secondary">Default card</p>
               </Card>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">FLAT ANGLE RIGHT SHADOW</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">FLAT ANGLE RIGHT SHADOW</p>
               <Card shadow="flat-angle-right" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Default card</p>
+                <p className="text-sm text-content-secondary">Default card</p>
               </Card>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">BLUR SHADOW</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">BLUR SHADOW</p>
               <Card shadow="blur" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Default card</p>
+                <p className="text-sm text-content-secondary">Default card</p>
               </Card>
             </div>
           </div>
@@ -55,14 +54,14 @@ export function CardsPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">States</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">States</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">DEFAULT</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">DEFAULT</p>
               <Card state="default" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Default state</p>
+                <p className="text-sm text-content-secondary">Default state</p>
               </Card>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-content-secondary mt-2">
                 Background: Neutral 00
                 <br />
                 Border: Neutral 80
@@ -70,11 +69,11 @@ export function CardsPage() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">HOVER</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">HOVER</p>
               <Card state="hover" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Hover state</p>
+                <p className="text-sm text-content-secondary">Hover state</p>
               </Card>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-content-secondary mt-2">
                 Background: Neutral 00
                 <br />
                 Border: Neutral 80
@@ -82,11 +81,11 @@ export function CardsPage() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">SELECTED</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">SELECTED</p>
               <Card state="selected" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Selected state</p>
+                <p className="text-sm text-content-secondary">Selected state</p>
               </Card>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-content-secondary mt-2">
                 Background: Action 90
                 <br />
                 Border: Action 90
@@ -94,11 +93,11 @@ export function CardsPage() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">HOVER SELECTED</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">HOVER SELECTED</p>
               <Card state="hover-selected" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Hover selected</p>
+                <p className="text-sm text-content-secondary">Hover selected</p>
               </Card>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-content-secondary mt-2">
                 Background: Action 10*
                 <br />
                 Border: Action 90
@@ -108,14 +107,14 @@ export function CardsPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Disabled State</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">Disabled State</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">DISABLED</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">DISABLED</p>
               <Card state="disabled" className="w-full h-32 p-6">
-                <p className="text-sm text-gray-400">Disabled state</p>
+                <p className="text-sm text-content-tertiary">Disabled state</p>
               </Card>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-content-secondary mt-2">
                 Background: Neutral 10
                 <br />
                 Border: Neutral 30*
@@ -125,17 +124,17 @@ export function CardsPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Skeleton Loading</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">Skeleton Loading</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">SKELETON LOADING</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">SKELETON LOADING</p>
               <SkeletonCard />
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Content Examples</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">Content Examples</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ContentCard
               shadow="flat-right"
@@ -156,7 +155,7 @@ export function CardsPage() {
               footer={
                 <div className="flex gap-2">
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">12 items</span>
+                  <span className="px-2 py-1 bg-surface-sunken text-content-primary text-xs rounded-full">12 items</span>
                 </div>
               }
             />
@@ -176,22 +175,22 @@ export function CardsPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Focus Ring</h2>
+          <h2 className="text-2xl font-semibold text-content-primary mb-6">Focus Ring</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-4">FOCUS RING</p>
+              <p className="text-sm font-medium text-content-secondary mb-4">FOCUS RING</p>
               <Card focusRing className="w-full h-32 p-6">
-                <p className="text-sm text-gray-600">Press Tab to focus</p>
+                <p className="text-sm text-content-secondary">Press Tab to focus</p>
               </Card>
             </div>
           </div>
         </section>
 
-        <section className="bg-white rounded-lg p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Usage Guidelines</h2>
-          <div className="space-y-4 text-sm text-gray-600">
+        <section className="bg-surface-raised rounded-lg p-6 border border-stroke-subtle">
+          <h2 className="text-xl font-semibold text-content-primary mb-4">Usage Guidelines</h2>
+          <div className="space-y-4 text-sm text-content-secondary">
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">When to Use Cards</h3>
+              <h3 className="font-medium text-content-primary mb-2">When to Use Cards</h3>
               <ul className="list-disc list-inside space-y-1">
                 <li>To group related information and actions</li>
                 <li>As clickable containers that lead to more detailed content</li>
@@ -200,7 +199,7 @@ export function CardsPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">Shadow Selection</h3>
+              <h3 className="font-medium text-content-primary mb-2">Shadow Selection</h3>
               <ul className="list-disc list-inside space-y-1">
                 <li><strong>No Shadow:</strong> For subtle, minimal designs</li>
                 <li><strong>Flat Right:</strong> Standard shadow for most use cases</li>
@@ -209,7 +208,7 @@ export function CardsPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">Accessibility</h3>
+              <h3 className="font-medium text-content-primary mb-2">Accessibility</h3>
               <ul className="list-disc list-inside space-y-1">
                 <li>Use focusRing prop for keyboard navigation</li>
                 <li>Ensure sufficient color contrast in all states</li>
@@ -218,7 +217,6 @@ export function CardsPage() {
             </div>
           </div>
         </section>
-      </div>
     </div>
   );
 }

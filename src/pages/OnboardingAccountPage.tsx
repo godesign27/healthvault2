@@ -101,12 +101,12 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
     errors[fieldName]
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
   } focus:outline-none focus:ring-2`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -125,14 +125,14 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
       }
     >
       <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <button
           onClick={onBack}
           className={`flex items-center gap-2 mb-6 text-sm font-medium transition-colors ${
             darkMode
-              ? 'text-stone-400 hover:text-stone-300'
-              : 'text-stone-600 hover:text-stone-900'
+              ? 'text-content-secondary hover:text-content-primary'
+              : 'text-content-secondary hover:text-content-primary'
           }`}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -141,12 +141,12 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
 
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Create Your Account
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             All fields marked with * are required
           </p>
@@ -166,8 +166,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                 errors.email
                   ? 'border-red-500 focus:ring-red-500'
                   : darkMode
-                    ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-                    : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+                    ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+                    : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
               } focus:outline-none focus:ring-2`}
             />
             {errors.email && (
@@ -193,8 +193,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
                     darkMode
-                      ? 'text-stone-400 hover:text-stone-300'
-                      : 'text-stone-600 hover:text-stone-900'
+                      ? 'text-content-secondary hover:text-content-primary'
+                      : 'text-content-secondary hover:text-content-primary'
                   }`}
                   tabIndex={-1}
                 >
@@ -227,8 +227,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
                     darkMode
-                      ? 'text-stone-400 hover:text-stone-300'
-                      : 'text-stone-600 hover:text-stone-900'
+                      ? 'text-content-secondary hover:text-content-primary'
+                      : 'text-content-secondary hover:text-content-primary'
                   }`}
                   tabIndex={-1}
                 >
@@ -246,10 +246,10 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
           </div>
 
           <div className={`p-4 rounded-lg ${
-            darkMode ? 'bg-stone-800' : 'bg-stone-50'
+            darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
           }`}>
             <p className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Your password must be at least 8 characters long and should include a mix of letters, numbers, and symbols for better security.
             </p>

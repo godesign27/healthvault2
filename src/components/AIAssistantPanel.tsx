@@ -962,8 +962,8 @@ export function AIAssistantPanel({
     <aside
       className={`h-full border-l flex flex-col w-full ${
         darkMode
-          ? 'border-stone-800 bg-white'
-          : 'border-stone-200 bg-white'
+          ? 'border-stroke-subtle bg-white'
+          : 'border-stroke-subtle bg-white'
       }`}
     >
       {showProviderConnectionFlow ? (
@@ -976,12 +976,12 @@ export function AIAssistantPanel({
         />
       ) : (
         <>
-          <div className="p-6 border-b flex-shrink-0 border-stone-200 bg-white">
+          <div className="p-6 border-b flex-shrink-0 border-stroke-subtle bg-white">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100">
-                <MessageCircle className="w-5 h-5 text-stone-700" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-sunken">
+                <MessageCircle className="w-5 h-5 text-content-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-stone-900">
+              <h2 className="text-lg font-semibold text-content-primary">
                 Health Assistant
               </h2>
             </div>
@@ -994,15 +994,15 @@ export function AIAssistantPanel({
                   <button
                     onClick={handleInsuranceBack}
                     className={`p-2 rounded-lg transition-colors ${
-                      darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'
+                      darkMode ? 'hover:bg-surface-sunken' : 'hover:bg-surface-sunken'
                     }`}
                   >
                     <ArrowLeft className={`w-5 h-5 ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`} />
                   </button>
                   <h3 className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>
                     {insuranceStep === 'picker' ? 'Select Insurance Provider' : `Connect ${selectedProvider?.name}`}
                   </h3>
@@ -1010,9 +1010,9 @@ export function AIAssistantPanel({
 
                 {insuranceStep === 'picker' && (
                   <>
-                    <div className={`relative mb-4 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                    <div className={`relative mb-4 ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                       <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
+                        darkMode ? 'text-content-secondary' : 'text-content-secondary'
                       }`} />
                       <input
                         type="text"
@@ -1021,8 +1021,8 @@ export function AIAssistantPanel({
                         onChange={(e) => setProviderSearchQuery(e.target.value)}
                         className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                           darkMode
-                            ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                            : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                            ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                            : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                         }`}
                       />
                     </div>
@@ -1036,7 +1036,7 @@ export function AIAssistantPanel({
                         {providers.filter(p => p.isPopular && (!providerSearchQuery || p.name.toLowerCase().includes(providerSearchQuery.toLowerCase()))).length > 0 && (
                           <div className="mb-6">
                             <h4 className={`text-sm font-medium mb-3 ${
-                              darkMode ? 'text-stone-400' : 'text-stone-600'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Popular Providers
                             </h4>
@@ -1049,8 +1049,8 @@ export function AIAssistantPanel({
                                     onClick={() => handleSelectProvider(provider)}
                                     className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
                                       darkMode
-                                        ? 'border-stone-700 hover:bg-stone-800 hover:border-indigo-600'
-                                        : 'border-stone-200 hover:bg-stone-50 hover:border-indigo-600'
+                                        ? 'border-stroke-default hover:bg-surface-sunken hover:border-indigo-600'
+                                        : 'border-stroke-subtle hover:bg-surface-sunken hover:border-indigo-600'
                                     }`}
                                   >
                                     {provider.logoUrl && (
@@ -1061,7 +1061,7 @@ export function AIAssistantPanel({
                                       />
                                     )}
                                     <span className={`text-sm font-medium ${
-                                      darkMode ? 'text-white' : 'text-stone-900'
+                                      darkMode ? 'text-white' : 'text-content-primary'
                                     }`}>
                                       {provider.name}
                                     </span>
@@ -1074,7 +1074,7 @@ export function AIAssistantPanel({
                         {providers.filter(p => !p.isPopular && (!providerSearchQuery || p.name.toLowerCase().includes(providerSearchQuery.toLowerCase()))).length > 0 && (
                           <div>
                             <h4 className={`text-sm font-medium mb-3 ${
-                              darkMode ? 'text-stone-400' : 'text-stone-600'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               All Providers
                             </h4>
@@ -1087,8 +1087,8 @@ export function AIAssistantPanel({
                                     onClick={() => handleSelectProvider(provider)}
                                     className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
                                       darkMode
-                                        ? 'border-stone-700 hover:bg-stone-800'
-                                        : 'border-stone-200 hover:bg-stone-50'
+                                        ? 'border-stroke-default hover:bg-surface-sunken'
+                                        : 'border-stroke-subtle hover:bg-surface-sunken'
                                     }`}
                                   >
                                     {provider.logoUrl && (
@@ -1099,7 +1099,7 @@ export function AIAssistantPanel({
                                       />
                                     )}
                                     <span className={`font-medium ${
-                                      darkMode ? 'text-white' : 'text-stone-900'
+                                      darkMode ? 'text-white' : 'text-content-primary'
                                     }`}>
                                       {provider.name}
                                     </span>
@@ -1125,7 +1125,7 @@ export function AIAssistantPanel({
                 {savingCoverage && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-                    <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                       Saving your coverage...
                     </p>
                   </div>
@@ -1156,34 +1156,34 @@ export function AIAssistantPanel({
                     </div>
 
                     <div className={`rounded-lg border p-6 ${
-                      darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
+                      darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
                     }`}>
                       <h4 className={`text-sm font-semibold mb-4 ${
-                        darkMode ? 'text-white' : 'text-stone-900'
+                        darkMode ? 'text-white' : 'text-content-primary'
                       }`}>
                         Coverage Summary
                       </h4>
                       <div className="space-y-3">
                         <div>
                           <label className={`text-xs font-medium ${
-                            darkMode ? 'text-stone-400' : 'text-stone-500'
+                            darkMode ? 'text-content-secondary' : 'text-content-secondary'
                           }`}>
                             Provider
                           </label>
                           <p className={`text-sm mt-1 ${
-                            darkMode ? 'text-white' : 'text-stone-900'
+                            darkMode ? 'text-white' : 'text-content-primary'
                           }`}>
                             {selectedProvider.name}
                           </p>
                         </div>
                         <div>
                           <label className={`text-xs font-medium ${
-                            darkMode ? 'text-stone-400' : 'text-stone-500'
+                            darkMode ? 'text-content-secondary' : 'text-content-secondary'
                           }`}>
                             Plan Name
                           </label>
                           <p className={`text-sm mt-1 ${
-                            darkMode ? 'text-white' : 'text-stone-900'
+                            darkMode ? 'text-white' : 'text-content-primary'
                           }`}>
                             {submittedCoverage.planName}
                           </p>
@@ -1191,12 +1191,12 @@ export function AIAssistantPanel({
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Member ID
                             </label>
                             <p className={`text-sm mt-1 font-mono ${
-                              darkMode ? 'text-white' : 'text-stone-900'
+                              darkMode ? 'text-white' : 'text-content-primary'
                             }`}>
                               {submittedCoverage.memberId}
                             </p>
@@ -1204,12 +1204,12 @@ export function AIAssistantPanel({
                           {submittedCoverage.groupNumber && (
                             <div>
                               <label className={`text-xs font-medium ${
-                                darkMode ? 'text-stone-400' : 'text-stone-500'
+                                darkMode ? 'text-content-secondary' : 'text-content-secondary'
                               }`}>
                                 Group Number
                               </label>
                               <p className={`text-sm mt-1 font-mono ${
-                                darkMode ? 'text-white' : 'text-stone-900'
+                                darkMode ? 'text-white' : 'text-content-primary'
                               }`}>
                                 {submittedCoverage.groupNumber}
                               </p>
@@ -1221,12 +1221,12 @@ export function AIAssistantPanel({
                             {submittedCoverage.bin && (
                               <div>
                                 <label className={`text-xs font-medium ${
-                                  darkMode ? 'text-stone-400' : 'text-stone-500'
+                                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                                 }`}>
                                   BIN
                                 </label>
                                 <p className={`text-sm mt-1 font-mono ${
-                                  darkMode ? 'text-white' : 'text-stone-900'
+                                  darkMode ? 'text-white' : 'text-content-primary'
                                 }`}>
                                   {submittedCoverage.bin}
                                 </p>
@@ -1235,12 +1235,12 @@ export function AIAssistantPanel({
                             {submittedCoverage.pcn && (
                               <div>
                                 <label className={`text-xs font-medium ${
-                                  darkMode ? 'text-stone-400' : 'text-stone-500'
+                                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                                 }`}>
                                   PCN
                                 </label>
                                 <p className={`text-sm mt-1 font-mono ${
-                                  darkMode ? 'text-white' : 'text-stone-900'
+                                  darkMode ? 'text-white' : 'text-content-primary'
                                 }`}>
                                   {submittedCoverage.pcn}
                                 </p>
@@ -1251,24 +1251,24 @@ export function AIAssistantPanel({
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Relationship
                             </label>
                             <p className={`text-sm mt-1 capitalize ${
-                              darkMode ? 'text-white' : 'text-stone-900'
+                              darkMode ? 'text-white' : 'text-content-primary'
                             }`}>
                               {submittedCoverage.relationship}
                             </p>
                           </div>
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Effective Start
                             </label>
                             <p className={`text-sm mt-1 ${
-                              darkMode ? 'text-white' : 'text-stone-900'
+                              darkMode ? 'text-white' : 'text-content-primary'
                             }`}>
                               {submittedCoverage.effectiveStart ? new Date(submittedCoverage.effectiveStart).toLocaleDateString() : 'N/A'}
                             </p>
@@ -1279,27 +1279,27 @@ export function AIAssistantPanel({
 
                     {selectedProvider && (
                       <div className={`rounded-lg border p-6 ${
-                        darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
+                        darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
                       }`}>
                         <h4 className={`text-sm font-semibold mb-4 ${
-                          darkMode ? 'text-white' : 'text-stone-900'
+                          darkMode ? 'text-white' : 'text-content-primary'
                         }`}>
                           Provider Contact Information
                         </h4>
                         <div className="space-y-3 text-sm">
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Customer Service
                             </label>
-                            <p className={`mt-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                            <p className={`mt-1 ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                               Available Monday - Friday, 8:00 AM - 8:00 PM EST
                             </p>
                           </div>
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Phone
                             </label>
@@ -1309,7 +1309,7 @@ export function AIAssistantPanel({
                           </div>
                           <div>
                             <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
+                              darkMode ? 'text-content-secondary' : 'text-content-secondary'
                             }`}>
                               Website
                             </label>
@@ -1339,17 +1339,17 @@ export function AIAssistantPanel({
               <>
                 {messages.length === 1 && (
                   <div className="space-y-6">
-                    <div className="bg-stone-50 rounded-2xl p-6">
-                      <p className="text-base leading-relaxed text-stone-900">
+                    <div className="bg-surface-sunken rounded-2xl p-6">
+                      <p className="text-base leading-relaxed text-content-primary">
                         Hello! I'm your AI health assistant. I can help you manage your health records, schedule appointments, track vitals, and answer medical questions.
                       </p>
-                      <p className="text-sm text-stone-500 mt-2">Just now</p>
+                      <p className="text-sm text-content-secondary mt-2">Just now</p>
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-stone-400" />
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                        <Sparkles className="w-4 h-4 text-content-secondary" />
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-content-secondary">
                           Suggestions
                         </h3>
                       </div>
@@ -1357,7 +1357,7 @@ export function AIAssistantPanel({
                         <button
                           key={index}
                           onClick={() => handleQuickAction(suggestion)}
-                          className="w-full text-left px-5 py-3.5 rounded-xl bg-white border border-stone-200 text-stone-700 text-sm hover:bg-stone-50 hover:border-stone-300 transition-all"
+                          className="w-full text-left px-5 py-3.5 rounded-xl bg-white border border-stroke-subtle text-content-primary text-sm hover:bg-surface-sunken hover:border-stroke-default transition-all"
                         >
                           {suggestion}
                         </button>
@@ -1371,12 +1371,12 @@ export function AIAssistantPanel({
                     {messages.map((msg, index) => (
                       <div key={index} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.type === 'assistant' && (
-                          <div className="bg-stone-50 rounded-2xl px-5 py-4 max-w-[85%]">
-                            <p className="text-sm leading-relaxed text-stone-900 whitespace-pre-wrap">{msg.message}</p>
+                          <div className="bg-surface-sunken rounded-2xl px-5 py-4 max-w-[85%]">
+                            <p className="text-sm leading-relaxed text-content-primary whitespace-pre-wrap">{msg.message}</p>
                           </div>
                         )}
                         {msg.type === 'user' && (
-                          <div className="bg-stone-900 rounded-2xl px-5 py-4 max-w-[85%]">
+                          <div className="bg-surface-raised rounded-2xl px-5 py-4 max-w-[85%]">
                             <p className="text-sm text-white leading-relaxed">{msg.message}</p>
                           </div>
                         )}
@@ -1384,8 +1384,8 @@ export function AIAssistantPanel({
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-stone-50 rounded-2xl px-5 py-4">
-                          <Loader2 className="w-4 h-4 animate-spin text-stone-600" />
+                        <div className="bg-surface-sunken rounded-2xl px-5 py-4">
+                          <Loader2 className="w-4 h-4 animate-spin text-content-secondary" />
                         </div>
                       </div>
                     )}
@@ -1408,7 +1408,7 @@ export function AIAssistantPanel({
           </div>
 
           {!showInsuranceFlow && (
-            <div className="p-6 border-t flex-shrink-0 border-stone-200 bg-white">
+            <div className="p-6 border-t flex-shrink-0 border-stroke-subtle bg-white">
               <div className="flex gap-3 items-end">
                 <input
                   type="text"
@@ -1417,14 +1417,14 @@ export function AIAssistantPanel({
                   onKeyPress={handleKeyPress}
                   placeholder="Ask your health assistant anything..."
                   disabled={isLoading}
-                  className={`flex-1 px-4 py-3.5 border border-stone-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent bg-white text-stone-900 placeholder:text-stone-400 ${
+                  className={`flex-1 px-4 py-3.5 border border-stroke-default rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-stroke-strong focus:border-transparent bg-white text-content-primary placeholder:text-content-secondary ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={isLoading}
-                  className={`flex items-center justify-center w-12 h-12 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-all flex-shrink-0 hover:scale-105 ${
+                  className={`flex items-center justify-center w-12 h-12 bg-surface-raised text-white rounded-full hover:bg-surface-sunken transition-all flex-shrink-0 hover:scale-105 ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >

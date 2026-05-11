@@ -116,21 +116,21 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
 
   return (
     <div className={`flex flex-col h-full ${
-      darkMode ? 'bg-stone-900' : 'bg-white'
+      darkMode ? 'bg-surface-raised' : 'bg-white'
     }`}>
       <div className={`p-4 border-b ${
-        darkMode ? 'border-stone-800' : 'border-stone-200'
+        darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
       }`}>
         <div className="flex items-center gap-2 mb-1">
           <Sparkles className="w-5 h-5 text-emerald-500" />
           <h3 className={`font-semibold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             AI Health Assistant
           </h3>
         </div>
         <p className={`text-xs ${
-          darkMode ? 'text-stone-400' : 'text-stone-600'
+          darkMode ? 'text-content-secondary' : 'text-content-secondary'
         }`}>
           Ask me to upload, find, compare, explain, or share your records.
         </p>
@@ -149,8 +149,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
                     ? 'bg-emerald-600 text-white'
                     : 'bg-emerald-600 text-white'
                   : darkMode
-                    ? 'bg-stone-800 text-stone-200'
-                    : 'bg-stone-100 text-stone-900'
+                    ? 'bg-surface-sunken text-content-primary'
+                    : 'bg-surface-sunken text-content-primary'
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -166,7 +166,7 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
         {messages.length === 1 && (
           <div className="space-y-2 pt-4">
             <p className={`text-xs font-medium mb-3 ${
-              darkMode ? 'text-stone-500' : 'text-stone-500'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Suggested actions:
             </p>
@@ -174,8 +174,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
               onClick={() => handleStarterPrompt('FILTER_BY_KIND' as CommandIntent, { kind: RecordKind.Lab })}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               <FlaskConical className="w-4 h-4" />
@@ -185,8 +185,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
               onClick={() => handleStarterPrompt('FILTER_BY_KIND' as CommandIntent, { kind: RecordKind.Imaging })}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               <Image className="w-4 h-4" />
@@ -196,8 +196,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
               onClick={() => handleStarterPrompt('UPLOAD_RECORD' as CommandIntent)}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               <Upload className="w-4 h-4" />
@@ -207,8 +207,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
               onClick={() => handleStarterPrompt('CONNECT_PROVIDER' as CommandIntent)}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               <Database className="w-4 h-4" />
@@ -218,8 +218,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
               onClick={() => handleStarterPrompt('REQUEST_RECORDS' as CommandIntent)}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
               }`}
             >
               <SendHorizontal className="w-4 h-4" />
@@ -232,7 +232,7 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
       </div>
 
       <div className={`p-4 border-t ${
-        darkMode ? 'border-stone-800' : 'border-stone-200'
+        darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
       }`}>
         <div className="flex gap-2">
           <input
@@ -244,8 +244,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
             disabled={isProcessing}
             className={`flex-1 px-4 py-2 rounded-lg border text-sm ${
               darkMode
-                ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
             }`}
           />
           <button
@@ -254,8 +254,8 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
             className={`p-2 rounded-lg transition-colors ${
               !input.trim() || isProcessing
                 ? darkMode
-                  ? 'bg-stone-800 text-stone-600 cursor-not-allowed'
-                  : 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                  ? 'bg-surface-sunken text-content-secondary cursor-not-allowed'
+                  : 'bg-surface-sunken text-content-secondary cursor-not-allowed'
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >

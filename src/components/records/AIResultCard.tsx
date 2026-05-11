@@ -28,8 +28,8 @@ export function AIResultCard({ insight, darkMode = false, onPin }: AIResultCardP
             onClick={onPin}
             className={`p-1.5 rounded transition-colors ${
               darkMode
-                ? 'hover:bg-stone-700 text-stone-400'
-                : 'hover:bg-white text-stone-500'
+                ? 'hover:bg-surface-sunken text-content-secondary'
+                : 'hover:bg-white text-content-secondary'
             }`}
             title="Pin to Notes"
           >
@@ -39,13 +39,13 @@ export function AIResultCard({ insight, darkMode = false, onPin }: AIResultCardP
       </div>
 
       <div className={`text-sm whitespace-pre-wrap ${
-        darkMode ? 'text-stone-200' : 'text-stone-700'
+        darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
         {insight.result}
       </div>
 
       <div className={`mt-3 text-xs ${
-        darkMode ? 'text-stone-500' : 'text-stone-500'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
         Generated {new Date(insight.createdAt).toLocaleTimeString()}
       </div>

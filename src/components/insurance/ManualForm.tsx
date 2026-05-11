@@ -57,12 +57,12 @@ export function ManualForm({ providerId, onSubmit, onCancel, darkMode = false }:
 
   const inputClass = `w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
     darkMode
-      ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-      : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
   }`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -200,8 +200,8 @@ export function ManualForm({ providerId, onSubmit, onCancel, darkMode = false }:
           onClick={onCancel}
           className={`px-6 py-3 font-medium rounded-lg transition-colors ${
             darkMode
-              ? 'text-stone-300 hover:bg-stone-800'
-              : 'text-stone-700 hover:bg-stone-100'
+              ? 'text-content-primary hover:bg-surface-sunken'
+              : 'text-content-primary hover:bg-surface-sunken'
           }`}
         >
           Cancel

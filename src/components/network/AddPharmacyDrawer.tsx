@@ -183,29 +183,29 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-      <div className={`fixed right-0 top-0 h-full w-full max-w-2xl z-50 ${darkMode ? 'bg-stone-900' : 'bg-white'} shadow-xl flex flex-col`}>
-        <div className={`sticky top-0 z-10 flex items-center justify-between p-6 border-b ${darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}`}>
-          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+      <div className={`fixed right-0 top-0 h-full w-full max-w-2xl z-50 ${'bg-surface-raised'} shadow-xl flex flex-col`}>
+        <div className={`sticky top-0 z-10 flex items-center justify-between p-6 border-b ${'bg-surface-raised border-stroke-subtle'}`}>
+          <h2 className={`text-2xl font-bold ${'text-content-primary'}`}>
             Add Pharmacy
           </h2>
-          <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'}`}>
-            <X className={`w-6 h-6 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+          <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${'hover:bg-surface-sunken'}`}>
+            <X className={`w-6 h-6 ${'text-content-secondary'}`} />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 pb-32">
-          <div className={`inline-flex rounded-lg p-1 mb-6 ${darkMode ? 'bg-stone-800' : 'bg-stone-100'}`}>
+          <div className={`inline-flex rounded-lg p-1 mb-6 ${'bg-surface-sunken'}`}>
             <button
               type="button"
               onClick={() => setViewMode('map')}
               className={`px-4 py-2 rounded-md font-medium transition-all ${
                 viewMode === 'map'
                   ? darkMode
-                    ? 'bg-stone-700 text-white'
-                    : 'bg-white text-stone-900 shadow-sm'
+                    ? 'bg-surface-sunken text-white'
+                    : 'bg-white text-content-primary shadow-sm'
                   : darkMode
-                  ? 'text-stone-400'
-                  : 'text-stone-600'
+                  ? 'text-content-secondary'
+                  : 'text-content-secondary'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -219,11 +219,11 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
               className={`px-4 py-2 rounded-md font-medium transition-all ${
                 viewMode === 'manual'
                   ? darkMode
-                    ? 'bg-stone-700 text-white'
-                    : 'bg-white text-stone-900 shadow-sm'
+                    ? 'bg-surface-sunken text-white'
+                    : 'bg-white text-content-primary shadow-sm'
                   : darkMode
-                  ? 'text-stone-400'
-                  : 'text-stone-600'
+                  ? 'text-content-secondary'
+                  : 'text-content-secondary'
               }`}
             >
               Manual Entry
@@ -238,9 +238,9 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                 </div>
               ) : (
                 <>
-                  <div className={`h-64 rounded-xl overflow-hidden border ${darkMode ? 'border-stone-700 bg-stone-800' : 'border-stone-200 bg-stone-100'}`} ref={mapRef}>
+                  <div className={`h-64 rounded-xl overflow-hidden border ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-surface-sunken'}`} ref={mapRef}>
                     <div className="relative w-full h-full">
-                      <div className={`absolute inset-0 ${darkMode ? 'bg-stone-800' : 'bg-stone-100'}`}>
+                      <div className={`absolute inset-0 ${'bg-surface-sunken'}`}>
                         <svg className="w-full h-full" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
                           <defs>
                             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -264,18 +264,18 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                           type="button"
                           onClick={getUserLocation}
                           className={`p-2 rounded-lg shadow-lg transition-colors ${
-                            darkMode ? 'bg-stone-700 hover:bg-stone-600' : 'bg-white hover:bg-stone-50'
+                            darkMode ? 'bg-surface-sunken hover:bg-surface-overlay' : 'bg-surface-raised hover:bg-surface-sunken'
                           }`}
                           title="Get current location"
                         >
-                          <Navigation className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-stone-700'}`} />
+                          <Navigation className={`w-5 h-5 ${'text-content-primary'}`} />
                         </button>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <h3 className={`text-sm font-semibold ${'text-content-primary'}`}>
                       Nearby Pharmacies
                     </h3>
                     {nearbyPharmacies.map((pharmacy, idx) => (
@@ -289,29 +289,29 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                               ? 'bg-blue-900/30 border-2 border-blue-600'
                               : 'bg-blue-50 border-2 border-blue-600'
                             : darkMode
-                            ? 'bg-stone-800 border border-stone-700 hover:border-stone-600'
-                            : 'bg-white border border-stone-200 hover:border-stone-300'
+                            ? 'bg-surface-sunken border border-stroke-default hover:border-stroke-default'
+                            : 'bg-white border border-stroke-subtle hover:border-stroke-default'
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                              <h4 className={`font-semibold ${'text-content-primary'}`}>
                                 {pharmacy.name}
                               </h4>
                               {pharmacy.distance && (
                                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                  darkMode ? 'bg-stone-700 text-stone-300' : 'bg-stone-100 text-stone-600'
+                                  darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
                                 }`}>
                                   {pharmacy.distance}
                                 </span>
                               )}
                             </div>
-                            <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                            <p className={`text-sm ${'text-content-secondary'}`}>
                               {pharmacy.address}
                             </p>
                             {pharmacy.phone && (
-                              <p className={`text-sm mt-1 ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              <p className={`text-sm mt-1 ${'text-content-secondary'}`}>
                                 {pharmacy.phone}
                               </p>
                             )}
@@ -320,8 +320,8 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                             selectedPharmacy?.name === pharmacy.name
                               ? 'text-blue-600'
                               : darkMode
-                              ? 'text-stone-600'
-                              : 'text-stone-400'
+                              ? 'text-content-secondary'
+                              : 'text-content-secondary'
                           }`} />
                         </div>
                       </button>
@@ -330,9 +330,9 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
 
                   {selectedPharmacy && (
                     <div className={`p-4 rounded-xl border ${
-                      darkMode ? 'bg-stone-800 border-stone-700' : 'bg-stone-50 border-stone-200'
+                      'bg-surface-sunken border-stroke-subtle'
                     }`}>
-                      <h4 className={`text-sm font-semibold mb-3 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                      <h4 className={`text-sm font-semibold mb-3 ${'text-content-primary'}`}>
                         Delivery Options
                       </h4>
                       <div className="flex gap-3 mb-4">
@@ -345,8 +345,8 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                               formData.deliveryOptions?.includes(option)
                                 ? 'bg-blue-600 text-white'
                                 : darkMode
-                                ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
-                                : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
+                                ? 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
+                                : 'bg-surface-overlay text-content-primary hover:bg-surface-sunken'
                             }`}
                           >
                             {option}
@@ -358,9 +358,9 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                           type="checkbox"
                           checked={formData.preferred || false}
                           onChange={(e) => setFormData({ ...formData, preferred: e.target.checked })}
-                          className="w-4 h-4 rounded border-stone-300"
+                          className="w-4 h-4 rounded border-stroke-default"
                         />
-                        <span className={`text-sm ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                        <span className={`text-sm ${'text-content-primary'}`}>
                           Set as preferred pharmacy
                         </span>
                       </label>
@@ -372,7 +372,7 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
           ) : (
             <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Pharmacy Name *
               </label>
               <input
@@ -380,7 +380,7 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.name ? 'border-red-500' : darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'
+                  errors.name ? 'border-red-500' : darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'
                 }`}
                 placeholder="CVS Pharmacy"
               />
@@ -388,46 +388,46 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Chain
               </label>
               <input
                 type="text"
                 value={formData.chain || ''}
                 onChange={(e) => setFormData({ ...formData, chain: e.target.value })}
-                className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                 placeholder="CVS, Walgreens, Independent"
               />
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Phone
               </label>
               <input
                 type="tel"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                className={`w-full px-4 py-3 rounded-lg border ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                 placeholder="(555) 123-4567"
               />
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Address
               </label>
               <textarea
                 value={formData.address || ''}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={3}
-                className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                 placeholder="123 Main St, Springfield, IL 62701"
               />
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Delivery Options
               </label>
               <div className="flex gap-3">
@@ -440,8 +440,8 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                       formData.deliveryOptions?.includes(option)
                         ? 'bg-blue-600 text-white'
                         : darkMode
-                        ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                        : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
+                        ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken'
+                        : 'bg-surface-overlay text-content-primary hover:bg-surface-sunken'
                     }`}
                   >
                     {option}
@@ -456,22 +456,22 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
                 id="preferred"
                 checked={formData.preferred || false}
                 onChange={(e) => setFormData({ ...formData, preferred: e.target.checked })}
-                className="w-5 h-5 rounded border-stone-300"
+                className="w-5 h-5 rounded border-stroke-default"
               />
-              <label htmlFor="preferred" className={`ml-3 text-sm font-medium ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label htmlFor="preferred" className={`ml-3 text-sm font-medium ${'text-content-primary'}`}>
                 Set as preferred pharmacy
               </label>
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-2 ${'text-content-primary'}`}>
                 Notes
               </label>
               <textarea
                 value={formData.notes || ''}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stone-700 bg-stone-800 text-white' : 'border-stone-300'}`}
+                className={`w-full px-4 py-3 rounded-lg border resize-none ${darkMode ? 'border-stroke-default bg-surface-sunken text-white' : 'border-stroke-default'}`}
                 placeholder="Any additional information..."
               />
             </div>
@@ -480,13 +480,13 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
 
         </div>
 
-        <div className={`sticky bottom-0 z-10 p-6 border-t ${darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}`}>
+        <div className={`sticky bottom-0 z-10 p-6 border-t ${'bg-surface-raised border-stroke-subtle'}`}>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
               className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors ${
-                darkMode ? 'bg-stone-800 text-stone-300 hover:bg-stone-700' : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
+                'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
               }`}
             >
               Cancel

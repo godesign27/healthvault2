@@ -227,12 +227,12 @@ export function VoiceInteraction({
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
-      <div className="w-[420px] rounded-2xl shadow-2xl overflow-hidden bg-white border border-stone-200">
+      <div className="w-[420px] rounded-2xl shadow-2xl overflow-hidden bg-white border border-stroke-subtle">
         {/* Header */}
-        <div className="px-4 py-3 bg-white border-b border-stone-200 flex items-center justify-between">
+        <div className="px-4 py-3 bg-white border-b border-stroke-subtle flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-500">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-content-secondary">
               Health Assistant
             </h2>
           </div>
@@ -243,15 +243,15 @@ export function VoiceInteraction({
                   audioRef.current.muted = !audioRef.current.muted;
                 }
               }}
-              className="p-1.5 rounded-lg transition-colors hover:bg-stone-100"
+              className="p-1.5 rounded-lg transition-colors hover:bg-surface-sunken"
             >
-              <Volume2 className="w-4 h-4 text-stone-500" />
+              <Volume2 className="w-4 h-4 text-content-secondary" />
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-stone-100"
+              className="p-1.5 rounded-lg transition-colors hover:bg-surface-sunken"
             >
-              <X className="w-4 h-4 text-stone-500" />
+              <X className="w-4 h-4 text-content-secondary" />
             </button>
           </div>
         </div>
@@ -265,10 +265,10 @@ export function VoiceInteraction({
               <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${
                 state === 'loading' ? 'animate-pulse' : ''
               } ${
-                state === 'error' ? 'bg-gradient-to-br from-red-100 to-red-200' : 'bg-gradient-to-br from-stone-200 to-stone-300'
+                state === 'error' ? 'bg-gradient-to-br from-red-100 to-red-200' : 'bg-gradient-to-br from-surface-sunken to-surface-overlay'
               }`}>
                 {state === 'loading' && (
-                  <Loader2 className="w-6 h-6 animate-spin text-stone-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-content-secondary" />
                 )}
                 {(state === 'playing' || state === 'paused') && (
                   <button
@@ -317,14 +317,14 @@ export function VoiceInteraction({
 
             {/* Message */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm leading-relaxed text-stone-900">{message}</p>
+              <p className="text-sm leading-relaxed text-content-primary">{message}</p>
             </div>
           </div>
 
           {/* Progress Bar */}
           {(state === 'playing' || state === 'paused' || state === 'completed') && (
             <div className="mb-4">
-              <div className="h-1 rounded-full overflow-hidden bg-stone-200">
+              <div className="h-1 rounded-full overflow-hidden bg-surface-overlay">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-100"
                   style={{ width: `${progress}%` }}
@@ -345,7 +345,7 @@ export function VoiceInteraction({
             {state === 'error' && (
               <button
                 onClick={synthesizeSpeech}
-                className="flex-1 px-4 py-2 rounded-full bg-stone-900 text-white text-xs font-bold uppercase tracking-wide hover:bg-stone-800 transition-all"
+                className="flex-1 px-4 py-2 rounded-full bg-surface-raised text-white text-xs font-bold uppercase tracking-wide hover:bg-surface-sunken transition-all"
               >
                 Retry
               </button>
@@ -366,14 +366,14 @@ export function VoiceInteraction({
                     cleanupAudio();
                     setState('completed');
                   }}
-                  className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all bg-stone-200 text-stone-700 hover:bg-stone-300"
+                  className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all bg-surface-overlay text-content-primary hover:bg-surface-overlay"
                 >
                   Complete
                 </button>
 
                 <button
                   onClick={handleReplay}
-                  className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all bg-stone-200 text-stone-700 hover:bg-stone-300"
+                  className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all bg-surface-overlay text-content-primary hover:bg-surface-overlay"
                 >
                   Replay
                 </button>

@@ -299,20 +299,18 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
       <div className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <ClipboardList className="w-7 h-7" />
             Medical Forms
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Complete and manage your healthcare documentation</p>
+          <p className="text-content-secondary">Complete and manage your healthcare documentation</p>
         </div>
         <button
           onClick={handleShareClick}
           disabled={completedSelectedCount === 0}
           className={`px-6 py-3 font-medium rounded-lg transition-colors flex items-center gap-2 ${
             completedSelectedCount === 0
-              ? 'bg-stone-400 text-white cursor-not-allowed'
+              ? 'bg-action-primary-disabled text-content-on-action cursor-not-allowed'
               : 'bg-indigo-600 text-white hover:bg-indigo-700'
           }`}
         >
@@ -322,62 +320,52 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className={`rounded-xl border p-6 bg-white ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
-        }`}>
+        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
           <div className="flex items-start justify-between mb-3">
-            <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Completed</h3>
-            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-stone-50'}`}>
-              <CheckCircle2 className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <h3 className="text-sm font-medium text-content-secondary">Completed</h3>
+            <div className="p-2.5 rounded-lg bg-surface-sunken">
+              <CheckCircle2 className="w-5 h-5 text-content-secondary" />
             </div>
           </div>
-          <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>{completedForms}</p>
-          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>of {totalForms} total</p>
+          <p className="text-3xl font-bold mb-1 text-content-primary">{completedForms}</p>
+          <p className="text-sm text-content-secondary">of {totalForms} total</p>
         </div>
 
-        <div className={`rounded-xl border p-6 bg-white ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
-        }`}>
+        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
           <div className="flex items-start justify-between mb-3">
-            <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Incomplete</h3>
-            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-stone-50'}`}>
-              <Clock className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <h3 className="text-sm font-medium text-content-secondary">Incomplete</h3>
+            <div className="p-2.5 rounded-lg bg-surface-sunken">
+              <Clock className="w-5 h-5 text-content-secondary" />
             </div>
           </div>
-          <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>{incompleteForms}</p>
-          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>of {totalForms} total</p>
+          <p className="text-3xl font-bold mb-1 text-content-primary">{incompleteForms}</p>
+          <p className="text-sm text-content-secondary">of {totalForms} total</p>
         </div>
 
-        <div className={`rounded-xl border p-6 bg-white ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
-        }`}>
+        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
           <div className="flex items-start justify-between mb-3">
-            <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Completion</h3>
-            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-stone-50'}`}>
-              <FileText className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <h3 className="text-sm font-medium text-content-secondary">Completion</h3>
+            <div className="p-2.5 rounded-lg bg-surface-sunken">
+              <FileText className="w-5 h-5 text-content-secondary" />
             </div>
           </div>
-          <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>{completionPercentage}%</p>
+          <p className="text-3xl font-bold mb-1 text-content-primary">{completionPercentage}%</p>
         </div>
 
         <div
           onClick={() => setSharedWithDrawerOpen(true)}
-          className={`rounded-xl border p-6 bg-white cursor-pointer transition-all ${
-            darkMode
-              ? 'border-stone-800 hover:bg-stone-100'
-              : 'border-stone-200 hover:bg-stone-50'
-          }`}
+          className="rounded-xl border border-stroke-subtle bg-surface-raised p-6 cursor-pointer transition-all hover:bg-surface-sunken"
         >
           <div className="flex items-start justify-between mb-3">
-            <h3 className={`text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>Shared With</h3>
-            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-indigo-50'}`}>
-              <Users className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-indigo-600'}`} />
+            <h3 className="text-sm font-medium text-content-secondary">Shared With</h3>
+            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-indigo-50'}`}>
+              <Users className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-indigo-600'}`} />
             </div>
           </div>
-          <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <p className="text-3xl font-bold mb-1 text-content-primary">
             {loadingShared ? '...' : sharedForms.length}
           </p>
-          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+          <p className="text-sm text-content-secondary">
             {sharedForms.length === 1 ? 'recipient' : 'recipients'}
           </p>
         </div>
@@ -391,22 +379,16 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
             <div key={category.name} className="space-y-6 mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
-                  }`}>{category.name}</h2>
+                  <h2 className="text-lg font-semibold text-content-primary">{category.name}</h2>
                 </div>
                 <div className="text-right">
-                  <div className={`w-48 rounded-full h-2 mb-2 ${
-                    darkMode ? 'bg-stone-700' : 'bg-stone-200'
-                  }`}>
+                  <div className="w-48 rounded-full h-2 mb-2 bg-surface-sunken">
                     <div
                       className="bg-indigo-600 h-2 rounded-full transition-all"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <p className={`text-sm ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
-                  }`}>
+                  <p className="text-sm text-content-secondary">
                     {category.completed} of {category.total} completed ({percentage}%)
                   </p>
                 </div>
@@ -416,11 +398,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                 {category.forms.map((form, formIndex) => (
                   <div
                     key={form.id}
-                    className={`flex items-center gap-4 p-4 rounded-lg border bg-white transition-colors cursor-pointer ${
-                      darkMode
-                        ? 'border-stone-700 hover:bg-stone-100'
-                        : 'border-stone-200 hover:bg-stone-50'
-                    }`}
+                    className="flex items-center gap-4 p-4 rounded-lg border border-stroke-subtle bg-surface-raised transition-colors cursor-pointer hover:bg-surface-sunken"
                     onClick={(e) => {
                       if ((e.target as HTMLElement).type !== 'checkbox') {
                         handleFormClick(form);
@@ -432,20 +410,16 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                       checked={form.selected}
                       onChange={() => handleCheckboxChange(categoryIndex, formIndex)}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-5 h-5 rounded border-stone-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 cursor-pointer"
+                      className="w-5 h-5 rounded border-stroke-default text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 cursor-pointer"
                     />
 
-                    <div className="p-3 rounded-lg bg-indigo-50 shrink-0">
-                      <FileText className="w-5 h-5 text-indigo-600" />
+                    <div className={`p-3 rounded-lg shrink-0 ${darkMode ? 'bg-surface-sunken' : 'bg-indigo-50'}`}>
+                      <FileText className={`w-5 h-5 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-semibold mb-1 ${
-                        darkMode ? 'text-white' : 'text-stone-900'
-                      }`}>{form.title}</h3>
-                      <p className={`text-sm ${
-                        darkMode ? 'text-stone-400' : 'text-stone-600'
-                      }`}>{form.description}</p>
+                      <h3 className="font-semibold mb-1 text-content-primary">{form.title}</h3>
+                      <p className="text-sm text-content-secondary">{form.description}</p>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -467,7 +441,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                             handleCheckboxChange(categoryIndex, formIndex);
                             setShareDrawerOpen(true);
                           }}
-                          className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-2.5 text-indigo-600 hover:bg-surface-sunken rounded-lg transition-colors"
                           title="Share this form"
                         >
                           <Share2 className="w-5 h-5" />

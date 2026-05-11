@@ -1,0 +1,186 @@
+/* ─── Theme: Steel (frosted glass + indigo/teal wash) ───────────────────────
+   Applied via data-surface="steel" on a container (design-system gallery).
+   Dark appearance: pair with html data-theme="dark" from ThemeProvider.
+   Structural hooks: data-steel-chrome="sidebar" | "main", data-steel-glass on demo wrapper.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+[data-surface="steel"] {
+  isolation: isolate;
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(at 12% 18%, rgba(20, 184, 166, 0.2) 0, transparent 45%),
+    radial-gradient(at 88% 12%, rgba(99, 102, 241, 0.18) 0, transparent 45%),
+    radial-gradient(at 78% 92%, rgba(20, 184, 166, 0.16) 0, transparent 45%),
+    radial-gradient(at 8% 88%, rgba(99, 102, 241, 0.14) 0, transparent 45%),
+    #fafafa;
+  background-attachment: fixed;
+
+  /* Semantic remaps — light Steel */
+  --hv-color-surface-page: transparent;
+  --hv-color-surface-raised: rgba(255, 255, 255, 0.78);
+  --hv-color-surface-sunken: rgba(255, 255, 255, 0.55);
+  --hv-color-surface-overlay: rgba(255, 255, 255, 0.88);
+
+  --hv-color-text-primary: #0f172a;
+  --hv-color-text-secondary: #475569;
+  --hv-color-text-tertiary: #64748b;
+  --hv-color-text-placeholder: #94a3b8;
+  --hv-color-text-disabled: #94a3b8;
+  --hv-color-text-inverse: #f8fafc;
+  --hv-color-text-on-action: #ffffff;
+  --hv-color-text-link: #4f46e5;
+  --hv-color-text-link-hover: #4338ca;
+
+  --hv-color-border-subtle: rgba(15, 23, 42, 0.06);
+  --hv-color-border-default: rgba(15, 23, 42, 0.1);
+  --hv-color-border-strong: rgba(15, 23, 42, 0.14);
+
+  --hv-color-action-primary-default: #4f46e5;
+  --hv-color-action-primary-hover: #4338ca;
+  --hv-color-action-primary-active: #3730a3;
+  --hv-color-action-primary-disabled: rgba(148, 163, 184, 0.6);
+  --hv-color-action-primary-subtle: rgba(99, 102, 241, 0.12);
+
+  --hv-color-action-secondary-default: rgba(15, 23, 42, 0.06);
+  --hv-color-action-secondary-hover: rgba(15, 23, 42, 0.1);
+  --hv-color-action-secondary-active: rgba(15, 23, 42, 0.14);
+  --hv-color-action-secondary-disabled: rgba(15, 23, 42, 0.04);
+
+  --hv-color-action-ghost-hover: rgba(99, 102, 241, 0.08);
+  --hv-color-action-ghost-active: rgba(99, 102, 241, 0.12);
+
+  --hv-component-card-radius-default: 1rem;
+  --hv-component-card-shadow-default:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+[data-surface="steel"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Demo pages: stack above shell grid */
+[data-surface="steel"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-surface="steel"] [data-steel-chrome="sidebar"] {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-right-color: rgba(15, 23, 42, 0.06);
+  box-shadow: none;
+}
+
+[data-surface="steel"] [data-steel-chrome="main"] {
+  background: transparent;
+}
+
+[data-surface="steel"] [data-steel-glass="true"] {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  border-radius: 1rem;
+  margin: 0.5rem 0.75rem 0.75rem 0;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+/* Optional: gradient heading (use class on specific headings in demos/docs) */
+.hv-steel-text-grad {
+  background: linear-gradient(90deg, #6366f1 0%, #14b8a6 50%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Steel + html dark ───────────────────────────────────────────────────── */
+[data-theme='dark'] [data-surface='steel'] {
+  background:
+    radial-gradient(at 12% 18%, rgba(20, 184, 166, 0.18) 0, transparent 45%),
+    radial-gradient(at 88% 12%, rgba(99, 102, 241, 0.22) 0, transparent 45%),
+    radial-gradient(at 78% 92%, rgba(20, 184, 166, 0.14) 0, transparent 45%),
+    radial-gradient(at 8% 88%, rgba(99, 102, 241, 0.18) 0, transparent 45%),
+    #0b1020;
+
+  --hv-color-surface-page: transparent;
+  --hv-color-surface-raised: rgba(15, 23, 42, 0.55);
+  --hv-color-surface-sunken: rgba(255, 255, 255, 0.04);
+  --hv-color-surface-overlay: rgba(15, 23, 42, 0.72);
+
+  --hv-color-text-primary: #e2e8f0;
+  --hv-color-text-secondary: #cbd5e1;
+  --hv-color-text-tertiary: #94a3b8;
+  --hv-color-text-placeholder: #64748b;
+  --hv-color-text-disabled: #64748b;
+  --hv-color-text-inverse: #0f172a;
+  --hv-color-text-on-action: #ffffff;
+  --hv-color-text-link: #818cf8;
+  --hv-color-text-link-hover: #a5b4fc;
+
+  --hv-color-border-subtle: rgba(255, 255, 255, 0.06);
+  --hv-color-border-default: rgba(255, 255, 255, 0.1);
+  --hv-color-border-strong: rgba(255, 255, 255, 0.14);
+
+  --hv-color-action-primary-default: #818cf8;
+  --hv-color-action-primary-hover: #a5b4fc;
+  --hv-color-action-primary-active: #c7d2fe;
+  --hv-color-action-primary-disabled: rgba(100, 116, 139, 0.5);
+  --hv-color-action-primary-subtle: rgba(99, 102, 241, 0.22);
+
+  --hv-color-action-secondary-default: rgba(255, 255, 255, 0.06);
+  --hv-color-action-secondary-hover: rgba(255, 255, 255, 0.1);
+  --hv-color-action-secondary-active: rgba(255, 255, 255, 0.14);
+  --hv-color-action-secondary-disabled: rgba(255, 255, 255, 0.04);
+
+  --hv-color-action-ghost-hover: rgba(99, 102, 241, 0.15);
+  --hv-color-action-ghost-active: rgba(99, 102, 241, 0.22);
+
+  --hv-component-card-shadow-default:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] [data-surface='steel']::before {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='sidebar'] {
+  background: rgba(15, 23, 42, 0.55);
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-glass='true'] {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] [data-surface='steel'] .hv-steel-text-grad {
+  background: linear-gradient(90deg, #818cf8 0%, #2dd4bf 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

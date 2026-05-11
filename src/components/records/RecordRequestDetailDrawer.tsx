@@ -203,9 +203,9 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
       <div className={`fixed top-0 right-0 h-full w-full max-w-xl shadow-2xl transition-transform duration-300 ease-in-out z-50 flex flex-col ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      } ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      } ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className={`flex items-center justify-between px-6 py-5 border-b shrink-0 ${
-          darkMode ? 'border-stone-700' : 'border-stone-200'
+          darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           <div className="flex items-center gap-3 min-w-0">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
@@ -215,16 +215,16 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                   ? darkMode ? 'bg-orange-900/30 text-orange-400' : 'bg-orange-100 text-orange-600'
                   : displayReq.status === 'sent'
                     ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
-                    : darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
+                    : darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
             }`}>
               <Building2 className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className={`text-lg font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <h2 className={`text-lg font-semibold truncate ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                 {displayReq.doctor_name || displayReq.provider_name}
               </h2>
               {displayReq.doctor_name && (
-                <p className={`text-sm truncate ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                <p className={`text-sm truncate ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                   {displayReq.provider_name}
                 </p>
               )}
@@ -233,7 +233,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
           <button
             onClick={onClose}
             className={`p-2 rounded-lg transition-colors shrink-0 ${
-              darkMode ? 'hover:bg-stone-800 text-stone-400' : 'hover:bg-stone-100 text-stone-600'
+              darkMode ? 'hover:bg-surface-sunken text-content-secondary' : 'hover:bg-surface-sunken text-content-secondary'
             }`}
           >
             <X className="w-5 h-5" />
@@ -256,7 +256,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
         </div>
 
         <div className={`px-6 py-4 border-t shrink-0 ${
-          darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-white'
+          darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-white'
         }`}>
           <div className="flex gap-3">
             {isExpired ? (
@@ -292,8 +292,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                   onClick={handleCopyLink}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
                     darkMode
-                      ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                      ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken'
+                      : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   {copied ? (
@@ -315,8 +315,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                   }}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
                     darkMode
-                      ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                      ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken'
+                      : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   <ExternalLink className="w-4 h-4" />
@@ -330,8 +330,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                   onClick={() => setShowDeleteConfirm(true)}
                   className={`flex items-center justify-center p-3 rounded-xl transition-colors ${
                     darkMode
-                      ? 'text-stone-500 hover:text-red-400 hover:bg-red-900/20'
-                      : 'text-stone-400 hover:text-red-600 hover:bg-red-50'
+                      ? 'text-content-secondary hover:text-red-400 hover:bg-red-900/20'
+                      : 'text-content-secondary hover:text-red-600 hover:bg-red-50'
                   }`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -339,12 +339,12 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
                 {showDeleteConfirm && (
                   <div className={`absolute bottom-full right-0 mb-2 w-64 rounded-xl shadow-xl border p-4 z-10 ${
-                    darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
+                    darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
                   }`}>
-                    <p className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <p className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                       Are you sure?
                     </p>
-                    <p className={`text-xs mb-3 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                    <p className={`text-xs mb-3 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                       This will permanently delete this request. This action cannot be undone.
                     </p>
                     <div className="flex gap-2">
@@ -352,8 +352,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                         onClick={() => setShowDeleteConfirm(false)}
                         className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                           darkMode
-                            ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
-                            : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                            ? 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
+                            : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                         }`}
                       >
                         Cancel
@@ -430,17 +430,17 @@ function StatusSection({ request, darkMode, isExpired }: { request: RecordReques
       <div>
         <p className={`text-sm font-semibold ${cfg.color}`}>{cfg.label}</p>
         {isExpired && (
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+          <p className={`text-xs mt-0.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             The provider link is no longer valid. Use Resend Request to issue a new one.
           </p>
         )}
         {!isExpired && request.status === 'sent' && !request.opened_at && (
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+          <p className={`text-xs mt-0.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             Waiting for provider to open the link
           </p>
         )}
         {!isExpired && request.status === 'sent' && request.opened_at && (
-          <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+          <p className={`text-xs mt-0.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             Provider opened the link -- awaiting file submission
           </p>
         )}
@@ -461,7 +461,7 @@ function RecordTypesSection({ request, darkMode }: { request: RecordRequestRow; 
   return (
     <div>
       <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${
-        darkMode ? 'text-stone-500' : 'text-stone-400'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>Requested Records</h3>
       <div className="flex flex-wrap gap-2">
         {request.record_types?.map(type => {
@@ -470,8 +470,8 @@ function RecordTypesSection({ request, darkMode }: { request: RecordRequestRow; 
           return (
             <span key={type} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${
               darkMode
-                ? 'bg-stone-800 text-stone-300 border border-stone-700'
-                : 'bg-stone-50 text-stone-700 border border-stone-200'
+                ? 'bg-surface-sunken text-content-primary border border-stroke-default'
+                : 'bg-surface-sunken text-content-primary border border-stroke-subtle'
             }`}>
               <Icon className="w-3.5 h-3.5" />
               {cfg.label}
@@ -487,12 +487,12 @@ function MessageSection({ message, darkMode }: { message: string; darkMode: bool
   return (
     <div>
       <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${
-        darkMode ? 'text-stone-500' : 'text-stone-400'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>Message to Provider</h3>
       <div className={`p-4 rounded-xl border-l-3 ${
-        darkMode ? 'bg-stone-800 border-stone-600' : 'bg-stone-50 border-stone-300'
+        darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-surface-sunken border-stroke-default'
       }`}>
-        <p className={`text-sm leading-relaxed ${darkMode ? 'text-stone-300' : 'text-stone-600'}`}>
+        <p className={`text-sm leading-relaxed ${darkMode ? 'text-content-primary' : 'text-content-secondary'}`}>
           {message}
         </p>
       </div>
@@ -504,7 +504,7 @@ function TimelineSection({ timeline, darkMode }: { timeline: { label: string; ti
   return (
     <div>
       <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${
-        darkMode ? 'text-stone-500' : 'text-stone-400'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>Timeline</h3>
       <div className="space-y-0">
         {timeline.map((step, i) => {
@@ -516,26 +516,26 @@ function TimelineSection({ timeline, darkMode }: { timeline: { label: string; ti
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                   step.done
                     ? 'bg-emerald-100 text-emerald-600'
-                    : darkMode ? 'bg-stone-800 text-stone-600' : 'bg-stone-100 text-stone-300'
+                    : darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-primary'
                 }`}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
                 {!isLast && (
                   <div className={`w-px h-6 ${
-                    step.done ? 'bg-emerald-200' : darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                    step.done ? 'bg-emerald-200' : darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
                   }`} />
                 )}
               </div>
               <div className="pb-4">
                 <p className={`text-sm font-medium ${
                   step.done
-                    ? darkMode ? 'text-stone-200' : 'text-stone-800'
-                    : darkMode ? 'text-stone-600' : 'text-stone-400'
+                    ? darkMode ? 'text-content-primary' : 'text-content-primary'
+                    : darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   {step.label}
                 </p>
                 {step.time && step.done && (
-                  <p className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                  <p className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     {formatDate(step.time)}
                   </p>
                 )}
@@ -552,12 +552,12 @@ function SubmittedFilesSection({ files, loading, darkMode }: { files: RecordRequ
   return (
     <div>
       <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${
-        darkMode ? 'text-stone-500' : 'text-stone-400'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>Submitted Files</h3>
       {loading ? (
         <div className="flex items-center gap-2 py-4">
-          <Loader2 className={`w-4 h-4 animate-spin ${darkMode ? 'text-stone-500' : 'text-stone-400'}`} />
-          <span className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>Loading files...</span>
+          <Loader2 className={`w-4 h-4 animate-spin ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
+          <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Loading files...</span>
         </div>
       ) : (
         <div className="space-y-2">
@@ -566,22 +566,22 @@ function SubmittedFilesSection({ files, loading, darkMode }: { files: RecordRequ
             const Icon = cfg.icon;
             return (
               <div key={file.id} className={`flex items-start gap-3 p-3 rounded-xl ${
-                darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
               }`}>
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  darkMode ? 'bg-stone-700' : 'bg-white border border-stone-200'
+                  darkMode ? 'bg-surface-sunken' : 'bg-white border border-stroke-subtle'
                 }`}>
-                  <Icon className={`w-4 h-4 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`} />
+                  <Icon className={`w-4 h-4 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium truncate ${darkMode ? 'text-stone-200' : 'text-stone-800'}`}>
+                  <p className={`text-sm font-medium truncate ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                     {file.file_name}
                   </p>
-                  <p className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                  <p className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     {file.file_type.toUpperCase()} &middot; {formatFileSize(file.file_size_bytes)}
                   </p>
                   {file.provider_notes && (
-                    <p className={`text-xs mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                    <p className={`text-xs mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                       {file.provider_notes}
                     </p>
                   )}
@@ -607,15 +607,15 @@ function DetailsSection({ request, darkMode }: { request: RecordRequestRow; dark
   return (
     <div>
       <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${
-        darkMode ? 'text-stone-500' : 'text-stone-400'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>Request Details</h3>
-      <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-stone-800' : 'bg-stone-50'}`}>
+      <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'}`}>
         {rows.map((row, i) => (
           <div key={row.label} className={`flex justify-between px-4 py-3 ${
-            i < rows.length - 1 ? darkMode ? 'border-b border-stone-700' : 'border-b border-stone-100' : ''
+            i < rows.length - 1 ? darkMode ? 'border-b border-stroke-default' : 'border-b border-stroke-subtle' : ''
           }`}>
-            <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>{row.label}</span>
-            <span className={`text-sm font-medium text-right ${darkMode ? 'text-stone-200' : 'text-stone-800'}`}>{row.value || '--'}</span>
+            <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>{row.label}</span>
+            <span className={`text-sm font-medium text-right ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>{row.value || '--'}</span>
           </div>
         ))}
       </div>

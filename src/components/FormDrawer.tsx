@@ -288,16 +288,16 @@ export function FormDrawer({
       />
 
       <div className={`fixed top-0 right-0 h-full w-full max-w-2xl z-50 shadow-2xl transform transition-transform ${
-        darkMode ? 'bg-stone-900' : 'bg-white'
+        'bg-surface-raised'
       }`}>
         <div className="flex flex-col h-full">
           <div className={`px-6 py-4 border-b flex items-start justify-between ${
-            darkMode ? 'border-stone-800' : 'border-stone-200'
+            'border-stroke-subtle'
           }`}>
             <div className="flex-1 pr-4">
               <div className="flex items-center gap-3 mb-2">
                 <h2 className={`text-xl font-semibold ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  'text-content-primary'
                 }`}>{formTitle}</h2>
                 {formStatus === 'complete' ? (
                   <span className="px-3 py-1 bg-emerald-600 text-white text-xs font-medium rounded-lg flex items-center gap-1.5">
@@ -312,7 +312,7 @@ export function FormDrawer({
                 )}
               </div>
               <p className={`text-sm ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                'text-content-secondary'
               }`}>{formDescription}</p>
             </div>
             <div className="flex items-center gap-2">
@@ -321,8 +321,8 @@ export function FormDrawer({
                   onClick={() => setIsEditing(true)}
                   className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'border-stone-700 text-stone-300 hover:bg-stone-800'
-                      : 'border-stone-300 text-stone-700 hover:bg-stone-50'
+                      ? 'border-stroke-default text-content-primary hover:bg-surface-sunken'
+                      : 'border-stroke-default text-content-primary hover:bg-surface-sunken'
                   }`}
                 >
                   <Edit className="w-4 h-4" />
@@ -333,8 +333,8 @@ export function FormDrawer({
                 onClick={onClose}
                 className={`p-2 rounded-lg transition-colors ${
                   darkMode
-                    ? 'hover:bg-stone-800 text-stone-400'
-                    : 'hover:bg-stone-100 text-stone-600'
+                    ? 'hover:bg-surface-sunken text-content-secondary'
+                    : 'hover:bg-surface-sunken text-content-secondary'
                 }`}
               >
                 <X className="w-5 h-5" />
@@ -347,7 +347,7 @@ export function FormDrawer({
               {fields.map((field, index) => (
                 <div key={index}>
                   <label className={`block text-sm font-medium mb-2 ${
-                    darkMode ? 'text-stone-300' : 'text-stone-900'
+                    'text-content-primary'
                   }`}>
                     {field.label}
                   </label>
@@ -360,8 +360,8 @@ export function FormDrawer({
                         rows={3}
                         className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                           darkMode
-                            ? 'bg-stone-800 border-stone-700 text-white placeholder:text-stone-500'
-                            : 'bg-white border-stone-300 text-stone-900 placeholder:text-stone-400'
+                            ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-secondary'
+                            : 'bg-white border-stroke-default text-content-primary placeholder:text-content-secondary'
                         }`}
                       />
                     ) : field.type === 'select' ? (
@@ -370,8 +370,8 @@ export function FormDrawer({
                         onChange={(e) => setFormData({ ...formData, [field.label]: e.target.value })}
                         className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                           darkMode
-                            ? 'bg-stone-800 border-stone-700 text-white'
-                            : 'bg-white border-stone-300 text-stone-900'
+                            ? 'bg-surface-sunken border-stroke-default text-white'
+                            : 'bg-white border-stroke-default text-content-primary'
                         }`}
                       >
                         {field.options?.map((option) => (
@@ -386,16 +386,16 @@ export function FormDrawer({
                         placeholder={field.placeholder}
                         className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                           darkMode
-                            ? 'bg-stone-800 border-stone-700 text-white placeholder:text-stone-500'
-                            : 'bg-white border-stone-300 text-stone-900 placeholder:text-stone-400'
+                            ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-secondary'
+                            : 'bg-white border-stroke-default text-content-primary placeholder:text-content-secondary'
                         }`}
                       />
                     )
                   ) : (
                     <div className={`text-sm ${
-                      darkMode ? 'text-stone-300' : 'text-stone-900'
+                      'text-content-primary'
                     }`}>
-                      {field.value || <span className={darkMode ? 'text-stone-600' : 'text-stone-400'}>Not provided</span>}
+                      {field.value || <span className={'text-content-tertiary'}>Not provided</span>}
                     </div>
                   )}
                 </div>
@@ -404,7 +404,7 @@ export function FormDrawer({
           </div>
 
           <div className={`px-6 py-4 border-t flex items-center justify-between ${
-            darkMode ? 'border-stone-800' : 'border-stone-200'
+            'border-stroke-subtle'
           }`}>
             {isEditing ? (
               <>
@@ -412,8 +412,8 @@ export function FormDrawer({
                   onClick={handleCancel}
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-700 hover:bg-stone-100'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-primary hover:bg-surface-sunken'
                   }`}
                 >
                   Cancel
@@ -431,8 +431,8 @@ export function FormDrawer({
                   onClick={onClose}
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-700 hover:bg-stone-100'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-primary hover:bg-surface-sunken'
                   }`}
                 >
                   Close

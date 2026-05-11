@@ -17,7 +17,7 @@ interface InsurancePageProps {
 export function InsurancePage({ darkMode = false, actionsRef }: InsurancePageProps) {
   const [coverages, setCoverages] = useState<CoverageWithProvider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{ id: string; message: string; type: 'success' | 'error' } | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [analytics] = useState(() => new InsuranceAnalytics());
 
@@ -91,7 +91,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       setCoverages(mapped);
     } catch (error) {
       console.error('Error loading coverages:', error);
-      setToast({ message: 'Failed to load insurance coverages', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to load insurance coverages', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -109,10 +109,10 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       if (error) throw error;
 
       analytics.trackSetPrimary(coverage.id!);
-      setToast({ message: 'Primary coverage updated', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Primary coverage updated', type: 'success' });
       loadCoverages();
     } catch (error) {
-      setToast({ message: 'Failed to update primary coverage', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to update primary coverage', type: 'error' });
     }
   };
 
@@ -129,10 +129,10 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       if (error) throw error;
 
       analytics.trackVerifyRefresh(coverage.id!);
-      setToast({ message: 'Coverage verified successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Coverage verified successfully', type: 'success' });
       loadCoverages();
     } catch (error) {
-      setToast({ message: 'Failed to verify coverage', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to verify coverage', type: 'error' });
     }
   };
 
@@ -148,10 +148,10 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       if (error) throw error;
 
       analytics.trackDelete(coverage.id!);
-      setToast({ message: 'Coverage removed successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Coverage removed successfully', type: 'success' });
       loadCoverages();
     } catch (error) {
-      setToast({ message: 'Failed to remove coverage', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to remove coverage', type: 'error' });
     }
   };
 
@@ -168,10 +168,10 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
       if (error) throw error;
 
-      setToast({ message: 'Coverage stopped successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Coverage stopped successfully', type: 'success' });
       loadCoverages();
     } catch (error) {
-      setToast({ message: 'Failed to stop coverage', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to stop coverage', type: 'error' });
     }
   };
 
@@ -187,44 +187,36 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
       if (error) throw error;
 
-      setToast({ message: 'Coverage resumed successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Coverage resumed successfully', type: 'success' });
       loadCoverages();
     } catch (error) {
-      setToast({ message: 'Failed to resume coverage', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to resume coverage', type: 'error' });
     }
   };
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
       <div className="mb-8">
-        <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-          darkMode ? 'text-white' : 'text-stone-900'
-        }`}>
+        <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
           <ShieldCheck className="w-7 h-7" />
           Insurance
         </h1>
-        <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+        <p className="text-content-secondary">
           Manage your insurance coverage and benefits
         </p>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-action-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : coverages.length === 0 ? (
-        <div className={`text-center py-16 rounded-xl border ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
-        }`}>
-          <ShieldCheck className={`w-16 h-16 mx-auto mb-4 ${
-            darkMode ? 'text-stone-700' : 'text-stone-300'
-          }`} />
-          <h3 className={`text-lg font-semibold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+        <div className="text-center py-16 rounded-xl border border-stroke-subtle bg-surface-raised">
+          <ShieldCheck className="w-16 h-16 mx-auto mb-4 text-content-tertiary" />
+          <h3 className="text-lg font-semibold mb-2 text-content-primary">
             No insurance coverage added
           </h3>
-          <p className={`${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+          <p className="text-content-secondary">
             Use the AI Assistant to add your insurance information
           </p>
         </div>
@@ -248,6 +240,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
       {toast && (
         <Toast
+          id={toast.id}
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}

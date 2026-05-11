@@ -1,5 +1,6 @@
-import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu, CheckCircle } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useTheme } from '../providers/ThemeProvider';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
 import { supabase } from '../lib/supabase';
 import { MedicalIDCard } from '../components/MedicalIDCard';
@@ -14,24 +15,13 @@ import { MedicalProfilePage } from './MedicalProfilePage';
 import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
-import type { PageContext } from '../lib/voice/context-messages';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
 }
 
-const PAGE_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  care: 'Care History',
-  'medical-forms': 'Medical Forms',
-  'medical-profile': 'Medical Profile',
-  network: 'Care Network',
-  insurance: 'Insurance',
-  'health-records': 'Health Records',
-  vitals: 'Vitals',
-};
-
 export default function DashboardPage({ onViewChange }: DashboardPageProps) {
+  const { setTheme: setGlobalTheme } = useTheme();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -123,6 +113,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   }, [darkMode]);
 
   useEffect(() => {
+    setGlobalTheme(darkMode ? 'dark' : 'light');
+  }, [darkMode, setGlobalTheme]);
+
+  useEffect(() => {
     localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
   }, [isSidebarCollapsed]);
 
@@ -172,28 +166,16 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       return (
         <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
           <div className="mb-8">
-            <h1 className={`text-2xl font-bold ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Vitals</h1>
-            <p className={`mt-1 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Track your vital signs and health metrics</p>
+            <h1 className="text-2xl font-bold text-content-primary">Vitals</h1>
+            <p className="mt-1 text-content-secondary">Track your vital signs and health metrics</p>
           </div>
 
           <div className="flex flex-col items-center justify-center py-24">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-              darkMode ? 'bg-stone-800' : 'bg-stone-100'
-            }`}>
-              <Activity className={`w-8 h-8 ${
-                darkMode ? 'text-stone-400' : 'text-stone-500'
-              }`} />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-surface-sunken">
+              <Activity className="w-8 h-8 text-content-tertiary" />
             </div>
-            <h2 className={`text-xl font-semibold mb-2 ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Coming Soon</h2>
-            <p className={`text-center max-w-md ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Coming Soon</h2>
+            <p className="text-center max-w-md text-content-secondary">
               We're working on bringing you powerful vitals tracking features. Stay tuned!
             </p>
           </div>
@@ -204,13 +186,11 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     return (
       <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
         <div className="mb-8">
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <Home className="w-7 h-7" />
             Dashboard
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className="text-content-secondary">
             Welcome back{userFirstName ? `, ${userFirstName}` : ''}! Here's your health overview.
           </p>
         </div>
@@ -318,82 +298,46 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
-          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
-            darkMode
-              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
-              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
-          }`}>
+          <div className="md:col-span-6 lg:col-span-6 rounded-xl border border-stroke-subtle bg-surface-raised p-6 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-3">
               <div className="p-2 rounded-lg bg-indigo-50">
                 <Sparkles className="w-5 h-5 text-indigo-600" />
               </div>
-              <h2 className={`text-lg font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>Quick Actions</h2>
+              <h2 className="text-lg font-semibold text-content-primary">Quick Actions</h2>
             </div>
-            <p className={`text-sm mb-6 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Common tasks to manage your health data</p>
+            <p className="text-sm mb-6 text-content-secondary">Common tasks to manage your health data</p>
 
             <div className="flex flex-col gap-3 mt-auto">
               <button className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-600/20 hover:-translate-y-0.5">
                 <FileText className="w-4 h-4" />
                 Download Medical Forms
               </button>
-              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
-                darkMode
-                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
-                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
-              }`}>
-                <div className={`flex items-center gap-2 text-sm font-medium ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
-                }`}>
+              <button className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md">
+                <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
                   <Activity className="w-4 h-4" />
                   View Care History
                 </div>
-                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                  darkMode
-                    ? 'text-stone-500 group-hover:text-stone-400'
-                    : 'text-stone-400 group-hover:text-stone-600'
-                }`} />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
-              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
-                darkMode
-                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
-                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
-              }`}>
-                <div className={`flex items-center gap-2 text-sm font-medium ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
-                }`}>
+              <button className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md">
+                <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
                   <Calendar className="w-4 h-4" />
                   Schedule Appointment
                 </div>
-                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                  darkMode
-                    ? 'text-stone-500 group-hover:text-stone-400'
-                    : 'text-stone-400 group-hover:text-stone-600'
-                }`} />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
             </div>
           </div>
 
           {/* Recent Activity - Balanced layout */}
-          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
-            darkMode
-              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
-              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
-          }`}>
+          <div className="md:col-span-6 lg:col-span-6 rounded-xl border border-stroke-subtle bg-surface-raised p-6 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-3">
               <div className="p-2 rounded-lg bg-indigo-50">
                 <Activity className="w-5 h-5 text-indigo-600" />
               </div>
-              <h2 className={`text-lg font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>Recent Activity</h2>
+              <h2 className="text-lg font-semibold text-content-primary">Recent Activity</h2>
             </div>
-            <p className={`text-sm mb-6 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Your latest health updates</p>
+            <p className="text-sm mb-6 text-content-secondary">Your latest health updates</p>
 
             <div className="space-y-3 flex-1">
               <RecentActivityItem
@@ -436,9 +380,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   };
 
   return (
-    <div className={`flex h-dvh w-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
-    }`}>
+    <div
+      data-theme={darkMode ? 'dark' : undefined}
+      className="flex h-dvh w-screen bg-surface-page text-content-primary"
+    >
       <DashboardSidebar
         onViewChange={onViewChange}
         onPageChange={(page) => {
@@ -455,22 +400,12 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       />
 
       <div className="flex-1 flex overflow-hidden min-w-0 relative">
-        <main className={`flex-1 overflow-y-auto min-w-0 relative ${
-          darkMode
-            ? 'bg-gradient-to-br from-stone-950 via-stone-950 to-stone-900'
-            : 'bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50'
-        }`}>
+        <main data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 relative bg-surface-page">
           {/* Mobile top bar — hamburger + centered logo */}
-          <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b backdrop-blur-sm ${
-            darkMode
-              ? 'bg-stone-950/95 border-stone-800'
-              : 'bg-white/95 border-stone-200'
-          }`}>
+          <div className="lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b border-stroke-subtle backdrop-blur-sm bg-surface-overlay/95">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className={`p-2.5 rounded-xl transition-all active:scale-95 ${
-                darkMode ? 'text-white hover:bg-stone-800' : 'text-stone-700 hover:bg-stone-100'
-              }`}
+              className="p-2.5 rounded-xl transition-all active:scale-95 text-content-primary hover:bg-action-secondary"
               aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -509,7 +444,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         {isAIPanelOpen && (
           <aside
             className={`
-              shrink-0 relative bg-white z-50
+              shrink-0 relative bg-surface-overlay z-50
               fixed lg:relative inset-y-0 right-0
               w-full lg:w-[33vw] lg:min-w-[400px]
               transition-transform duration-300 ease-in-out
@@ -518,7 +453,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           >
             <button
               onClick={() => setIsAIPanelOpen(false)}
-              className="absolute top-6 right-6 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-stone-100 active:scale-95 text-stone-500 hover:text-stone-700"
+              className="absolute top-6 right-6 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-action-secondary active:scale-95 text-content-tertiary hover:text-content-primary"
               title="Close"
               aria-label="Close assistant"
             >

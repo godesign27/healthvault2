@@ -2,6 +2,8 @@
    References semantic tokens only.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
+  --hv-component-drawer-radius-default:      0.75rem;
+  --hv-component-drawer-shadow-default:      0 20px 40px rgba(0, 0, 0, 0.2);
   --hv-component-drawer-background-default: var(--hv-color-surface-overlay);
   --hv-component-drawer-border-default:     var(--hv-color-border-subtle);
   --hv-component-drawer-text-title:         var(--hv-color-text-primary);

@@ -8,6 +8,18 @@ export default {
   ],
   theme: {
     extend: {
+      borderRadius: {
+        'hv-button': 'var(--hv-component-button-radius-default)',
+        'hv-button-pill': 'var(--hv-component-button-radius-pill)',
+        'hv-card': 'var(--hv-component-card-radius-default)',
+        'hv-dialog': 'var(--hv-component-dialog-radius-default)',
+        'hv-drawer': 'var(--hv-component-drawer-radius-default)',
+      },
+      boxShadow: {
+        'hv-card': 'var(--hv-component-card-shadow-default)',
+        'hv-dialog': 'var(--hv-component-dialog-shadow-default)',
+        'hv-drawer': 'var(--hv-component-drawer-shadow-default)',
+      },
       colors: {
         /* ── Brand primitives ── */
         brand: {

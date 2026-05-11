@@ -200,7 +200,7 @@ export function VoiceAssistant({
               state === 'listening'
                 ? 'bg-red-500 scale-110'
                 : state === 'processing' || state === 'responding'
-                ? 'bg-stone-400'
+                ? 'bg-action-primary-disabled'
                 : state === 'error'
                 ? 'bg-red-600 hover:bg-red-700'
                 : 'bg-blue-600 hover:bg-blue-700'
@@ -235,9 +235,9 @@ export function VoiceAssistant({
           <div className="mt-3 max-w-xs p-3 bg-white rounded-lg shadow-lg animate-in slide-in-from-bottom-2 fade-in">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-              <p className="text-xs font-bold text-stone-700">Listening...</p>
+              <p className="text-xs font-bold text-content-primary">Listening...</p>
             </div>
-            <div className="h-1 rounded-full bg-stone-200 overflow-hidden">
+            <div className="h-1 rounded-full bg-surface-overlay overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-100"
                 style={{ width: `${volumeLevel}%` }}
@@ -250,7 +250,7 @@ export function VoiceAssistant({
           <div className="mt-3 max-w-xs p-3 bg-white rounded-lg shadow-lg animate-in slide-in-from-bottom-2 fade-in">
             <div className="flex items-center gap-2">
               <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
-              <p className="text-xs font-bold text-stone-700">Transcribing...</p>
+              <p className="text-xs font-bold text-content-primary">Transcribing...</p>
             </div>
           </div>
         )}

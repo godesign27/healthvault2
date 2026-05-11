@@ -27,7 +27,11 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
   const [showAddProvider, setShowAddProvider] = useState(false);
   const [specialistMode, setSpecialistMode] = useState(false);
   const [showAddPharmacy, setShowAddPharmacy] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    id: string;
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
   const [insuranceDetail, setInsuranceDetail] = useState<InsuranceContextResult | null>(null);
 
   useEffect(() => {
@@ -60,9 +64,9 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
     if (!confirm(`Remove ${provider.name} from your network?`)) return;
     try {
       await removeProvider(provider.id);
-      setToast({ message: 'Provider removed successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Provider removed successfully', type: 'success' });
     } catch {
-      setToast({ message: 'Failed to remove provider', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to remove provider', type: 'error' });
     }
   };
 
@@ -70,9 +74,9 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
     if (!confirm(`Remove ${pharmacy.name} from your network?`)) return;
     try {
       await removePharmacy(pharmacy.id);
-      setToast({ message: 'Pharmacy removed successfully', type: 'success' });
+      setToast({ id: crypto.randomUUID(), message: 'Pharmacy removed successfully', type: 'success' });
     } catch {
-      setToast({ message: 'Failed to remove pharmacy', type: 'error' });
+      setToast({ id: crypto.randomUUID(), message: 'Failed to remove pharmacy', type: 'error' });
     }
   };
 
@@ -80,13 +84,11 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
     <>
       <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
         <div className="mb-6">
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <Users className="w-7 h-7" />
             Your Care Network
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className="text-content-secondary">
             {insuranceDetail && insuranceDetail.activeCount > 0
               ? insuranceDetail.summary
               : insurance.connected
@@ -96,13 +98,13 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
           </p>
         </div>
 
-        <div className={`flex border-b mb-8 ${darkMode ? 'border-stone-700' : 'border-stone-200'}`}>
+        <div className="flex border-b border-stroke-subtle mb-8">
           <button
             onClick={() => setActiveTab('providers')}
             className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-all relative ${
               activeTab === 'providers'
-                ? darkMode ? 'text-white' : 'text-stone-900'
-                : darkMode ? 'text-stone-400 hover:text-stone-200' : 'text-stone-500 hover:text-stone-700'
+                ? 'text-content-primary'
+                : 'text-content-secondary hover:text-content-primary'
             }`}
           >
             <Stethoscope className="w-4 h-4" />
@@ -115,8 +117,8 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
             onClick={() => setActiveTab('pharmacies')}
             className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-all relative ${
               activeTab === 'pharmacies'
-                ? darkMode ? 'text-white' : 'text-stone-900'
-                : darkMode ? 'text-stone-400 hover:text-stone-200' : 'text-stone-500 hover:text-stone-700'
+                ? darkMode ? 'text-white' : 'text-content-primary'
+                : darkMode ? 'text-content-secondary hover:text-content-primary' : 'text-content-secondary hover:text-content-primary'
             }`}
           >
             <Pill className="w-4 h-4" />
@@ -172,6 +174,7 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
 
       {toast && (
         <Toast
+          id={toast.id}
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}

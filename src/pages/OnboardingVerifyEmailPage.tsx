@@ -137,8 +137,8 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
     error
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:border-emerald-500 focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:border-emerald-500 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:border-emerald-500 focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:border-emerald-500 focus:ring-emerald-500'
   } focus:outline-none focus:ring-2 transition-colors`;
 
   return (
@@ -157,14 +157,14 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
       }
     >
       <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
       }`}>
         <button
           onClick={onBack}
           className={`flex items-center gap-2 mb-6 text-sm font-medium transition-colors ${
             darkMode
-              ? 'text-stone-400 hover:text-stone-300'
-              : 'text-stone-600 hover:text-stone-900'
+              ? 'text-content-secondary hover:text-content-primary'
+              : 'text-content-secondary hover:text-content-primary'
           }`}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -178,12 +178,12 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
             <Mail className={`w-8 h-8 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
           </div>
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Verify Your Email
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Enter the 8-digit code sent to
           </p>
@@ -218,7 +218,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
 
           {isVerifying && (
             <p className={`text-sm text-center ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Verifying code...
             </p>
@@ -232,8 +232,8 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
             className={`text-sm font-medium transition-colors ${
               resendTimer > 0 || isResending
                 ? darkMode
-                  ? 'text-stone-600 cursor-not-allowed'
-                  : 'text-stone-400 cursor-not-allowed'
+                  ? 'text-content-secondary cursor-not-allowed'
+                  : 'text-content-secondary cursor-not-allowed'
                 : darkMode
                   ? 'text-emerald-400 hover:text-emerald-300'
                   : 'text-emerald-600 hover:text-emerald-700'
@@ -249,10 +249,10 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         </div>
 
         <div className={`mt-6 p-4 rounded-lg ${
-          darkMode ? 'bg-stone-800' : 'bg-stone-50'
+          darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
         }`}>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             The verification code expires after 60 minutes. If you don't receive it within a few minutes, check your spam folder or request a new code.
           </p>

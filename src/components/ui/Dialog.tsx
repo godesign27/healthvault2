@@ -1,6 +1,6 @@
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X, ExternalLink, AlertTriangle, Info } from 'lucide-react';
-import { ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 
 const sizeMap = {
@@ -36,68 +36,65 @@ export function Dialog({
   headerAction,
 }: DialogProps) {
   const isDark = variant === 'dark';
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  return createPortal(
-    <>
-      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dialog-title"
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-          sizeMap[size], 'w-[calc(100%-2rem)]',
-          'bg-surface-overlay rounded-lg shadow-xl max-h-[90vh] flex flex-col',
-          'focus-visible:outline-none',
-        )}
-      >
-        <div className={cn(
-          'flex items-center justify-between px-6 py-4 border-b',
-          isDark ? 'bg-hv-neutral-800 text-hv-neutral-0 border-hv-neutral-700' : 'border-stroke-subtle',
-        )}>
-          <div className="flex items-center gap-3">
-            {showIcon && iconType === 'warning' && <AlertTriangle className="w-5 h-5 text-content-feedback-error" />}
-            {showIcon && iconType === 'info'    && <Info className="w-5 h-5 text-content-feedback-info" />}
-            <h2 id="dialog-title" className="text-lg font-semibold text-content-primary">{title}</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {headerAction}
-            <button
-              onClick={onClose}
-              className={cn(
-                'p-1 rounded transition-colors',
-                isDark ? 'hover:bg-hv-neutral-700 text-hv-neutral-200' : 'hover:bg-action-secondary text-content-secondary',
+  return (
+    <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          className="fixed inset-0 z-50 [background:var(--hv-component-dialog-overlay-background)]"
+        />
+        <DialogPrimitive.Content
+          className={cn(
+            'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+            sizeMap[size],
+            'w-[calc(100%-2rem)] max-h-[90vh] flex flex-col focus-visible:outline-none',
+            'rounded-hv-dialog shadow-hv-dialog',
+            '[background:var(--hv-component-dialog-background-default)]',
+          )}
+        >
+          <div
+            className={cn(
+              'flex items-center justify-between px-6 py-4 border-b',
+              isDark
+                ? 'bg-hv-neutral-800 text-hv-neutral-0 border-hv-neutral-700'
+                : '[border-color:var(--hv-component-dialog-border-default)]',
+            )}
+          >
+            <div className="flex items-center gap-3">
+              {showIcon && iconType === 'warning' && (
+                <AlertTriangle className="w-5 h-5 text-content-feedback-error" />
               )}
-            >
-              <X className="w-5 h-5" />
-            </button>
+              {showIcon && iconType === 'info' && (
+                <Info className="w-5 h-5 text-content-feedback-info" />
+              )}
+              <DialogPrimitive.Title className="text-lg font-semibold [color:var(--hv-component-dialog-text-title)]">
+                {title}
+              </DialogPrimitive.Title>
+            </div>
+            <div className="flex items-center gap-2">
+              {headerAction}
+              <DialogPrimitive.Close
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  isDark
+                    ? 'hover:bg-hv-neutral-700 text-hv-neutral-200'
+                    : 'hover:bg-action-secondary text-content-secondary',
+                )}
+              >
+                <X className="w-5 h-5" />
+              </DialogPrimitive.Close>
+            </div>
           </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
+          <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
 
-        {footerContent && (
-          <div className="px-6 py-4 border-t border-stroke-subtle flex justify-end gap-2">
-            {footerContent}
-          </div>
-        )}
-      </div>
-    </>,
-    document.body,
+          {footerContent && (
+            <div className="px-6 py-4 border-t [border-color:var(--hv-component-dialog-footer-border)] flex justify-end gap-2">
+              {footerContent}
+            </div>
+          )}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 

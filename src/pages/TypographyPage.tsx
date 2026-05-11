@@ -122,37 +122,37 @@ export function TypographyPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Typography</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Typography</h1>
+          <p className="text-content-secondary">
             Open Sans is the default font in ZSUI and specifications are as follows
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="bg-surface-raised rounded-lg shadow-sm overflow-hidden mb-8">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-surface-sunken border-b border-stroke-subtle">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type(Name)</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Size(px)</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Line height(px)</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Letter spacing(px)</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Weight</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Where to use</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Type(Name)</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Size(px)</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Line height(px)</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Letter spacing(px)</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Weight</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-content-primary">Where to use</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-stroke-subtle">
                 {typographySpecs.map((spec, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{spec.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{spec.size}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{spec.lineHeight}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{spec.letterSpacing}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{spec.weight}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{spec.usage}</td>
+                  <tr key={index} className="hover:bg-surface-sunken">
+                    <td className="px-6 py-4 text-sm text-content-primary">{spec.name}</td>
+                    <td className="px-6 py-4 text-sm text-content-primary">{spec.size}</td>
+                    <td className="px-6 py-4 text-sm text-content-primary">{spec.lineHeight}</td>
+                    <td className="px-6 py-4 text-sm text-content-primary">{spec.letterSpacing}</td>
+                    <td className="px-6 py-4 text-sm text-content-primary">{spec.weight}</td>
+                    <td className="px-6 py-4 text-sm text-content-secondary">{spec.usage}</td>
                   </tr>
                 ))}
               </tbody>
@@ -161,15 +161,15 @@ export function TypographyPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Typography Examples</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Typography Examples</h2>
 
             <div className="space-y-8">
               {typographySpecs.map((spec, index) => (
-                <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
+                <div key={index} className="border-b border-stroke-subtle pb-6 last:border-b-0">
                   <div className="flex items-baseline justify-between mb-3">
                     <span className="text-sm font-semibold text-[indigo-600]">{spec.name}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-content-secondary">
                       {spec.size} / {spec.lineHeight} / {spec.letterSpacing}
                     </span>
                   </div>
@@ -181,7 +181,7 @@ export function TypographyPage() {
                       fontWeight: spec.fontWeight,
                       fontStyle: spec.italic ? 'italic' : 'normal'
                     }}
-                    className="text-gray-900"
+                    className="text-content-primary"
                   >
                     The quick brown fox jumps over the lazy dog
                   </p>
@@ -190,10 +190,10 @@ export function TypographyPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Font Family</h3>
                 <p className="text-sm mb-3">
@@ -278,43 +278,43 @@ export function TypographyPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Implementation</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Implementation</h2>
 
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-3 text-lg">Tailwind CSS Classes</h3>
-                <div className="bg-gray-50 p-4 font-mono text-xs overflow-x-auto space-y-3">
+                <div className="bg-surface-sunken p-4 font-mono text-xs overflow-x-auto space-y-3">
                   <div>
-                    <div className="text-gray-500 mb-1">Display</div>
+                    <div className="text-content-secondary mb-1">Display</div>
                     <div>className="text-[44px] leading-[56px] tracking-[-0.15px] font-semibold"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Headline 1</div>
+                    <div className="text-content-secondary mb-1">Headline 1</div>
                     <div>className="text-[28px] leading-[40px] tracking-[-0.15px] font-semibold"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Headline 2</div>
+                    <div className="text-content-secondary mb-1">Headline 2</div>
                     <div>className="text-xl leading-7 tracking-[-0.15px] font-semibold"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Headline 3</div>
+                    <div className="text-content-secondary mb-1">Headline 3</div>
                     <div>className="text-base leading-6 tracking-[-0.15px] font-semibold"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Body - Regular</div>
+                    <div className="text-content-secondary mb-1">Body - Regular</div>
                     <div>className="text-sm leading-5 tracking-[-0.15px]"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Body - SemiBold</div>
+                    <div className="text-content-secondary mb-1">Body - SemiBold</div>
                     <div>className="text-sm leading-5 tracking-[-0.15px] font-semibold"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Caption 1 - Regular</div>
+                    <div className="text-content-secondary mb-1">Caption 1 - Regular</div>
                     <div>className="text-xs leading-4 tracking-[-0.15px]"</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Caption 2 - Regular</div>
+                    <div className="text-content-secondary mb-1">Caption 2 - Regular</div>
                     <div>className="text-[10px] leading-[14px] tracking-[-0.15px]"</div>
                   </div>
                 </div>

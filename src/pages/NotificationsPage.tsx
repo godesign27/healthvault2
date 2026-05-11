@@ -7,21 +7,21 @@ export function NotificationsPage() {
   const [showBanners, setShowBanners] = useState(true);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Notifications</h1>
-          <p className="text-gray-600">Toast messages and banner notifications for user feedback</p>
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Notifications</h1>
+          <p className="text-content-secondary">Toast messages and banner notifications for user feedback</p>
         </div>
 
         <div className="space-y-12">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Toast Notifications</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Toast Notifications</h2>
 
             <div className="space-y-8">
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-700">Inline Style</h3>
+                  <h3 className="text-lg font-semibold text-content-secondary">Inline Style</h3>
                   <button
                     onClick={() => setShowToasts(!showToasts)}
                     className="px-4 py-2 bg-[indigo-600] text-white rounded hover:bg-[#156570] transition-colors text-sm"
@@ -65,7 +65,7 @@ export function NotificationsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Solid Style</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Solid Style</h3>
                 <div className="space-y-3">
                   <Toast
                     message="This is an info message"
@@ -101,13 +101,13 @@ export function NotificationsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Banner Notifications</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Banner Notifications</h2>
 
             <div className="space-y-8">
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-700">Outline Style</h3>
+                  <h3 className="text-lg font-semibold text-content-secondary">Outline Style</h3>
                   <button
                     onClick={() => setShowBanners(!showBanners)}
                     className="px-4 py-2 bg-[indigo-600] text-white rounded hover:bg-[#156570] transition-colors text-sm"
@@ -146,7 +146,7 @@ export function NotificationsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Solid Style</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Solid Style</h3>
                 <div className="space-y-3">
                   <Banner
                     message="This is an info banner"
@@ -176,7 +176,7 @@ export function NotificationsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Light Style</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Light Style</h3>
                 <div className="space-y-3">
                   <Banner
                     message="This is an info banner"
@@ -207,14 +207,14 @@ export function NotificationsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2">Toast vs Banner</h3>
                 <div className="grid md:grid-cols-2 gap-4 mt-3">
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-stroke-subtle rounded-lg p-4">
                     <h4 className="font-medium text-[indigo-600] mb-2">Toast Notifications</h4>
                     <ul className="list-disc list-inside space-y-1 text-sm">
                       <li>Temporary, auto-dismissing messages</li>
@@ -224,7 +224,7 @@ export function NotificationsPage() {
                       <li>Should not block user interaction</li>
                     </ul>
                   </div>
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-stroke-subtle rounded-lg p-4">
                     <h4 className="font-medium text-[indigo-600] mb-2">Banner Notifications</h4>
                     <ul className="list-disc list-inside space-y-1 text-sm">
                       <li>Persistent until dismissed</li>
@@ -265,7 +265,7 @@ export function NotificationsPage() {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-4 h-4 bg-gray-400 rounded mt-0.5"></div>
+                    <div className="w-4 h-4 bg-hv-neutral-400 rounded mt-0.5"></div>
                     <div>
                       <strong>Loading:</strong> In-progress operations, processing states
                     </div>

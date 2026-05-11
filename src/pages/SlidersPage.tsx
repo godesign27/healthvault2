@@ -7,24 +7,24 @@ export function SlidersPage() {
   const [errorValue, setErrorValue] = useState(50);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Sliders</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Sliders</h1>
+          <p className="text-content-secondary">
             Interactive range sliders for selecting numeric values
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Interactive Examples</h2>
+        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8 mb-8">
+          <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive Examples</h2>
 
           <div className="space-y-12">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Standard Sliders</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Standard Sliders</h3>
               <div className="space-y-8">
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">Default State</p>
+                  <p className="text-sm text-content-secondary mb-4">Default State</p>
                   <Slider
                     value={standardValue}
                     onChange={setStandardValue}
@@ -33,7 +33,7 @@ export function SlidersPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">With Dynamic Value Display</p>
+                  <p className="text-sm text-content-secondary mb-4">With Dynamic Value Display</p>
                   <Slider
                     value={dynamicValue}
                     onChange={setDynamicValue}
@@ -42,7 +42,7 @@ export function SlidersPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">Error State</p>
+                  <p className="text-sm text-content-secondary mb-4">Error State</p>
                   <Slider
                     value={errorValue}
                     onChange={setErrorValue}
@@ -52,7 +52,7 @@ export function SlidersPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">Disabled State</p>
+                  <p className="text-sm text-content-secondary mb-4">Disabled State</p>
                   <Slider
                     value={50}
                     disabled
@@ -63,7 +63,7 @@ export function SlidersPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Slider Variants</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">Slider Variants</h3>
               <div className="space-y-8">
                 <Slider
                   label="Volume"
@@ -91,38 +91,38 @@ export function SlidersPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">States Overview</h3>
+              <h3 className="text-lg font-semibold text-content-primary mb-4">States Overview</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">Default</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">Default</p>
                     <Slider defaultValue={30} />
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">With Value</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">With Value</p>
                     <Slider defaultValue={50} showValue />
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">With Ticks</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">With Ticks</p>
                     <Slider defaultValue={70} showTicks />
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">Error</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">Error</p>
                     <Slider defaultValue={30} error />
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">Error with Value</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">Error with Value</p>
                     <Slider defaultValue={50} error showValue />
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">Disabled</p>
+                    <p className="text-sm font-medium text-content-secondary mb-3">Disabled</p>
                     <Slider defaultValue={70} disabled />
                   </div>
                 </div>
@@ -131,19 +131,19 @@ export function SlidersPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Usage Guidelines</h2>
+        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8">
+          <h2 className="text-2xl font-bold text-content-primary mb-4">Usage Guidelines</h2>
           <div className="prose max-w-none">
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">When to Use</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">When to Use</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>For selecting a value from a continuous range</li>
               <li>When the exact value is less important than the approximate range</li>
               <li>For adjusting settings like volume, brightness, or zoom</li>
               <li>When space is limited and you need a compact input method</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Best Practices</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">Best Practices</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>Show tick marks for sliders with discrete steps</li>
               <li>Display the current value for precise adjustments</li>
               <li>Use appropriate min/max ranges for the context</li>
@@ -151,8 +151,8 @@ export function SlidersPage() {
               <li>Use the error state to indicate invalid ranges or values</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Accessibility</h3>
-            <ul className="text-gray-600 space-y-2">
+            <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">Accessibility</h3>
+            <ul className="text-content-secondary space-y-2">
               <li>Sliders are keyboard accessible using arrow keys</li>
               <li>Always include a label for screen readers</li>
               <li>Provide visual feedback for focus states</li>
