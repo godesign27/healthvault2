@@ -446,7 +446,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         {isAIPanelOpen && (
           <aside
             className={`
-              shrink-0 relative bg-surface-overlay z-50
+              shrink-0 relative z-50 bg-transparent
               fixed lg:relative inset-y-0 right-0
               w-full lg:w-[33vw] lg:min-w-[400px]
               transition-transform duration-300 ease-in-out

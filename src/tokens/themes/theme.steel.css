@@ -114,7 +114,8 @@
   box-shadow: none;
 }
 
-[data-surface="steel"] [data-steel-chrome="main"] {
+[data-surface="steel"] [data-steel-chrome="main"],
+[data-surface="steel"] [data-steel-chrome="assistant"] {
   background: transparent;
 }
 
@@ -246,8 +247,9 @@
     0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
-/* Main content: same frosted-glass stack as sidebar (rail uses matching wash) */
-[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='main'] {
+/* Main content + AI assistant rail: same frosted-glass stack */
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='main'],
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='assistant'] {
   background: linear-gradient(
     195deg,
     rgba(32, 28, 58, 0.55) 0%,
@@ -259,6 +261,35 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='assistant'] {
+  border-left-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Nested data-theme=dark (e.g. Health Vault) — same chrome as html-level dark */
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='main'],
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='assistant'] {
+  background: linear-gradient(
+    195deg,
+    rgba(32, 28, 58, 0.55) 0%,
+    rgba(16, 18, 36, 0.72) 45%,
+    rgba(4, 6, 14, 0.88) 100%
+  );
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='assistant'] {
+  border-left-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Ensure midnight flood token exists under nested dark wrappers (Health Vault) */
+[data-surface='steel'] [data-theme='dark'] {
+  --hv-color-steel-chrome-flood: #060a12;
 }
 
 [data-theme='dark'] [data-surface='steel'] [data-steel-glass='true'] {
@@ -283,4 +314,30 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ─── Floating voice / chat FAB (Health Vault) ───────────────────────────────
+   Stronger glass + border so the cluster reads above Steel canvas; chat chip ink
+   matches midnight flood (same family as nav reverse-out) for contrast on white.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface='steel'] [data-hv-floating-chat-bar] {
+  --hv-component-floating-chat-chrome-background: rgba(255, 255, 255, 0.9);
+  --hv-component-floating-chat-chrome-border: rgba(15, 23, 42, 0.12);
+  --hv-component-floating-chat-chrome-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 12px 40px rgba(15, 23, 42, 0.2);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-hv-floating-chat-bar],
+[data-surface='steel'] [data-theme='dark'] [data-hv-floating-chat-bar] {
+  --hv-component-floating-chat-chrome-background: rgba(14, 16, 30, 0.86);
+  --hv-component-floating-chat-chrome-border: rgba(255, 255, 255, 0.14);
+  --hv-component-floating-chat-chrome-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+  --hv-component-floating-chat-secondary-fill: rgba(255, 255, 255, 0.98);
+  /* Fallback when html theme is light but a nested data-theme=dark wrapper is used */
+  --hv-component-floating-chat-secondary-ink: var(--hv-color-steel-chrome-flood, #060a12);
+  --hv-component-floating-chat-secondary-border: rgba(6, 10, 18, 0.22);
 }

@@ -144,4 +144,35 @@
   --hv-component-datepicker-day-text-today:         var(--hv-color-action-primary-default);
   --hv-component-datepicker-border-default:         var(--hv-color-border-subtle);
   --hv-component-datepicker-header-text:            var(--hv-color-text-primary);
+
+  /* Floating voice / chat FAB (Dashboard; Steel theme overrides chrome) */
+  --hv-component-floating-chat-chrome-background: rgba(255, 255, 255, 0.94);
+  --hv-component-floating-chat-chrome-border: rgba(15, 23, 42, 0.1);
+  --hv-component-floating-chat-chrome-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 10px 36px rgba(15, 23, 42, 0.14);
+  --hv-component-floating-chat-secondary-fill: #ffffff;
+  --hv-component-floating-chat-secondary-ink: var(--hv-color-text-primary);
+  --hv-component-floating-chat-secondary-border: rgba(15, 23, 42, 0.12);
+}
+
+/* FAB chrome shell — uses component tokens (theme files remap) */
+[data-hv-floating-chat-bar].hv-floating-chat-chrome {
+  background: var(--hv-component-floating-chat-chrome-background);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--hv-component-floating-chat-chrome-border);
+  box-shadow: var(--hv-component-floating-chat-chrome-shadow);
+}
+
+/* Secondary (chat) chip on bright fill — ink from token (Tailwind must not set text/bg on same node) */
+.hv-floating-chat__secondary {
+  background: var(--hv-component-floating-chat-secondary-fill);
+  color: var(--hv-component-floating-chat-secondary-ink);
+  border-color: var(--hv-component-floating-chat-secondary-border);
+}
+
+.hv-floating-chat__secondary svg {
+  color: var(--hv-component-floating-chat-secondary-ink);
+  stroke: var(--hv-component-floating-chat-secondary-ink);
 }

@@ -961,7 +961,7 @@ export function AIAssistantPanel({
   return (
     <aside
       data-steel-chrome="assistant"
-      className="flex h-full w-full flex-col border-l border-stroke-default bg-surface-overlay"
+      className="flex h-full w-full min-h-0 flex-col border-l border-stroke-default bg-transparent"
     >
       {showProviderConnectionFlow ? (
         <ProviderRecordConnectionFlow
@@ -973,9 +973,9 @@ export function AIAssistantPanel({
         />
       ) : (
         <>
-          <div className="flex-shrink-0 border-b border-stroke-default hv-surface-card-bg p-6">
+          <div className="flex-shrink-0 border-b border-stroke-default bg-transparent p-6">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-sunken">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-stroke-default bg-surface-sunken/80 backdrop-blur-sm">
                 <MessageCircle className="w-5 h-5 text-content-primary" />
               </div>
               <h2 className="text-lg font-semibold text-content-primary">
@@ -1331,7 +1331,7 @@ export function AIAssistantPanel({
           </div>
 
           {!showInsuranceFlow && (
-            <div className="flex-shrink-0 border-t border-stroke-default hv-surface-card-bg p-6">
+            <div className="flex-shrink-0 border-t border-stroke-default bg-transparent p-6">
               <div className="flex gap-3 items-end">
                 <input
                   type="text"
