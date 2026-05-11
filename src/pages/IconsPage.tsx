@@ -44,7 +44,7 @@ export function IconsPage() {
           </p>
         </div>
 
-        <div className="bg-surface-raised rounded-lg shadow-sm p-6 mb-8">
+        <div className="hv-surface-card p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-content-tertiary w-5 h-5" />
@@ -126,7 +126,7 @@ export function IconsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Icon Sizes</h2>
 
             <div className="space-y-6">
@@ -155,7 +155,7 @@ export function IconsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Icon Colors</h2>
 
             <div className="space-y-6">
@@ -188,7 +188,7 @@ export function IconsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

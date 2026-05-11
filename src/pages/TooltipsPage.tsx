@@ -12,7 +12,7 @@ export function TooltipsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Tooltip : Master Components</h2>
 
             <div className="grid grid-cols-2 gap-8 mb-8">
@@ -100,7 +100,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Normal Default (16px)</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -119,7 +119,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Small Default (14px)</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -138,7 +138,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Normal Inverse (16px)</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -157,7 +157,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Small Inverse (14px)</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -176,7 +176,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Popover : Inverse : Master Components</h2>
 
             <div className="border-2 border-dashed border-[#9B85D8] rounded p-12 flex justify-center">
@@ -193,7 +193,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Popover : Inverse</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -217,7 +217,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Popover Confirmation : Master Components</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -259,7 +259,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Popover Confirmation : Inverse</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -285,7 +285,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Popover Confirmation : Default</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -311,7 +311,7 @@ export function TooltipsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

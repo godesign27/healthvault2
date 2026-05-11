@@ -198,7 +198,7 @@ export function AdminPage() {
             </div>
 
             {isAddingToken && editingToken && (
-              <div className="bg-surface-raised rounded-lg shadow-sm p-6 border-2 border-[indigo-600]">
+              <div className="hv-surface-card p-6 border-2 border-[indigo-600]">
                 <h3 className="text-lg font-semibold text-content-primary mb-4">Add New Token</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <input
@@ -253,7 +253,7 @@ export function AdminPage() {
             )}
 
             {Object.entries(groupedTokens).map(([category, categoryTokens]) => (
-              <div key={category} className="bg-surface-raised rounded-lg shadow-sm p-6">
+              <div key={category} className="hv-surface-card p-6">
                 <h3 className="text-xl font-semibold text-content-primary mb-4 capitalize">{category}</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -378,7 +378,7 @@ export function AdminPage() {
             </div>
 
             {isAddingComponent && editingComponent && (
-              <div className="bg-surface-raised rounded-lg shadow-sm p-6 border-2 border-[indigo-600]">
+              <div className="hv-surface-card p-6 border-2 border-[indigo-600]">
                 <h3 className="text-lg font-semibold text-content-primary mb-4">Add New Component</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <input
@@ -426,7 +426,7 @@ export function AdminPage() {
             )}
 
             {Object.entries(groupedComponents).map(([category, categoryComponents]) => (
-              <div key={category} className="bg-surface-raised rounded-lg shadow-sm p-6">
+              <div key={category} className="hv-surface-card p-6">
                 <h3 className="text-xl font-semibold text-content-primary mb-4">{category}</h3>
                 <div className="grid gap-4">
                   {categoryComponents.map((component) => (

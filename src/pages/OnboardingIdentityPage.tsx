@@ -157,9 +157,7 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
         />
       }
     >
-      <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-      }`}>
+      <div className="hv-surface-card hv-surface-card--flat p-8">
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
             darkMode ? 'text-white' : 'text-content-primary'

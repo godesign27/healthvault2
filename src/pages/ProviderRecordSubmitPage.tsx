@@ -266,7 +266,7 @@ export default function ProviderRecordSubmitPage() {
   return (
     <PageShell>
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl border border-stroke-subtle shadow-sm overflow-hidden">
+        <div className="hv-surface-card hv-surface-card--flat overflow-hidden">
           <div className="p-6 sm:p-8 border-b border-stroke-subtle">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-xl font-bold text-content-primary">Record Request</h2>

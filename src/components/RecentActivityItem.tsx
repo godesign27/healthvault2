@@ -20,11 +20,11 @@ export function RecentActivityItem({
   darkMode = false
 }: RecentActivityItemProps) {
   return (
-    <div className={`flex items-start gap-4 p-4 rounded-xl transition-all cursor-pointer ${
-      darkMode
-        ? 'hover:bg-surface-sunken/50 hover:shadow-lg'
-        : 'hover:bg-white hover:shadow-md hover:shadow-black/10'
-    }`}>
+    <div
+      className={`hv-surface-card hv-surface-card--interactive flex cursor-pointer items-start gap-4 p-4 transition-all ${
+        darkMode ? 'hover:bg-action-secondary hover:shadow-lg' : 'hover:bg-action-secondary hover:shadow-md hover:shadow-black/10'
+      }`}
+    >
       <div className={`flex items-center justify-center w-11 h-11 ${iconBgColor} ${iconColor} rounded-xl flex-shrink-0 transition-transform hover:scale-110`}>
         {icon}
       </div>

@@ -42,7 +42,7 @@ export function AccordionsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -124,7 +124,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Border</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -218,7 +218,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Borderless</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -316,7 +316,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Nested Accordions</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -416,7 +416,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Disabled State</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -445,7 +445,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Working Examples</h2>
 
             <div className="space-y-8">
@@ -494,7 +494,7 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

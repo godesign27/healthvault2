@@ -12,7 +12,7 @@ export function SegmentedControlPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Left - Solid - Normal</h2>
 
             <div className="space-y-6">
@@ -60,7 +60,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Middle - Solid - Normal</h2>
 
             <div className="space-y-6">
@@ -108,7 +108,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Right - Solid - Normal</h2>
 
             <div className="space-y-6">
@@ -156,7 +156,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - Normal</h2>
 
             <div className="space-y-6">
@@ -200,7 +200,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid - Small</h2>
 
             <div className="space-y-6">
@@ -234,7 +234,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - Small</h2>
 
             <div className="space-y-6">
@@ -268,7 +268,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid - X-Small</h2>
 
             <div className="space-y-6">
@@ -302,7 +302,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline - X-Small</h2>
 
             <div className="space-y-6">
@@ -336,7 +336,7 @@ export function SegmentedControlPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

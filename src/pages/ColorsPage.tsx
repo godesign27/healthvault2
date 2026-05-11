@@ -80,7 +80,7 @@ export function ColorsPage() {
             const families = groupByFamily(categoryTokens);
 
             return (
-              <section key={category} className="bg-surface-raised rounded-lg shadow-sm p-8">
+              <section key={category} className="hv-surface-card p-8">
                 <h2 className="text-2xl font-bold text-content-primary mb-6">{getCategoryTitle(category)}</h2>
 
                 <div className="space-y-8">
@@ -139,7 +139,7 @@ export function ColorsPage() {
             );
           })}
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

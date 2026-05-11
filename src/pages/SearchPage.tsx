@@ -13,7 +13,7 @@ export default function SearchPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Basic Search Components</h2>
             <div className="grid grid-cols-3 gap-6 mb-8">
               <SearchIconOnly size="small" />
@@ -42,7 +42,7 @@ export default function SearchPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Search with Dropdown</h2>
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-6">

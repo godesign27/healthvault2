@@ -105,7 +105,7 @@ export default function SuperAdminPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6 mb-8">
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+          <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-indigo-50">
                 <Building2 className="w-5 h-5 text-indigo-600" />
@@ -120,7 +120,7 @@ export default function SuperAdminPage() {
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+          <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-emerald-50">
                 <Users className="w-5 h-5 text-emerald-600" />
@@ -135,7 +135,7 @@ export default function SuperAdminPage() {
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+          <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-amber-50">
                 <Activity className="w-5 h-5 text-amber-600" />
@@ -150,7 +150,7 @@ export default function SuperAdminPage() {
             </p>
           </div>
 
-          <div className={`rounded-lg border p-6 ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+          <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-rose-50">
                 <TrendingUp className="w-5 h-5 text-rose-600" />
@@ -166,7 +166,7 @@ export default function SuperAdminPage() {
           </div>
         </div>
 
-        <div className={`rounded-lg border ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-white'}`}>
+        <div className="hv-surface-card hv-surface-card--flat">
           <div className="p-6 border-b border-stroke-subtle">
             <div className="flex items-center justify-between">
               <div>

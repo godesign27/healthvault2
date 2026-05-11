@@ -16,7 +16,7 @@ export function TogglesPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-4 gap-6">
@@ -73,7 +73,7 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: Without label</h2>
 
             <div className="overflow-x-auto">
@@ -170,7 +170,7 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: With Label</h2>
 
             <div className="overflow-x-auto">
@@ -271,7 +271,7 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Toggles: Error Mode</h2>
 
             <div className="overflow-x-auto">
@@ -400,7 +400,7 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
             <div className="space-y-6 text-content-secondary">
@@ -437,7 +437,7 @@ export function TogglesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

@@ -170,7 +170,7 @@ export function TablesPage() {
       <div className="space-y-12">
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Default Table</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={userColumns}
               data={userData}
@@ -181,7 +181,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Selectable Table with Actions</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={userColumns}
               data={userData}
@@ -224,7 +224,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Striped Table</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={productColumns}
               data={productData}
@@ -249,7 +249,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Compact Table</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={compactColumns}
               data={compactData}
@@ -261,7 +261,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Sticky Header with Max Height</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={userColumns}
               data={[...userData, ...userData, ...userData]}
@@ -274,7 +274,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Loading State</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={userColumns}
               data={[]}
@@ -285,7 +285,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Empty State</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle overflow-hidden">
+          <div className="hv-surface-card overflow-hidden">
             <Table
               columns={userColumns}
               data={[]}
@@ -296,7 +296,7 @@ export function TablesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold text-content-primary mb-4">Table Badges</h2>
-          <div className="bg-surface-raised rounded-lg border border-stroke-subtle p-6">
+          <div className="hv-surface-card p-6">
             <div className="flex flex-wrap gap-4">
               <TableBadge variant="default">Default (Gray 70)</TableBadge>
               <TableBadge variant="completed">Completed (Gray 90)</TableBadge>

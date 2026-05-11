@@ -68,7 +68,7 @@ function getSavedDesignSystemSurface(): DesignSystemSurface {
     const v = sessionStorage.getItem(SESSION_DS_SURFACE_KEY);
     if (v === 'bold' || v === 'default' || v === 'steel') return v;
   } catch {}
-  return 'default';
+  return 'steel';
 }
 
 // Runs at module load time so sessionStorage is set before any useState reads it
@@ -534,17 +534,13 @@ function App() {
     </>
   );
 
-  const steelSurfaceOutsideDesignSystem =
-    designSystemSurface === 'steel' &&
-    (currentView === 'health-vault' || (currentView === 'projects' && !currentProjectId));
-
-  const useSurfaceRoot = currentView === 'design-system' || steelSurfaceOutsideDesignSystem;
-
-  const rootSurfaceName =
-    currentView === 'design-system' ? designSystemSurface : 'steel';
+  /* Steel / bold / default surfaces apply only inside the design-system gallery,
+   * or inside the Health Vault app (DashboardPage wraps itself in <Surface name="steel">).
+   * Marketing, login, and onboarding stay on the global default tokens — do not wrap them in Surface. */
+  const useSurfaceRoot = currentView === 'design-system';
 
   return useSurfaceRoot ? (
-    <Surface name={rootSurfaceName} className={layoutShellClass}>
+    <Surface name={designSystemSurface} className={layoutShellClass}>
       {shellInner}
     </Surface>
   ) : (

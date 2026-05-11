@@ -19,7 +19,7 @@ export function BreadcrumbsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
             <p className="text-sm text-content-secondary mb-6">For UI kit building only</p>
 
@@ -89,7 +89,7 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: Normal</h2>
 
             <div className="space-y-6">
@@ -201,7 +201,7 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: Small</h2>
 
             <div className="space-y-6">
@@ -313,7 +313,7 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: X-Small</h2>
 
             <div className="space-y-6">
@@ -425,7 +425,7 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Complete Breadcrumb Examples</h2>
 
             <div className="space-y-8">
@@ -511,7 +511,7 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

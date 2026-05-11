@@ -9,6 +9,13 @@
   --hv-component-nav-item-background-active:    var(--hv-color-action-primary-subtle);
   --hv-component-nav-item-background-selected:  var(--hv-color-action-primary-subtle);
 
+  /* Rail row shape + selected chrome (themes e.g. Steel override for reverse-out pills) */
+  --hv-component-nav-item-radius:               0.5rem;
+  --hv-component-nav-item-text-selected:        var(--hv-color-text-primary);
+  --hv-component-nav-item-icon-selected:        var(--hv-color-action-primary-default);
+  --hv-component-nav-item-ring-selected:        var(--hv-color-border-default);
+  --hv-component-nav-item-shadow-selected:      none;
+
   --hv-component-nav-item-text-default:         var(--hv-color-text-secondary);
   --hv-component-nav-item-text-hover:           var(--hv-color-text-primary);
   --hv-component-nav-item-text-active:          var(--hv-color-text-primary);
@@ -18,4 +25,44 @@
   --hv-component-nav-item-icon-active:          var(--hv-color-action-primary-default);
 
   --hv-component-nav-item-indicator-active:     var(--hv-color-action-primary-default);
+
+  /* Segmented controls in nav chrome (thumb + track corners) */
+  --hv-component-nav-segment-track-radius:      0.5rem;
+  --hv-component-nav-segment-thumb-radius:      0.375rem;
+}
+
+/* Primary navigation rail — uses nav tokens only (themes remap selection/hover) */
+.hv-nav-rail-item {
+  border-radius: var(--hv-component-nav-item-radius);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.hv-nav-rail-item:not(.hv-nav-rail-item--selected) {
+  color: var(--hv-component-nav-item-text-default);
+}
+
+.hv-nav-rail-item:not(.hv-nav-rail-item--selected) svg {
+  color: var(--hv-component-nav-item-icon-default);
+}
+
+.hv-nav-rail-item:not(.hv-nav-rail-item--selected):hover {
+  background: var(--hv-component-nav-item-background-hover);
+  color: var(--hv-component-nav-item-text-hover);
+}
+
+.hv-nav-rail-item:not(.hv-nav-rail-item--selected):hover svg {
+  color: var(--hv-component-nav-item-icon-hover);
+}
+
+.hv-nav-rail-item--selected {
+  background: var(--hv-component-nav-item-background-selected);
+  color: var(--hv-component-nav-item-text-selected);
+  box-shadow: var(--hv-component-nav-item-selected-overlay);
+}
+
+.hv-nav-rail-item--selected svg {
+  color: var(--hv-component-nav-item-icon-selected);
 }

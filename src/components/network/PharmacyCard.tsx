@@ -1,5 +1,6 @@
 import { Phone, MapPin, Star, Edit2, Share2, Trash2, Package, CheckCircle, XCircle } from 'lucide-react';
 import { Pharmacy } from '../../types/network';
+import { Card } from '../ui/Card';
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
@@ -19,13 +20,12 @@ export function PharmacyCard({
   onRemove
 }: PharmacyCardProps) {
   return (
-    <div
-      className={`rounded-xl border p-6 transition-all hover:shadow-lg cursor-pointer ${
-        darkMode ? 'border-stroke-default bg-surface-raised hover:border-stroke-default' : 'border-stroke-subtle bg-white hover:border-stroke-default'
-      }`}
+    <Card
+      shadow="blur"
+      className="h-full cursor-pointer transition-all hover:-translate-y-0.5"
       onClick={() => onView?.(pharmacy)}
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between p-6 pb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
@@ -61,8 +61,7 @@ export function PharmacyCard({
           </span>
         )}
       </div>
-
-      <div className={`space-y-2 mb-4 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
+      <div className={`mb-4 space-y-2 px-6 pb-4 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
         {pharmacy.phone && (
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
@@ -93,9 +92,8 @@ export function PharmacyCard({
           </div>
         )}
       </div>
-
       <div
-        className={`flex items-center gap-2 pt-4 border-t ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'}`}
+        className={`flex items-center gap-2 border-t ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'} px-6 pb-3 pt-4`}
         onClick={(e) => e.stopPropagation()}
       >
         {onEdit && (
@@ -134,6 +132,6 @@ export function PharmacyCard({
           </button>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

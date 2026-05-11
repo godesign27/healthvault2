@@ -21,11 +21,7 @@ export function OnboardingAssistantPanel({
   darkMode = false
 }: OnboardingAssistantPanelProps) {
   return (
-    <div className={`rounded-lg border p-6 ${
-      darkMode
-        ? 'bg-surface-sunken border-stroke-default'
-        : 'bg-white border-stroke-subtle'
-    }`}>
+    <div className="hv-surface-card hv-surface-card--flat p-6">
       <div className="flex items-start gap-3 mb-4">
         <div className={`p-2 rounded-lg ${
           darkMode ? 'bg-emerald-500/20' : 'bg-emerald-50'

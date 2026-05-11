@@ -18,7 +18,7 @@ export function DatePickerPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Date Picker Sizes</h2>
 
             <div className="grid grid-cols-3 gap-8">
@@ -54,7 +54,7 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components (For UI Kit building only)</h2>
 
             <div className="space-y-8">
@@ -224,7 +224,7 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Calendar Views</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -248,7 +248,7 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Action Field with Date Picker</h2>
 
             <div className="max-w-sm">
@@ -260,7 +260,7 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

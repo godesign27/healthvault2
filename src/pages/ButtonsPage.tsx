@@ -13,7 +13,7 @@ export function ButtonsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - Normal (55px)</h2>
 
             <div className="space-y-6">
@@ -59,7 +59,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - Small (44px)</h2>
 
             <div className="space-y-6">
@@ -105,7 +105,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
@@ -151,7 +151,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - Normal (55px)</h2>
 
             <div className="space-y-6">
@@ -197,7 +197,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - Small (44px)</h2>
 
             <div className="space-y-6">
@@ -243,7 +243,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
@@ -289,7 +289,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - Normal (55px)</h2>
 
             <div className="space-y-6">
@@ -335,7 +335,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - Small (44px)</h2>
 
             <div className="space-y-6">
@@ -381,7 +381,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Link Button - X-Small (38px)</h2>
 
             <div className="space-y-6">
@@ -427,7 +427,7 @@ export function ButtonsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

@@ -201,9 +201,9 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
         onClick={onClose}
       />
 
-      <div className={`fixed top-0 right-0 h-full w-full max-w-xl shadow-2xl transition-transform duration-300 ease-in-out z-50 flex flex-col ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-xl shadow-2xl transition-transform duration-300 ease-in-out z-50 flex flex-col hv-surface-card-bg ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      } ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
+      }`}>
         <div className={`flex items-center justify-between px-6 py-5 border-b shrink-0 ${
           darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
@@ -255,8 +255,8 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
           </div>
         </div>
 
-        <div className={`px-6 py-4 border-t shrink-0 ${
-          darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-white'
+        <div className={`px-6 py-4 border-t shrink-0 hv-surface-card-bg ${
+          darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           <div className="flex gap-3">
             {isExpired ? (
@@ -338,9 +338,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                 </button>
 
                 {showDeleteConfirm && (
-                  <div className={`absolute bottom-full right-0 mb-2 w-64 rounded-xl shadow-xl border p-4 z-10 ${
-                    darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
-                  }`}>
+                  <div className="absolute bottom-full right-0 mb-2 w-64 p-4 z-10 hv-surface-card hv-surface-card--flat shadow-xl">
                     <p className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                       Are you sure?
                     </p>
@@ -568,8 +566,8 @@ function SubmittedFilesSection({ files, loading, darkMode }: { files: RecordRequ
               <div key={file.id} className={`flex items-start gap-3 p-3 rounded-xl ${
                 darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
               }`}>
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  darkMode ? 'bg-surface-sunken' : 'bg-white border border-stroke-subtle'
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border hv-surface-card-bg ${
+                  darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
                 }`}>
                   <Icon className={`w-4 h-4 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
                 </div>

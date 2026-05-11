@@ -280,9 +280,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : filteredDirectory.length === 0 ? (
-          <div className={`text-center py-16 rounded-xl border ${
-            'border-stroke-subtle bg-surface-raised'
-          }`}>
+          <div className="hv-surface-card py-16 text-center">
             <Search className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
             <p className={`font-medium ${'text-content-primary'}`}>No providers found</p>
             <p className={`text-sm mt-1 ${'text-content-secondary'}`}>
@@ -370,15 +368,17 @@ function DirectoryCard({
   const avatarColor = CATEGORY_COLORS[provider.category] || 'bg-surface-overlay';
 
   return (
-    <div className={`rounded-xl border p-5 transition-all ${
-      isAdded
-        ? darkMode
-          ? 'border-emerald-800/50 bg-emerald-950/20'
-          : 'border-emerald-200 bg-emerald-50/30'
-        : darkMode
-        ? 'border-stroke-default bg-surface-raised hover:border-stroke-default'
-        : 'border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
-    }`}>
+    <div
+      className={`p-5 transition-all ${
+        isAdded
+          ? darkMode
+            ? 'rounded-xl border border-emerald-800/50 bg-emerald-950/20'
+            : 'rounded-xl border border-emerald-200 bg-emerald-50/30'
+          : darkMode
+            ? 'hv-surface-card hv-surface-card--interactive'
+            : 'rounded-xl border border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
+      }`}
+    >
       <div className="flex gap-4">
         <div className={`w-11 h-11 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
           {initials}

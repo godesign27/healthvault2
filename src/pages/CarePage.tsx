@@ -215,7 +215,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
           {statsCards.map((card) => {
             const Icon = card.icon;
             return (
-              <div key={card.title} className="rounded-xl border border-stroke-subtle bg-surface-raised p-6 transition-all">
+              <div key={card.title} className="hv-surface-card p-6 transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-sm font-medium text-content-secondary">{card.title}</h3>
                   <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : card.bgColor}`}>
@@ -230,7 +230,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
       </section>
 
       <section className="mb-8">
-        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+        <div className="hv-surface-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-content-secondary" />
             <h2 className="text-lg font-semibold text-content-primary">Upcoming Appointments</h2>
@@ -265,7 +265,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
       </section>
 
       <section className="mb-8">
-        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+        <div className="hv-surface-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Pill className="w-5 h-5 text-content-secondary" />
             <h2 className="text-lg font-semibold text-content-primary">Medications</h2>
@@ -317,7 +317,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
         </div>
       </section>
 
-      <section className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+      <section className="hv-surface-card p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold mb-1 text-content-primary">Care History</h2>
@@ -343,7 +343,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
               </button>
 
               {isTimeDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 rounded-lg shadow-lg border border-stroke-subtle bg-surface-raised z-10">
+                <div className="absolute left-0 top-full z-10 mt-2 w-48 hv-surface-card hv-surface-card--flat rounded-lg shadow-lg">
                   {[
                     { id: 'all', label: 'All time' },
                     { id: '6months', label: 'Last 6 months' },
@@ -443,7 +443,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
 
             <div className="space-y-4">
               {searchFilteredHistory.map((record, index) => (
-                <div key={index} className="border border-stroke-subtle rounded-lg p-5 bg-surface-raised hover:shadow-md transition-shadow">
+                <div key={index} className="hv-surface-card p-5 transition-shadow hover:shadow-md">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">

@@ -211,7 +211,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
           <div className="w-8 h-8 border-4 border-action-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : coverages.length === 0 ? (
-        <div className="text-center py-16 rounded-xl border border-stroke-subtle bg-surface-raised">
+        <div className="text-center py-16 hv-surface-card">
           <ShieldCheck className="w-16 h-16 mx-auto mb-4 text-content-tertiary" />
           <h3 className="text-lg font-semibold mb-2 text-content-primary">
             No insurance coverage added

@@ -133,7 +133,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+            <div className="h-full hv-surface-card p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium text-content-secondary">Conditions</h3>
                 <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-blue-50'}`}>
@@ -150,7 +150,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+            <div className="h-full hv-surface-card p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium text-content-secondary">Medications</h3>
                 <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-emerald-50'}`}>
@@ -165,7 +165,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+            <div className="h-full hv-surface-card p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium text-content-secondary">Allergies</h3>
                 <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-amber-50'}`}>
@@ -182,7 +182,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           <div className="md:col-span-3 lg:col-span-3 h-full">
-            <div className="h-full rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+            <div className="h-full hv-surface-card p-6">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-medium text-content-secondary">Immunizations</h3>
                 <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-rose-50'}`}>
@@ -206,13 +206,13 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
           </div>
 
           {isLoading ? (
-            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <div className="hv-surface-card p-8 text-center">
               <p className="text-sm text-content-secondary">
                 Loading conditions...
               </p>
             </div>
           ) : conditions.length === 0 ? (
-            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <div className="hv-surface-card p-8 text-center">
               <Stethoscope className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
               <h3 className="text-lg font-semibold mb-2 text-content-primary">No conditions added</h3>
               <p className="text-sm text-content-secondary">
@@ -224,7 +224,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {conditions.map((condition) => (
                 <div
                   key={condition.id}
-                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
+                  className="hv-surface-card p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -282,7 +282,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
             </p>
           </div>
           {medications.length === 0 ? (
-            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <div className="hv-surface-card p-8 text-center">
               <Pill className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
               <h3 className="text-lg font-semibold mb-2 text-content-primary">No medications tracked</h3>
               <p className="text-sm text-content-secondary">
@@ -294,7 +294,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {medications.map((med) => (
                 <div
                   key={med.id}
-                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
+                  className="hv-surface-card p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -351,7 +351,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
             </p>
           </div>
           {allergies.length === 0 ? (
-            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <div className="hv-surface-card p-8 text-center">
               <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
               <h3 className="text-lg font-semibold mb-2 text-content-primary">No allergies listed</h3>
               <p className="text-sm text-content-secondary">
@@ -363,7 +363,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {allergies.map((allergy) => (
                 <div
                   key={allergy.id}
-                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
+                  className="hv-surface-card p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -421,7 +421,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
             </p>
           </div>
           {immunizations.length === 0 ? (
-            <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+            <div className="hv-surface-card p-8 text-center">
               <Syringe className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
               <h3 className="text-lg font-semibold mb-2 text-content-primary">No immunizations recorded</h3>
               <p className="text-sm text-content-secondary">
@@ -433,7 +433,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               {immunizations.map((immunization) => (
                 <div
                   key={immunization.id}
-                  className="rounded-xl border border-stroke-subtle bg-surface-raised p-6"
+                  className="hv-surface-card p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -489,7 +489,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               Stay proactive with your health. Add screenings, checkups, or care reminders recommended by your provider or the Health Vault assistant.
             </p>
           </div>
-          <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-8 text-center">
+          <div className="hv-surface-card p-8 text-center">
             <CalendarCheck className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
             <h3 className="text-lg font-semibold mb-2 text-content-primary">No preventive care items</h3>
             <p className="text-sm text-content-secondary">

@@ -320,7 +320,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+        <div className="hv-surface-card p-6">
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-medium text-content-secondary">Completed</h3>
             <div className="p-2.5 rounded-lg bg-surface-sunken">
@@ -331,7 +331,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
           <p className="text-sm text-content-secondary">of {totalForms} total</p>
         </div>
 
-        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+        <div className="hv-surface-card p-6">
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-medium text-content-secondary">Incomplete</h3>
             <div className="p-2.5 rounded-lg bg-surface-sunken">
@@ -342,7 +342,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
           <p className="text-sm text-content-secondary">of {totalForms} total</p>
         </div>
 
-        <div className="rounded-xl border border-stroke-subtle bg-surface-raised p-6">
+        <div className="hv-surface-card p-6">
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-medium text-content-secondary">Completion</h3>
             <div className="p-2.5 rounded-lg bg-surface-sunken">
@@ -354,7 +354,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
 
         <div
           onClick={() => setSharedWithDrawerOpen(true)}
-          className="rounded-xl border border-stroke-subtle bg-surface-raised p-6 cursor-pointer transition-all hover:bg-surface-sunken"
+          className="hv-surface-card hv-surface-card--interactive cursor-pointer p-6 transition-all hover:bg-action-secondary"
         >
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-medium text-content-secondary">Shared With</h3>
@@ -398,7 +398,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                 {category.forms.map((form, formIndex) => (
                   <div
                     key={form.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border border-stroke-subtle bg-surface-raised transition-colors cursor-pointer hover:bg-surface-sunken"
+                    className="hv-surface-card hv-surface-card--interactive flex cursor-pointer items-center gap-4 rounded-lg p-4 transition-colors hover:bg-action-secondary"
                     onClick={(e) => {
                       if ((e.target as HTMLElement).type !== 'checkbox') {
                         handleFormClick(form);

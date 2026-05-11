@@ -41,6 +41,9 @@
   --hv-color-border-default: #475569;
   --hv-color-border-strong:  #64748B;
 
+  /* Card surfaces follow component tokens (overrides card.css → surface-raised) */
+  --hv-component-card-background-default: rgba(255, 255, 255, 0.04);
+
   /* ── Semantic: Feedback surface overrides (subtler in dark mode) ── */
   --hv-color-surface-feedback-error:   rgba(193, 41, 46, 0.15);
   --hv-color-surface-feedback-success: rgba(11, 132, 87, 0.15);

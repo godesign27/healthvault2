@@ -23,7 +23,7 @@ export function TabsPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">
               Master Components <span className="text-base font-normal text-content-secondary">(for UI Kit building only)</span>
             </h2>
@@ -91,7 +91,7 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Tab</h2>
 
             <div className="space-y-8">
@@ -273,7 +273,7 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Tab</h2>
 
             <div className="space-y-8">
@@ -455,7 +455,7 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Examples</h2>
 
             <div className="space-y-8">
@@ -490,7 +490,7 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Vertical Tab</h2>
 
             <div className="border border-stroke-subtle rounded inline-block">
@@ -503,7 +503,7 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

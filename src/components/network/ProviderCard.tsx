@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Calendar, CreditCard as Edit2, Share2, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { Provider } from '../../types/network';
+import { Card } from '../ui/Card';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -30,13 +31,12 @@ export function ProviderCard({
   const relationshipColor = provider.relationship ? relationshipColors[provider.relationship] : 'bg-surface-overlay';
 
   return (
-    <div
-      className={`rounded-xl border p-6 transition-all hover:shadow-lg cursor-pointer ${
-        darkMode ? 'border-stroke-default bg-surface-raised hover:border-stroke-default' : 'border-stroke-subtle bg-white hover:border-stroke-default'
-      }`}
+    <Card
+      shadow="blur"
+      className="h-full cursor-pointer transition-all hover:-translate-y-0.5"
       onClick={() => onView?.(provider)}
     >
-      <div className="flex items-start justify-between gap-3 mb-4">
+      <div className="mb-4 flex items-start justify-between gap-3 p-6 pb-4">
         <div className="flex-1 min-w-0">
           <h3 className={`text-lg font-semibold mb-1 truncate ${darkMode ? 'text-white' : 'text-content-primary'}`}>
             {provider.name}
@@ -79,8 +79,7 @@ export function ProviderCard({
           )}
         </div>
       </div>
-
-      <div className={`space-y-2 mb-4 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
+      <div className={`mb-4 space-y-2 px-6 pb-4 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
         {provider.phone && (
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
@@ -106,9 +105,8 @@ export function ProviderCard({
           </div>
         )}
       </div>
-
       <div
-        className={`flex items-center gap-2 pt-4 border-t ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'}`}
+        className={`flex items-center gap-2 border-t ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'} px-6 pb-3 pt-4`}
         onClick={(e) => e.stopPropagation()}
       >
         {onEdit && (
@@ -147,6 +145,6 @@ export function ProviderCard({
           </button>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

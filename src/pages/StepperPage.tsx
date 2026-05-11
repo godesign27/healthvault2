@@ -73,7 +73,7 @@ export function StepperPage() {
           </p>
         </div>
 
-        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8 mb-8">
+        <div className="hv-surface-card p-8 mb-8">
           <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive Examples</h2>
 
           <div className="space-y-12">
@@ -204,7 +204,7 @@ export function StepperPage() {
           </div>
         </div>
 
-        <div className="bg-surface-raised rounded-lg shadow-sm border border-stroke-subtle p-8">
+        <div className="hv-surface-card p-8">
           <h2 className="text-2xl font-bold text-content-primary mb-4">Usage Guidelines</h2>
           <div className="prose max-w-none">
             <h3 className="text-lg font-semibold text-content-primary mt-6 mb-3">When to Use</h3>

@@ -273,18 +273,14 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
         onClick={handleClose}
       />
-      <div className={`fixed right-0 top-0 h-full w-full max-w-xl z-50 ${
-        darkMode ? 'bg-surface-raised' : 'bg-white'
-      } shadow-2xl transform transition-transform duration-300 ease-out ${
+      <div className={`fixed right-0 top-0 h-full w-full max-w-xl z-50 hv-surface-card-bg shadow-2xl transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {isManualFlow ? (
             <ManualEntryHeader darkMode={darkMode} onBack={() => setStep('provider')} onClose={handleClose} />
           ) : (
-            <div className={`sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b ${
-              darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-            }`}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-stroke-subtle hv-surface-card-bg">
               <div>
                 <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   Request Health Record
@@ -410,9 +406,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
           </div>
 
           {step === 'details' && (
-            <div className={`px-6 py-4 border-t ${
-              darkMode ? 'border-stroke-subtle bg-surface-raised' : 'border-stroke-subtle bg-white'
-            }`}>
+            <div className="px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
               {submitError && (
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
                   darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
@@ -452,9 +446,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
           )}
 
           {step === 'manual' && (
-            <div className={`px-6 py-4 border-t ${
-              darkMode ? 'border-stroke-subtle bg-surface-raised' : 'border-stroke-subtle bg-white'
-            }`}>
+            <div className="px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
               {submitError && (
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
                   darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
@@ -490,9 +482,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
 
 function ManualEntryHeader({ darkMode, onBack, onClose }: { darkMode: boolean; onBack: () => void; onClose: () => void }) {
   return (
-    <div className={`sticky top-0 z-10 flex items-center gap-3 px-6 py-5 border-b ${
-      darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-    }`}>
+    <div className="sticky top-0 z-10 flex items-center gap-3 px-6 py-5 border-b border-stroke-subtle hv-surface-card-bg">
       <button
         onClick={onBack}
         className={`p-2 -ml-2 rounded-lg transition-colors ${
@@ -596,7 +586,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
 
       </div>
 
-      <div className={`shrink-0 px-6 py-4 border-t ${darkMode ? 'border-stroke-subtle bg-surface-raised' : 'border-stroke-subtle bg-white'}`}>
+      <div className="shrink-0 px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
         <button
           onClick={onManualEntry}
           className={`w-full p-4 rounded-xl border-2 border-dashed text-left transition-all group ${

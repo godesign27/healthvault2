@@ -15,7 +15,7 @@ export function CheckboxesPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="border-2 border-dashed border-[#9B85D8] rounded p-6 inline-block">
@@ -36,7 +36,7 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Checkbox</h2>
 
             <div className="overflow-x-auto">
@@ -384,7 +384,7 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Checkbox + Text</h2>
 
             <div className="overflow-x-auto">
@@ -484,7 +484,7 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
             <div className="space-y-6 text-content-secondary">
@@ -535,7 +535,7 @@ export function CheckboxesPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

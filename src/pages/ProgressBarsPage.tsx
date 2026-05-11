@@ -13,7 +13,7 @@ export function ProgressBarsPage() {
         </div>
 
         <div className="space-y-12">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Duration: Default</h2>
 
             <div className="space-y-8">
@@ -137,7 +137,7 @@ export function ProgressBarsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Track: Default</h2>
 
             <div className="space-y-8">
@@ -169,7 +169,7 @@ export function ProgressBarsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Size Reference</h2>
 
             <div className="overflow-x-auto">
@@ -227,7 +227,7 @@ export function ProgressBarsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-4 text-content-secondary">

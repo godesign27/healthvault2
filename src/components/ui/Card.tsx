@@ -5,18 +5,18 @@ export type CardState  = 'default' | 'hover' | 'selected' | 'hover-selected' | '
 export type CardShadow = 'none' | 'flat-right' | 'flat-angle-right' | 'blur';
 
 const stateClasses: Record<CardState, string> = {
-  default:          '[background:var(--hv-component-card-background-default)] [border-color:var(--hv-component-card-border-default)]',
-  hover:            '[background:var(--hv-component-card-background-default)] [border-color:var(--hv-component-card-border-hover)]',
+  default:          '',
+  hover:            '[border-color:var(--hv-component-card-border-hover)]',
   selected:         '[background:var(--hv-component-card-background-selected)] [border-color:var(--hv-component-card-border-selected)]',
   'hover-selected': '[background:var(--hv-component-card-background-selected)] [border-color:var(--hv-component-card-border-selected)]',
   disabled:         '[background:var(--hv-component-card-background-disabled)] [border-color:var(--hv-component-card-border-disabled)] opacity-60',
 };
 
 const shadowClasses: Record<CardShadow, string> = {
-  none:               '',
-  'flat-right':       'shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]',
-  'flat-angle-right': 'shadow-[6px_6px_0_0_rgba(0,0,0,0.06)]',
-  blur:               'shadow-hv-card',
+  none:               'hv-surface-card--flat',
+  'flat-right':       'hv-surface-card--flat shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]',
+  'flat-angle-right': 'hv-surface-card--flat shadow-[6px_6px_0_0_rgba(0,0,0,0.06)]',
+  blur:               '',
 };
 
 interface CardProps {
@@ -41,7 +41,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'border transition-all rounded-hv-card',
+        'hv-surface-card transition-all',
         stateClasses[state],
         shadowClasses[shadow],
         isDisabled ? 'cursor-not-allowed' : onClick ? 'cursor-pointer' : '',

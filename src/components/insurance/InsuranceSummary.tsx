@@ -74,9 +74,11 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
 
   if (loading) {
     return (
-      <div className={`rounded-xl border p-6 ${
-        darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-surface-sunken'
-      }`}>
+      <div
+        className={
+          darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+        }
+      >
         <div className="animate-pulse">
           <div className={`h-4 rounded w-32 mb-4 ${
             darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
@@ -91,9 +93,11 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
 
   if (!primaryCoverage) {
     return (
-      <div className={`rounded-xl border p-6 ${
-        darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-surface-sunken'
-      }`}>
+      <div
+        className={
+          darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+        }
+      >
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck className={`w-5 h-5 ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
@@ -122,9 +126,11 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
   }
 
   return (
-    <div className={`rounded-xl border p-6 ${
-      darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-surface-sunken'
-    }`}>
+    <div
+      className={
+        darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+      }
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ShieldCheck className={`w-5 h-5 ${

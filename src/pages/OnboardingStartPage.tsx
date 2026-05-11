@@ -28,9 +28,7 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
     <div className={`min-h-screen ${
       darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
     }`}>
-      <header className={`sticky top-0 z-50 border-b ${
-        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-      }`}>
+      <header className="sticky top-0 z-50 border-b border-stroke-subtle hv-surface-card-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-4">
@@ -67,9 +65,7 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
       <div className="max-w-6xl w-full mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className={`rounded-lg border p-8 ${
-              darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-            }`}>
+            <div className="hv-surface-card hv-surface-card--flat p-8">
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-3 rounded-lg ${

@@ -1,6 +1,7 @@
 import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../providers/ThemeProvider';
+import { Surface } from '../providers/SurfaceProvider';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
 import { supabase } from '../lib/supabase';
 import { MedicalIDCard } from '../components/MedicalIDCard';
@@ -298,17 +299,17 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
-          <div className="md:col-span-6 lg:col-span-6 rounded-xl border border-stroke-subtle bg-surface-raised p-6 h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
+          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
+                <Sparkles className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
               </div>
               <h2 className="text-lg font-semibold text-content-primary">Quick Actions</h2>
             </div>
             <p className="text-sm mb-6 text-content-secondary">Common tasks to manage your health data</p>
 
             <div className="flex flex-col gap-3 mt-auto">
-              <button className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-600/20 hover:-translate-y-0.5">
+              <button className="flex items-center justify-center gap-2 rounded-lg bg-action-primary px-5 py-3 text-sm font-medium text-content-on-action transition-all hover:-translate-y-0.5 hover:bg-action-primary-hover hover:shadow-lg hover:shadow-black/20">
                 <FileText className="w-4 h-4" />
                 Download Medical Forms
               </button>
@@ -330,10 +331,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Recent Activity - Balanced layout */}
-          <div className="md:col-span-6 lg:col-span-6 rounded-xl border border-stroke-subtle bg-surface-raised p-6 h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Activity className="w-5 h-5 text-indigo-600" />
+          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
+                <Activity className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
               </div>
               <h2 className="text-lg font-semibold text-content-primary">Recent Activity</h2>
             </div>
@@ -369,7 +370,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               />
             </div>
 
-            <button className="flex items-center gap-2 mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors group">
+            <button className="group mt-6 flex items-center gap-2 text-sm font-medium text-action-primary transition-colors hover:text-action-primary-hover">
               View All Activity
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
@@ -380,10 +381,11 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   };
 
   return (
-    <div
-      data-theme={darkMode ? 'dark' : undefined}
-      className="flex h-dvh w-screen bg-surface-page text-content-primary"
-    >
+    <Surface name="steel" className="h-dvh w-screen max-w-none min-h-0">
+      <div
+        data-theme={darkMode ? 'dark' : undefined}
+        className="flex h-dvh w-screen bg-surface-page text-content-primary"
+      >
       <DashboardSidebar
         onViewChange={onViewChange}
         onPageChange={(page) => {
@@ -490,5 +492,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         )}
       </div>
     </div>
+    </Surface>
   );
 }

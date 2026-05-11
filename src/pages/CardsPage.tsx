@@ -186,7 +186,7 @@ export function CardsPage() {
           </div>
         </section>
 
-        <section className="bg-surface-raised rounded-lg p-6 border border-stroke-subtle">
+        <section className="hv-surface-card hv-surface-card--flat p-6">
           <h2 className="text-xl font-semibold text-content-primary mb-4">Usage Guidelines</h2>
           <div className="space-y-4 text-sm text-content-secondary">
             <div>

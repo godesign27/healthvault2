@@ -55,7 +55,7 @@ The dashboard root in `src/pages/DashboardPage.tsx` sets `data-theme="dark"` whe
 
 Some documentation describes surface themes as `data-theme` on a container. In this repo, **light/dark** for the whole app is still `data-theme` on `document.documentElement` (see `ThemeProvider`). **Nested surface themes** (default, bold, subdued, overlay, **steel**) are implemented as **`data-surface="…"`** on a subtree, with overrides in `src/tokens/themes/theme.bold.css`, `theme.steel.css`, and siblings.
 
-The design-system route wraps the gallery chrome in `Surface` from `src/providers/SurfaceProvider.tsx`. The sidebar **Surface theme** control switches among **`default`** (inherits `:root` / html theme tokens), **`bold`** (dark brand surface), and **`steel`** (frosted-glass gallery with indigo/teal radial wash + masked grid). The choice is persisted as `sessionStorage` key `hv-ds-surface-theme`.
+The design-system route wraps the gallery chrome in `Surface` from `src/providers/SurfaceProvider.tsx`. The sidebar **Surface theme** control switches among **`default`** (inherits `:root` / html theme tokens), **`bold`** (dark brand surface), and **`steel`** (frosted-glass gallery with indigo/teal radial wash + masked grid). The choice is persisted as `sessionStorage` key `hv-ds-surface-theme`. **Out of the box**, when that key is absent (first visit or cleared storage), the app uses **`steel`** as the active surface for the gallery, Health Vault, and Projects list until the user picks another option.
 
 **Steel** does not require `@radix-ui/themes`; it remaps the same `--hv-color-*` / `--hv-component-*` variables plus scoped chrome:
 

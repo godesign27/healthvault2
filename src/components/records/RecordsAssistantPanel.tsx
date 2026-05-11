@@ -115,9 +115,7 @@ export function RecordsAssistantPanel({ darkMode = false, onUpdateRecords, onSho
   };
 
   return (
-    <div className={`flex flex-col h-full ${
-      darkMode ? 'bg-surface-raised' : 'bg-white'
-    }`}>
+    <div className="flex flex-col h-full hv-surface-card-bg">
       <div className={`p-4 border-b ${
         darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
       }`}>

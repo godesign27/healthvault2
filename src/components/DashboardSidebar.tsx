@@ -4,6 +4,7 @@ import { ProfileSettingsDrawer } from './ProfileSettingsDrawer';
 import { ToastContainer, ToastProps } from './Toast';
 import { Tooltip } from './ui/Tooltip';
 import { supabase } from '../lib/supabase';
+import { cn } from '../lib/utils';
 
 interface DashboardSidebarProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
@@ -186,14 +187,11 @@ export function DashboardSidebar({
                   <button
                     key={item.name}
                     onClick={() => onPageChange?.(item.id)}
-                    className={`
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
-                      ${isCollapsed ? 'justify-center px-3 py-2' : 'gap-3 px-3 py-2'}
-                      ${isActive
-                        ? 'bg-action-primary text-content-on-action'
-                        : 'text-content-secondary hover:bg-action-secondary'
-                      }
-                    `}
+                    className={cn(
+                      'hv-nav-rail-item w-full flex items-center text-sm font-medium transition-all duration-300',
+                      isCollapsed ? 'justify-center px-3 py-2' : 'gap-3 px-3 py-2',
+                      isActive && 'hv-nav-rail-item--selected',
+                    )}
                     aria-label={item.name}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -274,7 +272,7 @@ export function DashboardSidebar({
                     <button
                       onClick={handleSignOut}
                       className="
-                        w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                        w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                         justify-center px-3 py-2
                         text-content-secondary hover:bg-action-secondary
                       "
@@ -302,7 +300,7 @@ export function DashboardSidebar({
                   <button
                     onClick={() => onViewChange?.('design-system')}
                     className="
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                      w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
                       text-content-secondary hover:bg-action-secondary
                     "
@@ -316,7 +314,7 @@ export function DashboardSidebar({
                   <button
                     onClick={() => onViewChange?.('marketing')}
                     className="
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                      w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
                       text-content-secondary hover:bg-action-secondary
                     "
@@ -406,7 +404,7 @@ export function DashboardSidebar({
               <button
                 onClick={() => setShowProfileSettings(true)}
                 className="
-                  w-full flex items-center rounded-lg transition-all duration-300
+                  w-full flex items-center rounded-hv-button transition-all duration-300
                   justify-center p-0
                   hover:bg-action-secondary
                 "
@@ -429,7 +427,7 @@ export function DashboardSidebar({
             <button
               onClick={() => setShowProfileSettings(true)}
               className="
-                w-full flex items-center rounded-lg transition-all duration-300
+                w-full flex items-center rounded-hv-button transition-all duration-300
                 gap-3 p-0
                 hover:bg-action-secondary
               "

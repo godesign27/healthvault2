@@ -15,7 +15,7 @@ export function NotificationsPage() {
         </div>
 
         <div className="space-y-12">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Toast Notifications</h2>
 
             <div className="space-y-8">
@@ -101,7 +101,7 @@ export function NotificationsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Banner Notifications</h2>
 
             <div className="space-y-8">
@@ -207,7 +207,7 @@ export function NotificationsPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

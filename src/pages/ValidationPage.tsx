@@ -12,7 +12,7 @@ export function ValidationPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-4">
               Master Components <span className="text-base font-normal text-content-secondary">(for UI Kit building only)</span>
             </h2>
@@ -52,7 +52,7 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Validation Messages</h2>
 
             <div className="grid grid-cols-2 gap-8">
@@ -310,7 +310,7 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
             <div className="space-y-6 text-content-secondary">
@@ -367,7 +367,7 @@ export function ValidationPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

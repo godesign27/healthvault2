@@ -18,7 +18,7 @@ export function Sidebar({
   currentView,
   onNavigate,
   onViewChange,
-  designSystemSurface = 'default',
+  designSystemSurface = 'steel',
   onDesignSystemSurfaceChange,
 }: SidebarProps) {
   const { theme, setTheme } = useTheme();
@@ -96,21 +96,21 @@ export function Sidebar({
         <div className="flex gap-2">
           <button
             onClick={() => onViewChange('projects')}
-            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-lg hover:bg-surface-sunken transition-colors"
+            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-hv-button hover:bg-surface-sunken transition-colors"
             title="Projects"
           >
             <FolderKanban className="w-4 h-4 text-content-secondary" />
           </button>
           <button
             onClick={() => onViewChange('health-vault')}
-            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-lg hover:bg-surface-sunken transition-colors"
+            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-hv-button hover:bg-surface-sunken transition-colors"
             title="Health Vault"
           >
             <Heart className="w-4 h-4 text-content-secondary" />
           </button>
           <button
             onClick={() => onViewChange('design-system')}
-            className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+            className={`flex items-center justify-center w-9 h-9 rounded-hv-button transition-colors ${
               currentView === 'design-system'
                 ? 'bg-action-primary text-content-on-action shadow-sm'
                 : 'border border-stroke-subtle hover:bg-surface-sunken'
@@ -130,7 +130,7 @@ export function Sidebar({
             <div className="text-xs font-semibold text-content-secondary uppercase tracking-wide px-2 mb-2">
               Color mode
             </div>
-            <div className="flex rounded-lg border border-stroke-subtle p-0.5 bg-surface-sunken gap-0.5">
+            <div className="flex rounded-hv-nav-segment-track border border-stroke-subtle p-0.5 bg-surface-sunken gap-0.5">
               {(['light', 'dark', 'system'] as const).map((mode) => {
                 const selected = theme === mode;
                 return (
@@ -160,7 +160,7 @@ export function Sidebar({
             <div className="text-xs font-semibold text-content-secondary uppercase tracking-wide px-2 mb-2">
               Surface theme
             </div>
-            <div className="flex flex-wrap gap-0.5 rounded-lg border border-stroke-subtle p-0.5 bg-surface-sunken">
+            <div className="flex flex-wrap gap-0.5 rounded-hv-nav-segment-track border border-stroke-subtle p-0.5 bg-surface-sunken">
               {(
                 [
                   { id: 'default' as const, label: 'Default', hint: 'Standard UI' },
@@ -234,8 +234,8 @@ export function Sidebar({
           <button
             onClick={() => onNavigate('admin')}
             className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-              ${currentPage === 'admin' ? 'bg-action-primary-subtle text-content-primary ring-1 ring-inset ring-stroke-default' : 'text-content-primary hover:bg-surface-sunken'}
+              hv-nav-rail-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium
+              ${currentPage === 'admin' ? 'hv-nav-rail-item--selected' : ''}
             `}
           >
             <Settings className="w-4 h-4" />

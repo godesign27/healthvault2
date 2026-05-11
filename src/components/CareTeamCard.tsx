@@ -1,4 +1,5 @@
 import { User, Mail, Phone, Share2, ExternalLink } from 'lucide-react';
+import { Card } from './ui/Card';
 
 interface CareTeamMember {
   id: string;
@@ -21,9 +22,8 @@ interface CareTeamCardProps {
 
 export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareRecords }: CareTeamCardProps) {
   return (
-    <div className={`rounded-xl border p-6 transition-all ${
-      darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
-    }`}>
+    <Card shadow="blur" className="h-full">
+      <div className="flex h-full flex-col rounded-xl p-6">
       <div className="flex items-start gap-4 mb-4">
         {member.photo_url ? (
           <img
@@ -75,7 +75,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
       </div>
 
       {(member.email || member.phone) && (
-        <div className={`space-y-2 mb-4 pt-4 border-t ${
+        <div className={`mb-4 space-y-2 border-t pt-4 ${
           darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           {member.email && (
@@ -111,7 +111,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <button
           onClick={() => onViewProfile?.(member)}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -131,6 +131,7 @@ export function CareTeamCard({ member, darkMode = false, onViewProfile, onShareR
           Share Records
         </button>
       </div>
-    </div>
+      </div>
+    </Card>
   );
 }

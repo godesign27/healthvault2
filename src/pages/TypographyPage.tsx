@@ -131,7 +131,7 @@ export function TypographyPage() {
           </p>
         </div>
 
-        <div className="bg-surface-raised rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="hv-surface-card overflow-hidden mb-8">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-surface-sunken border-b border-stroke-subtle">
@@ -161,7 +161,7 @@ export function TypographyPage() {
         </div>
 
         <div className="space-y-8">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Typography Examples</h2>
 
             <div className="space-y-8">
@@ -190,7 +190,7 @@ export function TypographyPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">
@@ -278,7 +278,7 @@ export function TypographyPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Implementation</h2>
 
             <div className="space-y-4">

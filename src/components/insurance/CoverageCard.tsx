@@ -1,6 +1,7 @@
 import { Edit2, Trash2, RefreshCw, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
 import { CoverageWithProvider, maskMemberId } from '../../schemas/insurance';
 import { StatusBadge } from './StatusBadge';
+import { Card } from '../ui/Card';
 
 interface CoverageCardProps {
   coverage: CoverageWithProvider;
@@ -30,12 +31,12 @@ export function CoverageCard({
   const isStopped = coverage.coverageStatus === 'stopped';
 
   return (
-    <div className={`rounded-xl border p-6 ${
-      isStopped
-        ? darkMode ? 'border-stroke-subtle bg-surface-raised/50 opacity-75' : 'border-stroke-default bg-white/50 opacity-75'
-        : darkMode ? 'border-stroke-default bg-surface-raised' : 'border-stroke-subtle bg-white'
-    }`}>
-      <div className="flex items-start justify-between mb-4">
+    <Card
+      shadow="blur"
+      className={`h-full ${isStopped ? 'opacity-75' : ''}`}
+      state={isStopped ? 'disabled' : 'default'}
+    >
+      <div className="mb-4 flex items-start justify-between p-6 pb-4">
         <div className="flex items-start gap-4">
           {coverage.provider.logoUrl && (
             <img
@@ -68,8 +69,7 @@ export function CoverageCard({
         </div>
         <StatusBadge status={isExpiringSoon ? 'expiring' : coverage.verificationStatus} darkMode={darkMode} />
       </div>
-
-      <div className={`grid grid-cols-2 gap-4 mb-4 ${
+      <div className={`grid grid-cols-2 gap-4 px-6 pb-4 ${
         darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
         <div>
@@ -103,16 +103,14 @@ export function CoverageCard({
           </div>
         )}
       </div>
-
-      <div className={`text-xs mb-4 ${
+      <div className={`px-6 pb-4 text-xs ${
         darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
         Effective: {new Date(coverage.effectiveStart).toLocaleDateString()}
         {effectiveEndDate && ` - ${effectiveEndDate.toLocaleDateString()}`}
       </div>
-
       {showActions && (
-        <div className="flex items-center gap-2 pt-4 border-t border-stroke-default">
+        <div className="flex items-center gap-2 border-t border-stroke-default px-6 pb-2 pt-4">
           {!isStopped && (
             <>
               {!coverage.isPrimary && onSetPrimary && (
@@ -172,7 +170,7 @@ export function CoverageCard({
           {onDelete && (
             <button
               onClick={() => onDelete(coverage)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors ml-auto"
+              className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
               Remove
@@ -180,6 +178,6 @@ export function CoverageCard({
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

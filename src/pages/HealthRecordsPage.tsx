@@ -317,12 +317,12 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
           <button
             key={req.id}
             onClick={() => onRequestClick(req)}
-            className={`rounded-xl border p-4 transition-all text-left cursor-pointer ${
+            className={`p-4 text-left transition-all cursor-pointer ${
               req.status === 'received'
                 ? darkMode
-                  ? 'border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
-                  : 'border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
-                : 'border-stroke-subtle bg-surface-raised hover:border-stroke-default hover:shadow-sm'
+                  ? 'rounded-xl border border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
+                  : 'rounded-xl border border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
+                : 'hv-surface-card hv-surface-card--interactive hover:shadow-sm'
             }`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">

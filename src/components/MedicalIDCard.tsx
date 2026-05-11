@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { Card } from './ui/Card';
 
 interface MedicalIDCardProps {
   darkMode?: boolean;
@@ -89,11 +90,8 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
   );
 
   return (
-    <div className={`h-full rounded-xl border p-8 transition-all ${
-      darkMode
-        ? 'bg-gradient-to-br from-surface-raised via-surface-raised to-surface-sunken border-stroke-default'
-        : 'bg-gradient-to-br from-surface-raised via-surface-raised to-surface-sunken border-stroke-subtle'
-    }`}>
+    <Card shadow="blur" className="h-full">
+      <div className="flex h-full flex-col rounded-xl p-8">
       <div className={`text-xs font-semibold uppercase tracking-wide mb-6 ${
         darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
@@ -107,11 +105,13 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
           className="w-24 h-24 rounded-full object-cover mb-4 mx-auto ring-4 ring-stroke-subtle dark:ring-stroke-default"
         />
       ) : (
-        <div className={`flex items-center justify-center w-24 h-24 rounded-full mb-4 mx-auto ring-4 ${
-          darkMode
-            ? 'bg-gradient-to-br from-surface-sunken to-surface-sunken ring-stroke-default'
-            : 'bg-gradient-to-br from-surface-sunken to-surface-sunken ring-stroke-subtle'
-        }`}>
+        <div
+          className={`mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full ring-4 ${
+            darkMode
+              ? 'bg-surface-sunken/35 ring-stroke-default'
+              : 'bg-gradient-to-br from-surface-sunken to-surface-sunken ring-stroke-subtle'
+          }`}
+        >
           <span className={`text-3xl font-bold ${
             darkMode ? 'text-content-primary' : 'text-content-primary'
           }`}>{initials}</span>
@@ -122,9 +122,7 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
         {isLoading ? (
           <div className="w-40 mx-auto"><Skeleton /></div>
         ) : (
-          <h3 className={`text-xl font-bold ${
-            darkMode ? 'text-white' : 'text-content-primary'
-          }`}>{displayName || 'Your Name'}</h3>
+          <h3 className="text-xl font-bold text-content-primary">{displayName || 'Your Name'}</h3>
         )}
       </div>
 
@@ -211,6 +209,7 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
         <ChevronDown className={`w-4 h-4 transition-transform ${showMore ? 'rotate-180' : ''}`} />
         Show {showMore ? 'Less' : 'More'}
       </button>
-    </div>
+      </div>
+    </Card>
   );
 }

@@ -47,7 +47,7 @@ export function PrimaryNavigationPage() {
         </div>
 
         <div className="space-y-12">
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Navigation Variants</h2>
 
             <div className="grid grid-cols-3 gap-8">
@@ -83,7 +83,7 @@ export function PrimaryNavigationPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive States</h2>
 
             <div className="space-y-6">
@@ -133,7 +133,7 @@ export function PrimaryNavigationPage() {
             </div>
           </section>
 
-          <section className="bg-surface-raised rounded-lg shadow-sm p-8">
+          <section className="hv-surface-card p-8">
             <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
             <div className="space-y-6 text-content-secondary">

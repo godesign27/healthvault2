@@ -208,14 +208,14 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
               return (
                 <div
                   key={addr.id}
-                  className={`relative rounded-xl border p-4 transition-all ${
+                  className={`relative p-4 transition-all ${
                     addr.isActive
                       ? darkMode
-                        ? 'border-blue-600 bg-blue-950/20 ring-1 ring-blue-600/30'
-                        : 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
+                        ? 'rounded-xl border border-blue-600 bg-blue-950/20 ring-1 ring-blue-600/30'
+                        : 'rounded-xl border border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
                       : darkMode
-                        ? 'border-stroke-default bg-surface-raised'
-                        : 'border-stroke-subtle bg-white'
+                        ? 'hv-surface-card'
+                        : 'rounded-xl border border-stroke-subtle bg-white'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -416,9 +416,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : nearbyPharmacies.length === 0 ? (
-              <div className={`text-center py-16 rounded-xl border ${
-                'border-stroke-subtle bg-surface-raised'
-              }`}>
+              <div className="hv-surface-card py-16 text-center">
                 <Pill className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
                 <p className={`font-medium ${'text-content-primary'}`}>
                   No pharmacies found nearby
@@ -452,9 +450,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
             )}
           </>
         ) : (
-          <div className={`text-center py-12 rounded-xl border mt-4 ${
-            'border-stroke-subtle bg-surface-raised'
-          }`}>
+          <div className="hv-surface-card mt-4 py-12 text-center">
             <MapPin className={`w-10 h-10 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
             <p className={`font-medium mb-1 ${'text-content-primary'}`}>
               Add an address to see nearby pharmacies
@@ -512,18 +508,18 @@ function PharmacyResultCard({
   return (
     <div
       onClick={onSelect}
-      className={`rounded-xl border p-5 transition-all cursor-pointer ${
+      className={`cursor-pointer p-5 transition-all ${
         isDesignated
           ? darkMode
-            ? 'border-emerald-700 bg-emerald-950/20'
-            : 'border-emerald-300 bg-emerald-50/50'
+            ? 'rounded-xl border border-emerald-700 bg-emerald-950/20'
+            : 'rounded-xl border border-emerald-300 bg-emerald-50/50'
           : isSelected
-          ? darkMode
-            ? 'border-blue-600 bg-blue-950/20'
-            : 'border-blue-300 bg-blue-50/30'
-          : darkMode
-          ? 'border-stroke-default bg-surface-raised hover:border-stroke-default'
-          : 'border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
+            ? darkMode
+              ? 'rounded-xl border border-blue-600 bg-blue-950/20'
+              : 'rounded-xl border border-blue-300 bg-blue-50/30'
+            : darkMode
+              ? 'hv-surface-card hv-surface-card--interactive'
+              : 'rounded-xl border border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
       }`}
     >
       <div className="flex items-start gap-4">

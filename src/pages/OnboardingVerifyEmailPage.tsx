@@ -156,9 +156,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         />
       }
     >
-      <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-white border-stroke-subtle'
-      }`}>
+      <div className="hv-surface-card hv-surface-card--flat p-8">
         <button
           onClick={onBack}
           className={`flex items-center gap-2 mb-6 text-sm font-medium transition-colors ${
