@@ -46,7 +46,7 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
       const userId = session.user.id;
 
       const [userProfileRes, patientProfileRes, allergiesRes, conditionsRes] = await Promise.all([
-        supabase.from('user_profiles').select('first_name, last_name, date_of_birth, profile_image_url').eq('user_id', userId).maybeSingle(),
+        supabase.from('user_profiles').select('first_name, last_name, date_of_birth, profile_photo_url').eq('user_id', userId).maybeSingle(),
         supabase.from('patient_profiles').select('blood_type, organ_donor, emergency_contact_name, emergency_contact_phone').eq('user_id', userId).maybeSingle(),
         supabase.from('allergies').select('allergen').eq('user_id', userId),
         supabase.from('conditions').select('name').eq('user_id', userId),
@@ -59,7 +59,7 @@ export function MedicalIDCard({ darkMode = false }: MedicalIDCardProps) {
         firstName: up?.first_name || '',
         lastName: up?.last_name || '',
         dateOfBirth: up?.date_of_birth || null,
-        profilePhoto: up?.profile_image_url || null,
+        profilePhoto: up?.profile_photo_url || null,
         bloodType: pp?.blood_type || null,
         organDonor: pp?.organ_donor ?? null,
         emergencyContactName: pp?.emergency_contact_name || null,

@@ -32,20 +32,36 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
   const [sharedWithDrawerOpen, setSharedWithDrawerOpen] = useState(false);
   const [sharedForms, setSharedForms] = useState<SharedFormEvent[]>([]);
   const [loadingShared, setLoadingShared] = useState(false);
+  const [currentPatient, setCurrentPatient] = useState<PatientSummary | null>(null);
 
-  const demoPatient: PatientSummary = {
-    id: 'demo-patient-1',
-    name: 'Timothy McGuire',
-    birthDate: '1985-06-22',
-  };
+  // Resolve the authenticated patient once on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) return;
+      const userId = session.user.id;
+      // Fetch name from user_profiles, fall back to email
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('full_name, date_of_birth')
+        .eq('id', userId)
+        .maybeSingle();
+      setCurrentPatient({
+        id: userId,
+        name: profile?.full_name || session.user.email || '',
+        birthDate: profile?.date_of_birth || '',
+      });
+    });
+  }, []);
 
   const loadSharedForms = async () => {
     setLoadingShared(true);
     try {
+      const patientId = currentPatient?.id;
+      if (!patientId) { setLoadingShared(false); return; }
       const { data, error } = await supabase
         .from('share_events')
         .select('*')
-        .eq('patient_id', demoPatient.id)
+        .eq('patient_id', patientId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -71,8 +87,8 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
   };
 
   useEffect(() => {
-    loadSharedForms();
-  }, []);
+    if (currentPatient?.id) loadSharedForms();
+  }, [currentPatient?.id]);
 
   const [categories, setCategories] = useState<FormCategory[]>([
     {
@@ -475,7 +491,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
         open={shareDrawerOpen}
         onOpenChange={setShareDrawerOpen}
         selectedForms={getSelectedForms()}
-        patient={demoPatient}
+        patient={currentPatient || { id: '', name: '', birthDate: '' }}
         onShared={(id) => {
           console.log('Shared successfully:', id);
           loadSharedForms();

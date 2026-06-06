@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Health Vault",
+    "slug": "health-vault",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "healthvault",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.healthvault.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Health Vault uses Face ID to keep your medical records secure.",
+        "NSCameraUsageDescription": "Health Vault uses the camera to scan and upload medical documents.",
+        "NSPhotoLibraryUsageDescription": "Health Vault accesses your photos to upload medical documents."
+      }
+    },
+    "plugins": [
+      "expo-dev-client",
+      "expo-secure-store",
+      "expo-local-authentication",
+      "expo-font"
+    ]
+  }
+}

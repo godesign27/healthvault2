@@ -164,7 +164,6 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
     try {
       await addPharmacy({
         ...validation.data,
-        userId: '00000000-0000-0000-0000-000000000000'
       });
       setToast({ message: 'Pharmacy added successfully!', type: 'success' });
       setTimeout(() => {

@@ -204,7 +204,10 @@ async function handleCreateRequest(
     );
   }
 
-  const resolvedUserId = userId || "00000000-0000-0000-0000-000000000000";
+  if (!userId) {
+    return jsonResponse({ error: "Not authenticated" }, 401);
+  }
+  const resolvedUserId = userId;
 
   const patient = await fetchPatientIdentity(
     supabase,

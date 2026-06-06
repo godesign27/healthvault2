@@ -99,16 +99,12 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
     try {
       const alreadyAdded = pharmacies.find(p => p.name === np.name);
       if (alreadyAdded) {
-        await setPreferredPharmacyApi(
-          '00000000-0000-0000-0000-000000000000',
-          alreadyAdded.id
-        );
+        await setPreferredPharmacyApi(undefined, alreadyAdded.id);
       } else {
         if (preferredPharmacy) {
           await updatePharmacy(preferredPharmacy.id, { preferred: false });
         }
         await addPharmacy({
-          userId: '00000000-0000-0000-0000-000000000000',
           name: np.name,
           chain: np.chain,
           phone: np.phone.replace(/[^\d]/g, ''),
@@ -129,10 +125,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
   const handleSetSavedPreferred = async (pharmacy: Pharmacy) => {
     setAddingId(pharmacy.id);
     try {
-      await setPreferredPharmacyApi(
-        '00000000-0000-0000-0000-000000000000',
-        pharmacy.id
-      );
+      await setPreferredPharmacyApi(undefined, pharmacy.id);
       await loadData();
     } catch {
       // handled silently

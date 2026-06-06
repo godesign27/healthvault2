@@ -1,3 +1,8 @@
+// @deprecated — This browser-side OpenAI path is no longer used.
+// All assistant calls now route through the authenticated Edge Function
+// (supabase/functions/ai-health-assistant) via sendChatMessage in lib/openai/client.ts.
+// This file is kept for reference and should be deleted after the next code review.
+// @ts-nocheck
 import { openai } from "../../lib/openai/client";
 import {
   assistantToolDefinitions,

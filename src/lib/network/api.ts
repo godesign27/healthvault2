@@ -1,11 +1,10 @@
 import { supabase } from '../supabase';
 
-const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
-
 async function resolveUserId(providedId?: string): Promise<string> {
   if (providedId) return providedId;
   const { data: { user } } = await supabase.auth.getUser();
-  return user?.id || DEMO_USER_ID;
+  if (!user?.id) throw new Error('Not authenticated');
+  return user.id;
 }
 
 export interface InsuranceDetail {
@@ -82,7 +81,7 @@ export interface PharmacySearchResult {
 }
 
 export async function fetchInsuranceContext(
-  userId = DEMO_USER_ID
+  userId?: string
 ): Promise<InsuranceContextResult> {
   const { data, error } = await supabase
     .from('insurance_coverages')
@@ -122,7 +121,7 @@ export async function fetchInsuranceContext(
 }
 
 export async function fetchCareNetwork(
-  userId = DEMO_USER_ID
+  userId?: string
 ): Promise<CareNetworkResult> {
   let insuranceName: string | null = null;
   const { data: primaryCoverage } = await supabase
@@ -206,7 +205,7 @@ export async function fetchCareNetwork(
 }
 
 export async function searchNetworkProviders(
-  userId = DEMO_USER_ID,
+  userId?: string,
   opts?: { query?: string; specialty?: string; insuranceId?: string; limit?: number }
 ): Promise<{
   insuranceContext: { providerName: string; planName: string } | null;
@@ -296,7 +295,7 @@ export async function searchNetworkProviders(
 }
 
 export async function fetchNearbyPharmacies(
-  userId = DEMO_USER_ID,
+  userId?: string,
   query?: string
 ): Promise<PharmacySearchResult> {
   const { data: profile } = await supabase
@@ -359,13 +358,16 @@ export async function fetchNearbyPharmacies(
 }
 
 export async function setPreferredPharmacyApi(
-  userId = DEMO_USER_ID,
-  pharmacyId: string
+  userId?: string,
+  pharmacyId?: string
 ) {
+  if (!pharmacyId) throw new Error('pharmacyId is required');
+  const effectiveUserId = await resolveUserId(userId);
+
   const { error: clearError } = await supabase
     .from('pharmacies')
     .update({ preferred: false, updated_at: new Date().toISOString() })
-    .eq('user_id', userId);
+    .eq('user_id', effectiveUserId);
 
   if (clearError) throw clearError;
 
@@ -373,7 +375,7 @@ export async function setPreferredPharmacyApi(
     .from('pharmacies')
     .update({ preferred: true, updated_at: new Date().toISOString() })
     .eq('id', pharmacyId)
-    .eq('user_id', userId);
+    .eq('user_id', effectiveUserId);
 
   if (setError) throw setError;
 }
@@ -517,8 +519,8 @@ export function getActiveAddressContext(addresses: UserAddress[]): AddressContex
 }
 
 export async function saveProviderApi(
-  userId = DEMO_USER_ID,
-  data: {
+  userId?: string,
+  data?: {
     name: string;
     specialty?: string;
     clinic?: string;
@@ -531,6 +533,8 @@ export async function saveProviderApi(
     inNetwork?: boolean;
   }
 ) {
+  if (!data) throw new Error('Provider data is required');
+  const effectiveUserId = await resolveUserId(userId);
   const effectiveRelationship = data.relationship
     || (data.providerType === 'primary_care' ? 'Primary' : undefined)
     || (data.providerType === 'specialist' ? 'Specialist' : undefined)
@@ -539,7 +543,7 @@ export async function saveProviderApi(
   const { data: result, error } = await supabase
     .from('providers')
     .insert({
-      user_id: userId,
+      user_id: effectiveUserId,
       npi: data.npi || null,
       name: data.name,
       specialty: data.specialty || null,

@@ -16,6 +16,7 @@ import { MedicalProfilePage } from './MedicalProfilePage';
 import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
+import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
@@ -73,6 +74,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch { return new Set(); }
   });
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
   useEffect(() => {
     if (dismissedDashboardBanners.size > 0) {
@@ -129,7 +131,25 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  const handleProfileSignOut = async () => {
+    await supabase.auth.signOut();
+    onViewChange?.('marketing');
+  };
+
   const renderMainContent = () => {
+    if (currentPage === 'profile-settings') {
+      return (
+        <ProfileSettingsDrawer
+          layout="inline"
+          isOpen
+          darkMode={darkMode}
+          onClose={() => setCurrentPage('dashboard')}
+          onSave={() => setProfileRefreshKey((k) => k + 1)}
+          onSignOut={handleProfileSignOut}
+        />
+      );
+    }
+
     if (currentPage === 'care') {
       return <CarePage darkMode={darkMode} actionsRef={careActionsRef} />;
     }
@@ -399,6 +419,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         onToggleCollapse={toggleSidebarCollapse}
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        profileRefreshKey={profileRefreshKey}
       />
 
       <div className="flex-1 flex overflow-hidden min-w-0 relative">

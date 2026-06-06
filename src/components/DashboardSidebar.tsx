@@ -1,7 +1,5 @@
 import { Home, Heart, FileText, ClipboardList, Activity, LogOut, Sun, Moon, Settings, Menu, Globe, User, ShieldCheck, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { ProfileSettingsDrawer } from './ProfileSettingsDrawer';
-import { ToastContainer, ToastProps } from './Toast';
 import { Tooltip } from './ui/Tooltip';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
@@ -16,6 +14,8 @@ interface DashboardSidebarProps {
   onToggleCollapse?: () => void;
   isMobileMenuOpen?: boolean;
   onMobileMenuToggle?: () => void;
+  /** Increment to refetch sidebar profile after main-column profile save */
+  profileRefreshKey?: number;
 }
 
 export function DashboardSidebar({
@@ -27,34 +27,15 @@ export function DashboardSidebar({
   isCollapsed = false,
   onToggleCollapse,
   isMobileMenuOpen = false,
-  onMobileMenuToggle
+  onMobileMenuToggle,
+  profileRefreshKey = 0,
 }: DashboardSidebarProps) {
-  const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
   const [showViewsDropdown, setShowViewsDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleProfileSave = (data: { profilePhoto: string | null; firstName: string; lastName: string }) => {
-    setProfilePhoto(data.profilePhoto);
-    setFirstName(data.firstName);
-    setLastName(data.lastName);
-
-    const toast: ToastProps = {
-      id: Date.now().toString(),
-      type: 'success',
-      message: 'Profile updated successfully',
-      onClose: removeToast
-    };
-    setToasts(prev => [...prev, toast]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -88,7 +69,7 @@ export function DashboardSidebar({
     };
 
     loadProfile();
-  }, []);
+  }, [profileRefreshKey]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -402,7 +383,9 @@ export function DashboardSidebar({
           {isCollapsed ? (
             <Tooltip content={`${firstName} ${lastName}`} position="right" className="w-full">
               <button
-                onClick={() => setShowProfileSettings(true)}
+                onClick={() => {
+                  onPageChange?.('profile-settings');
+                }}
                 className="
                   w-full flex items-center rounded-hv-button transition-all duration-300
                   justify-center p-0
@@ -425,7 +408,9 @@ export function DashboardSidebar({
             </Tooltip>
           ) : (
             <button
-              onClick={() => setShowProfileSettings(true)}
+              onClick={() => {
+                onPageChange?.('profile-settings');
+              }}
               className="
                 w-full flex items-center rounded-hv-button transition-all duration-300
                 gap-3 p-0
@@ -453,15 +438,6 @@ export function DashboardSidebar({
         </div>
       </div>
 
-      <ProfileSettingsDrawer
-        isOpen={showProfileSettings}
-        onClose={() => setShowProfileSettings(false)}
-        darkMode={darkMode}
-        onSave={handleProfileSave}
-        onSignOut={handleSignOut}
-      />
-
-      <ToastContainer toasts={toasts} onClose={removeToast} />
     </aside>
     </>
   );

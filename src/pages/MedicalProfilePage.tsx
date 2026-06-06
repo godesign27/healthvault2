@@ -25,6 +25,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
   const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerSessionId, setDrawerSessionId] = useState('');
+  const [assistantTaskId, setAssistantTaskId] = useState<'add-condition' | 'add-medication' | 'add-allergy' | 'add-immunization'>('add-condition');
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
   const fetchAllData = async () => {
@@ -52,10 +53,54 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
       if (allergiesRes.error) throw allergiesRes.error;
       if (immunizationsRes.error) throw immunizationsRes.error;
 
-      setConditions(conditionsRes.data || []);
-      setMedications(medicationsRes.data || []);
-      setAllergies(allergiesRes.data || []);
-      setImmunizations(immunizationsRes.data || []);
+      // Map DB snake_case → camelCase to match schema types
+      setConditions((conditionsRes.data || []).map((r: any) => ({
+        id: r.id,
+        userId: r.user_id,
+        name: r.name,
+        diagnosedOn: r.diagnosed_on ?? null,
+        status: r.status ?? null,
+        managingPhysician: r.managing_physician ?? null,
+        notes: r.notes ?? null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })));
+      setMedications((medicationsRes.data || []).map((r: any) => ({
+        id: r.id,
+        userId: r.user_id,
+        name: r.name,
+        dosage: r.dosage ?? null,
+        frequency: r.frequency ?? null,
+        prescribedBy: r.prescribed_by ?? null,
+        startDate: r.start_date ?? null,
+        endDate: r.end_date ?? null,
+        notes: r.notes ?? null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })));
+      setAllergies((allergiesRes.data || []).map((r: any) => ({
+        id: r.id,
+        userId: r.user_id,
+        allergen: r.allergen,
+        reaction: r.reaction ?? null,
+        severity: r.severity ?? null,
+        diagnosedOn: r.diagnosed_on ?? null,
+        notes: r.notes ?? null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })));
+      setImmunizations((immunizationsRes.data || []).map((r: any) => ({
+        id: r.id,
+        userId: r.user_id,
+        vaccine: r.vaccine,
+        administeredOn: r.administered_on ?? null,
+        provider: r.provider ?? null,
+        lotNumber: r.lot_number ?? null,
+        nextDose: r.next_dose ?? null,
+        notes: r.notes ?? null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })));
     } catch (error) {
       console.error('Error fetching medical data:', error);
       showToast('error', 'Failed to load medical data');
@@ -72,9 +117,9 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
     if (actionsRef) {
       actionsRef.current = {
         openAddCondition: handleOpenDrawer,
-        openAddMedication: () => {},
-        openAddAllergy: () => {},
-        openAddImmunization: () => {},
+        openAddMedication: handleOpenAddMedication,
+        openAddAllergy: handleOpenAddAllergy,
+        openAddImmunization: handleOpenAddImmunization,
         refreshData: fetchAllData
       };
     }
@@ -96,6 +141,25 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
   };
 
   const handleOpenDrawer = () => {
+    setAssistantTaskId('add-condition');
+    setDrawerSessionId(crypto.randomUUID());
+    setIsDrawerOpen(true);
+  };
+
+  const handleOpenAddMedication = () => {
+    setAssistantTaskId('add-medication');
+    setDrawerSessionId(crypto.randomUUID());
+    setIsDrawerOpen(true);
+  };
+
+  const handleOpenAddAllergy = () => {
+    setAssistantTaskId('add-allergy');
+    setDrawerSessionId(crypto.randomUUID());
+    setIsDrawerOpen(true);
+  };
+
+  const handleOpenAddImmunization = () => {
+    setAssistantTaskId('add-immunization');
     setDrawerSessionId(crypto.randomUUID());
     setIsDrawerOpen(true);
   };
@@ -104,10 +168,37 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
     setIsDrawerOpen(false);
   };
 
-  const handleConditionComplete = async (record: Condition) => {
+  const handleConditionComplete = async (record: any) => {
     handleCloseDrawer();
     showToast('success', `Successfully added "${record.name}" to your medical profile`);
     await fetchAllData();
+  };
+
+  const handleMedicationComplete = async (record: any) => {
+    handleCloseDrawer();
+    showToast('success', `Successfully added "${record.name}" to your medications`);
+    await fetchAllData();
+  };
+
+  const handleAllergyComplete = async (record: any) => {
+    handleCloseDrawer();
+    showToast('success', `Successfully added "${record.allergen}" to your allergies`);
+    await fetchAllData();
+  };
+
+  const handleImmunizationComplete = async (record: any) => {
+    handleCloseDrawer();
+    showToast('success', `Successfully added "${record.vaccine}" to your immunizations`);
+    await fetchAllData();
+  };
+
+  const handleAssistantComplete = async (record: any) => {
+    switch (assistantTaskId) {
+      case 'add-condition': return handleConditionComplete(record);
+      case 'add-medication': return handleMedicationComplete(record);
+      case 'add-allergy': return handleAllergyComplete(record);
+      case 'add-immunization': return handleImmunizationComplete(record);
+    }
   };
 
   const activeConditions = conditions.filter(c => c.status === 'Active' || !c.status);
@@ -275,11 +366,19 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         </section>
 
         <section className="mb-10">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2 text-content-primary">Medications</h2>
-            <p className="text-sm text-content-secondary">
-              Track your prescriptions and supplements in one place. Stay on top of refills, dosages, and physician instructions.
-            </p>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold mb-2 text-content-primary">Medications</h2>
+              <p className="text-sm text-content-secondary">
+                Track your prescriptions and supplements in one place. Stay on top of refills, dosages, and physician instructions.
+              </p>
+            </div>
+            <button
+              onClick={handleOpenAddMedication}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 ml-4"
+            >
+              + Add
+            </button>
           </div>
           {medications.length === 0 ? (
             <div className="hv-surface-card p-8 text-center">
@@ -312,21 +411,21 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                     </div>
                   </div>
 
-                  {(med.frequency || med.prescribed_by || med.start_date) && (
+                  {(med.frequency || med.prescribedBy || med.startDate) && (
                     <div className="mt-4 space-y-2 text-sm text-content-secondary">
                       {med.frequency && (
                         <p>
                           <span className="font-medium">Frequency:</span> {med.frequency}
                         </p>
                       )}
-                      {med.prescribed_by && (
+                      {med.prescribedBy && (
                         <p>
-                          <span className="font-medium">Prescribed By:</span> {med.prescribed_by}
+                          <span className="font-medium">Prescribed By:</span> {med.prescribedBy}
                         </p>
                       )}
-                      {med.start_date && (
+                      {med.startDate && (
                         <p>
-                          <span className="font-medium">Started:</span> {new Date(med.start_date).toLocaleDateString()}
+                          <span className="font-medium">Started:</span> {new Date(med.startDate).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -344,11 +443,19 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         </section>
 
         <section className="mb-10">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2 text-content-primary">Allergies</h2>
-            <p className="text-sm text-content-secondary">
-              List any allergies and their reactions to help avoid unwanted exposure and ensure safe treatment plans.
-            </p>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold mb-2 text-content-primary">Allergies</h2>
+              <p className="text-sm text-content-secondary">
+                List any allergies and their reactions to help avoid unwanted exposure and ensure safe treatment plans.
+              </p>
+            </div>
+            <button
+              onClick={handleOpenAddAllergy}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 ml-4"
+            >
+              + Add
+            </button>
           </div>
           {allergies.length === 0 ? (
             <div className="hv-surface-card p-8 text-center">
@@ -414,11 +521,19 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         </section>
 
         <section className="mb-10">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2 text-content-primary">Immunizations</h2>
-            <p className="text-sm text-content-secondary">
-              Record your vaccines and boosters for quick verification and reminders when something's due.
-            </p>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold mb-2 text-content-primary">Immunizations</h2>
+              <p className="text-sm text-content-secondary">
+                Record your vaccines and boosters for quick verification and reminders when something's due.
+              </p>
+            </div>
+            <button
+              onClick={handleOpenAddImmunization}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 ml-4"
+            >
+              + Add
+            </button>
           </div>
           {immunizations.length === 0 ? (
             <div className="hv-surface-card p-8 text-center">
@@ -503,8 +618,8 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
         sessionId={drawerSessionId}
-        taskId="add-condition"
-        onComplete={handleConditionComplete}
+        taskId={assistantTaskId}
+        onComplete={handleAssistantComplete}
         darkMode={darkMode}
       />
 

@@ -83,7 +83,8 @@ export function ProviderRecordConnectionFlow({
 
   const getUserId = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    return user?.id || '00000000-0000-0000-0000-000000000000';
+    if (!user?.id) throw new Error('Not authenticated');
+    return user.id;
   }, []);
 
   useEffect(() => {

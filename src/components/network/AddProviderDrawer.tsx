@@ -101,7 +101,6 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
     try {
       await addProvider({
         ...validation.data,
-        userId: '00000000-0000-0000-0000-000000000000'
       });
       setToast({ message: 'Provider added successfully!', type: 'success' });
       setTimeout(() => {

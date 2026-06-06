@@ -59,12 +59,13 @@ export async function fetchUserProfileData(userId: string): Promise<UserProfileD
         dateOfBirth: userProfile.date_of_birth,
         email: userProfile.email,
         phone: userProfile.phone,
-        address: userProfile.address ? {
-          street: userProfile.address.street,
-          city: userProfile.address.city,
-          state: userProfile.address.state,
-          zipCode: userProfile.address.zip_code,
-          country: userProfile.address.country || 'USA',
+        // Support both flat columns (written by onboarding) and legacy JSON address field
+        address: (userProfile.address_line1 || userProfile.address) ? {
+          street: userProfile.address_line1 || userProfile.address?.street,
+          city: userProfile.city || userProfile.address?.city,
+          state: userProfile.state || userProfile.address?.state,
+          zipCode: userProfile.postal_code || userProfile.address?.zip_code,
+          country: userProfile.country || userProfile.address?.country || 'USA',
         } : undefined,
       };
 
@@ -224,13 +225,12 @@ export async function updateUserProfile(
     };
 
     if (updates.address) {
-      profileUpdate.address = {
-        street: updates.address.street,
-        city: updates.address.city,
-        state: updates.address.state,
-        zip_code: updates.address.zipCode,
-        country: updates.address.country || 'USA',
-      };
+      // Write flat columns to match onboarding schema
+      profileUpdate.address_line1 = updates.address.street ?? null;
+      profileUpdate.city = updates.address.city ?? null;
+      profileUpdate.state = updates.address.state ?? null;
+      profileUpdate.postal_code = updates.address.zipCode ?? null;
+      profileUpdate.country = updates.address.country || 'USA';
     }
 
     if (updates.emergencyContact) {

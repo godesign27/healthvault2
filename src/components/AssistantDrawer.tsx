@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export interface Message {
   role: 'user' | 'assistant' | 'tool';
@@ -72,13 +73,16 @@ export function AssistantDrawer({
 
   const sendMessageToAPI = async (currentMessages: Message[]) => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const { data: { session } } = await supabase.auth.getSession();
+    const authToken = session?.access_token || supabaseAnonKey;
     const apiUrl = `${supabaseUrl}/functions/v1/${taskId}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${supabaseKey}`,
+        'Authorization': `Bearer ${authToken}`,
+        'apikey': supabaseAnonKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

@@ -6,11 +6,20 @@ interface ProfileSettingsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   darkMode?: boolean;
+  /** `drawer` = overlay + fixed panel (legacy). `inline` = full-width content for main column (no overlay). */
+  layout?: 'drawer' | 'inline';
   onSave?: (data: { profilePhoto: string | null; firstName: string; lastName: string }) => void;
   onSignOut?: () => void;
 }
 
-export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSave, onSignOut }: ProfileSettingsDrawerProps) {
+export function ProfileSettingsDrawer({
+  isOpen,
+  onClose,
+  darkMode = false,
+  layout = 'drawer',
+  onSave,
+  onSignOut,
+}: ProfileSettingsDrawerProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -149,20 +158,33 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
 
   if (!isOpen) return null;
 
+  const isInline = layout === 'inline';
+
+  const panelShellClass = isInline
+    ? 'flex flex-col w-full min-h-0 flex-1 bg-surface-page pt-20 lg:pt-0'
+    : `fixed inset-y-0 right-0 w-full max-w-2xl z-50 shadow-xl flex flex-col ${
+        darkMode ? 'bg-surface-page' : 'bg-surface-page'
+      }`;
+
+  const scrollBodyClass = isInline
+    ? 'w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pt-6 lg:pt-8 pb-8 space-y-6'
+    : 'flex-1 overflow-y-auto p-6 space-y-6';
+
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/50 z-40"
-        onClick={onClose}
-      />
-      <div className={`fixed inset-y-0 right-0 w-full max-w-2xl z-50 shadow-xl flex flex-col ${
-        darkMode ? 'bg-surface-page' : 'bg-surface-page'
-      }`}>
-        <div className={`sticky top-0 z-10 px-6 py-4 border-b flex items-center justify-between ${
-          darkMode
-            ? 'bg-surface-raised border-stroke-subtle'
-            : 'bg-surface-sunken border-stroke-subtle'
-        }`}>
+      {!isInline ? (
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={onClose}
+          aria-hidden={!isOpen}
+        />
+      ) : null}
+      <div className={panelShellClass}>
+        <div
+          className={`${isInline ? 'sticky top-0 z-10' : 'sticky top-0 z-10'} px-6 py-4 border-b flex items-center justify-between ${
+            darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-surface-sunken border-stroke-subtle'
+          }`}
+        >
           <div>
             <h2 className={`text-lg font-semibold ${
               'text-content-primary'
@@ -198,7 +220,7 @@ export function ProfileSettingsDrawer({ isOpen, onClose, darkMode = false, onSav
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className={scrollBodyClass}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className={`rounded-lg border p-6 ${
               darkMode

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+/** @deprecated Use only in tests. Real handlers must receive userId from auth. */
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+export { DEMO_USER_ID };
 
 export interface ToolResult<T = unknown> {
   success: boolean;
@@ -27,5 +29,6 @@ export interface ToolDefinition {
 }
 
 export function getUserId(authUserId: string | null | undefined): string {
-  return authUserId || DEMO_USER_ID;
+  if (!authUserId) throw new Error('Not authenticated: userId is required');
+  return authUserId;
 }

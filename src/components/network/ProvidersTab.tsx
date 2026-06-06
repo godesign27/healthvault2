@@ -91,7 +91,6 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
     setAddingId(dp.id);
     try {
       await addProvider({
-        userId: '00000000-0000-0000-0000-000000000000',
         npi: dp.npi,
         name: dp.name,
         specialty: dp.specialty,

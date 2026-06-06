@@ -7,8 +7,9 @@ import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
-import { sendAssistantMessage } from '../lib/openai/client';
+import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
+import type { ConversationMessage } from '../lib/openai/types';
 
 interface Message {
   type: 'user' | 'assistant';
@@ -94,7 +95,15 @@ export function AIAssistantPanel({
   const [collectingProfileData, setCollectingProfileData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [collectedData, setCollectedData] = useState<any>({});
-  const [lastResponseId, setLastResponseId] = useState<string | undefined>(undefined);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Resolve the authenticated user ID once on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUserId(session?.user?.id ?? null);
+    });
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,7 +128,7 @@ export function AIAssistantPanel({
     setCollectingProfileData(false);
     setCurrentFieldIndex(0);
     setCollectedData({});
-    setLastResponseId(undefined);
+    setConversationHistory([]);
   }, [currentPage]);
 
   useEffect(() => {
@@ -260,14 +269,20 @@ export function AIAssistantPanel({
     setIsLoading(true);
 
     try {
-      const data = await sendAssistantMessage({
+      const updatedHistory: ConversationMessage[] = [
+        ...conversationHistory,
+        { role: 'user', content: userMessage },
+      ];
+      const data = await sendChatMessage({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: updatedHistory,
       });
-
-      setLastResponseId(data.responseId);
+      setConversationHistory([
+        ...updatedHistory,
+        { role: 'assistant', content: data.message },
+      ]);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -324,14 +339,20 @@ export function AIAssistantPanel({
     }
 
     try {
-      const data = await sendAssistantMessage({
+      const updatedHistory: ConversationMessage[] = [
+        ...conversationHistory,
+        { role: 'user', content: prompt },
+      ];
+      const data = await sendChatMessage({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: updatedHistory,
       });
-
-      setLastResponseId(data.responseId);
+      setConversationHistory([
+        ...updatedHistory,
+        { role: 'assistant', content: data.message },
+      ]);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -348,24 +369,18 @@ export function AIAssistantPanel({
   };
 
   const handleMedicationRefillFlow = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     setMessages(prev => [...prev, {
       type: 'assistant',
-      message: "I can help you refill your medication. Which medication would you like to refill?\n\n1. Albuterol Inhaler (3 refills remaining)\n2. Fluticasone Propionate (2 refills remaining)\n3. Montelukast (5 refills remaining)\n\nPlease reply with the number or name of the medication."
+      message: "Medication refills through the app aren't supported yet. Please contact your pharmacy or prescribing provider directly to request a refill. You can find your provider's contact info in your Care Network."
     }]);
-
     setIsLoading(false);
   };
 
   const handleScheduleAppointmentFlow = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     setMessages(prev => [...prev, {
       type: 'assistant',
-      message: "I'd be happy to help you schedule an appointment. What type of appointment do you need?\n\n1. Primary Care Visit\n2. Specialist Consultation\n3. Annual Physical\n4. Follow-up Appointment\n\nPlease reply with the number or describe what you need."
+      message: "Appointment scheduling through the app isn't supported yet. Please contact your provider's office directly to schedule an appointment. You can find contact info for your providers in your Care Network."
     }]);
-
     setIsLoading(false);
   };
 
@@ -380,7 +395,8 @@ export function AIAssistantPanel({
     await new Promise(resolve => setTimeout(resolve, 600));
 
     try {
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const profileData = await fetchUserProfileData(userId);
       setUserProfileData(profileData);
 
@@ -573,7 +589,8 @@ export function AIAssistantPanel({
 
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const success = await updateUserProfile(userId, newData);
 
       if (success) {
@@ -693,7 +710,8 @@ export function AIAssistantPanel({
 
   const handleInitiateStopCoverage = async (providerName: string) => {
     try {
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const { data: coverages, error } = await supabase
         .from('insurance_coverages')
         .select('id, provider_id, insurance_providers!inner(name)')
@@ -794,8 +812,9 @@ export function AIAssistantPanel({
       // Generate a simple hash of the member ID for storage (in production, use proper encryption)
       const memberIdHash = coverage.memberId || '';
 
+      if (!currentUserId) throw new Error('Not authenticated');
       const insertData = {
-        user_id: '00000000-0000-0000-0000-000000000000', // Demo UUID
+        user_id: currentUserId,
         provider_id: coverage.providerId,
         plan_name: coverage.planName,
         member_id_hash: memberIdHash,
