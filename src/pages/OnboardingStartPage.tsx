@@ -9,19 +9,12 @@ interface OnboardingStartPageProps {
 
 export function OnboardingStartPage({ darkMode = false, onNext, onBack }: OnboardingStartPageProps) {
 
-  const quickActions: QuickAction[] = [
-    {
-      label: "What happens if I skip optional steps?",
-      onClick: () => alert("You can skip Insurance and Preferences during onboarding. Identity verification is required for security. You can add insurance and update preferences anytime from your Dashboard.")
-    },
-    {
-      label: "How long will this take?",
-      onClick: () => alert("Identity verification takes about 2-3 minutes. Optional steps take 1-2 minutes each. You can skip them and return later.")
-    },
-    {
-      label: "Is my data secure?",
-      onClick: () => alert("Yes. All your health data is encrypted and stored securely. We follow HIPAA guidelines and never share your data without your explicit consent.")
-    }
+  const quickActions: QuickAction[] = [];
+
+  const suggestedQuestions = [
+    "What happens if I skip optional steps?",
+    "How long will onboarding take?",
+    "Is my health data secure?",
   ];
 
   return (
@@ -175,6 +168,7 @@ export function OnboardingStartPage({ darkMode = false, onNext, onBack }: Onboar
               title="Let's Get Started"
               message="This onboarding will take about 5-10 minutes. We'll create your account, verify your identity (required), and optionally collect insurance and preferences. Everything except account creation and identity verification can be skipped and completed later from your Dashboard."
               quickActions={quickActions}
+              suggestedQuestions={suggestedQuestions}
               darkMode={darkMode}
             />
           </div>

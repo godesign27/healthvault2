@@ -7,6 +7,27 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-06-06 (session 4 — autonomous fixes)
+
+- **supabase** — Fixed siloed insurance models. Created migration `20260606000001_backfill_insurance_policies_to_coverages.sql` that copies existing `insurance_policies` rows into `insurance_coverages` (find-or-create `insurance_providers` by name). Updated `OnboardingInsurancePage` to write directly to `insurance_coverages` going forward; still writes to `insurance_policies` (non-blocking) for backward compatibility / card image storage. Deploy migration: `npx supabase db push`.
+- **web** — Fixed provider import to write `health_records`: after `importMedicalRecords` succeeds, a `health_records` entry (kind `specialist_report`, source `connected`) is created with an import summary, so the import appears on the Records page. Provider name passed through from the connection flow.
+- **web** — Fixed onboarding Skip defaults: `OnboardingPreferencesPage.handleSkip` now writes a default `user_preferences` row (all prefs false, notifications true) before navigating, so downstream reads don't get null state. Skip button wired to `handleSkip`.
+- **web** — Removed orphaned `RecordsAssistantPanel.tsx` (replaced with stub/deprecation notice — file permission prevented deletion). Fixed DICOM viewer button: instead of dead "Open in External Viewer" button, now shows a helpful message listing compatible viewers (OsiriX, RadiAnt, 3D Slicer) with a download link.
+- **supabase** — Fixed record submission partial failures: `fileErrors[]` array now collected; response includes `filesFailed`, `fileErrors`, and `success: false` when any upload fails instead of silently succeeding.
+- **web** — Wired onboarding assistant to real AI. `OnboardingAssistantPanel` upgraded from a static display to a full mini chat interface: shows suggested questions as clickable chips, maintains conversation history, calls `sendChatMessage` → Edge Function. All FAQ `alert()` stubs across 5 onboarding pages converted to `suggestedQuestions` arrays.
+
+---
+
+## 2026-06-06 (session 3 — autonomous fixes)
+
+- **web** — Fixed insurance page: member ID now displays from `member_id_hash`; `verificationStatus: 'verified'` added to schema + StatusBadge (was `'connected'` — mismatched AI tool); `handleRefreshVerification` aligned to set `'verified'`; "+ Add Coverage" header button and info banner added (directs to AI assistant); `onEdit` wired to coverage cards.
+- **web** — Fixed pharmacy query bug: `fetchNearbyPharmacies` was `.eq('id', userId)` on `user_profiles` — corrected to `.eq('user_id', effectiveUserId)`. Pharmacies query also uses `effectiveUserId`. Both resolve via `resolveUserId()` which throws if unauthenticated.
+- **web** — Fixed Care page: hardcoded/fabricated AI contextual insights replaced with neutral real message. Search input no longer clears on blur (only collapses if empty). Share Link button now copies the current URL to clipboard. `openAddProvider` in `actionsRef` no longer throws (wired as noop with comment).
+- **web** — Fixed auth and profile settings: LoginPage title changed from "Admin Login" → "Sign In"; inline signup now routes to onboarding (preventing email-verification bypass). ProfileSettingsDrawer: "Verified Account" badge gated on `email_verified` field from DB. Notification toggles + regional settings (language/timezone) now load from `user_preferences` and save on form submit. Change Password button wired to `supabase.auth.updateUser()` with inline form.
+- **web** — Fixed onboarding optimistic navigation: `OnboardingCompletePage` now tracks `completionError` state. If the `onboarding_complete` DB write fails, the "Go to Dashboard" button is replaced with an error message + Retry button. Users can no longer reach the dashboard without a confirmed DB write.
+
+---
+
 ## 2026-06-05 (session 2 — autonomous fixes)
 
 - **web + supabase** — Fixed all hardcoded demo UUIDs (`00000000-0000-0000-0000-000000000000`, `demo-patient-1`) across the codebase. Key files: `AIAssistantPanel.tsx` (4 handlers), `ProvidersTab.tsx`, `AddProviderDrawer.tsx`, `AddPharmacyDrawer.tsx`, `PharmaciesTab.tsx`, `MedicalFormsPage.tsx`, `ProviderRecordConnectionFlow.tsx`, `network/api.ts`, `ai-tools/types.ts`, `record-request` Edge Function. All components now use `supabase.auth.getSession()` / `supabase.auth.getUser()` to resolve the authenticated user.

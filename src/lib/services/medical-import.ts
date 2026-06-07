@@ -5,6 +5,7 @@ interface ImportData {
   medications: { unique: any[] };
   allergies: { unique: any[] };
   immunizations: { unique: any[] };
+  providerName?: string; // optional — passed from the connection flow
 }
 
 export async function importMedicalRecords(data: ImportData) {
@@ -142,5 +143,30 @@ export async function importMedicalRecords(data: ImportData) {
   }
 
   console.log('Import results:', results);
+
+  // Create a health_records document entry so the import is visible on the Records page
+  const totalImported = results.conditions + results.medications + results.allergies + results.immunizations;
+  if (totalImported > 0) {
+    const parts: string[] = [];
+    if (results.conditions > 0) parts.push(`${results.conditions} condition${results.conditions !== 1 ? 's' : ''}`);
+    if (results.medications > 0) parts.push(`${results.medications} medication${results.medications !== 1 ? 's' : ''}`);
+    if (results.allergies > 0) parts.push(`${results.allergies} allerg${results.allergies !== 1 ? 'ies' : 'y'}`);
+    if (results.immunizations > 0) parts.push(`${results.immunizations} immunization${results.immunizations !== 1 ? 's' : ''}`);
+
+    const providerLabel = data.providerName ? `from ${data.providerName}` : 'via provider connection';
+    const summary = `Imported ${parts.join(', ')} ${providerLabel}.`;
+
+    await supabase.from('health_records').insert({
+      user_id: userId,
+      kind: 'specialist_report',
+      title: `Medical Record Import${data.providerName ? ` — ${data.providerName}` : ''}`,
+      provider_name: data.providerName || 'Connected Provider',
+      service_date: new Date().toISOString().split('T')[0],
+      source: 'connected',
+      ai_summary: summary,
+      tags: ['import', 'medical-profile'],
+    }).then(() => {}).catch(err => console.warn('Could not create health_records entry for import:', err));
+  }
+
   return results;
 }

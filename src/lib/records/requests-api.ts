@@ -30,6 +30,7 @@ export interface RecordRequestRow {
   submitted_at: string | null;
   opened_at: string | null;
   expires_at: string | null;
+  secure_token: string | null;
 }
 
 export interface CreateRequestResult {

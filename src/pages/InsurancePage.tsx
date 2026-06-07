@@ -1,5 +1,5 @@
 import { useState, useEffect, MutableRefObject } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Plus, X } from 'lucide-react';
 import { CoverageCard } from '../components/insurance/CoverageCard';
 import { CoverageWithProvider } from '../schemas/insurance';
 import { InsuranceAnalytics } from '../lib/insurance/analytics';
@@ -20,6 +20,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
   const [toast, setToast] = useState<{ id: string; message: string; type: 'success' | 'error' } | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [analytics] = useState(() => new InsuranceAnalytics());
+  const [showAddHint, setShowAddHint] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,7 +34,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
   useEffect(() => {
     if (actionsRef) {
       actionsRef.current = {
-        openAddCoverage: () => {}, // Handler removed - managed by AI Assistant
+        openAddCoverage: () => setShowAddHint(true),
         refreshData: loadCoverages
       };
     }
@@ -61,7 +62,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
         userId: c.user_id,
         providerId: c.provider_id,
         planName: c.plan_name,
-        memberId: '',
+        memberId: c.member_id_hash || '',   // member_id_hash stores the display value
         memberIdHash: c.member_id_hash,
         groupNumber: c.group_number,
         bin: c.bin,
@@ -121,7 +122,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       const { error } = await supabase
         .from('insurance_coverages')
         .update({
-          verification_status: 'connected',
+          verification_status: 'verified',
           last_verified_at: new Date().toISOString(),
         })
         .eq('id', coverage.id);
@@ -196,15 +197,39 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
-          <ShieldCheck className="w-7 h-7" />
-          Insurance
-        </h1>
-        <p className="text-content-secondary">
-          Manage your insurance coverage and benefits
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
+            <ShieldCheck className="w-7 h-7" />
+            Insurance
+          </h1>
+          <p className="text-content-secondary">
+            Manage your insurance coverage and benefits
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddHint(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 ml-4"
+        >
+          <Plus className="w-4 h-4" />
+          Add Coverage
+        </button>
       </div>
+
+      {showAddHint && (
+        <div className="mb-6 flex items-start gap-3 p-4 rounded-lg bg-indigo-50 border border-indigo-200">
+          <ShieldCheck className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-indigo-900">Add coverage via the AI Assistant</p>
+            <p className="text-sm text-indigo-700 mt-0.5">
+              Open the AI Assistant panel on the right and say "Add my insurance" — it will walk you through adding a new plan.
+            </p>
+          </div>
+          <button onClick={() => setShowAddHint(false)} className="text-indigo-400 hover:text-indigo-600 flex-shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -228,6 +253,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
               coverage={coverage}
               darkMode={darkMode}
               showActions
+              onEdit={() => setShowAddHint(true)}
               onSetPrimary={handleSetPrimary}
               onRefreshVerification={handleRefreshVerification}
               onStopCoverage={handleStopCoverage}

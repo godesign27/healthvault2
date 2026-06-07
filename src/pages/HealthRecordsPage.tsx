@@ -7,6 +7,7 @@ import { RecordRequestDetailDrawer } from '../components/records/RecordRequestDe
 import { HealthRecord, RecordKind } from '../lib/records/types';
 import { listRecords } from '../lib/records/query';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
+import { supabase } from '../lib/supabase';
 
 interface HealthRecordsPageProps {
   darkMode?: boolean;
@@ -43,8 +44,8 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   const [selectedRequest, setSelectedRequest] = useState<RecordRequestRow | null>(null);
   const [requests, setRequests] = useState<RecordRequestRow[]>([]);
   const [stats, setStats] = useState({
-    lastSynced: new Date().toLocaleDateString(),
-    connectedProviders: 3,
+    lastSynced: 'Never',
+    connectedProviders: 0,
     totalRecords: 0
   });
 
@@ -59,7 +60,32 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   useEffect(() => {
     loadRecords();
     loadRequests();
+    loadStats();
   }, []);
+
+  const loadStats = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vault-stats`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+        },
+      });
+      if (!res.ok) return;
+      const s = await res.json();
+      setStats(prev => ({
+        ...prev,
+        connectedProviders: s.connectedProviders ?? 0,
+        lastSynced: s.lastSyncedAt
+          ? new Date(s.lastSyncedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : 'Never',
+      }));
+    } catch {
+      /* non-blocking */
+    }
+  };
 
   useEffect(() => {
     if (currentFilter === 'all') {

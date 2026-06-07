@@ -22,6 +22,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
   const [medications, setMedications] = useState<any[]>([]);
   const [allergies, setAllergies] = useState<any[]>([]);
   const [immunizations, setImmunizations] = useState<any[]>([]);
+  const [preventiveCare, setPreventiveCare] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerSessionId, setDrawerSessionId] = useState('');
@@ -38,20 +39,23 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         setMedications([]);
         setAllergies([]);
         setImmunizations([]);
+        setPreventiveCare([]);
         setIsLoading(false);
         return;
       }
-      const [conditionsRes, medicationsRes, allergiesRes, immunizationsRes] = await Promise.all([
+      const [conditionsRes, medicationsRes, allergiesRes, immunizationsRes, preventiveRes] = await Promise.all([
         supabase.from('conditions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('medications').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('allergies').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('immunizations').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('preventive_care').select('*').eq('user_id', userId).order('next_due_date', { ascending: true, nullsFirst: false }),
       ]);
 
       if (conditionsRes.error) throw conditionsRes.error;
       if (medicationsRes.error) throw medicationsRes.error;
       if (allergiesRes.error) throw allergiesRes.error;
       if (immunizationsRes.error) throw immunizationsRes.error;
+      if (preventiveRes.error) throw preventiveRes.error;
 
       // Map DB snake_case → camelCase to match schema types
       setConditions((conditionsRes.data || []).map((r: any) => ({
@@ -100,6 +104,18 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
         notes: r.notes ?? null,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
+      })));
+      setPreventiveCare((preventiveRes.data || []).map((r: any) => ({
+        id: r.id,
+        itemName: r.item_name,
+        category: r.category,
+        status: r.status,
+        recommendedDate: r.recommended_date ?? null,
+        completedDate: r.completed_date ?? null,
+        nextDueDate: r.next_due_date ?? null,
+        frequency: r.frequency ?? null,
+        provider: r.provider ?? null,
+        notes: r.notes ?? null,
       })));
     } catch (error) {
       console.error('Error fetching medical data:', error);
@@ -202,6 +218,14 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
   };
 
   const activeConditions = conditions.filter(c => c.status === 'Active' || !c.status);
+  const today = new Date();
+  const activeMedications = medications.filter(m => !m.endDate || new Date(m.endDate) >= today);
+  const immunizationsDue = immunizations.filter(i => i.nextDose && new Date(i.nextDose) <= today).length;
+  const immunizationSubtitle = immunizations.length === 0
+    ? 'None recorded'
+    : immunizationsDue > 0
+      ? `${immunizationsDue} due`
+      : 'Up to date';
 
   return (
     <>
@@ -251,7 +275,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               <p className="text-3xl font-bold mb-1 text-content-primary">
                 {medications.length}
               </p>
-              <p className="text-sm text-content-secondary">{medications.length} active</p>
+              <p className="text-sm text-content-secondary">{activeMedications.length} active</p>
             </div>
           </div>
 
@@ -283,7 +307,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               <p className="text-3xl font-bold mb-1 text-content-primary">
                 {immunizations.length}
               </p>
-              <p className="text-sm text-content-secondary">Up to date</p>
+              <p className="text-sm text-content-secondary">{immunizationSubtitle}</p>
             </div>
           </div>
         </div>
@@ -561,11 +585,11 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                     </div>
                   </div>
 
-                  {(immunization.administered_on || immunization.provider || immunization.lot_number) && (
+                  {(immunization.administeredOn || immunization.provider || immunization.lotNumber || immunization.nextDose) && (
                     <div className="mt-4 space-y-2 text-sm text-content-secondary">
-                      {immunization.administered_on && (
+                      {immunization.administeredOn && (
                         <p>
-                          <span className="font-medium">Administered:</span> {new Date(immunization.administered_on).toLocaleDateString()}
+                          <span className="font-medium">Administered:</span> {new Date(immunization.administeredOn).toLocaleDateString()}
                         </p>
                       )}
                       {immunization.provider && (
@@ -573,14 +597,14 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                           <span className="font-medium">Provider:</span> {immunization.provider}
                         </p>
                       )}
-                      {immunization.lot_number && (
+                      {immunization.lotNumber && (
                         <p>
-                          <span className="font-medium">Lot Number:</span> {immunization.lot_number}
+                          <span className="font-medium">Lot Number:</span> {immunization.lotNumber}
                         </p>
                       )}
-                      {immunization.next_dose && (
+                      {immunization.nextDose && (
                         <p>
-                          <span className="font-medium">Next Dose:</span> {new Date(immunization.next_dose).toLocaleDateString()}
+                          <span className="font-medium">Next Dose:</span> {new Date(immunization.nextDose).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -604,13 +628,71 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
               Stay proactive with your health. Add screenings, checkups, or care reminders recommended by your provider or the Health Vault assistant.
             </p>
           </div>
-          <div className="hv-surface-card p-8 text-center">
-            <CalendarCheck className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
-            <h3 className="text-lg font-semibold mb-2 text-content-primary">No preventive care items</h3>
-            <p className="text-sm text-content-secondary">
-              Use the AI Assistant to add screenings and checkups.
-            </p>
-          </div>
+          {isLoading ? (
+            <div className="hv-surface-card p-8 text-center">
+              <p className="text-sm text-content-secondary">Loading preventive care...</p>
+            </div>
+          ) : preventiveCare.length === 0 ? (
+            <div className="hv-surface-card p-8 text-center">
+              <CalendarCheck className="w-12 h-12 mx-auto mb-4 text-content-tertiary" />
+              <h3 className="text-lg font-semibold mb-2 text-content-primary">No preventive care items</h3>
+              <p className="text-sm text-content-secondary">
+                Use the AI Assistant to add screenings and checkups.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {preventiveCare.map((item) => {
+                const due = item.nextDueDate ? new Date(item.nextDueDate) : null;
+                const isOverdue = due ? due < today && item.status !== 'completed' : false;
+                return (
+                  <div key={item.id} className="hv-surface-card p-6">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-indigo-50'}`}>
+                          <CalendarCheck className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-indigo-600'}`} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-content-primary">{item.itemName}</h3>
+                          {item.category && (
+                            <span className="text-xs text-content-secondary">{item.category}</span>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        item.status === 'completed'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : isOverdue
+                            ? 'bg-rose-100 text-rose-700'
+                            : 'bg-surface-sunken text-content-secondary'
+                      }`}>
+                        {item.status === 'completed' ? 'Completed' : isOverdue ? 'Overdue' : (item.status || 'Recommended')}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 space-y-2 text-sm text-content-secondary">
+                      {item.completedDate && (
+                        <p><span className="font-medium">Completed:</span> {new Date(item.completedDate).toLocaleDateString()}</p>
+                      )}
+                      {item.nextDueDate && (
+                        <p><span className="font-medium">Next Due:</span> {new Date(item.nextDueDate).toLocaleDateString()}</p>
+                      )}
+                      {item.frequency && (
+                        <p><span className="font-medium">Frequency:</span> {item.frequency}</p>
+                      )}
+                      {item.provider && (
+                        <p><span className="font-medium">Provider:</span> {item.provider}</p>
+                      )}
+                    </div>
+
+                    {item.notes && (
+                      <p className="mt-3 text-sm text-content-secondary">{item.notes}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
 

@@ -116,18 +116,13 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Why do you need my address?",
-      onClick: () => alert("Your address helps verify your identity and ensures we can securely match your health records. It's required for HIPAA compliance.")
-    },
-    {
-      label: "Can I change this later?",
-      onClick: () => alert("Yes! You can update your identity information anytime from your Profile settings in the Dashboard.")
-    },
-    {
-      label: "Use demo data",
-      onClick: fillDemoData
-    }
+    { label: "Use demo data", onClick: fillDemoData },
+  ];
+
+  const suggestedQuestions = [
+    "Why do you need my address?",
+    "Can I change my information later?",
+    "How is my identity information protected?",
   ];
 
   const inputClass = (fieldName: string) => `w-full px-4 py-2 rounded-lg border ${
@@ -153,6 +148,7 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
           title="Identity Verification"
           message="We need to verify your identity to protect your health information and comply with HIPAA regulations. This is a one-time process that ensures your records stay secure."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }

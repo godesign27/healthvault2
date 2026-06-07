@@ -2,6 +2,8 @@
 
 HealthVault is a patient-centered health information platform with an embedded AI assistant. Users manage medical forms, health records, insurance, care providers, pharmacies, medications, and medical profiles through a modern web interface. The AI assistant actively guides users through health tasks -- it is a context-aware orchestration system, not a passive chatbot.
 
+> **Before you start:** Read [`AGENT_INSTRUCTIONS.md`](./AGENT_INSTRUCTIONS.md) before picking up tasks. It documents intended UX behaviors (e.g. form autofill, real data vs mocks), schema gotchas, and project rules so work stays aligned with what we want. Also see [`tasks.md`](./tasks.md) for outstanding work and [`TECH_STACK.md`](./TECH_STACK.md) for architecture details.
+
 ---
 
 ## Monorepo structure
@@ -265,7 +267,7 @@ All assistant documentation lives in `docs/ai-assistant/`:
 | `tool-exposure-map.md` | Maps each OpenAI tool name to its backend handler |
 | `realtime-readiness.md` | What is reusable for voice and what still needs building |
 
-Root governance: `AGENT_INSTRUCTIONS.md`
+Root governance: [`AGENT_INSTRUCTIONS.md`](./AGENT_INSTRUCTIONS.md) — **read this before starting tasks**
 
 ---
 

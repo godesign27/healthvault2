@@ -55,6 +55,25 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
     }
   };
 
+  const handleSkip = async () => {
+    // Write default preferences so downstream reads don't get null state
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        await supabase.from('user_preferences').upsert({
+          user_id: session.user.id,
+          help_with_labs: false,
+          help_with_forms: false,
+          help_with_providers: false,
+          help_with_wellness_suggestions: false,
+        }, { onConflict: 'user_id' });
+      }
+    } catch {
+      // Non-blocking — user can still proceed
+    }
+    onSkip(); // called from quick action in assistant panel — same as handleSkip
+  };
+
   const togglePreference = (key: keyof typeof preferences) => {
     setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -78,18 +97,14 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Turn everything on",
-      onClick: turnAllOn
-    },
-    {
-      label: "Turn everything off",
-      onClick: turnAllOff
-    },
-    {
-      label: "What do these do?",
-      onClick: () => alert("These preferences control how the AI assistant helps you:\n\n• Labs: Get summaries and insights on test results\n• Forms: Help completing and organizing medical forms\n• Providers: Reminders and connections with your care team\n• Wellness: Educational tips and suggestions (not medical advice)\n\nYou can change these anytime in Settings.")
-    }
+    { label: "Turn everything on", onClick: turnAllOn },
+    { label: "Turn everything off", onClick: turnAllOff },
+  ];
+
+  const suggestedQuestions = [
+    "What do these AI preferences do?",
+    "Is wellness guidance considered medical advice?",
+    "Can I change these settings later?",
   ];
 
   const preferenceItems = [
@@ -130,6 +145,7 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
           title="Health Preferences"
           message="Choose how Health Vault can assist you. These preferences help personalize your experience. You can change them anytime from your Settings."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }
@@ -233,7 +249,7 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
             </button>
             <button
               type="button"
-              onClick={onSkip}
+              onClick={handleSkip}
               className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
                   ? 'text-content-secondary hover:text-content-primary'

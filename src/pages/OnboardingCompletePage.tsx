@@ -12,6 +12,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
   const [hasInsurance, setHasInsurance] = useState(false);
   const [hasPreferences, setHasPreferences] = useState(false);
   const [isCompleting, setIsCompleting] = useState(true);
+  const [completionError, setCompletionError] = useState<string | null>(null);
 
   useEffect(() => {
     const completeOnboarding = async () => {
@@ -64,7 +65,8 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
             {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'Authorization': `Bearer ${session.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
@@ -78,6 +80,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
         }
       } catch (error) {
         console.error('Failed to complete onboarding:', error);
+        setCompletionError('We had trouble saving your setup. Please try again.');
       } finally {
         setIsCompleting(false);
       }
@@ -262,12 +265,34 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                 </ul>
               </div>
 
-              <button
-                onClick={onGoToDashboard}
-                className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
-              >
-                Go to Dashboard
-              </button>
+              {completionError ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-red-600 text-center">{completionError}</p>
+                  <button
+                    onClick={() => {
+                      setIsCompleting(true);
+                      setCompletionError(null);
+                      // Re-run the completion flow
+                      supabase.auth.getSession().then(async ({ data: { session } }) => {
+                        if (!session?.user?.id) { setCompletionError('No session found. Please sign in again.'); setIsCompleting(false); return; }
+                        const { error } = await supabase.from('user_profiles').update({ onboarding_complete: true }).eq('user_id', session.user.id);
+                        if (error) { setCompletionError('Still having trouble. Please try again.'); } else { setCompletionError(null); }
+                        setIsCompleting(false);
+                      });
+                    }}
+                    className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onGoToDashboard}
+                  className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
+                >
+                  Go to Dashboard
+                </button>
+              )}
             </div>
           </div>
 

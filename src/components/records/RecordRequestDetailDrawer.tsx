@@ -5,6 +5,7 @@ import {
   ExternalLink, Send, Copy, AlertTriangle, Loader2, Trash2, RefreshCw,
 } from 'lucide-react';
 import { type RecordRequestRow, resendRecordRequest } from '../../lib/records/requests-api';
+import { supabase } from '../../lib/supabase';
 
 interface RecordRequestFile {
   id: string;
@@ -23,9 +24,6 @@ interface RecordRequestDetailDrawerProps {
   onDelete?: (requestId: string) => void;
   onRequestUpdated?: (updated: RecordRequestRow) => void;
 }
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const KIND_CONFIG: Record<string, { label: string; icon: typeof FileText }> = {
   LAB: { label: 'Lab Results', icon: FlaskConical },
@@ -85,22 +83,15 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
 
   const refreshRequest = async (requestId: string) => {
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${requestId}&select=*`,
-        {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      if (res.ok) {
-        const rows = await res.json();
-        if (rows.length > 0) {
-          setLiveRequest(rows[0]);
-          if (onRequestUpdated) {
-            onRequestUpdated(rows[0]);
-          }
+      const { data: rows, error } = await supabase
+        .from('health_record_requests')
+        .select('*')
+        .eq('id', requestId)
+        .limit(1);
+      if (!error && rows && rows.length > 0) {
+        setLiveRequest(rows[0] as RecordRequestRow);
+        if (onRequestUpdated) {
+          onRequestUpdated(rows[0] as RecordRequestRow);
         }
       }
     } catch {}
@@ -109,18 +100,13 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
   const loadFiles = async (requestId: string) => {
     setLoadingFiles(true);
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/record_request_files?request_id=eq.${requestId}&order=created_at.desc&select=*`,
-        {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setFiles(data);
+      const { data, error } = await supabase
+        .from('record_request_files')
+        .select('*')
+        .eq('request_id', requestId)
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        setFiles(data as RecordRequestFile[]);
       }
     } catch (err) {
       console.error('Failed to load files:', err);
@@ -129,9 +115,12 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
     }
   };
 
+  const portalLink = (req: RecordRequestRow) =>
+    `${window.location.origin}/record-request/${req.id}${req.secure_token ? `?token=${req.secure_token}` : ''}`;
+
   const handleCopyLink = async () => {
     if (!displayReq) return;
-    const link = `${window.location.origin}/record-request/${displayReq.id}`;
+    const link = portalLink(displayReq);
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
@@ -143,17 +132,11 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
     if (!displayReq || !onDelete) return;
     setDeleting(true);
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/health_record_requests?id=eq.${displayReq.id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      if (res.ok) {
+      const { error } = await supabase
+        .from('health_record_requests')
+        .delete()
+        .eq('id', displayReq.id);
+      if (!error) {
         onDelete(displayReq.id);
       }
     } catch (err) {
@@ -310,8 +293,7 @@ export function RecordRequestDetailDrawer({ request, darkMode = false, onClose, 
                 </button>
                 <button
                   onClick={() => {
-                    const link = `${window.location.origin}/record-request/${displayReq.id}`;
-                    window.open(link, '_blank');
+                    window.open(portalLink(displayReq), '_blank');
                   }}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
                     darkMode

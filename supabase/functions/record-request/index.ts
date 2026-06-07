@@ -526,6 +526,8 @@ async function handleSubmitRecords(
   }
 
   const fileRecords = [];
+  const fileErrors: { fileName: string; error: string }[] = [];
+
   if (files && Array.isArray(files)) {
     for (const file of files) {
       const storagePath = `${requestId}/${crypto.randomUUID()}-${file.fileName}`;
@@ -542,6 +544,7 @@ async function handleSubmitRecords(
 
       if (uploadError) {
         console.error("File upload error:", uploadError);
+        fileErrors.push({ fileName: file.fileName, error: uploadError.message });
         continue;
       }
 
@@ -559,7 +562,9 @@ async function handleSubmitRecords(
         .select()
         .single();
 
-      if (!fileInsertError && fileRow) {
+      if (fileInsertError) {
+        fileErrors.push({ fileName: file.fileName, error: fileInsertError.message });
+      } else if (fileRow) {
         fileRecords.push(fileRow);
       }
     }
@@ -635,9 +640,13 @@ async function handleSubmitRecords(
     .eq("id", requestId);
 
   return jsonResponse({
-    success: true,
+    success: fileErrors.length === 0,
     filesReceived: fileRecords.length,
-    message: "Records submitted successfully",
+    filesFailed: fileErrors.length,
+    fileErrors: fileErrors.length > 0 ? fileErrors : undefined,
+    message: fileErrors.length === 0
+      ? "Records submitted successfully"
+      : `${fileRecords.length} file(s) uploaded; ${fileErrors.length} failed. Check fileErrors for details.`,
   });
 }
 

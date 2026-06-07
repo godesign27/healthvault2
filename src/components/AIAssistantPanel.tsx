@@ -160,7 +160,7 @@ export function AIAssistantPanel({
         setTimeout(() => {
           setMessages(prev => [...prev, {
             type: 'assistant',
-            message: "I noticed you're viewing your Care page. Here are some insights:\n\n• You haven't had an annual physical in over 12 months\n• Consider scheduling preventive care appointments\n• Would you like to import recent visit data from your providers?"
+            message: "You're on your Care page. I can look up your medications, care timeline, or encounters — just ask. You can also say \"connect a provider\" to import records."
           }]);
           setHasShownImportPrompt(true);
           localStorage.setItem('hasSeenCarePagePrompt', 'true');

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, FileText, Share2, Sparkles, ExternalLink } from 'lucide-react';
+import { X, FileText, Share2, Sparkles, ExternalLink, Loader2 } from 'lucide-react';
 import { HealthRecord } from '../../lib/records/types';
 import { ShareInput } from '../../lib/records/zod';
 import { shareRecord } from '../../lib/records/query';
+import { supabase } from '../../lib/supabase';
 
 interface DocumentViewerProps {
   record: HealthRecord | null;
@@ -18,6 +19,9 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
   const [shareMessage, setShareMessage] = useState('');
   const [shareHours, setShareHours] = useState(72);
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightResult, setInsightResult] = useState<string | null>(null);
+  const [insightError, setInsightError] = useState<string | null>(null);
   const isOpen = !!record;
 
   useEffect(() => {
@@ -31,7 +35,39 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setInsightResult(record?.aiSummary ?? null);
+    setInsightError(null);
+    setInsightLoading(false);
+  }, [record?.id]);
+
   if (!record) return null;
+
+  const handleGenerateInsight = async () => {
+    setInsightLoading(true);
+    setInsightError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Please sign in to generate insights.');
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-record`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recordId: record.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not analyze this record.');
+      setInsightResult(data.summary || 'No insight available for this record.');
+      onRequestInsight?.(record.id);
+    } catch (err) {
+      setInsightError(err instanceof Error ? err.message : 'Could not analyze this record.');
+    } finally {
+      setInsightLoading(false);
+    }
+  };
 
   const handleShare = async () => {
     if (!shareEmail) return;
@@ -218,15 +254,22 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                   <FileText className="w-16 h-16 mb-4" />
                   {record.fileType === 'dicom' ? (
                     <>
-                      <p className="text-center mb-4">DICOM viewer integration coming soon</p>
-                      <button className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                        darkMode
-                          ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
-                          : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
-                      }`}>
-                        <ExternalLink className="w-4 h-4" />
-                        Open in External Viewer
-                      </button>
+                      <p className="text-center mb-2">DICOM viewing is not yet supported in-browser.</p>
+                      <p className="text-sm text-center mb-4">Download the file and open it with a DICOM viewer such as <strong>OsiriX</strong>, <strong>RadiAnt</strong>, or <strong>3D Slicer</strong>.</p>
+                      {record.previewUrl && (
+                        <a
+                          href={record.previewUrl}
+                          download
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                            darkMode
+                              ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
+                              : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
+                          }`}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Download DICOM File
+                        </a>
+                      )}
                     </>
                   ) : (
                     <p className="text-center">
@@ -243,24 +286,61 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
           {activeTab === 'insights' && (
             <div className="space-y-4">
               <button
-                onClick={() => onRequestInsight?.(record.id)}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
+                onClick={handleGenerateInsight}
+                disabled={insightLoading}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-60 ${
                   darkMode
                     ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400'
                     : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
                 }`}
               >
-                <Sparkles className="w-5 h-5" />
-                Generate AI Insights
+                {insightLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Analyzing record...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    {insightResult ? 'Regenerate AI Insights' : 'Generate AI Insights'}
+                  </>
+                )}
               </button>
 
-              <div className={`p-4 rounded-lg text-center ${
-                darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
-              }`}>
-                <p className="text-sm">
-                  Ask the AI assistant to analyze this record, explain findings, or compare with previous results.
-                </p>
-              </div>
+              {insightError && (
+                <div className={`p-4 rounded-lg text-sm ${
+                  darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-700'
+                }`}>
+                  {insightError}
+                </div>
+              )}
+
+              {insightResult ? (
+                <div className={`p-4 rounded-lg border ${
+                  darkMode
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-content-primary'
+                    : 'bg-emerald-50 border-emerald-200 text-content-primary'
+                }`}>
+                  <div className="flex items-start gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span className="font-medium text-emerald-600">AI Insight</span>
+                  </div>
+                  <p className="text-sm leading-relaxed">{insightResult}</p>
+                  <p className={`text-xs mt-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`}>
+                    AI-generated summary. Not medical advice.
+                  </p>
+                </div>
+              ) : (
+                !insightLoading && (
+                  <div className={`p-4 rounded-lg text-center ${
+                    darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
+                  }`}>
+                    <p className="text-sm">
+                      Generate a plain-language summary of this record. Not medical advice.
+                    </p>
+                  </div>
+                )
+              )}
             </div>
           )}
 

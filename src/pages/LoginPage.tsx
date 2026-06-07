@@ -23,14 +23,9 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
 
     try {
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        onLoginSuccess();
+        // Route to the full onboarding flow instead of bypassing email verification
+        onCreateAccount?.();
+        return;
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -69,12 +64,12 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
           <h2 className={`text-2xl font-bold text-center mb-2 ${
             darkMode ? 'text-white' : 'text-content-primary'
           }`}>
-            {isSignup ? 'Create Admin Account' : 'Admin Login'}
+            {isSignup ? 'Create Account' : 'Sign In'}
           </h2>
           <p className={`text-center mb-8 ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
-            {isSignup ? 'Sign up to create your admin account' : 'Sign in to access the Health Vault dashboard'}
+            {isSignup ? 'Create your Health Vault account' : 'Sign in to your Health Vault'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

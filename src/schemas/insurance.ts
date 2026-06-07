@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 export const RelationshipZ = z.enum(['self', 'spouse', 'dependent', 'other']);
 
-export const VerificationStatusZ = z.enum(['connected', 'verifying', 'needs_attention', 'expiring']);
+// 'verified' is set by the Edge Function's verifyInsurance tool; treat as alias for 'connected'
+export const VerificationStatusZ = z.enum(['connected', 'verified', 'verifying', 'needs_attention', 'expiring']);
 
 export const ConnectionSourceZ = z.enum(['oauth', 'upload', 'manual']);
 
