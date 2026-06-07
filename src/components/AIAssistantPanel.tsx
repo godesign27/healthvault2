@@ -10,6 +10,9 @@ import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '.
 import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 import type { ConversationMessage } from '../lib/openai/types';
+import { FORM_TEMPLATES } from '../lib/forms/catalog';
+import { buildAutofillAnswers, loadFormAutofillContext, mergeFormAnswers } from '../lib/forms/autopopulate';
+import { getPatientProfileId, isResponseComplete, loadFormResponses, saveFormResponse } from '../lib/forms/responses';
 
 interface Message {
   type: 'user' | 'assistant';
@@ -186,6 +189,11 @@ export function AIAssistantPanel({
     if (onImportComplete) onImportComplete(data);
   };
 
+  const isFillFormIntent = (text: string) => {
+    const lower = text.toLowerCase();
+    return lower.includes('fill') && (lower.includes('form') || lower.includes('incomplete'));
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -256,6 +264,11 @@ export function AIAssistantPanel({
 
     if (collectingProfileData) {
       await handleCollectFieldData(userMessage);
+      return;
+    }
+
+    if (isFillFormIntent(userMessage)) {
+      await handleFormFillingRequest();
       return;
     }
 
@@ -338,6 +351,11 @@ export function AIAssistantPanel({
       return;
     }
 
+    if (isFillFormIntent(prompt)) {
+      await handleFormFillingRequest();
+      return;
+    }
+
     try {
       const updatedHistory: ConversationMessage[] = [
         ...conversationHistory,
@@ -389,104 +407,82 @@ export function AIAssistantPanel({
 
     setMessages(prev => [...prev, {
       type: 'assistant',
-      message: "I'll help you fill out the form with your profile information. Let me gather your data..."
+      message: "I'll pre-fill your incomplete forms using your profile and medical data..."
     }]);
-
-    await new Promise(resolve => setTimeout(resolve, 600));
 
     try {
       const userId = currentUserId;
       if (!userId) throw new Error('Not authenticated');
-      const profileData = await fetchUserProfileData(userId);
-      setUserProfileData(profileData);
 
-      let formSummary = "Based on your profile, here's what I can help you fill in:\n\n";
-      const availableFields: string[] = [];
-      const missingInfo: string[] = [];
+      const patientProfileId = await getPatientProfileId(userId);
+      if (!patientProfileId) throw new Error('Patient profile not found');
 
-      if (profileData.personalInfo.fullName) {
-        formSummary += `**Name**: ${profileData.personalInfo.fullName}\n`;
-        availableFields.push('name');
-      } else {
-        missingInfo.push('Full Name');
+      const [autofill, responses] = await Promise.all([
+        loadFormAutofillContext(userId),
+        loadFormResponses(patientProfileId),
+      ]);
+
+      const incomplete = FORM_TEMPLATES.filter((template) => !isResponseComplete(responses[template.id]));
+      if (incomplete.length === 0) {
+        setMessages(prev => [...prev, {
+          type: 'assistant',
+          message: 'All your forms are already complete. Open Medical Forms to review or share them with a provider.'
+        }]);
+        setIsFormFillingMode(false);
+        return;
       }
 
-      if (profileData.personalInfo.dateOfBirth) {
-        const dob = new Date(profileData.personalInfo.dateOfBirth);
-        formSummary += `**Date of Birth**: ${dob.toLocaleDateString()}\n`;
-        availableFields.push('dob');
-      } else {
-        missingInfo.push('Date of Birth');
+      const filledSummaries: string[] = [];
+      let totalFields = 0;
+
+      for (const template of incomplete) {
+        const saved = responses[template.id]?.answers_json;
+        const answers = mergeFormAnswers(saved, buildAutofillAnswers(template, autofill));
+        const fieldCount = Object.keys(answers).length;
+        if (fieldCount === 0) continue;
+
+        await saveFormResponse({
+          patientProfileId,
+          templateId: template.id,
+          answers,
+          markComplete: false,
+        });
+
+        totalFields += fieldCount;
+        filledSummaries.push(`• **${template.title}** — ${fieldCount} fields pre-filled`);
       }
 
-      if (profileData.personalInfo.email) {
-        formSummary += `**Email**: ${profileData.personalInfo.email}\n`;
-        availableFields.push('email');
-      } else {
-        missingInfo.push('Email');
+      if (filledSummaries.length === 0) {
+        setMessages(prev => [...prev, {
+          type: 'assistant',
+          message: "I couldn't find profile data to pre-fill your forms yet. Complete your Medical Profile and Insurance sections, then try again."
+        }]);
+        setIsFormFillingMode(false);
+        return;
       }
 
-      if (profileData.personalInfo.phone) {
-        formSummary += `**Phone**: ${profileData.personalInfo.phone}\n`;
-        availableFields.push('phone');
-      } else {
-        missingInfo.push('Phone Number');
-      }
-
-      if (profileData.personalInfo.address) {
-        const addr = profileData.personalInfo.address;
-        if (addr.street) {
-          formSummary += `**Address**: ${addr.street}`;
-          if (addr.city && addr.state && addr.zipCode) {
-            formSummary += `, ${addr.city}, ${addr.state} ${addr.zipCode}`;
-          }
-          formSummary += '\n';
-          availableFields.push('address');
-        }
-      } else {
-        missingInfo.push('Address');
-      }
-
-      if (profileData.insuranceInfo.provider) {
-        formSummary += `\n**Insurance Provider**: ${profileData.insuranceInfo.provider}\n`;
-        if (profileData.insuranceInfo.memberId) {
-          formSummary += `**Member ID**: ${profileData.insuranceInfo.memberId}\n`;
-        }
-        availableFields.push('insurance');
-      }
-
-      if (profileData.emergencyContact?.name) {
-        formSummary += `\n**Emergency Contact**: ${profileData.emergencyContact.name}`;
-        if (profileData.emergencyContact.phone) {
-          formSummary += ` (${profileData.emergencyContact.phone})`;
-        }
-        formSummary += '\n';
-        availableFields.push('emergency');
-      }
-
-      if (missingInfo.length > 0) {
-        formSummary += `\n**Missing Information**: ${missingInfo.join(', ')}\n`;
-        formSummary += "\nWould you like me to help you add this information to your profile?";
-        setAwaitingProfileDataConfirmation(true);
-      } else {
-        formSummary += "\nYou can copy this information to fill out your form. Is there anything specific you'd like to update?";
-      }
+      const summary = [
+        `Pre-filled **${filledSummaries.length}** form${filledSummaries.length !== 1 ? 's' : ''} (${totalFields} fields total):`,
+        '',
+        ...filledSummaries,
+        '',
+        'Open **Medical Forms** to review, finish any remaining fields, and save. Ask me to share a completed form when you\'re ready.',
+      ].join('\n');
 
       setMessages(prev => [...prev, {
         type: 'assistant',
-        message: formSummary
+        message: summary
       }]);
 
-      setFormFields(availableFields);
-      setMissingFields(missingInfo);
       setIsFormFillingMode(true);
-      setIsLoading(false);
     } catch (error) {
-      console.error('Error fetching profile data:', error);
+      console.error('Error pre-filling forms:', error);
       setMessages(prev => [...prev, {
         type: 'assistant',
-        message: "I'm sorry, I had trouble accessing your profile data. Please make sure your profile is set up in the Medical Profile section."
+        message: "I'm sorry, I had trouble pre-filling your forms. Open Medical Forms to edit them directly, or try again in a moment."
       }]);
+      setIsFormFillingMode(false);
+    } finally {
       setIsLoading(false);
     }
   };

@@ -106,13 +106,13 @@ handle all of it.
 - [x] **Demo UUID in assistant mutations** — Fixed 2026-06-05 (see §8.0).
 - [x] **Tool ↔ DB schema mismatches** — Fixed 2026-06-05: `getMedicalHistory` corrected (`diagnosed_on`, `vaccine`, `administered_on`). See also §8.0 address fix.
 - [ ] **Add explicit confirmation UX** for destructive LLM tool calls.
-- [~] **Dead `handleFormFillingRequest`** — UUID fixed; logic is wired but needs end-to-end testing.
+- [x] **`handleFormFillingRequest`** — Wired 2026-06-07: Fill Form quick action + typed intent pre-fill incomplete forms via `autopopulate` + `saveFormResponse` (incomplete).
 - [x] **Mock medication-refill and appointment flows** — Replaced 2026-06-05 with honest "not yet supported" messages.
 
 ### 5b. Known assistant capability gaps (build tools / knowledge)
 
 Users will ask for these but the assistant currently cannot do them reliably:
-- [ ] Share a completed form with a provider (`shareForm` is Edge-only; also payload mismatch).
+- [x] Share a completed form with a provider — Fixed 2026-06-07: `shareForm` tool payload aligned with `share` Edge Function (`forms[]` + `recipient.method`, not `formResponseIds`).
 - [ ] Update profile via chat (e.g. "change my phone") — `updateMedicalProfile` is Edge-only.
 - [ ] Submit a medication refill to a pharmacy (no refill-submit tool).
 - [ ] Book / cancel an appointment (`getAppointments` is read-only; no create/cancel tool).
@@ -210,7 +210,7 @@ user. Citations are `file:line` at time of audit.
 - [x] Share flow now uses real `form_responses` UUIDs — Fixed 2026-06-07: selected completed
       forms map to their response UUID, so `share` builds real PDFs and the recipient view
       resolves titles via `template_id` (redeployed). Patient lookup fixed (`user_id` + name).
-- [ ] AI `shareForm` payload shape still mismatches the `share` contract (Edge-side; pending).
+- [x] AI `shareForm` payload shape aligned with `share` contract — Fixed 2026-06-07 in `ai-health-assistant/tools.ts` + `src/lib/ai-tools/forms.ts` (`src/lib/forms/share-api.ts` helper).
 - [x] Share function PDFs — Fixed 2026-06-05: generates real HTML document from `form_responses` data with actual field answers. Patient DOB fetched from `user_profiles` (was hardcoded `1985-06-22`).
 - [x] Share revoke/opened auth — Fixed 2026-06-05: revoke checks ownership (`patient_id === user.id`, returns 403 if mismatch); opened validates `share_token`.
 - [x] Ensure every user has a `patient_profiles` row — Fixed 2026-06-06 via migration

@@ -373,18 +373,45 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
         const formIds = args.formIds as string[];
         if (!formIds?.length) return error('At least one form ID is required.');
 
+        const { data: formRows, error: formsErr } = await sb
+          .from('form_responses')
+          .select('id, template_id, status, signed_at, form_templates(title, version)')
+          .in('id', formIds);
+
+        if (formsErr) return error(`Database error: ${formsErr.message}`);
+        if (!formRows?.length) return error('No matching form responses found.');
+
+        const rowById = new Map(formRows.map((row: any) => [row.id, row]));
         for (const fid of formIds) {
-          const { data, error: dbErr } = await sb
-            .from('form_responses')
-            .select('status')
-            .eq('id', fid)
-            .maybeSingle();
-          if (dbErr) return error(`Database error: ${dbErr.message}`);
-          if (!data) return error(`Form ${fid} not found.`);
-          if (data.status !== 'complete') {
+          const row = rowById.get(fid);
+          if (!row) return error(`Form ${fid} not found.`);
+          if (row.status !== 'complete') {
             return error(`Form ${fid} is not complete.`);
           }
         }
+
+        const { data: profile } = await sb
+          .from('user_profiles')
+          .select('first_name, last_name, date_of_birth')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        const patientName = profile
+          ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+          : '';
+        const displayName = String(args.recipientName || '').trim();
+        const orgName = args.recipientOrg ? String(args.recipientOrg).trim() : '';
+
+        const forms = formIds.map((fid) => {
+          const row = rowById.get(fid)!;
+          const template = row.form_templates;
+          return {
+            id: row.id,
+            title: template?.title || row.template_id,
+            version: template?.version || '2025.01',
+            signedAt: row.signed_at || undefined,
+          };
+        });
 
         const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
         const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -397,15 +424,21 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
           },
           body: JSON.stringify({
             patientId: userId,
-            formResponseIds: formIds,
-            method: 'SecureLink',
+            forms,
             recipient: {
-              providerName: args.recipientOrg || args.recipientName,
-              patientName: '',
+              displayName,
+              orgName: orgName || undefined,
               email: args.recipientEmail,
-              displayName: args.recipientName,
+              method: 'SecureLink',
+              patientName,
+              patientDob: profile?.date_of_birth || undefined,
+              providerName: orgName || displayName,
             },
             note: args.note || '',
+            options: {
+              package: { pdf: true, fhirBundle: true },
+              cc: { me: true, patient: false },
+            },
           }),
         });
 
@@ -421,9 +454,8 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
             shareId: result.id,
             status: result.status || 'sent',
             recipientEmail: args.recipientEmail,
-            expiresAt:
-              result.expiresAt ||
-              new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            shareUrl: result.shareUrl,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           },
           `Forms shared with ${args.recipientName} (${args.recipientEmail}).`
         );
