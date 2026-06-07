@@ -274,7 +274,7 @@ Deno.serve(async (req: Request) => {
       // Fetch real form_responses data for the forms being shared
       const { data: formResponses } = await supabase
         .from('form_responses')
-        .select('id, template_id, answers, status, completed_at')
+        .select('id, template_id, answers_json, status, signed_at')
         .in('id', formIds);
 
       const shareEventId = crypto.randomUUID();
@@ -337,7 +337,7 @@ Deno.serve(async (req: Request) => {
       // Generate PDF packet from real form_responses data
       const formSections = (formResponses || []).map((fr: any) => {
         const formTitle = getFormTitle(fr.template_id) || fr.template_id || 'Medical Form';
-        const answers = fr.answers || {};
+        const answers = fr.answers_json || {};
         const answerLines = Object.entries(answers)
           .filter(([, v]) => v !== null && v !== undefined && v !== '')
           .map(([k, v]) => {

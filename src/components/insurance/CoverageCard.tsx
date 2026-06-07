@@ -113,6 +113,19 @@ export function CoverageCard({
         <div className="flex items-center gap-2 border-t border-stroke-default px-6 pb-2 pt-4">
           {!isStopped && (
             <>
+              {onEdit && (
+                <button
+                  onClick={() => onEdit(coverage)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    darkMode
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-primary hover:bg-surface-overlay'
+                  }`}
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </button>
+              )}
               {!coverage.isPrimary && onSetPrimary && (
                 <button
                   onClick={() => onSetPrimary(coverage)}

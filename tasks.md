@@ -148,50 +148,55 @@ user. Citations are `file:line` at time of audit.
 ### 8.0 Cross-cutting (highest priority — affects many features)
 
 - [x] **Hardcoded demo user IDs in real write paths.** Fixed 2026-06-05: all write paths now use `session.user.id`. `AIAssistantPanel` uses `currentUserId` state from auth. Network components pass no userId (store resolves from session). `network/api.ts` resolves via `resolveUserId()` which throws if unauthenticated. `MedicalFormsPage` uses `currentPatient` state from auth. `record-request` Edge Function returns 401 if no userId.
-- [ ] **Anon key sent instead of user JWT** on several authenticated calls — likely silent
-      failures under RLS for real users: record-request detail refresh/files/delete
-      (`RecordRequestDetailDrawer.tsx:88-155`), share revoke (`MedicalFormsPage.tsx:510`),
-      `AssistantDrawer` add-condition (`AssistantDrawer.tsx:75-82`), `welcome-email`
-      (`OnboardingCompletePage.tsx:67`).
-- [ ] **Edge Function ↔ DB schema mismatches** (`provider_connections` has no
-      `provider_name`/`ehr_source`; `connection_method` enum has no `keragon`):
-      `sync-status` selects nonexistent `provider_name`/`ehr_source` → 500
-      (`sync-status/index.ts:46`); `providers` POST inserts `ehr_source`/`keragon` and omits
-      NOT NULL `provider_organization_id`; `vault-stats` filters `connection_method='keragon'`.
-      Either add a migration for these columns/enum or fix the functions. (`providers` GET was
-      already fixed to join `provider_organizations(name)`.)
-- [ ] **Two siloed insurance models** — onboarding writes `insurance_policies`; dashboard +
-      AI read `insurance_coverages`. Onboarding insurance never appears in-app. Unify/migrate.
+- [x] **Anon key sent instead of user JWT** — Fixed 2026-06-06: `RecordRequestDetailDrawer`
+      refresh/files/delete now use the authenticated `supabase` client; share revoke
+      (`MedicalFormsPage`) and `welcome-email` (`OnboardingCompletePage`) now send
+      `session.access_token`. `AssistantDrawer` already sent the user token.
+- [x] **Edge Function ↔ DB schema mismatches** — Resolved 2026-06-06. Live schema is healthier
+      than the audit implied: `connection_method` is a plain `text` column (so `"keragon"` is
+      valid), `ehr_source` **exists**, and `provider_organization_id` is **nullable** — so
+      `providers` POST and `vault-stats` are schema-safe (re-deployed `providers` v3). The only
+      real bug was `sync-status` selecting nonexistent `provider_name` → fixed to join
+      `provider_organizations(name)` and re-deployed (v3).
+- [x] **Two siloed insurance models** — Fixed 2026-06-06: migration `20260606000001` backfills existing `insurance_policies` → `insurance_coverages`; `OnboardingInsurancePage` now writes directly to `insurance_coverages`. Run `npx supabase db push` to apply migration.
 - [x] **`MedicalIDCard` photo column bug** — Fixed 2026-06-05: column corrected to `profile_photo_url`.
 - [x] **Address schema mismatch** — Fixed 2026-06-05: `profile-data.ts` now reads flat `address_line1`/`city`/`state`/`postal_code` columns (with JSON fallback) and writes flat columns matching onboarding.
 
 ### 8.1 Dashboard
 
-- [ ] Recent Activity feed is mock; "View All Activity" is a dead button
-      (`DashboardPage.tsx:364-396`).
-- [ ] Quick Actions (Download Medical Forms / View Care History / Schedule Appointment) have
-      no handlers (`DashboardPage.tsx:332-349`).
-- [ ] Medical Forms stat card shows hardcoded "—" (`DashboardPage.tsx:289`).
-- [ ] Stats omit connected providers / pending requests / last sync (wire to `vault-stats`).
+- [x] Recent Activity feed — Fixed 2026-06-06: built from real data (recent `health_records`,
+      received `health_record_requests`, recent `medications`), sorted by time with relative
+      timestamps + empty state. "View All Activity" now navigates to Health Records.
+- [x] Quick Actions — Fixed 2026-06-06: "View Medical Forms" → forms page, "View Care History"
+      → care page, third action → opens the AI Assistant (scheduling not yet supported, so the
+      misleading "Schedule Appointment" dead-end was removed).
+- [x] Medical Forms stat card — Fixed 2026-06-06: shows real completed `form_responses` count
+      (resolved via `patient_profiles.id`).
+- [x] Connected providers / last sync — Fixed 2026-06-06: Health Records stat subtitle now wires
+      to `vault-stats` (connected count + last-synced).
 
 ### 8.2 Health Records
 
-- [ ] Vault stats partly fake: `connectedProviders: 3` hardcoded, `lastSynced` = today
-      (`HealthRecordsPage.tsx:45-48`) — wire to `sync-status`.
+- [x] Vault stats partly fake — Fixed 2026-06-06: `HealthRecordsPage` now fetches `vault-stats`
+      for connected providers + last synced (no more hardcoded `connectedProviders: 3` / today).
 - [ ] Patient record **upload** is an in-memory stub, lost on refresh (`query.ts:105-122`);
-      build real upload → storage + `health_records` insert.
-- [ ] "Generate AI Insights" only `console.log`s; wire to `analyze-record`
-      (`DocumentViewer.tsx:245-255`).
-- [ ] Single-record "Share Record" is a fake 400ms stub (`query.ts:124-138`).
-- [ ] Provider import writes only medical-profile tables, **not** `health_records` documents
-      (`medical-import.ts`, `ProviderRecordConnectionFlow.tsx:274-281`).
+      build real upload → storage + `health_records` insert. **(Deferred — needs a file-bearing
+      upload UI + storage; current `uploadRecord` only receives metadata. Feature build.)**
+- [x] "Generate AI Insights" — Fixed 2026-06-06: `DocumentViewer` insights tab calls
+      `analyze-record` with the user JWT and renders the returned summary (with loading/error
+      states + "not medical advice" note).
+- [ ] Single-record "Share Record" is a fake 400ms stub (`query.ts:124-138`). **(Deferred —
+      no single-record share endpoint exists; the `share` function is form-oriented. Feature
+      build: needs a new endpoint.)**
+- [x] Provider import writes only medical-profile tables — Fixed 2026-06-06: `importMedicalRecords` now also inserts a `health_records` summary row (kind `specialist_report`, source `connected`) after a successful import.
 - [ ] "Request Manually" provider picker uses `MOCK_PROVIDERS` + fabricated
-      `records@{clinic}.com` emails (`RequestRecordDrawer.tsx:71-80,182`).
-- [ ] Copied provider-portal links omit `?token=` → portal 403s
-      (`RecordRequestDetailDrawer.tsx:134,313`).
-- [ ] DICOM viewer button has no handler (`DocumentViewer.tsx:219-229`).
-- [ ] Delete or integrate orphaned `RecordsAssistantPanel.tsx`; align copy with
-      `HEALTH_RECORDS_REQUEST_GUIDE.md`.
+      `records@{clinic}.com` emails (`RequestRecordDrawer.tsx:71-80,182`). **(Tied to §8.7
+      network directory mock — Phase 3.)**
+- [x] Copied provider-portal links omit `?token=` — Fixed 2026-06-06: `RecordRequestRow` now
+      carries `secure_token`; Copy Link + View Portal append `?token=` so the portal no longer
+      403s.
+- [x] DICOM viewer button — Fixed 2026-06-06: replaced dead button with message listing compatible viewers + download link.
+- [x] Orphaned `RecordsAssistantPanel.tsx` — Stubbed out 2026-06-06 (file permission prevents deletion; replaced with deprecation notice).
 
 ### 8.3 Medical Forms + Secure Share
 
@@ -202,45 +207,44 @@ user. Citations are `file:line` at time of audit.
       `shareForm` payload shape mismatches the `share` function contract.
 - [x] Share function PDFs — Fixed 2026-06-05: generates real HTML document from `form_responses` data with actual field answers. Patient DOB fetched from `user_profiles` (was hardcoded `1985-06-22`).
 - [x] Share revoke/opened auth — Fixed 2026-06-05: revoke checks ownership (`patient_id === user.id`, returns 403 if mismatch); opened validates `share_token`.
-- [ ] Ensure every user has a `patient_profiles` row (required by `saveFormAnswers`).
+- [x] Ensure every user has a `patient_profiles` row — Fixed 2026-06-06 via migration
+      `ensure_patient_profiles_row`: unique index on `user_id`, backfill of missing rows from
+      `user_profiles`, and an `AFTER INSERT/UPDATE` trigger that keeps `patient_profiles` in
+      sync (name/dob/email/phone). `EXECUTE` revoked from public/anon/authenticated.
 
 ### 8.4 Insurance
 
-- [ ] Member ID forced to `''` on coverage cards (`InsurancePage.tsx:64`).
-- [ ] In-page "Add coverage" is a dead no-op (`InsurancePage.tsx:36,213-221`); wire it or route
-      to the AI flow. Edit-coverage flow missing (`onEdit` never passed).
-- [ ] AI insurance add/stop use demo UUID (see §8.0); `useInsuranceConnection` (correct auth)
-      exists but is unused.
-- [ ] Coverage "verify/refresh" is a local stub; `connected` vs `verified` status enums
-      disagree across page and AI tool.
-- [ ] Unused `ProviderPickerDrawer` — wire or remove.
+- [x] Member ID forced to `''` — Fixed 2026-06-06: uses `member_id_hash` for display.
+- [x] "Add coverage" dead no-op + missing `onEdit` — Fixed 2026-06-06: header button + hint banner added; Edit button wired on CoverageCard; both direct to AI assistant.
+- [x] AI insurance add/stop demo UUID — Fixed 2026-06-05 (see §8.0).
+- [x] Coverage status enum mismatch — Fixed 2026-06-06: `'verified'` added to schema + StatusBadge; page now sets `'verified'` consistent with AI tool.
+- [ ] Unused `ProviderPickerDrawer` — wire or remove (deferred).
 
 ### 8.5 Medical Profile
 
 - [x] Condition cards read camelCase — Fixed 2026-06-05: `fetchAllData` now maps DB rows to camelCase before setting state.
 - [x] Add Medication / Add Allergy / Add Immunization — Built 2026-06-05: 3 new Edge Functions created, `MedicalProfilePage` wired with `assistantTaskId` state + "Add" buttons per section. `AssistantDrawer` fixed to send user access token.
-- [ ] Active-medication count uses total count; immunization "Up to date" is hardcoded
-      (`MedicalProfilePage.tsx:163,195`).
-- [ ] Preventive Care section is a static empty placeholder; load from `preventive_care`
-      (`MedicalProfilePage.tsx:485-498`).
+- [x] Active-medication count / immunization status — Fixed 2026-06-06: meds card shows real
+      active count (no `end_date` or future `end_date`); immunization subtitle is data-driven
+      (`N due` / `Up to date` / `None recorded`). Also fixed a latent bug where immunization
+      detail fields rendered snake_case against camelCase-mapped state.
+- [x] Preventive Care section — Fixed 2026-06-06: loads from `preventive_care` (status/overdue
+      badges, next-due/frequency/provider/notes) with loading + empty states.
 
 ### 8.6 Care
 
-- [ ] Care History "Share Link" button has no handler (`CarePage.tsx:398-401`).
-- [ ] Care-page AI contextual insights are hardcoded/fabricated
-      (`AIAssistantPanel.tsx:148-159`).
-- [ ] `openAddProvider` prop is never assigned (dead wiring, `CarePage.tsx:7-9`); `CareTeamCard`
-      is unused. Search input clears on blur (UX).
-- [ ] No inline med add/edit (lives in Medical Profile); no drill-down from timeline.
+- [x] Care History "Share Link" — Fixed 2026-06-06: copies current URL to clipboard.
+- [x] Hardcoded AI care insights — Fixed 2026-06-06: replaced with neutral real message.
+- [x] `openAddProvider` dead wiring + search clears on blur — Fixed 2026-06-06: actionsRef wired as noop; search only collapses when empty.
+- [ ] No inline med add/edit; no drill-down from timeline (deferred — feature build).
 
 ### 8.7 Network / Providers
 
 - [ ] In-network provider **directory** is static Springfield mock (`network-directory.ts`);
       replace with real payer/NPI/`provider_organizations` search. Manual add search is also
       mock (`clinical-connectors.ts`).
-- [ ] Nearby-pharmacy search is mock; map pinned to Springfield; `fetchNearbyPharmacies` uses
-      `.eq('id', userId)` (should be `user_id`) and is imported but unused
-      (`PharmaciesTab.tsx:64-67`, `network/api.ts:305`).
+- [x] `fetchNearbyPharmacies` query bug — Fixed 2026-06-06: `.eq('id', userId)` → `.eq('user_id', effectiveUserId)` on both `user_profiles` and `pharmacies` queries.
+- [ ] Nearby-pharmacy search is still mock data; map pinned to Springfield (deferred — needs real geocoding/payer-directory integration).
 - [ ] No first-class **EHR connections** UI: web never calls `providers` (list/connect/
       disconnect) or `sync-status`; connect only happens via the AI flow. Add a connections +
       sync-status panel (Network or Health Records).
@@ -248,35 +252,29 @@ user. Citations are `file:line` at time of audit.
 
 ### 8.8 Onboarding
 
-- [ ] "Do This Later" / Skip steps are navigation-only no-ops (no deferral, no default rows)
-      (`OnboardingStartPage.tsx:158-167`, preferences/insurance skips).
+- [x] Skip steps write no defaults — Fixed 2026-06-06: preferences skip now writes a default `user_preferences` row before navigating.
 - [x] Email OTP — Fixed 2026-06-05: UI now uses 6 digits consistently everywhere. `email_verified: true` written to `user_profiles` on successful verification.
 - [ ] `identity_verified: true` self-set with no real verification
       (`OnboardingIdentityPage.tsx:81`).
-- [ ] Dashboard entry optimistically set even if the DB `onboarding_complete` write failed
-      (`App.tsx:375-380`).
-- [ ] Onboarding "assistant" is static FAQ/`alert()` stubs, not the real AI
-      (`OnboardingAssistantPanel.tsx`).
-- [ ] Saved `user_preferences` are never read anywhere else in the app.
+- [x] Optimistic dashboard navigation — Fixed 2026-06-06: `OnboardingCompletePage` now shows error + Retry on DB write failure; "Go to Dashboard" blocked until confirmed success.
+- [x] Onboarding assistant wired to real AI — Fixed 2026-06-06: `OnboardingAssistantPanel` upgraded to a mini chat interface with `sendChatMessage` integration. All 5 onboarding pages converted from `alert()` FAQ stubs to `suggestedQuestions` chips.
+- [x] `user_preferences` never read — Partially fixed: Profile Settings now reads + saves preferences (session 3). Onboarding skip writes defaults (session 4). Full app-wide application (language/theme) deferred.
 
 ### 8.9 Auth & Profile Settings
 
-- [ ] Login page titled "Admin Login"; no forgot-password flow (`LoginPage.tsx:72-77`).
-- [ ] Login-page inline signup bypasses the email-verification flow that onboarding enforces
-      (`LoginPage.tsx:25-33`) — unify signup paths.
-- [ ] Profile Settings: notification toggles and regional settings (language/timezone) are
-      UI-only, never saved (`ProfileSettingsDrawer.tsx:495-581`).
-- [ ] Change Password / Download My Data / Delete Account buttons have no handlers
-      (`ProfileSettingsDrawer.tsx:610-626`).
-- [ ] "Verified Account" badge always shown regardless of state (`ProfileSettingsDrawer.tsx:281`).
+- [x] Login page title — Fixed 2026-06-06: "Admin Login" → "Sign In".
+- [x] Login-page signup bypass — Fixed 2026-06-06: inline signup now routes to `onCreateAccount` (onboarding) instead of calling `signUp` directly.
+- [x] Notification toggles + regional settings — Fixed 2026-06-06: load from `user_preferences`, saved on form submit.
+- [x] Change Password — Fixed 2026-06-06: wired to `supabase.auth.updateUser()` with inline form.
+- [ ] Download My Data / Delete Account — no handlers (deferred — needs backend support).
+- [x] "Verified Account" badge — Fixed 2026-06-06: gated on `email_verified` from `user_profiles`.
 
 ### 8.10 Provider/Admin
 
 - [ ] `ProviderAdminPage` stats (`appointments_today`, `pending_forms`, `active_staff`) are
       hardcoded; Quick Actions / Add Patient / View buttons have no handlers
       (`ProviderAdminPage.tsx:76-315`).
-- [ ] Provider record submission: submit succeeds even if some file uploads fail; surface
-      partial failures (`record-request/index.ts:540-543`).
+- [x] Record submission partial failures — Fixed 2026-06-06: `fileErrors[]` collected per file; response now includes `filesFailed`, `fileErrors[]`, and `success: false` when any upload fails.
 
 ### 8.11 AI Assistant flows
 
@@ -285,4 +283,4 @@ this audit (demo UUIDs, dual backends, tool/schema mismatches, missing tools).
 
 ---
 
-_Last updated: 2026-06-05_
+_Last updated: 2026-06-06_

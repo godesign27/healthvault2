@@ -25,7 +25,14 @@ export function ProfileSettingsDrawer({
   const [imageUrl, setImageUrl] = useState('');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [language, setLanguage] = useState('en-US');
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,19 +101,31 @@ export function ProfileSettingsDrawer({
       const userId = session?.user?.id;
       if (!userId) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: userId,
-          first_name: firstName,
-          last_name: lastName,
-          profile_photo_url: profileData.profilePhoto,
-          email: session.user.email,
-        }, {
-          onConflict: 'user_id'
-        });
+      const [profileErr, prefsErr] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .upsert({
+            user_id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            profile_photo_url: profileData.profilePhoto,
+            email: session.user.email,
+          }, { onConflict: 'user_id' })
+          .then(r => r.error),
+        supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: userId,
+            email_notifications: emailNotifications,
+            push_notifications: pushNotifications,
+            language,
+            timezone,
+          }, { onConflict: 'user_id' })
+          .then(r => r.error),
+      ]);
 
-      if (error) throw error;
+      if (profileErr) throw profileErr;
+      if (prefsErr) console.warn('Could not save preferences:', prefsErr);
 
       onSave?.(profileData);
       onClose();
@@ -133,19 +152,34 @@ export function ProfileSettingsDrawer({
             }));
           }
 
-          const { data, error } = await supabase
-            .from('user_profiles')
-            .select('first_name, last_name, profile_photo_url')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
+          const [profileRes, prefsRes] = await Promise.all([
+            supabase
+              .from('user_profiles')
+              .select('first_name, last_name, profile_photo_url, email_verified')
+              .eq('user_id', session.user.id)
+              .maybeSingle(),
+            supabase
+              .from('user_preferences')
+              .select('email_notifications, push_notifications, language, timezone')
+              .eq('user_id', session.user.id)
+              .maybeSingle(),
+          ]);
 
-          if (error) throw error;
+          if (profileRes.error) throw profileRes.error;
 
-          if (data) {
-            setFirstName(data.first_name || '');
-            setLastName(data.last_name || '');
-            setProfilePhoto(data.profile_photo_url);
-            setImageUrl(data.profile_photo_url || '');
+          if (profileRes.data) {
+            setFirstName(profileRes.data.first_name || '');
+            setLastName(profileRes.data.last_name || '');
+            setProfilePhoto(profileRes.data.profile_photo_url);
+            setImageUrl(profileRes.data.profile_photo_url || '');
+            setIsEmailVerified(profileRes.data.email_verified ?? false);
+          }
+
+          if (prefsRes.data) {
+            setEmailNotifications(prefsRes.data.email_notifications ?? true);
+            setPushNotifications(prefsRes.data.push_notifications ?? true);
+            if (prefsRes.data.language) setLanguage(prefsRes.data.language);
+            if (prefsRes.data.timezone) setTimezone(prefsRes.data.timezone);
           }
         } catch (error) {
           console.error('Failed to load profile:', error);
@@ -275,12 +309,14 @@ export function ProfileSettingsDrawer({
                   <Mail className="w-3 h-3" />
                   {userEmail}
                 </p>
-                <p className={`text-xs flex items-center gap-1.5 mt-1 ${
-                  'text-content-secondary'
-                }`}>
-                  <Shield className="w-3 h-3 text-emerald-500" />
-                  Verified Account
-                </p>
+                {isEmailVerified && (
+                  <p className={`text-xs flex items-center gap-1.5 mt-1 ${
+                    'text-content-secondary'
+                  }`}>
+                    <Shield className="w-3 h-3 text-emerald-500" />
+                    Verified Account
+                  </p>
+                )}
               </div>
             </div>
 
@@ -555,29 +591,36 @@ export function ProfileSettingsDrawer({
                 <label className={`block text-xs font-medium mb-1.5 ${
                   'text-content-primary'
                 }`}>Language</label>
-                <select className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                  darkMode
-                    ? 'bg-surface-raised border-stroke-default text-white'
-                    : 'bg-white border-stroke-default text-content-primary'
-                }`}>
-                  <option>English (US)</option>
-                  <option>Spanish</option>
-                  <option>French</option>
+                <select
+                  value={language}
+                  onChange={e => setLanguage(e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                    darkMode
+                      ? 'bg-surface-raised border-stroke-default text-white'
+                      : 'bg-white border-stroke-default text-content-primary'
+                  }`}
+                >
+                  <option value="en-US">English (US)</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
                 </select>
               </div>
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${
-                  'text-content-primary'
-                }`}>Timezone</label>
-                <select className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                  darkMode
-                    ? 'bg-surface-raised border-stroke-default text-white'
-                    : 'bg-white border-stroke-default text-content-primary'
-                }`}>
-                  <option>Pacific (PST)</option>
-                  <option>Mountain (MST)</option>
-                  <option>Central (CST)</option>
-                  <option>Eastern (EST)</option>
+                <label className={`block text-xs font-medium mb-1.5 ${'text-content-primary'}`}>Timezone</label>
+                <select
+                  value={timezone}
+                  onChange={e => setTimezone(e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                    darkMode
+                      ? 'bg-surface-raised border-stroke-default text-white'
+                      : 'bg-white border-stroke-default text-content-primary'
+                  }`}
+                >
+                  <option value="America/Los_Angeles">Pacific (PST/PDT)</option>
+                  <option value="America/Denver">Mountain (MST/MDT)</option>
+                  <option value="America/Chicago">Central (CST/CDT)</option>
+                  <option value="America/New_York">Eastern (EST/EDT)</option>
+                  <option value="UTC">UTC</option>
                 </select>
               </div>
             </div>
@@ -607,13 +650,40 @@ export function ProfileSettingsDrawer({
             </div>
 
             <div className="space-y-3">
-              <button className={`w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors text-left ${
-                darkMode
-                  ? 'border-stroke-default hover:bg-surface-sunken text-content-primary'
-                  : 'border-stroke-default hover:bg-surface-sunken text-content-primary'
-              }`}>
+              <button
+                onClick={() => { setShowPasswordForm(v => !v); setPasswordError(null); setPasswordSuccess(false); setNewPassword(''); }}
+                className={`w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors text-left ${
+                  darkMode
+                    ? 'border-stroke-default hover:bg-surface-sunken text-content-primary'
+                    : 'border-stroke-default hover:bg-surface-sunken text-content-primary'
+                }`}
+              >
                 Change Password
               </button>
+              {showPasswordForm && (
+                <div className="mt-2 p-4 rounded-lg bg-surface-sunken space-y-3">
+                  <input
+                    type="password"
+                    placeholder="New password (min 8 characters)"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm border-stroke-default bg-white text-content-primary"
+                  />
+                  {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
+                  {passwordSuccess && <p className="text-xs text-emerald-600">Password updated successfully.</p>}
+                  <button
+                    onClick={async () => {
+                      setPasswordError(null);
+                      if (newPassword.length < 8) { setPasswordError('Password must be at least 8 characters.'); return; }
+                      const { error } = await supabase.auth.updateUser({ password: newPassword });
+                      if (error) { setPasswordError(error.message); } else { setPasswordSuccess(true); setNewPassword(''); setShowPasswordForm(false); }
+                    }}
+                    className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              )}
               <button className={`w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors text-left ${
                 darkMode
                   ? 'border-stroke-default hover:bg-surface-sunken text-content-primary'

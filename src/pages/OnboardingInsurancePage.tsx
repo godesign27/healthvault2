@@ -81,21 +81,57 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
         cardBackUrl = await uploadCard(cardBackFile, 'back', userId);
       }
 
+      // Find or create an insurance_providers entry for the carrier name
+      let { data: existingProvider } = await supabase
+        .from('insurance_providers')
+        .select('id')
+        .ilike('name', formData.carrierName.trim())
+        .maybeSingle();
+
+      let providerId = existingProvider?.id;
+
+      if (!providerId) {
+        const slug = formData.carrierName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const { data: newProvider, error: providerError } = await supabase
+          .from('insurance_providers')
+          .insert({ name: formData.carrierName.trim(), slug, is_popular: false })
+          .select('id')
+          .single();
+        if (providerError) throw providerError;
+        providerId = newProvider.id;
+      }
+
+      // Write to insurance_coverages (what the rest of the app reads)
       const { error } = await supabase
-        .from('insurance_policies')
+        .from('insurance_coverages')
         .insert({
           user_id: userId,
-          carrier_name: formData.carrierName,
-          member_id: formData.memberId,
+          provider_id: providerId,
+          plan_name: formData.carrierName.trim(),
+          member_id_hash: formData.memberId.trim(),
           group_number: formData.groupNumber || null,
-          plan_type: formData.planType || null,
-          claims_phone: formData.claimsPhone || null,
-          card_front_url: cardFrontUrl,
-          card_back_url: cardBackUrl,
-          is_primary: true
+          relationship: 'self',
+          effective_start: new Date().toISOString(),
+          is_primary: true,
+          coverage_status: 'active',
+          verification_status: 'connected',
+          source: 'manual',
         });
 
       if (error) throw error;
+
+      // Also write to insurance_policies for backward compatibility / card images
+      await supabase.from('insurance_policies').insert({
+        user_id: userId,
+        carrier_name: formData.carrierName,
+        member_id: formData.memberId,
+        group_number: formData.groupNumber || null,
+        plan_type: formData.planType || null,
+        claims_phone: formData.claimsPhone || null,
+        card_front_url: cardFrontUrl,
+        card_back_url: cardBackUrl,
+        is_primary: true,
+      }).then(() => {}).catch(() => {}); // non-blocking
 
       onNext();
     } catch (error) {
@@ -117,18 +153,14 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "I don't have insurance",
-      onClick: onSkip
-    },
-    {
-      label: "Help me read my card",
-      onClick: () => alert("Your insurance card typically shows:\n• Carrier name (Blue Cross, Aetna, etc.)\n• Member/Subscriber ID\n• Group number\n• Claims phone number\n\nYou can take photos of both sides to save for later reference.")
-    },
-    {
-      label: "Use demo data",
-      onClick: fillDemoData
-    }
+    { label: "I don't have insurance", onClick: onSkip },
+    { label: "Use demo data", onClick: fillDemoData },
+  ];
+
+  const suggestedQuestions = [
+    "How do I read my insurance card?",
+    "What is a group number?",
+    "Is it safe to enter my member ID here?",
   ];
 
   const inputClass = (fieldName: string) => `w-full px-4 py-2 rounded-lg border ${
@@ -154,6 +186,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
           title="Add Insurance (Optional)"
           message="Adding your insurance helps us verify coverage, track claims, and connect with providers. This is optional and can be done later from your Insurance page."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }

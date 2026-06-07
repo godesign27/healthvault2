@@ -83,18 +83,13 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Why do I need to create an account?",
-      onClick: () => alert("Creating an account allows you to securely store and access your health information from anywhere. Your data is encrypted and protected with HIPAA-compliant security.")
-    },
-    {
-      label: "What if I already have an account?",
-      onClick: () => alert("If you already have an account, please use the 'Log In' button instead of 'Get Started'.")
-    },
-    {
-      label: "Use demo data",
-      onClick: fillDemoData
-    }
+    { label: "Use demo data", onClick: fillDemoData },
+  ];
+
+  const suggestedQuestions = [
+    "Why do I need to create an account?",
+    "What if I already have an account?",
+    "How is my password protected?",
   ];
 
   const inputClass = (fieldName: string) => `w-full px-4 py-2 pr-12 rounded-lg border ${
@@ -120,6 +115,7 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
           title="Create Your Account"
           message="Let's start by creating your secure Health Vault account. You'll use this email and password to access your health information anytime, anywhere."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }

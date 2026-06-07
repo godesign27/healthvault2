@@ -14,6 +14,12 @@ export function StatusBadge({ status, darkMode = false }: StatusBadgeProps) {
       bgClass: 'bg-emerald-600',
       textClass: 'text-white',
     },
+    verified: {
+      icon: CheckCircle2,
+      label: 'Verified',
+      bgClass: 'bg-emerald-600',
+      textClass: 'text-white',
+    },
     verifying: {
       icon: Clock,
       label: 'Verifying',

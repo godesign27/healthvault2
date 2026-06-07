@@ -124,18 +124,13 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Why do I need to verify my email?",
-      onClick: () => alert("Email verification ensures that you have access to the email address you provided and helps keep your account secure. It's a required step to protect your health information.")
-    },
-    {
-      label: "I didn't receive a code",
-      onClick: () => alert("Please check your spam/junk folder. If you still don't see it, wait for the timer to expire and click 'Resend Code'.")
-    },
-    {
-      label: "Can I change my email?",
-      onClick: onBack
-    }
+    { label: "Change my email", onClick: onBack },
+  ];
+
+  const suggestedQuestions = [
+    "Why do I need to verify my email?",
+    "I didn't receive a code — what should I do?",
+    "How long is the verification code valid?",
   ];
 
   const inputClass = `w-10 h-12 text-center text-xl font-semibold rounded-lg border-2 ${
@@ -155,8 +150,9 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         <OnboardingAssistantPanel
           step="1 of 5"
           title="Verify Your Email"
-          message="We've sent an 6-digit verification code to your email address. Please enter it below to continue."
+          message="We've sent a 6-digit verification code to your email address. Please enter it below to continue."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }

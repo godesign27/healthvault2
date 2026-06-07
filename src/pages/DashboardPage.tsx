@@ -1,4 +1,4 @@
-import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
+import { FileText, Activity, Calendar, Pill, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../providers/ThemeProvider';
 import { Surface } from '../providers/SurfaceProvider';
@@ -20,6 +20,31 @@ import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
+}
+
+interface ActivityItem {
+  id: string;
+  kind: 'record' | 'request' | 'medication';
+  title: string;
+  subtitle: string;
+  timestamp: string;
+}
+
+function relativeTime(iso: string | null): string {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const diffMs = Date.now() - then;
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`;
+  const weeks = Math.round(days / 7);
+  if (weeks < 5) return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export default function DashboardPage({ onViewChange }: DashboardPageProps) {
@@ -68,6 +93,9 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   const [receivedRequests, setReceivedRequests] = useState<RecordRequestRow[]>([]);
   const [userFirstName, setUserFirstName] = useState<string | null>(null);
   const [dashboardStats, setDashboardStats] = useState({ records: 0, medications: 0, appointments: 0 });
+  const [formsCount, setFormsCount] = useState<number | null>(null);
+  const [vaultStats, setVaultStats] = useState<{ connectedProviders: number; pendingRequests: number; lastSyncedAt: string | null } | null>(null);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem('dismissedRecordBanners');
@@ -94,11 +122,12 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       if (!session?.user?.id) return;
       const userId = session.user.id;
 
-      const [profileRes, recordsRes, medsRes, apptRes] = await Promise.all([
+      const [profileRes, recordsRes, medsRes, apptRes, patientRes] = await Promise.all([
         supabase.from('user_profiles').select('first_name').eq('user_id', userId).maybeSingle(),
         supabase.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'scheduled'),
+        supabase.from('patient_profiles').select('id').eq('user_id', userId).maybeSingle(),
       ]);
 
       if (profileRes.data?.first_name) setUserFirstName(profileRes.data.first_name);
@@ -107,6 +136,76 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         medications: medsRes.count ?? 0,
         appointments: apptRes.count ?? 0,
       });
+
+      // Completed medical forms count (form_responses is keyed by patient_profiles.id)
+      if (patientRes.data?.id) {
+        const { count: formsDone } = await supabase
+          .from('form_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('patient_id', patientRes.data.id)
+          .in('status', ['completed', 'signed']);
+        setFormsCount(formsDone ?? 0);
+      } else {
+        setFormsCount(0);
+      }
+
+      // Connected providers / pending requests / last sync via vault-stats
+      try {
+        const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vault-stats`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        if (res.ok) {
+          const s = await res.json();
+          setVaultStats({
+            connectedProviders: s.connectedProviders ?? 0,
+            pendingRequests: s.pendingRequests ?? 0,
+            lastSyncedAt: s.lastSyncedAt ?? null,
+          });
+        }
+      } catch { /* non-blocking */ }
+
+      // Recent activity feed from real data (records + received requests + medications)
+      const [recRows, reqRows, medRows] = await Promise.all([
+        supabase.from('health_records').select('id, title, kind, provider_name, received_at, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('health_record_requests').select('id, provider_name, doctor_name, status, submitted_at, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('medications').select('id, name, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+      ]);
+
+      const activity: ActivityItem[] = [];
+      for (const r of recRows.data ?? []) {
+        activity.push({
+          id: `rec-${r.id}`,
+          kind: 'record',
+          title: r.title || 'Health record added',
+          subtitle: r.provider_name || (r.kind ? String(r.kind) : 'Health record'),
+          timestamp: r.received_at || r.created_at,
+        });
+      }
+      for (const r of reqRows.data ?? []) {
+        if (r.status === 'received') {
+          activity.push({
+            id: `req-${r.id}`,
+            kind: 'request',
+            title: `Records received from ${r.doctor_name || r.provider_name}`,
+            subtitle: 'Requested records are now available',
+            timestamp: r.submitted_at || r.created_at,
+          });
+        }
+      }
+      for (const m of medRows.data ?? []) {
+        activity.push({
+          id: `med-${m.id}`,
+          kind: 'medication',
+          title: `Medication added: ${m.name}`,
+          subtitle: 'Added to your medications',
+          timestamp: m.created_at,
+        });
+      }
+      activity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      setRecentActivity(activity.slice(0, 4));
     };
     loadUserData().catch(() => {});
   }, []);
@@ -275,7 +374,13 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               icon={<FileText className="w-5 h-5" />}
               title="Health Records"
               value={String(dashboardStats.records)}
-              subtitle={dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`}
+              subtitle={
+                vaultStats && vaultStats.connectedProviders > 0
+                  ? `${dashboardStats.records} total · ${vaultStats.connectedProviders} connected`
+                  : vaultStats?.lastSyncedAt
+                    ? `Last synced ${relativeTime(vaultStats.lastSyncedAt)}`
+                    : dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`
+              }
               iconBgColor="bg-indigo-50"
               iconColor="text-indigo-600"
               darkMode={darkMode}
@@ -286,8 +391,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <HealthStatsCard
               icon={<Activity className="w-5 h-5" />}
               title="Medical Forms"
-              value="—"
-              subtitle="View in Medical Forms"
+              value={formsCount === null ? '—' : String(formsCount)}
+              subtitle={formsCount ? `${formsCount} completed` : 'None completed yet'}
               iconBgColor="bg-emerald-50"
               iconColor="text-emerald-600"
               darkMode={darkMode}
@@ -329,21 +434,30 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <p className="text-sm mb-6 text-content-secondary">Common tasks to manage your health data</p>
 
             <div className="flex flex-col gap-3 mt-auto">
-              <button className="flex items-center justify-center gap-2 rounded-lg bg-action-primary px-5 py-3 text-sm font-medium text-content-on-action transition-all hover:-translate-y-0.5 hover:bg-action-primary-hover hover:shadow-lg hover:shadow-black/20">
+              <button
+                onClick={() => setCurrentPage('medical-forms')}
+                className="flex items-center justify-center gap-2 rounded-lg bg-action-primary px-5 py-3 text-sm font-medium text-content-on-action transition-all hover:-translate-y-0.5 hover:bg-action-primary-hover hover:shadow-lg hover:shadow-black/20"
+              >
                 <FileText className="w-4 h-4" />
-                Download Medical Forms
+                View Medical Forms
               </button>
-              <button className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md">
+              <button
+                onClick={() => setCurrentPage('care')}
+                className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md"
+              >
                 <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
                   <Activity className="w-4 h-4" />
                   View Care History
                 </div>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
-              <button className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md">
+              <button
+                onClick={() => setIsAIPanelOpen(true)}
+                className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md"
+              >
                 <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
-                  <Calendar className="w-4 h-4" />
-                  Schedule Appointment
+                  <Sparkles className="w-4 h-4" />
+                  Ask the AI Assistant
                 </div>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
@@ -361,39 +475,46 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <p className="text-sm mb-6 text-content-secondary">Your latest health updates</p>
 
             <div className="space-y-3 flex-1">
-              <RecentActivityItem
-                icon={<Heart className="w-5 h-5" />}
-                title="Annual Physical Examination"
-                subtitle="Completed with Dr. Sarah Johnson"
-                time="2 days ago"
-                iconBgColor="bg-rose-50"
-                iconColor="text-rose-600"
-                darkMode={darkMode}
-              />
-              <RecentActivityItem
-                icon={<Activity className="w-5 h-5" />}
-                title="Lab Results Updated"
-                subtitle="Complete Blood Count (CBC) - Normal"
-                time="5 days ago"
-                iconBgColor="bg-emerald-50"
-                iconColor="text-emerald-600"
-                darkMode={darkMode}
-              />
-              <RecentActivityItem
-                icon={<Pill className="w-5 h-5" />}
-                title="Prescription Refilled"
-                subtitle="Albuterol Inhaler - 3 refills remaining"
-                time="1 week ago"
-                iconBgColor="bg-indigo-50"
-                iconColor="text-indigo-600"
-                darkMode={darkMode}
-              />
+              {recentActivity.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-surface-sunken">
+                    <Activity className="w-6 h-6 text-content-tertiary" />
+                  </div>
+                  <p className="text-sm text-content-secondary">No recent activity yet</p>
+                  <p className="text-xs mt-1 text-content-tertiary">Records, requests, and medications will show up here.</p>
+                </div>
+              ) : (
+                recentActivity.map(item => {
+                  const cfg = item.kind === 'request'
+                    ? { icon: <CheckCircle className="w-5 h-5" />, bg: 'bg-emerald-50', color: 'text-emerald-600' }
+                    : item.kind === 'medication'
+                      ? { icon: <Pill className="w-5 h-5" />, bg: 'bg-rose-50', color: 'text-rose-600' }
+                      : { icon: <FileText className="w-5 h-5" />, bg: 'bg-indigo-50', color: 'text-indigo-600' };
+                  return (
+                    <RecentActivityItem
+                      key={item.id}
+                      icon={cfg.icon}
+                      title={item.title}
+                      subtitle={item.subtitle}
+                      time={relativeTime(item.timestamp)}
+                      iconBgColor={cfg.bg}
+                      iconColor={cfg.color}
+                      darkMode={darkMode}
+                    />
+                  );
+                })
+              )}
             </div>
 
-            <button className="group mt-6 flex items-center gap-2 text-sm font-medium text-action-primary transition-colors hover:text-action-primary-hover">
-              View All Activity
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
+            {recentActivity.length > 0 && (
+              <button
+                onClick={() => setCurrentPage('health-records')}
+                className="group mt-6 flex items-center gap-2 text-sm font-medium text-action-primary transition-colors hover:text-action-primary-hover"
+              >
+                View All Activity
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            )}
           </div>
         </div>
       </div>

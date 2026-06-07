@@ -104,7 +104,8 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
   useEffect(() => {
     loadData();
     if (actionsRef) {
-      actionsRef.current = { refreshData: loadData };
+      // openAddProvider is handled by the Network page — noop here so callers don't error
+      actionsRef.current = { openAddProvider: () => {}, refreshData: loadData };
     }
   }, []);
 
@@ -387,7 +388,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => { setIsSearchExpanded(false); setSearchQuery(''); }}
+                    onBlur={() => { if (!searchQuery) setIsSearchExpanded(false); }}
                     className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all bg-surface-raised border-stroke-subtle text-content-primary placeholder:text-content-placeholder"
                     style={{ minWidth: '300px' }}
                   />
@@ -395,7 +396,13 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
               )}
             </div>
 
-            <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+            <button
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href).catch(() => {});
+              }}
+              title="Copy link to this page"
+            >
               <Share2 className="w-4 h-4" />
               Share Link
             </button>

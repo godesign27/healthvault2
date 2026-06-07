@@ -298,10 +298,11 @@ export async function fetchNearbyPharmacies(
   userId?: string,
   query?: string
 ): Promise<PharmacySearchResult> {
+  const effectiveUserId = await resolveUserId(userId);
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('address_line1, address_line2, city, state, postal_code')
-    .eq('id', userId)
+    .eq('user_id', effectiveUserId)
     .maybeSingle();
 
   let addressContext: AddressContext | null = null;
@@ -320,7 +321,7 @@ export async function fetchNearbyPharmacies(
   let dbQuery = supabase
     .from('pharmacies')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', effectiveUserId)
     .order('preferred', { ascending: false })
     .order('name', { ascending: true })
     .limit(20);

@@ -43,7 +43,9 @@ Deno.serve(async (req: Request) => {
     // Get the most recent active connection and its sync time
     const { data: connections, error } = await sb
       .from("provider_connections")
-      .select("id, ehr_source, provider_name, status, last_synced_at")
+      .select(
+        "id, ehr_source, status, last_synced_at, provider_organizations ( name )",
+      )
       .eq("user_id", user.id)
       .order("last_synced_at", { ascending: false, nullsFirst: false })
       .limit(10);
@@ -66,13 +68,19 @@ Deno.serve(async (req: Request) => {
     return json({
       lastSyncedAt,
       status: overallStatus,
-      connections: rows.map((r) => ({
-        id: r.id,
-        ehrSource: r.ehr_source,
-        providerName: r.provider_name ?? r.ehr_source,
-        status: r.status,
-        lastSyncedAt: r.last_synced_at ?? null,
-      })),
+      connections: rows.map((r) => {
+        const org = r.provider_organizations as { name?: string } | null | undefined;
+        const orgName = org && typeof org === "object" && "name" in org
+          ? String(org.name ?? "").trim()
+          : "";
+        return {
+          id: r.id,
+          ehrSource: r.ehr_source,
+          providerName: orgName || r.ehr_source || "Connected provider",
+          status: r.status,
+          lastSyncedAt: r.last_synced_at ?? null,
+        };
+      }),
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Internal error";

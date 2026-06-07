@@ -275,7 +275,8 @@ export function ProviderRecordConnectionFlow({
   const handleImportConfirm = async (selectedData: any) => {
     setStep('importing');
     try {
-      const results = await importMedicalRecords(selectedData);
+      const providerName = selectedOrg?.name || resolution?.providerOrganization?.name || initialProviderName;
+      const results = await importMedicalRecords({ ...selectedData, providerName });
       setImportResults(results);
       setStep('complete');
       if (onRefreshData) await onRefreshData();
