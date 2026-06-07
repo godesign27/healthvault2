@@ -113,12 +113,26 @@ Deno.serve(async (req: Request) => {
       }
 
       const formResponseIds = shareEvent.form_response_ids || [];
-      const forms = formResponseIds.map((formId: string) => ({
-        id: formId,
-        title: getFormTitle(formId),
-        version: '2025.01',
-        signedAt: shareEvent.sent_at || new Date().toISOString(),
-      }));
+      // form_response_ids are form_responses UUIDs; resolve titles via their template_id.
+      let formRows: any[] = [];
+      if (formResponseIds.length > 0) {
+        const { data: frs } = await supabase
+          .from('form_responses')
+          .select('id, template_id, signed_at')
+          .in('id', formResponseIds);
+        formRows = frs || [];
+      }
+      const formRowById = new Map(formRows.map((fr: any) => [fr.id, fr]));
+      const forms = formResponseIds.map((formId: string) => {
+        const fr = formRowById.get(formId);
+        const templateId = fr?.template_id || formId;
+        return {
+          id: formId,
+          title: getFormTitle(templateId),
+          version: '2025.01',
+          signedAt: fr?.signed_at || shareEvent.sent_at || new Date().toISOString(),
+        };
+      });
 
       const payload = {
         id: shareEvent.id,

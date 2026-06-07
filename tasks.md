@@ -200,11 +200,17 @@ user. Citations are `file:line` at time of audit.
 
 ### 8.3 Medical Forms + Secure Share
 
-- [ ] Forms list/open/edit is hardcoded mock; not wired to `form_templates`/`form_responses`
-      (`MedicalFormsPage.tsx:77-239`, `FormDrawer.tsx:36-274`). `FormDrawer` Save only exits
-      edit mode (no persist); the real save path exists only via the AI tool.
-- [ ] Share flow uses demo patient + template slugs (not `form_responses` UUIDs); AI
-      `shareForm` payload shape mismatches the `share` function contract.
+- [x] Forms list/open/edit wired to real data — Fixed 2026-06-07. Catalog extracted to
+      `src/lib/forms/catalog.ts` (structure) + `src/lib/forms/responses.ts` (load/save).
+      `MedicalFormsPage` derives status/stats from the user's `form_responses`; `FormDrawer`
+      loads saved answers and **persists** on Save (upsert). Migration `20260607000001` seeds
+      the 18 `form_templates` (required FK), adds a unique `(patient_id, template_id)` index,
+      and **fixes a fatal RLS/FK contradiction** that had made the table unwritable. Forms **autopopulate** from
+      profile/clinical data (`src/lib/forms/autopopulate.ts`); saved answers take precedence on Save.
+- [x] Share flow now uses real `form_responses` UUIDs — Fixed 2026-06-07: selected completed
+      forms map to their response UUID, so `share` builds real PDFs and the recipient view
+      resolves titles via `template_id` (redeployed). Patient lookup fixed (`user_id` + name).
+- [ ] AI `shareForm` payload shape still mismatches the `share` contract (Edge-side; pending).
 - [x] Share function PDFs — Fixed 2026-06-05: generates real HTML document from `form_responses` data with actual field answers. Patient DOB fetched from `user_profiles` (was hardcoded `1985-06-22`).
 - [x] Share revoke/opened auth — Fixed 2026-06-05: revoke checks ownership (`patient_id === user.id`, returns 403 if mismatch); opened validates `share_token`.
 - [x] Ensure every user has a `patient_profiles` row — Fixed 2026-06-06 via migration
@@ -283,4 +289,4 @@ this audit (demo UUIDs, dual backends, tool/schema mismatches, missing tools).
 
 ---
 
-_Last updated: 2026-06-06_
+_Last updated: 2026-06-07_
