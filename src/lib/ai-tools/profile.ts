@@ -98,6 +98,13 @@ export const UpdateMedicalProfileInputZ = z.object({
   lastName: z.string().optional(),
   phone: z.string().optional(),
   dateOfBirth: z.string().optional(),
+  addressLine1: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postalCode: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactRelationship: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
   confirmed: z.boolean(),
 });
 
@@ -124,7 +131,13 @@ export async function updateMedicalProfile(
 
     const effectiveUserId = userId || DEMO_USER_ID;
 
-    const updates: Record<string, string> = {};
+    const { data: existing } = await supabase
+      .from('user_profiles')
+      .select('emergency_contact')
+      .eq('user_id', effectiveUserId)
+      .maybeSingle();
+
+    const updates: Record<string, unknown> = {};
     const fieldNames: string[] = [];
 
     if (parsed.data.firstName !== undefined) {
@@ -142,6 +155,38 @@ export async function updateMedicalProfile(
     if (parsed.data.dateOfBirth !== undefined) {
       updates.date_of_birth = parsed.data.dateOfBirth;
       fieldNames.push('date of birth');
+    }
+    if (parsed.data.addressLine1 !== undefined) {
+      updates.address_line1 = parsed.data.addressLine1;
+      fieldNames.push('address');
+    }
+    if (parsed.data.city !== undefined) {
+      updates.city = parsed.data.city;
+      fieldNames.push('city');
+    }
+    if (parsed.data.state !== undefined) {
+      updates.state = parsed.data.state;
+      fieldNames.push('state');
+    }
+    if (parsed.data.postalCode !== undefined) {
+      updates.postal_code = parsed.data.postalCode;
+      fieldNames.push('postal code');
+    }
+
+    const hasEmergency =
+      parsed.data.emergencyContactName !== undefined ||
+      parsed.data.emergencyContactRelationship !== undefined ||
+      parsed.data.emergencyContactPhone !== undefined;
+
+    if (hasEmergency) {
+      const ec = {
+        ...((existing?.emergency_contact as Record<string, string>) || {}),
+      };
+      if (parsed.data.emergencyContactName !== undefined) ec.name = parsed.data.emergencyContactName;
+      if (parsed.data.emergencyContactRelationship !== undefined) ec.relationship = parsed.data.emergencyContactRelationship;
+      if (parsed.data.emergencyContactPhone !== undefined) ec.phone = parsed.data.emergencyContactPhone;
+      updates.emergency_contact = ec;
+      fieldNames.push('emergency contact');
     }
 
     if (fieldNames.length === 0) {

@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle, ShieldCheck, User } from 'lucide-react';
+import { X, Search, Building2, Send, ChevronRight, CheckCircle, Clock, FileText, FlaskConical, ScanLine, Microscope, Stethoscope, ArrowLeft, PenLine, Mail, AlertCircle, ShieldCheck } from 'lucide-react';
 import { RecordKind } from '../../lib/records/types';
 import { createRecordRequest } from '../../lib/records/requests-api';
 import { supabase } from '../../lib/supabase';
+import {
+  orgToRecordRequestProvider,
+  searchProviderOrganizationsClient,
+  type RecordRequestProviderOption,
+} from '../../lib/network/organization-directory';
 
 interface PatientProfileSnapshot {
   dateOfBirth: string;
@@ -60,24 +65,7 @@ interface RequestRecordDrawerProps {
   darkMode?: boolean;
 }
 
-interface ProviderOption {
-  id: string;
-  name: string;
-  specialty: string;
-  clinic: string;
-  address: string;
-}
-
-const MOCK_PROVIDERS: ProviderOption[] = [
-  { id: '1', name: 'Dr. Sarah Chen', specialty: 'Internal Medicine', clinic: 'Springfield Medical Center', address: '123 Main St, Springfield, IL' },
-  { id: '2', name: 'Dr. Michael Rivera', specialty: 'Cardiology', clinic: 'Heart Health Associates', address: '456 Oak Ave, Springfield, IL' },
-  { id: '3', name: 'Dr. Emily Watson', specialty: 'Dermatology', clinic: 'Skin Care Clinic', address: '789 Elm St, Springfield, IL' },
-  { id: '4', name: 'Dr. James Park', specialty: 'Orthopedics', clinic: 'Joint & Bone Specialists', address: '321 Pine Rd, Springfield, IL' },
-  { id: '5', name: 'Dr. Lisa Thompson', specialty: 'Neurology', clinic: 'Brain & Spine Institute', address: '654 Maple Dr, Springfield, IL' },
-  { id: '6', name: 'Springfield General Hospital', specialty: 'Hospital', clinic: 'Springfield General Hospital', address: '100 Hospital Blvd, Springfield, IL' },
-  { id: '7', name: 'Midwest Imaging Center', specialty: 'Radiology', clinic: 'Midwest Imaging Center', address: '200 Diagnostic Way, Springfield, IL' },
-  { id: '8', name: 'Premier Lab Services', specialty: 'Laboratory', clinic: 'Premier Lab Services', address: '50 Science Park, Springfield, IL' },
-];
+interface ProviderOption extends RecordRequestProviderOption {}
 
 const RECORD_TYPES = [
   { kind: RecordKind.Lab, label: 'Lab Results', icon: FlaskConical, description: 'Blood work, urinalysis, cultures' },
@@ -113,6 +101,10 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
   const [editPhone, setEditPhone] = useState('');
   const [editEmail, setEditEmail] = useState('');
 
+  const [providerResults, setProviderResults] = useState<ProviderOption[]>([]);
+  const [providerSearchLoading, setProviderSearchLoading] = useState(false);
+  const [providerEmail, setProviderEmail] = useState('');
+
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -137,13 +129,27 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  const missingFields = profileLoaded && (!editDob || !editPhone || !editEmail);
+  const loadProviderResults = useCallback(async (query: string) => {
+    setProviderSearchLoading(true);
+    try {
+      const orgs = await searchProviderOrganizationsClient(query.trim() || undefined, 20);
+      setProviderResults(orgs.map(orgToRecordRequestProvider));
+    } catch {
+      setProviderResults([]);
+    } finally {
+      setProviderSearchLoading(false);
+    }
+  }, []);
 
-  const filteredProviders = MOCK_PROVIDERS.filter(p =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.clinic.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    if (!isOpen || step !== 'provider') return;
+    const timer = setTimeout(() => {
+      loadProviderResults(searchQuery);
+    }, searchQuery.trim() ? 300 : 0);
+    return () => clearTimeout(timer);
+  }, [isOpen, step, searchQuery, loadProviderResults]);
+
+  const filteredProviders = providerResults;
 
   const toggleRecordType = (kind: RecordKind) => {
     setSelectedTypes(prev =>
@@ -173,13 +179,17 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
       setSubmitError('Please complete your identity information before sending.');
       return;
     }
+    if (!providerEmail.trim()) {
+      setSubmitError('Please enter the medical records email for this provider.');
+      return;
+    }
     setSubmitting(true);
     setSubmitError('');
     try {
       await saveProfileIfNeeded();
       const result = await createRecordRequest({
         providerName: selectedProvider.clinic || selectedProvider.name,
-        providerEmail: `records@${selectedProvider.clinic.toLowerCase().replace(/\s+/g, '')}.com`,
+        providerEmail: providerEmail.trim(),
         doctorName: selectedProvider.name,
         recordTypes: selectedTypes,
         urgency,
@@ -216,7 +226,15 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
       });
       setEmailSent(result.emailSent);
       setEmailError(result.emailError || '');
-      setSelectedProvider({ id: 'manual', name: manualDoctorName || manualProviderName, specialty: '', clinic: manualProviderName, address: '' });
+      setSelectedProvider({
+        id: 'manual',
+        name: manualDoctorName || manualProviderName,
+        specialty: '',
+        clinic: manualProviderName,
+        address: '',
+        organizationId: 'manual',
+        supportsManualRequest: true,
+      });
       setSelectedTypes(manualRecordTypes);
       setStep('submitted');
       onRequestSent?.();
@@ -250,9 +268,11 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
     setEmailError('');
     setSubmitError('');
     setProfileLoaded(false);
+    setProviderResults([]);
+    setProviderEmail('');
   };
 
-  const canSubmit = selectedProvider && selectedTypes.length > 0;
+  const canSubmit = selectedProvider && selectedTypes.length > 0 && providerEmail.trim().length > 0;
   const canSubmitManual = manualProviderName.trim() && manualEmail.trim() && manualRecordTypes.length > 0;
 
   if (!isOpen) return null;
@@ -328,8 +348,10 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 setSearchQuery={setSearchQuery}
                 searchInputRef={searchInputRef}
                 filteredProviders={filteredProviders}
+                searching={providerSearchLoading}
                 onSelectProvider={(provider) => {
                   setSelectedProvider(provider);
+                  setProviderEmail('');
                   setStep('details');
                 }}
                 onManualEntry={() => setStep('manual')}
@@ -362,6 +384,8 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 onSetDob={setEditDob}
                 onSetPhone={setEditPhone}
                 onSetEmail={setEditEmail}
+                providerEmail={providerEmail}
+                onSetProviderEmail={setProviderEmail}
               />
             )}
 
@@ -511,12 +535,13 @@ function ManualEntryHeader({ darkMode, onBack, onClose }: { darkMode: boolean; o
   );
 }
 
-function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, filteredProviders, onSelectProvider, onManualEntry }: {
+function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, filteredProviders, searching, onSelectProvider, onManualEntry }: {
   darkMode: boolean;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement>;
   filteredProviders: ProviderOption[];
+  searching: boolean;
   onSelectProvider: (p: ProviderOption) => void;
   onManualEntry: () => void;
 }) {
@@ -532,7 +557,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by provider name, specialty, or clinic..."
+            placeholder="Search health systems by name, EHR, or city..."
           className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-colors ${
             darkMode
               ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-purple-500'
@@ -542,7 +567,13 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
       </div>
 
       <div className="space-y-2">
-        {filteredProviders.map((provider) => (
+        {searching && (
+          <div className={`text-center py-8 text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
+            Searching provider directory...
+          </div>
+        )}
+
+        {!searching && filteredProviders.map((provider) => (
           <button
             key={provider.id}
             onClick={() => onSelectProvider(provider)}
@@ -575,7 +606,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
           </button>
         ))}
 
-        {filteredProviders.length === 0 && (
+        {!searching && filteredProviders.length === 0 && (
           <div className={`text-center py-12 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             <Search className="w-10 h-10 mx-auto mb-3 opacity-50" />
             <p className="font-medium">No providers found</p>
@@ -822,7 +853,7 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
   );
 }
 
-function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, dateTo, notes, urgency, inputClasses, labelClasses, onChangeProvider, onToggleType, onSetDateFrom, onSetDateTo, onSetNotes, onSetUrgency, profileLoaded, editDob, editPhone, editEmail, onSetDob, onSetPhone, onSetEmail }: {
+function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, dateTo, notes, urgency, inputClasses, labelClasses, onChangeProvider, onToggleType, onSetDateFrom, onSetDateTo, onSetNotes, onSetUrgency, profileLoaded, editDob, editPhone, editEmail, onSetDob, onSetPhone, onSetEmail, providerEmail, onSetProviderEmail }: {
   darkMode: boolean;
   selectedProvider: ProviderOption | null;
   selectedTypes: RecordKind[];
@@ -845,6 +876,8 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
   onSetDob: (v: string) => void;
   onSetPhone: (v: string) => void;
   onSetEmail: (v: string) => void;
+  providerEmail: string;
+  onSetProviderEmail: (v: string) => void;
 }) {
   return (
     <div className="p-6 space-y-6">
@@ -872,6 +905,20 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
         >
           Change
         </button>
+      </div>
+
+      <div>
+        <label className={labelClasses}>Medical Records Email *</label>
+        <input
+          type="email"
+          value={providerEmail}
+          onChange={(e) => onSetProviderEmail(e.target.value)}
+          placeholder="records@hospital.org"
+          className={inputClasses}
+        />
+        <p className={`text-xs mt-1.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
+          Enter the email address where this organization accepts record requests.
+        </p>
       </div>
 
       <div>

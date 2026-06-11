@@ -113,7 +113,7 @@ handle all of it.
 
 Users will ask for these but the assistant currently cannot do them reliably:
 - [x] Share a completed form with a provider — Fixed 2026-06-07: `shareForm` tool payload aligned with `share` Edge Function (`forms[]` + `recipient.method`, not `formResponseIds`).
-- [ ] Update profile via chat (e.g. "change my phone") — `updateMedicalProfile` is Edge-only.
+- [x] Update profile via chat (e.g. "change my phone") — Fixed 2026-06-07: `updateMedicalProfile` Edge tool expanded (address + emergency contact); UI refreshes after successful tool via `toolEvents`.
 - [ ] Submit a medication refill to a pharmacy (no refill-submit tool).
 - [ ] Book / cancel an appointment (`getAppointments` is read-only; no create/cancel tool).
 - [ ] Upload a new health record via chat (no upload tool).
@@ -131,13 +131,18 @@ Users will ask for these but the assistant currently cannot do them reliably:
       existing tool handlers, and session management for persistent voice conversations.
       (Related functions already exist: `transcribe-audio`, `elevenlabs-tts`.)
 
-## 7. EHR integration — Keragon
+## 7. EHR integration — DIY first (Keragon optional fallback)
 
-- [ ] **Integrate Keragon** (third-party healthcare automation tool) to power the **EHR flow**.
-      This was in progress. Document the intended flow, what Keragon provides vs. what we build,
-      auth/keys, and which Edge Functions it touches (likely `records-import`, `inbound-records`,
-      `sync-status`, `providers`). Decide build vs. buy for the connection/import path.
-- [ ] Add Keragon API/docs reference link here.
+**Decision (2026-06-07):** Build EHR connect ourselves using the existing DIY architecture. Keragon remains an optional fallback if DIY blockers emerge (see §8.7 reference).
+
+- [ ] **Phase A — Foundation** (§8.7): connections UI, fix `fetchInsuranceContext` user ID, unify on `direct_provider_connection` / `epic_connection` (not Keragon-only paths in `vault-stats`).
+- [ ] **Phase B — Pilot FHIR:** SMART on FHIR OAuth + sync for one sandbox or partner org via `provider_organizations.fhir_endpoint_url`.
+  - [x] Edge functions: `fhir-oauth-start`, `fhir-oauth-callback`, `fhir-sync` (PKCE + live FHIR fetch)
+  - [x] Pilot org seeded: **SMART Health IT Sandbox (Pilot)** in migration `20260608000001`
+  - [x] Client: OAuth redirect in connect flow, `/connect/fhir/complete` page, live preview via `fetchProviderRecordPreview` → `fhir-sync`
+  - [ ] **Deploy + secrets:** set `FHIR_CLIENT_ID` (+ optional `FHIR_CLIENT_SECRET`, `APP_URL`, `FHIR_REDIRECT_URI`) and run migration
+- [ ] **Phase C — Scale:** add orgs to `provider_organizations` as partnerships land; keep manual record request as permanent fallback.
+- [ ] Keragon fallback (only if needed): wire `KERAGON_WEBHOOK_URL` in `providers` Edge Function; document in README.
 
 ## 8. Product audit — findings & gaps
 
@@ -189,9 +194,7 @@ user. Citations are `file:line` at time of audit.
       no single-record share endpoint exists; the `share` function is form-oriented. Feature
       build: needs a new endpoint.)**
 - [x] Provider import writes only medical-profile tables — Fixed 2026-06-06: `importMedicalRecords` now also inserts a `health_records` summary row (kind `specialist_report`, source `connected`) after a successful import.
-- [ ] "Request Manually" provider picker uses `MOCK_PROVIDERS` + fabricated
-      `records@{clinic}.com` emails (`RequestRecordDrawer.tsx:71-80,182`). **(Tied to §8.7
-      network directory mock — Phase 3.)**
+- [x] "Request Manually" provider picker — Fixed 2026-06-07: searches `provider_organizations`; user enters real records email on details step (no fabricated `records@{clinic}.com`).
 - [x] Copied provider-portal links omit `?token=` — Fixed 2026-06-06: `RecordRequestRow` now
       carries `secure_token`; Copy Link + View Portal append `?token=` so the portal no longer
       403s.
@@ -246,15 +249,35 @@ user. Citations are `file:line` at time of audit.
 
 ### 8.7 Network / Providers
 
-- [ ] In-network provider **directory** is static Springfield mock (`network-directory.ts`);
-      replace with real payer/NPI/`provider_organizations` search. Manual add search is also
-      mock (`clinical-connectors.ts`).
+**Architecture reference (DIY EHR — 2026-06-07):**
+
+Two provider concepts in the app:
+- **Care network** (`providers` / `pharmacies` tables) — user's saved doctors/pharmacies. Mostly real data today.
+- **EHR connections** (`provider_connections` + `provider_organizations`) — digital record import. Backend scaffolded; UI missing.
+
+**DIY connection strategies (already in code):**
+| Strategy | Code | Status |
+|----------|------|--------|
+| `direct_provider_connection` | `fhir-oauth-start` + `fhir-sync` | SMART on FHIR — **implemented** (needs `FHIR_CLIENT_ID` secret) |
+| `epic_connection` | same OAuth path | Epic/MyChart — uses org OAuth endpoints when configured |
+| `manual_fallback` | `record-request` Edge Function | **Works today** |
+| Inbound push | `inbound-records` Edge Function | API-key FHIR ingest — works for partners |
+
+**Keragon:** thin bolt-on in `supabase/functions/providers/index.ts` only (`connection_method: "keragon"` + webhook). AI connect flow uses DIY tools above, not Keragon. `vault-stats` still filters `connection_method = 'keragon'` — fix in Phase A.
+
+**Recommended implementation order:**
+1. Fix `fetchInsuranceContext` / `fetchCareNetwork` — call `resolveUserId()` (NetworkPage passes no user id today).
+2. **EHR connections panel** — wire `GET/POST/DELETE /functions/v1/providers` + `GET /functions/v1/sync-status` on Network or Health Records (reuse `ProviderRecordConnectionFlow` org search via `searchProviderOrganizations`).
+3. ~~**Directory unification**~~ — Done 2026-06-07: `provider-organizations.ts` + `organization-directory.ts`; wired ProvidersTab, AddProviderDrawer, RequestRecordDrawer.
+4. ~~Wire `RequestRecordDrawer` MOCK_PROVIDERS → org search.~~ Done 2026-06-07 (includes required records email field on details step).
+5. (Deferred) Pharmacy geocoding / payer directory API.
+6. ~~(Phase B) SMART on FHIR OAuth callback + live `fetchProviderRecordPreview`~~ — Done 2026-06-07: edge functions + pilot sandbox org; deploy secrets to activate.
+
+- [x] In-network provider **directory** — Fixed 2026-06-07: `network-directory.ts`, `clinical-connectors.ts`, and `RequestRecordDrawer` now search `provider_organizations` via shared `organization-directory.ts` helpers (same query as AI `searchProviderOrganizations`).
 - [x] `fetchNearbyPharmacies` query bug — Fixed 2026-06-06: `.eq('id', userId)` → `.eq('user_id', effectiveUserId)` on both `user_profiles` and `pharmacies` queries.
 - [ ] Nearby-pharmacy search is still mock data; map pinned to Springfield (deferred — needs real geocoding/payer-directory integration).
-- [ ] No first-class **EHR connections** UI: web never calls `providers` (list/connect/
-      disconnect) or `sync-status`; connect only happens via the AI flow. Add a connections +
-      sync-status panel (Network or Health Records).
-- [ ] `fetchInsuranceContext()` + add flows pass demo IDs (see §8.0).
+- [x] `fetchInsuranceContext()` missing `resolveUserId()` — Fixed 2026-06-07: `fetchInsuranceContext`, `fetchCareNetwork`, and `searchNetworkProviders` now resolve the session user id.
+- [x] **EHR connections UI (Phase A)** — Fixed 2026-06-07: `EhrConnectionsPanel` on Health Records calls `providers` + `sync-status`; disconnect wired; Connect opens existing flow. `vault-stats` counts all active connections (not Keragon-only).
 
 ### 8.8 Onboarding
 
@@ -289,4 +312,4 @@ this audit (demo UUIDs, dual backends, tool/schema mismatches, missing tools).
 
 ---
 
-_Last updated: 2026-06-07_
+_Last updated: 2026-06-07 (§8.7 Phase B SMART on FHIR pilot)_

@@ -208,6 +208,12 @@ export function ProviderRecordConnectionFlow({
       }
 
       if (connectResult?.success) {
+        const launchUrl = connectResult.data?.launchUrl;
+        if (launchUrl) {
+          window.location.href = launchUrl;
+          return;
+        }
+
         const status = connectResult.data?.status;
         if (status === 'not_configured' || status === 'not_supported') {
           setStep('fetching');

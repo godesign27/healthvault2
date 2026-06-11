@@ -1,11 +1,14 @@
 import { z } from "zod";
 import { createSupabaseServerClient } from "../supabase/server";
+import {
+  mapOrganizationRow,
+  organizationSearchFilter,
+} from "../network/provider-organizations";
 
 /**
- * SCAFFOLD NOTE: This tool queries the `provider_organizations` table which is
- * currently seeded with placeholder organizations. When a real provider directory
- * integration is available (e.g. CMS NPPES, Carequality), this tool should be
- * updated to query that source.
+ * Queries the `provider_organizations` directory table (seeded health systems).
+ * When a real provider directory integration is available (e.g. CMS NPPES,
+ * Carequality), extend this to query that source.
  */
 
 export const searchProviderOrganizationsInputSchema = z.object({
@@ -29,9 +32,7 @@ export async function searchProviderOrganizations(input: unknown) {
     const { data: orgs, error } = await supabase
       .from("provider_organizations")
       .select("*")
-      .or(
-        `name.ilike.%${query}%,ehr_vendor.ilike.%${query}%,portal_brand.ilike.%${query}%,city.ilike.%${query}%`
-      )
+      .or(organizationSearchFilter(query))
       .order("name", { ascending: true })
       .limit(20);
 
@@ -39,17 +40,7 @@ export async function searchProviderOrganizations(input: unknown) {
       return { success: false, error: `Database error: ${error.message}` };
     }
 
-    const organizations = (orgs || []).map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      ehrVendor: row.ehr_vendor || null,
-      portalBrand: row.portal_brand || null,
-      city: row.city || null,
-      state: row.state || null,
-      supportsDirectConnection: row.supports_direct_connection,
-      supportsEpicConnection: row.supports_epic_connection,
-      supportsManualRequest: row.supports_manual_request,
-    }));
+    const organizations = (orgs || []).map(mapOrganizationRow);
 
     if (organizations.length === 0) {
       return {

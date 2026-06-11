@@ -16,10 +16,11 @@ export const envSchema = z.object({
   // EHR integration (Keragon webhook)
   KERAGON_WEBHOOK_URL: z.string().url().optional(),
 
-  // FHIR direct connection (optional — Keragon is used by default)
+  // FHIR direct connection (SMART on FHIR pilot)
   FHIR_BASE_URL: z.string().url().optional(),
   FHIR_CLIENT_ID: z.string().optional(),
   FHIR_CLIENT_SECRET: z.string().optional(),
+  FHIR_REDIRECT_URI: z.string().url().optional(),
 
   // MCP integrations (feature flags)
   GMAIL_MCP_ENABLED: z.coerce.boolean().default(false),

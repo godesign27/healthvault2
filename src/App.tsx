@@ -42,6 +42,7 @@ import DashboardPage from './pages/DashboardPage';
 import { MarketingSitePage } from './pages/MarketingSitePage';
 import SecureShareLanding from './pages/SecureShareLanding';
 import ProviderRecordSubmitPage from './pages/ProviderRecordSubmitPage';
+import { FhirConnectCompletePage } from './pages/FhirConnectCompletePage';
 import { LoginPage } from './pages/LoginPage';
 import { OnboardingStartPage } from './pages/OnboardingStartPage';
 import { OnboardingAccountPage } from './pages/OnboardingAccountPage';
@@ -495,6 +496,11 @@ function App() {
   const isRecordRequestRoute = window.location.pathname.startsWith('/record-request/');
   if (isRecordRequestRoute) {
     return <ProviderRecordSubmitPage />;
+  }
+
+  const isFhirConnectRoute = window.location.pathname.startsWith('/connect/fhir/');
+  if (isFhirConnectRoute) {
+    return <FhirConnectCompletePage />;
   }
 
   const subdomainInfo = parseSubdomain();

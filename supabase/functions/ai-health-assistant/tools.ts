@@ -1539,7 +1539,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
     execute: async (_args, userId, sb) => {
       try {
         const [userRes, conds, meds, allerg, immun] = await Promise.all([
-          sb.from('user_profiles').select('first_name, last_name, email, date_of_birth, phone').eq('user_id', userId).maybeSingle(),
+          sb.from('user_profiles').select('first_name, last_name, email, date_of_birth, phone, address_line1, city, state, postal_code, country, emergency_contact').eq('user_id', userId).maybeSingle(),
           sb.from('conditions').select('id', { count: 'exact', head: true }).eq('user_id', userId),
           sb.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
           sb.from('allergies').select('id', { count: 'exact', head: true }).eq('user_id', userId),
@@ -1549,7 +1549,25 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
         const total = counts.conditions + counts.medications + counts.allergies + counts.immunizations;
         const hasProfile = !!userRes.data?.first_name;
         const status = !hasProfile && total === 0 ? 'empty' : hasProfile && total >= 2 ? 'complete' : 'partial';
-        const user = userRes.data ? { firstName: userRes.data.first_name, lastName: userRes.data.last_name, email: userRes.data.email, dateOfBirth: userRes.data.date_of_birth, phone: userRes.data.phone } : null;
+        const row = userRes.data;
+        const ec = row?.emergency_contact as { name?: string; relationship?: string; phone?: string } | null;
+        const user = row ? {
+          firstName: row.first_name,
+          lastName: row.last_name,
+          email: row.email,
+          dateOfBirth: row.date_of_birth,
+          phone: row.phone,
+          addressLine1: row.address_line1 || null,
+          city: row.city || null,
+          state: row.state || null,
+          postalCode: row.postal_code || null,
+          country: row.country || null,
+          emergencyContact: ec ? {
+            name: ec.name || null,
+            relationship: ec.relationship || null,
+            phone: ec.phone || null,
+          } : null,
+        } : null;
         return success({ user, counts, completionStatus: status }, `Profile: ${counts.conditions} conditions, ${counts.medications} meds, ${counts.allergies} allergies, ${counts.immunizations} immunizations. Status: ${status}.`);
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);
@@ -1563,7 +1581,8 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       type: 'function',
       function: {
         name: 'updateMedicalProfile',
-        description: 'Updates the user\'s profile information. Requires confirmation.',
+        description:
+          'Updates the user\'s profile (name, phone, date of birth, address, emergency contact). Requires confirmed=true after the user agrees.',
         parameters: {
           type: 'object',
           properties: {
@@ -1571,7 +1590,14 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
             lastName: { type: 'string', description: 'Last name.' },
             phone: { type: 'string', description: 'Phone number.' },
             dateOfBirth: { type: 'string', description: 'Date of birth (YYYY-MM-DD).' },
-            confirmed: { type: 'boolean', description: 'Must be true to proceed.' },
+            addressLine1: { type: 'string', description: 'Street address line 1.' },
+            city: { type: 'string', description: 'City.' },
+            state: { type: 'string', description: 'State or province (e.g. IL).' },
+            postalCode: { type: 'string', description: 'ZIP / postal code.' },
+            emergencyContactName: { type: 'string', description: 'Emergency contact full name.' },
+            emergencyContactRelationship: { type: 'string', description: 'Emergency contact relationship (e.g. Spouse).' },
+            emergencyContactPhone: { type: 'string', description: 'Emergency contact phone number.' },
+            confirmed: { type: 'boolean', description: 'Must be true to execute the update.' },
           },
           required: ['confirmed'],
         },
@@ -1579,17 +1605,49 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
     },
     execute: async (args, userId, sb) => {
       try {
-        if (!args.confirmed) return error('Profile update requires confirmation.');
-        const updates: Record<string, string> = {};
+        if (!args.confirmed) return error('Profile update requires confirmation. Set confirmed: true after the user agrees.');
+
+        const updates: Record<string, unknown> = {};
         const fields: string[] = [];
-        if (args.firstName !== undefined) { updates.first_name = args.firstName; fields.push('first name'); }
-        if (args.lastName !== undefined) { updates.last_name = args.lastName; fields.push('last name'); }
-        if (args.phone !== undefined) { updates.phone = args.phone; fields.push('phone'); }
-        if (args.dateOfBirth !== undefined) { updates.date_of_birth = args.dateOfBirth; fields.push('date of birth'); }
-        if (!fields.length) return error('No fields to update.');
+
+        if (args.firstName !== undefined) { updates.first_name = String(args.firstName); fields.push('first name'); }
+        if (args.lastName !== undefined) { updates.last_name = String(args.lastName); fields.push('last name'); }
+        if (args.phone !== undefined) { updates.phone = String(args.phone); fields.push('phone'); }
+        if (args.dateOfBirth !== undefined) { updates.date_of_birth = String(args.dateOfBirth); fields.push('date of birth'); }
+        if (args.addressLine1 !== undefined) { updates.address_line1 = String(args.addressLine1); fields.push('address'); }
+        if (args.city !== undefined) { updates.city = String(args.city); fields.push('city'); }
+        if (args.state !== undefined) { updates.state = String(args.state); fields.push('state'); }
+        if (args.postalCode !== undefined) { updates.postal_code = String(args.postalCode); fields.push('postal code'); }
+
+        const hasEmergency =
+          args.emergencyContactName !== undefined ||
+          args.emergencyContactRelationship !== undefined ||
+          args.emergencyContactPhone !== undefined;
+
+        if (hasEmergency) {
+          const { data: existing } = await sb
+            .from('user_profiles')
+            .select('emergency_contact')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+          const ec = {
+            ...((existing?.emergency_contact as Record<string, string>) || {}),
+          };
+          if (args.emergencyContactName !== undefined) ec.name = String(args.emergencyContactName);
+          if (args.emergencyContactRelationship !== undefined) ec.relationship = String(args.emergencyContactRelationship);
+          if (args.emergencyContactPhone !== undefined) ec.phone = String(args.emergencyContactPhone);
+          updates.emergency_contact = ec;
+          fields.push('emergency contact');
+        }
+
+        if (!fields.length) return error('No fields to update. Provide at least one profile field.');
+
         updates.updated_at = new Date().toISOString();
+
         const { error: dbErr } = await sb.from('user_profiles').update(updates).eq('user_id', userId);
         if (dbErr) return error(`Database error: ${dbErr.message}`);
+
         return success({ updated: true, fields }, `Updated ${fields.join(', ')}.`);
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);

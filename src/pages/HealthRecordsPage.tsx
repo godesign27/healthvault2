@@ -8,6 +8,7 @@ import { HealthRecord, RecordKind } from '../lib/records/types';
 import { listRecords } from '../lib/records/query';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
 import { supabase } from '../lib/supabase';
+import { EhrConnectionsPanel } from '../components/network/EhrConnectionsPanel';
 
 interface HealthRecordsPageProps {
   darkMode?: boolean;
@@ -198,6 +199,11 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
           Total Records: {stats.totalRecords}
         </div>
       </div>
+
+      <EhrConnectionsPanel
+        onConnect={onConnectProvider}
+        onConnectionChange={loadStats}
+      />
 
       {receivedRequests.filter(r => !dismissedReceived.has(r.id)).length > 0 && (
         <ReceivedRecordsBanner

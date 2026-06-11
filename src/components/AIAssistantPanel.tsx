@@ -9,7 +9,7 @@ import { getVoiceMessageForContext, type PageContext } from '../lib/voice/contex
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
 import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
-import type { ConversationMessage } from '../lib/openai/types';
+import type { ChatResponse, ConversationMessage } from '../lib/openai/types';
 import { FORM_TEMPLATES } from '../lib/forms/catalog';
 import { buildAutofillAnswers, loadFormAutofillContext, mergeFormAnswers } from '../lib/forms/autopopulate';
 import { getPatientProfileId, isResponseComplete, loadFormResponses, saveFormResponse } from '../lib/forms/responses';
@@ -194,6 +194,21 @@ export function AIAssistantPanel({
     return lower.includes('fill') && (lower.includes('form') || lower.includes('incomplete'));
   };
 
+  const refreshAfterAssistantTools = async (response: ChatResponse) => {
+    const refreshTools = new Set([
+      'updateMedicalProfile',
+      'saveFormAnswers',
+      'addProvider',
+      'setPreferredPharmacy',
+    ]);
+    const shouldRefresh = response.toolEvents?.some(
+      (event) => event.success && refreshTools.has(event.tool)
+    );
+    if (shouldRefresh && onRefreshData) {
+      await onRefreshData();
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -300,6 +315,7 @@ export function AIAssistantPanel({
         type: 'assistant',
         message: data.message
       }]);
+      await refreshAfterAssistantTools(data);
     } catch (error) {
       console.error('Error calling AI:', error);
       setMessages(prev => [...prev, {
@@ -375,6 +391,7 @@ export function AIAssistantPanel({
         type: 'assistant',
         message: data.message
       }]);
+      await refreshAfterAssistantTools(data);
     } catch (error) {
       console.error('Error calling AI:', error);
       setMessages(prev => [...prev, {
