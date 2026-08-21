@@ -83,7 +83,8 @@ export function ProviderRecordConnectionFlow({
 
   const getUserId = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    return user?.id || '00000000-0000-0000-0000-000000000000';
+    if (!user?.id) throw new Error('Not authenticated');
+    return user.id;
   }, []);
 
   useEffect(() => {
@@ -274,7 +275,8 @@ export function ProviderRecordConnectionFlow({
   const handleImportConfirm = async (selectedData: any) => {
     setStep('importing');
     try {
-      const results = await importMedicalRecords(selectedData);
+      const providerName = selectedOrg?.name || resolution?.providerOrganization?.name || initialProviderName;
+      const results = await importMedicalRecords({ ...selectedData, providerName });
       setImportResults(results);
       setStep('complete');
       if (onRefreshData) await onRefreshData();
@@ -402,26 +404,26 @@ function FlowHeader({
   if (step === 'review') return null;
 
   return (
-    <div className="p-6 border-b border-stone-200 flex items-center gap-3 flex-shrink-0">
+    <div className="p-6 border-b border-stroke-subtle flex items-center gap-3 flex-shrink-0">
       {step !== 'importing' && step !== 'complete' && (
         <button
           onClick={onBack}
-          className="p-2 -ml-2 rounded-lg hover:bg-stone-100 transition-colors"
+          className="p-2 -ml-2 rounded-lg hover:bg-surface-sunken transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-stone-600" />
+          <ArrowLeft className="w-5 h-5 text-content-secondary" />
         </button>
       )}
       <div className="flex-1 min-w-0">
-        <h3 className="text-lg font-semibold text-stone-900 truncate">
+        <h3 className="text-lg font-semibold text-content-primary truncate">
           {titles[step]}
         </h3>
         {step !== 'search' && step !== 'complete' && step !== 'error' && (
-          <p className="text-sm text-stone-500 truncate">{orgName}</p>
+          <p className="text-sm text-content-secondary truncate">{orgName}</p>
         )}
       </div>
       {step === 'search' && (
-        <button onClick={onClose} className="p-2 -mr-2 rounded-lg hover:bg-stone-100 transition-colors">
-          <X className="w-5 h-5 text-stone-400" />
+        <button onClick={onClose} className="p-2 -mr-2 rounded-lg hover:bg-surface-sunken transition-colors">
+          <X className="w-5 h-5 text-content-secondary" />
         </button>
       )}
     </div>
@@ -447,25 +449,25 @@ function SearchStep({
 }) {
   return (
     <div className="p-6 space-y-5">
-      <p className="text-sm text-stone-600 leading-relaxed">
+      <p className="text-sm text-content-secondary leading-relaxed">
         Search for your healthcare provider to import your medical records securely.
       </p>
 
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-content-secondary" />
         <input
           type="text"
           placeholder="Search by provider, hospital, or clinic..."
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           autoFocus
-          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent bg-white text-stone-900 placeholder:text-stone-400"
+          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-stroke-default text-sm focus:outline-none focus:ring-2 focus:ring-stroke-strong focus:border-transparent bg-white text-content-primary placeholder:text-content-secondary"
         />
       </div>
 
       {searching && (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
+          <Loader2 className="w-6 h-6 text-content-secondary animate-spin" />
         </div>
       )}
 
@@ -475,16 +477,16 @@ function SearchStep({
             <button
               key={org.id}
               onClick={() => onSelect(org)}
-              className="w-full text-left p-4 rounded-xl border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all group"
+              className="w-full text-left p-4 rounded-xl border border-stroke-subtle hover:border-stroke-strong hover:bg-surface-sunken transition-all group"
             >
               <div className="flex items-start gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 flex-shrink-0 mt-0.5">
-                  <Building2 className="w-5 h-5 text-stone-600" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-sunken flex-shrink-0 mt-0.5">
+                  <Building2 className="w-5 h-5 text-content-secondary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-stone-900 text-sm">{org.name}</p>
+                  <p className="font-medium text-content-primary text-sm">{org.name}</p>
                   {(org.city || org.ehrVendor) && (
-                    <div className="flex items-center gap-3 mt-1 text-xs text-stone-500">
+                    <div className="flex items-center gap-3 mt-1 text-xs text-content-secondary">
                       {org.city && org.state && (
                         <span className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
@@ -506,13 +508,13 @@ function SearchStep({
                       </span>
                     )}
                     {!org.supportsDirectConnection && !org.supportsEpicConnection && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-surface-sunken text-content-secondary">
                         <FileText className="w-3 h-3" /> Manual
                       </span>
                     )}
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-stone-300 group-hover:text-stone-500 transition-colors flex-shrink-0 mt-3" />
+                <ChevronRight className="w-5 h-5 text-content-primary group-hover:text-content-secondary transition-colors flex-shrink-0 mt-3" />
               </div>
             </button>
           ))}
@@ -521,13 +523,13 @@ function SearchStep({
 
       {!searching && query.length >= 2 && results.length === 0 && (
         <div className="text-center py-8 space-y-3">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-stone-100 mx-auto">
-            <Search className="w-6 h-6 text-stone-400" />
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-surface-sunken mx-auto">
+            <Search className="w-6 h-6 text-content-secondary" />
           </div>
-          <p className="text-sm text-stone-500">No providers found for "{query}"</p>
+          <p className="text-sm text-content-secondary">No providers found for "{query}"</p>
           <button
             onClick={onManual}
-            className="text-sm font-medium text-stone-700 hover:text-stone-900 underline underline-offset-2"
+            className="text-sm font-medium text-content-primary hover:text-content-primary underline underline-offset-2"
           >
             Request records manually instead
           </button>
@@ -535,17 +537,17 @@ function SearchStep({
       )}
 
       {!searching && query.length < 2 && (
-        <div className="pt-4 border-t border-stone-100">
+        <div className="pt-4 border-t border-stroke-subtle">
           <button
             onClick={onManual}
-            className="w-full flex items-center gap-3 p-4 rounded-xl border border-dashed border-stone-300 hover:border-stone-400 hover:bg-stone-50 transition-all text-left"
+            className="w-full flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke-default hover:border-stroke-strong hover:bg-surface-sunken transition-all text-left"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 flex-shrink-0">
-              <FileText className="w-5 h-5 text-stone-500" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-sunken flex-shrink-0">
+              <FileText className="w-5 h-5 text-content-secondary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-stone-700">Request records manually</p>
-              <p className="text-xs text-stone-500 mt-0.5">Send a secure request to any provider</p>
+              <p className="text-sm font-medium text-content-primary">Request records manually</p>
+              <p className="text-xs text-content-secondary mt-0.5">Send a secure request to any provider</p>
             </div>
           </button>
         </div>
@@ -558,15 +560,15 @@ function ResolvingStep({ orgName }: { orgName: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
       <div className="relative mb-6">
-        <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center">
-          <Shield className="w-8 h-8 text-stone-600" />
+        <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center">
+          <Shield className="w-8 h-8 text-content-secondary" />
         </div>
         <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm">
-          <Loader2 className="w-4 h-4 text-stone-600 animate-spin" />
+          <Loader2 className="w-4 h-4 text-content-secondary animate-spin" />
         </div>
       </div>
-      <p className="text-sm font-medium text-stone-900 mb-1">Finding the best connection</p>
-      <p className="text-xs text-stone-500 text-center max-w-xs">
+      <p className="text-sm font-medium text-content-primary mb-1">Finding the best connection</p>
+      <p className="text-xs text-content-secondary text-center max-w-xs">
         Checking available paths to securely connect to {orgName}
       </p>
     </div>
@@ -631,27 +633,27 @@ function ResolvedStep({
 
   return (
     <div className="p-6 space-y-6">
-      <div className="rounded-2xl border border-stone-200 p-6 space-y-5">
+      <div className="rounded-2xl border border-stroke-subtle p-6 space-y-5">
         <div className="flex items-start gap-4">
           <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${config.iconBg} flex-shrink-0`}>
             <Icon className={`w-6 h-6 ${config.iconColor}`} />
           </div>
           <div>
-            <h4 className="font-semibold text-stone-900">{config.title}</h4>
-            <p className="text-sm text-stone-600 mt-1 leading-relaxed">{config.description}</p>
+            <h4 className="font-semibold text-content-primary">{config.title}</h4>
+            <p className="text-sm text-content-secondary mt-1 leading-relaxed">{config.description}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-stone-50">
-          <Shield className="w-4 h-4 text-stone-500 flex-shrink-0" />
-          <p className="text-xs text-stone-600">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-sunken">
+          <Shield className="w-4 h-4 text-content-secondary flex-shrink-0" />
+          <p className="text-xs text-content-secondary">
             Your data is encrypted and transferred securely. Health Vault never stores provider credentials.
           </p>
         </div>
 
         <button
           onClick={config.action}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-all hover:shadow-lg active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all hover:shadow-lg active:scale-[0.98]"
         >
           {config.actionLabel}
           <ChevronRight className="w-4 h-4" />
@@ -672,8 +674,8 @@ function ConnectingStep({ orgName }: { orgName: string }) {
           <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
         </div>
       </div>
-      <p className="text-sm font-medium text-stone-900 mb-1">Establishing secure connection</p>
-      <p className="text-xs text-stone-500 text-center max-w-xs">
+      <p className="text-sm font-medium text-content-primary mb-1">Establishing secure connection</p>
+      <p className="text-xs text-content-secondary text-center max-w-xs">
         Connecting to {orgName} with end-to-end encryption
       </p>
     </div>
@@ -690,12 +692,12 @@ function FetchingStep({ orgName, stage }: { orgName: string; stage: number }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-6">
       <div className="relative mb-8">
-        <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center">
-          <RefreshCw className="w-8 h-8 text-stone-600 animate-spin" style={{ animationDuration: '2s' }} />
+        <div className="w-16 h-16 rounded-full bg-surface-sunken flex items-center justify-center">
+          <RefreshCw className="w-8 h-8 text-content-secondary animate-spin" style={{ animationDuration: '2s' }} />
         </div>
       </div>
 
-      <p className="text-sm font-medium text-stone-900 mb-6">Retrieving your records</p>
+      <p className="text-sm font-medium text-content-primary mb-6">Retrieving your records</p>
 
       <div className="w-full max-w-xs space-y-3">
         {steps.map((s, i) => (
@@ -703,18 +705,18 @@ function FetchingStep({ orgName, stage }: { orgName: string; stage: number }) {
             {s.done ? (
               <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
             ) : i === steps.findIndex(x => !x.done) ? (
-              <Loader2 className="w-5 h-5 text-stone-500 animate-spin flex-shrink-0" />
+              <Loader2 className="w-5 h-5 text-content-secondary animate-spin flex-shrink-0" />
             ) : (
-              <div className="w-5 h-5 rounded-full border-2 border-stone-200 flex-shrink-0" />
+              <div className="w-5 h-5 rounded-full border-2 border-stroke-subtle flex-shrink-0" />
             )}
-            <span className={`text-sm ${s.done ? 'text-stone-700' : i === steps.findIndex(x => !x.done) ? 'text-stone-900 font-medium' : 'text-stone-400'}`}>
+            <span className={`text-sm ${s.done ? 'text-content-primary' : i === steps.findIndex(x => !x.done) ? 'text-content-primary font-medium' : 'text-content-secondary'}`}>
               {s.label}
             </span>
           </div>
         ))}
       </div>
 
-      <p className="text-xs text-stone-400 mt-6 text-center">
+      <p className="text-xs text-content-secondary mt-6 text-center">
         Checking {orgName} for importable records
       </p>
     </div>
@@ -727,8 +729,8 @@ function ImportingStep() {
       <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6">
         <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
-      <p className="text-sm font-medium text-stone-900 mb-1">Importing records</p>
-      <p className="text-xs text-stone-500 text-center max-w-xs">
+      <p className="text-sm font-medium text-content-primary mb-1">Importing records</p>
+      <p className="text-xs text-content-secondary text-center max-w-xs">
         Saving selected records to your Health Vault
       </p>
     </div>
@@ -760,34 +762,34 @@ function CompleteStep({
           <CheckCircle className="w-7 h-7 text-emerald-600" />
         </div>
         <div>
-          <h4 className="text-lg font-semibold text-stone-900">Records Imported</h4>
-          <p className="text-sm text-stone-600 mt-1">
+          <h4 className="text-lg font-semibold text-content-primary">Records Imported</h4>
+          <p className="text-sm text-content-secondary mt-1">
             {total} {total === 1 ? 'record' : 'records'} from {orgName}
           </p>
         </div>
       </div>
 
       {items.length > 0 && (
-        <div className="rounded-xl border border-stone-200 divide-y divide-stone-100">
+        <div className="rounded-xl border border-stroke-subtle divide-y divide-stroke-subtle">
           {items.map((item, i) => (
             <div key={i} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-stone-700">{item.label}</span>
+              <span className="text-sm text-content-primary">{item.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-stone-900">{item.count}</span>
-                <span className="text-xs text-stone-400">in {item.dest}</span>
+                <span className="text-sm font-semibold text-content-primary">{item.count}</span>
+                <span className="text-xs text-content-secondary">in {item.dest}</span>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <p className="text-xs text-stone-500 text-center leading-relaxed">
+      <p className="text-xs text-content-secondary text-center leading-relaxed">
         Your imported records are now available across Health Vault. Visit Medical Profile to review your updated health data.
       </p>
 
       <button
         onClick={onDone}
-        className="w-full px-5 py-3 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-all"
+        className="w-full px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
       >
         Done
       </button>
@@ -808,14 +810,14 @@ function ManualStep({
 }) {
   return (
     <div className="p-6 space-y-6">
-      <div className="rounded-2xl border border-stone-200 p-6 space-y-5">
+      <div className="rounded-2xl border border-stroke-subtle p-6 space-y-5">
         <div className="flex items-start gap-4">
           <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-amber-50 flex-shrink-0">
             <FileText className="w-6 h-6 text-amber-600" />
           </div>
           <div>
-            <h4 className="font-semibold text-stone-900">Manual request needed</h4>
-            <p className="text-sm text-stone-600 mt-1 leading-relaxed">
+            <h4 className="font-semibold text-content-primary">Manual request needed</h4>
+            <p className="text-sm text-content-secondary mt-1 leading-relaxed">
               We don't have a direct digital connection to {orgName} yet. You can request your records manually and we'll help you get them into Health Vault.
             </p>
           </div>
@@ -825,7 +827,7 @@ function ManualStep({
           {hasManualHandler && (
             <button
               onClick={onManualRequest}
-              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-all"
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
             >
               <FileText className="w-4 h-4" />
               Send Record Request
@@ -833,16 +835,16 @@ function ManualStep({
           )}
           <button
             onClick={onBack}
-            className="w-full px-5 py-3 border border-stone-300 text-stone-700 rounded-xl font-medium hover:bg-stone-50 transition-all"
+            className="w-full px-5 py-3 border border-stroke-default text-content-primary rounded-xl font-medium hover:bg-surface-sunken transition-all"
           >
             Search for a different provider
           </button>
         </div>
       </div>
 
-      <div className="flex items-start gap-3 p-4 rounded-lg bg-stone-50">
-        <AlertCircle className="w-4 h-4 text-stone-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-stone-600 leading-relaxed">
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-surface-sunken">
+        <AlertCircle className="w-4 h-4 text-content-secondary flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-content-secondary leading-relaxed">
           Digital connections are being expanded regularly. Check back soon for direct access to more providers.
         </p>
       </div>
@@ -867,12 +869,12 @@ function ErrorStep({
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto">
           <AlertCircle className="w-6 h-6 text-red-600" />
         </div>
-        <p className="text-sm text-stone-700">{message}</p>
+        <p className="text-sm text-content-primary">{message}</p>
       </div>
       <div className="space-y-3">
         <button
           onClick={onRetry}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-all"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
         >
           <RefreshCw className="w-4 h-4" />
           Try Again
@@ -880,7 +882,7 @@ function ErrorStep({
         {hasManualHandler && (
           <button
             onClick={onManual}
-            className="w-full px-5 py-3 border border-stone-300 text-stone-700 rounded-xl font-medium hover:bg-stone-50 transition-all"
+            className="w-full px-5 py-3 border border-stroke-default text-content-primary rounded-xl font-medium hover:bg-surface-sunken transition-all"
           >
             Request records manually
           </button>

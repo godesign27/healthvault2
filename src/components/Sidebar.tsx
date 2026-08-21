@@ -1,15 +1,41 @@
-import { Package, Settings, ChevronRight, Circle, BarChart3, Bell, Menu, Palette, Sparkles, Type, Square, ToggleLeft, Navigation, FileText, ChevronsUpDown, Calendar, PanelLeft, ChevronDown, CheckSquare, ShieldAlert, MessageSquare, ToggleRight, Tag as TagIcon, Folder, FolderKanban, Layers, Loader2, SlidersHorizontal, GitBranch, Wrench, Wand2, MessageCircle, Search as SearchIcon, RectangleHorizontal, Table2, Heart } from 'lucide-react';
-import { useState } from 'react';
+import { Settings, ChevronRight, Circle, BarChart3, Bell, Menu, Palette, Sparkles, Type, Square, ToggleLeft, Navigation, FileText, ChevronsUpDown, Calendar, PanelLeft, ChevronDown, CheckSquare, ShieldAlert, MessageSquare, ToggleRight, Tag as TagIcon, Folder, FolderKanban, Loader2, SlidersHorizontal, GitBranch, Wrench, Wand2, MessageCircle, Search as SearchIcon, RectangleHorizontal, Table2, Heart } from 'lucide-react';
+import { useMemo } from 'react';
+import { useTheme } from '../providers/ThemeProvider';
+
+export type DesignSystemGallerySurface = 'default' | 'bold' | 'steel';
 
 interface SidebarProps {
   currentPage: string;
   currentView: 'design-system' | 'projects' | 'health-vault' | 'marketing';
   onNavigate: (page: string) => void;
   onViewChange: (view: 'design-system' | 'projects' | 'health-vault' | 'marketing') => void;
+  designSystemSurface?: DesignSystemGallerySurface;
+  onDesignSystemSurfaceChange?: (surface: DesignSystemGallerySurface) => void;
 }
 
-export function Sidebar({ currentPage, currentView, onNavigate, onViewChange }: SidebarProps) {
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+export function Sidebar({
+  currentPage,
+  currentView,
+  onNavigate,
+  onViewChange,
+  designSystemSurface = 'steel',
+  onDesignSystemSurfaceChange,
+}: SidebarProps) {
+  const { theme, setTheme } = useTheme();
+
+  const resolvedHtmlTheme = useMemo((): 'light' | 'dark' => {
+    if (theme === 'system') {
+      return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+    return theme;
+  }, [theme]);
+
+  const headerLogoSrc =
+    (currentView === 'design-system' && designSystemSurface === 'bold') || resolvedHtmlTheme === 'dark'
+      ? '/hv_logo-dark.png'
+      : '/hv_logo-light.png';
 
   const componentItems = [
     { id: 'accordions', label: 'Accordions', icon: ChevronsUpDown },
@@ -48,51 +74,124 @@ export function Sidebar({ currentPage, currentView, onNavigate, onViewChange }: 
   ];
 
   return (
-    <div className="w-72 bg-white border-r border-stone-200 h-screen flex flex-col">
-      <div className="p-6 border-b border-stone-200">
+    <div
+      data-steel-chrome="sidebar"
+      className="w-72 bg-surface-raised border-r border-stroke-subtle h-screen flex flex-col"
+    >
+      <div className="p-6 border-b border-stroke-subtle">
         <div className="flex items-center gap-3 mb-6">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg overflow-hidden">
             <img
-              src="/hv_logo-light.png"
+              src={headerLogoSrc}
               alt="Health Vault"
               className="w-full h-full object-contain"
             />
           </div>
           <div>
-            <h1 className="text-base font-bold text-stone-900">Health Vault</h1>
-            <p className="text-xs text-stone-500">Design System</p>
+            <h1 className="text-base font-bold text-content-primary">Health Vault</h1>
+            <p className="text-xs text-content-secondary">Design System</p>
           </div>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={() => onViewChange('projects')}
-            className="flex items-center justify-center w-9 h-9 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-hv-button hover:bg-surface-sunken transition-colors"
             title="Projects"
           >
-            <FolderKanban className="w-4 h-4 text-stone-600" />
+            <FolderKanban className="w-4 h-4 text-content-secondary" />
           </button>
           <button
             onClick={() => onViewChange('health-vault')}
-            className="flex items-center justify-center w-9 h-9 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+            className="flex items-center justify-center w-9 h-9 border border-stroke-subtle rounded-hv-button hover:bg-surface-sunken transition-colors"
             title="Health Vault"
           >
-            <Heart className="w-4 h-4 text-stone-600" />
+            <Heart className="w-4 h-4 text-content-secondary" />
           </button>
           <button
             onClick={() => onViewChange('design-system')}
-            className="flex items-center justify-center w-9 h-9 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className={`flex items-center justify-center w-9 h-9 rounded-hv-button transition-colors ${
+              currentView === 'design-system'
+                ? 'bg-action-primary text-content-on-action shadow-sm'
+                : 'border border-stroke-subtle hover:bg-surface-sunken'
+            }`}
             title="Design System"
           >
-            <Settings className="w-4 h-4 text-white" />
+            <Settings
+              className={`w-4 h-4 ${currentView === 'design-system' ? 'text-content-on-action' : 'text-content-secondary'}`}
+            />
           </button>
         </div>
       </div>
 
       <nav className="flex-1 p-4 overflow-y-auto">
+        {(currentView === 'design-system' || currentView === 'projects') && (
+          <div className="mb-5 px-1">
+            <div className="text-xs font-semibold text-content-secondary uppercase tracking-wide px-2 mb-2">
+              Color mode
+            </div>
+            <div className="flex rounded-hv-nav-segment-track border border-stroke-subtle p-0.5 bg-surface-sunken gap-0.5">
+              {(['light', 'dark', 'system'] as const).map((mode) => {
+                const selected = theme === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    title={
+                      mode === 'light' ? 'Light' : mode === 'dark' ? 'Dark' : 'Match system'
+                    }
+                    onClick={() => setTheme(mode)}
+                    className={`flex-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition-colors capitalize ${
+                      selected
+                        ? 'bg-surface-raised text-content-primary shadow-sm ring-1 ring-stroke-subtle'
+                        : 'text-content-secondary hover:text-content-primary'
+                    }`}
+                  >
+                    {mode === 'system' ? 'Auto' : mode}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {currentView === 'design-system' && onDesignSystemSurfaceChange && (
+          <div className="mb-5 px-1">
+            <div className="text-xs font-semibold text-content-secondary uppercase tracking-wide px-2 mb-2">
+              Surface theme
+            </div>
+            <div className="flex flex-wrap gap-0.5 rounded-hv-nav-segment-track border border-stroke-subtle p-0.5 bg-surface-sunken">
+              {(
+                [
+                  { id: 'default' as const, label: 'Default', hint: 'Standard UI' },
+                  { id: 'bold' as const, label: 'Bold', hint: 'Dark brand' },
+                  { id: 'steel' as const, label: 'Steel', hint: 'Frosted glass' },
+                ] as const
+              ).map((opt) => {
+                const selected = designSystemSurface === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    title={opt.hint}
+                    onClick={() => onDesignSystemSurfaceChange(opt.id)}
+                    className={`min-w-[4.25rem] flex-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition-colors ${
+                      selected
+                        ? 'bg-surface-raised text-content-primary shadow-sm ring-1 ring-stroke-subtle'
+                        : 'text-content-secondary hover:text-content-primary'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {currentView === 'design-system' && (
         <div className="space-y-1">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wide px-3 mb-2">
+          <div className="text-xs font-semibold text-content-secondary uppercase tracking-wide px-3 mb-2">
             Components
           </div>
           {componentItems.map((item) => {
@@ -110,7 +209,7 @@ export function Sidebar({ currentPage, currentView, onNavigate, onViewChange }: 
                 }}
                 className={`
                   w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${isActive ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}
+                  ${isActive ? 'bg-action-primary-subtle text-content-primary ring-1 ring-inset ring-stroke-default' : 'text-content-primary hover:bg-surface-sunken'}
                 `}
               >
                 <Icon className="w-4 h-4" />
@@ -123,20 +222,20 @@ export function Sidebar({ currentPage, currentView, onNavigate, onViewChange }: 
 
         {currentView === 'projects' && (
           <div className="px-4 py-2">
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-content-secondary">
               View your projects in the main area
             </div>
           </div>
         )}
       </nav>
 
-      <div className="sticky bottom-0 bg-white">
-        <div className="border-t border-stone-200 p-4">
+      <div className="sticky bottom-0 bg-surface-raised">
+        <div className="border-t border-stroke-subtle p-4">
           <button
             onClick={() => onNavigate('admin')}
             className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-              ${currentPage === 'admin' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}
+              hv-nav-rail-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium
+              ${currentPage === 'admin' ? 'hv-nav-rail-item--selected' : ''}
             `}
           >
             <Settings className="w-4 h-4" />
@@ -144,14 +243,14 @@ export function Sidebar({ currentPage, currentView, onNavigate, onViewChange }: 
           </button>
         </div>
 
-        <div className="p-4 border-t border-stone-200">
+        <div className="p-4 border-t border-stroke-subtle">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-stone-100 rounded-full flex-shrink-0">
-              <span className="text-sm font-bold text-stone-700">TM</span>
+            <div className="flex items-center justify-center w-10 h-10 bg-surface-sunken rounded-full flex-shrink-0">
+              <span className="text-sm font-bold text-content-primary">TM</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-stone-900 truncate">Timothy McGuire</p>
-              <p className="text-xs text-stone-500 truncate">Version 1.0.0</p>
+              <p className="text-sm font-semibold text-content-primary truncate">Timothy McGuire</p>
+              <p className="text-xs text-content-secondary truncate">Version 1.0.0</p>
             </div>
           </div>
         </div>

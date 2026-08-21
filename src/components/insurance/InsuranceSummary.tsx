@@ -74,15 +74,17 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
 
   if (loading) {
     return (
-      <div className={`rounded-xl border p-6 ${
-        darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-stone-50'
-      }`}>
+      <div
+        className={
+          darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+        }
+      >
         <div className="animate-pulse">
           <div className={`h-4 rounded w-32 mb-4 ${
-            darkMode ? 'bg-stone-800' : 'bg-stone-200'
+            darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
           }`} />
           <div className={`h-8 rounded w-full ${
-            darkMode ? 'bg-stone-800' : 'bg-stone-200'
+            darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
           }`} />
         </div>
       </div>
@@ -91,21 +93,23 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
 
   if (!primaryCoverage) {
     return (
-      <div className={`rounded-xl border p-6 ${
-        darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-stone-50'
-      }`}>
+      <div
+        className={
+          darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+        }
+      >
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck className={`w-5 h-5 ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`} />
           <h3 className={`font-semibold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Primary Insurance
           </h3>
         </div>
         <p className={`text-sm mb-4 ${
-          darkMode ? 'text-stone-400' : 'text-stone-600'
+          darkMode ? 'text-content-secondary' : 'text-content-secondary'
         }`}>
           No primary insurance coverage on file
         </p>
@@ -122,16 +126,18 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
   }
 
   return (
-    <div className={`rounded-xl border p-6 ${
-      darkMode ? 'border-stone-700 bg-stone-900' : 'border-stone-200 bg-stone-50'
-    }`}>
+    <div
+      className={
+        darkMode ? 'hv-surface-card p-6' : 'rounded-xl border border-stroke-subtle bg-surface-sunken p-6'
+      }
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ShieldCheck className={`w-5 h-5 ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`} />
           <h3 className={`font-semibold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Primary Insurance
           </h3>
@@ -149,12 +155,12 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
         )}
         <div>
           <h4 className={`font-semibold mb-1 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             {primaryCoverage.provider.name}
           </h4>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             {primaryCoverage.planName}
           </p>
@@ -164,12 +170,12 @@ export function InsuranceSummary({ userId, darkMode = false, onViewAll }: Insura
       {primaryCoverage.groupNumber && (
         <div className="mb-3">
           <p className={`text-xs mb-1 ${
-            darkMode ? 'text-stone-500' : 'text-stone-500'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Group Number
           </p>
           <p className={`font-mono text-sm ${
-            darkMode ? 'text-stone-300' : 'text-stone-700'
+            darkMode ? 'text-content-primary' : 'text-content-primary'
           }`}>
             {primaryCoverage.groupNumber}
           </p>

@@ -25,69 +25,69 @@ export function PopupMenusPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Pop-up Menus</h1>
-          <p className="text-gray-600">Context menus and dropdown menus for navigation and actions</p>
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Pop-up Menus</h1>
+          <p className="text-content-secondary">Context menus and dropdown menus for navigation and actions</p>
         </div>
 
         <div className="space-y-12">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Size Variants</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Size Variants</h2>
 
             <div className="grid md:grid-cols-3 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">Normal</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Normal</h3>
                 <PopupMenu size="normal" items={sampleMenuItems} />
-                <p className="text-xs text-gray-500 mt-3">Default size, best for most use cases</p>
+                <p className="text-xs text-content-secondary mt-3">Default size, best for most use cases</p>
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Small</h3>
                 <PopupMenu size="small" items={sampleMenuItems} />
-                <p className="text-xs text-gray-500 mt-3">Compact interfaces, tight spaces</p>
+                <p className="text-xs text-content-secondary mt-3">Compact interfaces, tight spaces</p>
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">X-Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">X-Small</h3>
                 <PopupMenu size="xsmall" items={sampleMenuItems} />
-                <p className="text-xs text-gray-500 mt-3">Dense layouts, minimal footprint</p>
+                <p className="text-xs text-content-secondary mt-3">Dense layouts, minimal footprint</p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">With Scrollbar</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">With Scrollbar</h2>
 
             <div className="grid md:grid-cols-3 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">Normal</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Normal</h3>
                 <PopupMenu size="normal" items={longMenuItems} showScrollbar maxHeight="250px" />
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Small</h3>
                 <PopupMenu size="small" items={longMenuItems} showScrollbar maxHeight="250px" />
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-600 mb-4">X-Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">X-Small</h3>
                 <PopupMenu size="xsmall" items={longMenuItems} showScrollbar maxHeight="250px" />
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mt-6">
+            <p className="text-sm text-content-secondary mt-6">
               When menu content exceeds the maximum height, a scrollbar appears automatically.
             </p>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Interactive States</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Interactive States</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Hover State</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Hover State</h3>
                 <div className="flex gap-4 items-start">
                   <PopupMenu
                     size="normal"
@@ -98,7 +98,7 @@ export function PopupMenusPage() {
                     ]}
                   />
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-content-secondary">
                       Hover over menu items to see the teal background highlight. The hover state provides
                       clear visual feedback for interactive elements.
                     </p>
@@ -107,7 +107,7 @@ export function PopupMenusPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">With Submenu Indicator</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">With Submenu Indicator</h3>
                 <div className="flex gap-4 items-start">
                   <PopupMenu
                     size="normal"
@@ -119,7 +119,7 @@ export function PopupMenusPage() {
                     ]}
                   />
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-content-secondary">
                       Items with submenus display a chevron icon on the right, indicating additional options
                       are available.
                     </p>
@@ -129,10 +129,10 @@ export function PopupMenusPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2">
@@ -175,19 +175,19 @@ export function PopupMenusPage() {
               <div>
                 <h3 className="font-semibold mb-2">Design Tokens</h3>
                 <div className="grid md:grid-cols-2 gap-4 mt-3">
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-8 bg-[indigo-600] rounded mb-2 flex items-center px-3">
                       <span className="text-white text-sm">Hover State</span>
                     </div>
                     <p className="text-xs font-medium">Primary Teal</p>
-                    <p className="text-xs text-gray-500 font-mono">indigo-600</p>
+                    <p className="text-xs text-content-secondary font-mono">indigo-600</p>
                   </div>
-                  <div className="border border-gray-200 rounded p-4">
-                    <div className="h-8 bg-white border border-gray-200 rounded mb-2 flex items-center px-3">
-                      <span className="text-gray-700 text-sm">Default State</span>
+                  <div className="border border-stroke-subtle rounded p-4">
+                    <div className="h-8 bg-surface-raised border border-stroke-subtle rounded mb-2 flex items-center px-3">
+                      <span className="text-content-secondary text-sm">Default State</span>
                     </div>
                     <p className="text-xs font-medium">White Background</p>
-                    <p className="text-xs text-gray-500 font-mono">#FFFFFF</p>
+                    <p className="text-xs text-content-secondary font-mono">#FFFFFF</p>
                   </div>
                 </div>
               </div>

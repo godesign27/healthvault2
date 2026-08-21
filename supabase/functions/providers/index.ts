@@ -15,11 +15,22 @@ function json(body: unknown, status = 200) {
 }
 
 function rowToConnection(r: Record<string, unknown>) {
+  const org = r.provider_organizations as { name?: string } | null | undefined;
+  const orgName =
+    org && typeof org === "object" && org !== null && "name" in org
+      ? String((org as { name?: string }).name ?? "").trim()
+      : "";
+  const ehr = r.ehr_source != null ? String(r.ehr_source).trim() : "";
+  const legacyName =
+    typeof (r as { provider_name?: string }).provider_name === "string"
+      ? String((r as { provider_name?: string }).provider_name).trim()
+      : "";
+  const providerName = legacyName || orgName || ehr || "Connected provider";
   return {
     id: r.id,
-    ehrSource: r.ehr_source,
+    ehrSource: ehr || orgName || null,
     ehrPatientId: r.fhir_patient_id ?? null,
-    providerName: r.provider_name ?? r.ehr_source,
+    providerName,
     status: r.status,
     lastSyncedAt: r.last_synced_at ?? null,
   };
@@ -56,7 +67,9 @@ Deno.serve(async (req: Request) => {
     if (req.method === "GET") {
       const { data, error } = await sb
         .from("provider_connections")
-        .select("id, ehr_source, provider_name, fhir_patient_id, status, last_synced_at")
+        .select(
+          "id, ehr_source, fhir_patient_id, status, last_synced_at, provider_organization_id, provider_organizations ( name )",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -81,7 +94,6 @@ Deno.serve(async (req: Request) => {
         .insert({
           user_id: user.id,
           ehr_source: body.ehrSource,
-          provider_name: body.providerName ?? body.ehrSource,
           fhir_patient_id: body.ehrPatientId ?? null,
           connection_method: "keragon",
           status: "pending",
@@ -118,7 +130,7 @@ Deno.serve(async (req: Request) => {
     if (req.method === "DELETE" && connectionId) {
       const { error } = await sb
         .from("provider_connections")
-        .update({ status: "inactive" })
+        .update({ status: "revoked" })
         .eq("id", connectionId)
         .eq("user_id", user.id);
 

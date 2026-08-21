@@ -12,10 +12,10 @@ export const GetMedicalHistoryInputZ = z.object({
 export type GetMedicalHistoryInput = z.infer<typeof GetMedicalHistoryInputZ>;
 
 export interface MedicalHistoryResult {
-  conditions?: Array<{ id: string; name: string; status: string; onsetDate: string | null }>;
+  conditions?: Array<{ id: string; name: string; status: string; diagnosedOn: string | null }>;
   medications?: Array<{ id: string; name: string; dosage: string | null; frequency: string | null; isActive: boolean }>;
   allergies?: Array<{ id: string; allergen: string; severity: string | null; reaction: string | null }>;
-  immunizations?: Array<{ id: string; name: string; dateAdministered: string | null; nextDose: string | null }>;
+  immunizations?: Array<{ id: string; vaccine: string; administeredOn: string | null; nextDose: string | null }>;
 }
 
 export async function getMedicalHistory(
@@ -43,7 +43,7 @@ export async function getMedicalHistory(
       queries.push(
         supabase
           .from('conditions')
-          .select('id, name, status, onset_date')
+          .select('id, name, status, diagnosed_on')
           .eq('user_id', effectiveUserId)
           .order('name', { ascending: true })
       );
@@ -73,9 +73,9 @@ export async function getMedicalHistory(
       queries.push(
         supabase
           .from('immunizations')
-          .select('id, name, date_administered, next_dose')
+          .select('id, vaccine, administered_on, next_dose')
           .eq('user_id', effectiveUserId)
-          .order('name', { ascending: true })
+          .order('vaccine', { ascending: true })
       );
     }
 
@@ -89,7 +89,7 @@ export async function getMedicalHistory(
           id: r.id,
           name: r.name,
           status: r.status,
-          onsetDate: r.onset_date,
+          diagnosedOn: r.diagnosed_on,
         }));
       }
     }
@@ -125,8 +125,8 @@ export async function getMedicalHistory(
       if (!error && data) {
         result.immunizations = data.map((r: any) => ({
           id: r.id,
-          name: r.name,
-          dateAdministered: r.date_administered,
+          vaccine: r.vaccine,
+          administeredOn: r.administered_on,
           nextDose: r.next_dose,
         }));
       }

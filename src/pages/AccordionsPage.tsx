@@ -17,7 +17,7 @@ export function AccordionsPage() {
   };
 
   const sampleContent = (
-    <div className="flex items-center justify-center py-12 text-gray-400">
+    <div className="flex items-center justify-center py-12 text-content-tertiary">
       <div className="text-center">
         <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
         <p className="text-sm">Replace Me</p>
@@ -32,18 +32,18 @@ export function AccordionsPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Accordions</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Accordions</h1>
+          <p className="text-content-secondary">
             Collapsible content panels for organizing and displaying information hierarchically
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-4">
@@ -124,12 +124,12 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Border</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Border</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Default Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Default Collapsed</h3>
                 <div className="space-y-4">
                   <AccordionItem
                     title="Header"
@@ -150,7 +150,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Default Expanded</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Default Expanded</h3>
                 <div className="space-y-4">
                   <AccordionItem
                     title="Header"
@@ -171,7 +171,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Focus Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Focus Collapsed</h3>
                 <div className="space-y-4">
                   <AccordionItem
                     title="Header"
@@ -194,7 +194,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Focus Expanded</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Focus Expanded</h3>
                 <div className="space-y-4">
                   <AccordionItem
                     title="Header"
@@ -218,12 +218,12 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Borderless</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Borderless</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Default Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Default Collapsed</h3>
                 <div className="space-y-2">
                   <AccordionItem
                     title="Header"
@@ -245,7 +245,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Default Expanded</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Default Expanded</h3>
                 <div className="space-y-2">
                   <AccordionItem
                     title="Header"
@@ -267,7 +267,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Focus Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Focus Collapsed</h3>
                 <div className="space-y-2">
                   <AccordionItem
                     title="Header"
@@ -291,7 +291,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Focus Expanded</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Focus Expanded</h3>
                 <div className="space-y-2">
                   <AccordionItem
                     title="Header"
@@ -316,15 +316,15 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Nested Accordions</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Nested Accordions</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Border</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Border</h3>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Default Collapsed</p>
+                    <p className="text-xs text-content-secondary mb-2">Default Collapsed</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -334,7 +334,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Default Expanded</p>
+                    <p className="text-xs text-content-secondary mb-2">Default Expanded</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -344,7 +344,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Focus Collapsed</p>
+                    <p className="text-xs text-content-secondary mb-2">Focus Collapsed</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -355,7 +355,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Focus Expanded</p>
+                    <p className="text-xs text-content-secondary mb-2">Focus Expanded</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -368,10 +368,10 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Borderless</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Borderless</h3>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Default Collapsed</p>
+                    <p className="text-xs text-content-secondary mb-2">Default Collapsed</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -381,7 +381,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Default Expanded</p>
+                    <p className="text-xs text-content-secondary mb-2">Default Expanded</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -391,7 +391,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Focus Collapsed</p>
+                    <p className="text-xs text-content-secondary mb-2">Focus Collapsed</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -402,7 +402,7 @@ export function AccordionsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-600 mb-2">Focus Expanded</p>
+                    <p className="text-xs text-content-secondary mb-2">Focus Expanded</p>
                     <NestedAccordion
                       title="Header"
                       nestedItems={nestedItems}
@@ -416,12 +416,12 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Disabled State</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Disabled State</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Border - Disabled Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Border - Disabled Collapsed</h3>
                 <AccordionItem
                   title="Header"
                   content={sampleContent}
@@ -432,7 +432,7 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Borderless - Disabled Collapsed</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Borderless - Disabled Collapsed</h3>
                 <AccordionItem
                   title="Header"
                   content={sampleContent}
@@ -445,17 +445,17 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Working Examples</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Working Examples</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Simple Accordion Group</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Simple Accordion Group</h3>
                 <Accordion
                   items={[
-                    { title: 'What is a Design System?', content: <p className="text-sm text-gray-700">A design system is a collection of reusable components, guided by clear standards, that can be assembled together to build applications.</p> },
-                    { title: 'How do I use components?', content: <p className="text-sm text-gray-700">Import the component from the library and use it in your application with the appropriate props.</p> },
-                    { title: 'Can I customize the styles?', content: <p className="text-sm text-gray-700">Yes, most components accept className props and can be customized using Tailwind CSS classes.</p> }
+                    { title: 'What is a Design System?', content: <p className="text-sm text-content-secondary">A design system is a collection of reusable components, guided by clear standards, that can be assembled together to build applications.</p> },
+                    { title: 'How do I use components?', content: <p className="text-sm text-content-secondary">Import the component from the library and use it in your application with the appropriate props.</p> },
+                    { title: 'Can I customize the styles?', content: <p className="text-sm text-content-secondary">Yes, most components accept className props and can be customized using Tailwind CSS classes.</p> }
                   ]}
                   variant="border"
                   defaultExpanded={[0]}
@@ -464,12 +464,12 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Accordion with Buttons</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Accordion with Buttons</h3>
                 <Accordion
                   items={[
-                    { title: 'Account Settings', content: <p className="text-sm text-gray-700">Manage your account settings and preferences here.</p> },
-                    { title: 'Privacy Settings', content: <p className="text-sm text-gray-700">Control who can see your information and how it's used.</p> },
-                    { title: 'Notification Settings', content: <p className="text-sm text-gray-700">Choose what notifications you want to receive.</p> }
+                    { title: 'Account Settings', content: <p className="text-sm text-content-secondary">Manage your account settings and preferences here.</p> },
+                    { title: 'Privacy Settings', content: <p className="text-sm text-content-secondary">Control who can see your information and how it's used.</p> },
+                    { title: 'Notification Settings', content: <p className="text-sm text-content-secondary">Choose what notifications you want to receive.</p> }
                   ]}
                   variant="border"
                   showButtons={true}
@@ -479,12 +479,12 @@ export function AccordionsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Borderless Accordion</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Borderless Accordion</h3>
                 <Accordion
                   items={[
-                    { title: 'General Information', content: <p className="text-sm text-gray-700">Basic information about the product or service.</p> },
-                    { title: 'Technical Specifications', content: <p className="text-sm text-gray-700">Detailed technical specifications and requirements.</p> },
-                    { title: 'Support & Help', content: <p className="text-sm text-gray-700">Get help and support for any issues you may encounter.</p> }
+                    { title: 'General Information', content: <p className="text-sm text-content-secondary">Basic information about the product or service.</p> },
+                    { title: 'Technical Specifications', content: <p className="text-sm text-content-secondary">Detailed technical specifications and requirements.</p> },
+                    { title: 'Support & Help', content: <p className="text-sm text-content-secondary">Get help and support for any issues you may encounter.</p> }
                   ]}
                   variant="borderless"
                   defaultExpanded={[1]}
@@ -494,10 +494,10 @@ export function AccordionsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

@@ -7,8 +7,9 @@ import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
 import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
-import { sendAssistantMessage } from '../lib/openai/client';
+import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
+import type { ConversationMessage } from '../lib/openai/types';
 
 interface Message {
   type: 'user' | 'assistant';
@@ -94,7 +95,15 @@ export function AIAssistantPanel({
   const [collectingProfileData, setCollectingProfileData] = useState(false);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [collectedData, setCollectedData] = useState<any>({});
-  const [lastResponseId, setLastResponseId] = useState<string | undefined>(undefined);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Resolve the authenticated user ID once on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUserId(session?.user?.id ?? null);
+    });
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,7 +128,7 @@ export function AIAssistantPanel({
     setCollectingProfileData(false);
     setCurrentFieldIndex(0);
     setCollectedData({});
-    setLastResponseId(undefined);
+    setConversationHistory([]);
   }, [currentPage]);
 
   useEffect(() => {
@@ -151,7 +160,7 @@ export function AIAssistantPanel({
         setTimeout(() => {
           setMessages(prev => [...prev, {
             type: 'assistant',
-            message: "I noticed you're viewing your Care page. Here are some insights:\n\n• You haven't had an annual physical in over 12 months\n• Consider scheduling preventive care appointments\n• Would you like to import recent visit data from your providers?"
+            message: "You're on your Care page. I can look up your medications, care timeline, or encounters — just ask. You can also say \"connect a provider\" to import records."
           }]);
           setHasShownImportPrompt(true);
           localStorage.setItem('hasSeenCarePagePrompt', 'true');
@@ -260,14 +269,20 @@ export function AIAssistantPanel({
     setIsLoading(true);
 
     try {
-      const data = await sendAssistantMessage({
+      const updatedHistory: ConversationMessage[] = [
+        ...conversationHistory,
+        { role: 'user', content: userMessage },
+      ];
+      const data = await sendChatMessage({
         message: userMessage,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: updatedHistory,
       });
-
-      setLastResponseId(data.responseId);
+      setConversationHistory([
+        ...updatedHistory,
+        { role: 'assistant', content: data.message },
+      ]);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -324,14 +339,20 @@ export function AIAssistantPanel({
     }
 
     try {
-      const data = await sendAssistantMessage({
+      const updatedHistory: ConversationMessage[] = [
+        ...conversationHistory,
+        { role: 'user', content: prompt },
+      ];
+      const data = await sendChatMessage({
         message: prompt,
         page: currentPage,
         pageContext: buildPageContext(currentPage),
-        previousResponseId: lastResponseId,
+        conversationHistory: updatedHistory,
       });
-
-      setLastResponseId(data.responseId);
+      setConversationHistory([
+        ...updatedHistory,
+        { role: 'assistant', content: data.message },
+      ]);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: data.message
@@ -348,24 +369,18 @@ export function AIAssistantPanel({
   };
 
   const handleMedicationRefillFlow = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     setMessages(prev => [...prev, {
       type: 'assistant',
-      message: "I can help you refill your medication. Which medication would you like to refill?\n\n1. Albuterol Inhaler (3 refills remaining)\n2. Fluticasone Propionate (2 refills remaining)\n3. Montelukast (5 refills remaining)\n\nPlease reply with the number or name of the medication."
+      message: "Medication refills through the app aren't supported yet. Please contact your pharmacy or prescribing provider directly to request a refill. You can find your provider's contact info in your Care Network."
     }]);
-
     setIsLoading(false);
   };
 
   const handleScheduleAppointmentFlow = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     setMessages(prev => [...prev, {
       type: 'assistant',
-      message: "I'd be happy to help you schedule an appointment. What type of appointment do you need?\n\n1. Primary Care Visit\n2. Specialist Consultation\n3. Annual Physical\n4. Follow-up Appointment\n\nPlease reply with the number or describe what you need."
+      message: "Appointment scheduling through the app isn't supported yet. Please contact your provider's office directly to schedule an appointment. You can find contact info for your providers in your Care Network."
     }]);
-
     setIsLoading(false);
   };
 
@@ -380,7 +395,8 @@ export function AIAssistantPanel({
     await new Promise(resolve => setTimeout(resolve, 600));
 
     try {
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const profileData = await fetchUserProfileData(userId);
       setUserProfileData(profileData);
 
@@ -573,7 +589,8 @@ export function AIAssistantPanel({
 
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const success = await updateUserProfile(userId, newData);
 
       if (success) {
@@ -693,7 +710,8 @@ export function AIAssistantPanel({
 
   const handleInitiateStopCoverage = async (providerName: string) => {
     try {
-      const userId = '00000000-0000-0000-0000-000000000000';
+      const userId = currentUserId;
+      if (!userId) throw new Error('Not authenticated');
       const { data: coverages, error } = await supabase
         .from('insurance_coverages')
         .select('id, provider_id, insurance_providers!inner(name)')
@@ -794,8 +812,9 @@ export function AIAssistantPanel({
       // Generate a simple hash of the member ID for storage (in production, use proper encryption)
       const memberIdHash = coverage.memberId || '';
 
+      if (!currentUserId) throw new Error('Not authenticated');
       const insertData = {
-        user_id: '00000000-0000-0000-0000-000000000000', // Demo UUID
+        user_id: currentUserId,
         provider_id: coverage.providerId,
         plan_name: coverage.planName,
         member_id_hash: memberIdHash,
@@ -960,11 +979,8 @@ export function AIAssistantPanel({
 
   return (
     <aside
-      className={`h-full border-l flex flex-col w-full ${
-        darkMode
-          ? 'border-stone-800 bg-white'
-          : 'border-stone-200 bg-white'
-      }`}
+      data-steel-chrome="assistant"
+      className="flex h-full w-full min-h-0 flex-col border-l border-stroke-default bg-transparent"
     >
       {showProviderConnectionFlow ? (
         <ProviderRecordConnectionFlow
@@ -976,68 +992,54 @@ export function AIAssistantPanel({
         />
       ) : (
         <>
-          <div className="p-6 border-b flex-shrink-0 border-stone-200 bg-white">
+          <div className="flex-shrink-0 border-b border-stroke-default bg-transparent p-6">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100">
-                <MessageCircle className="w-5 h-5 text-stone-700" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-stroke-default bg-surface-sunken/80 backdrop-blur-sm">
+                <MessageCircle className="w-5 h-5 text-content-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-stone-900">
+              <h2 className="text-lg font-semibold text-content-primary">
                 Health Assistant
               </h2>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 min-h-0 bg-white">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-surface-page p-6">
             {showInsuranceFlow ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <button
                     onClick={handleInsuranceBack}
-                    className={`p-2 rounded-lg transition-colors ${
-                      darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'
-                    }`}
+                    className="rounded-lg p-2 transition-colors hover:bg-surface-sunken"
                   >
-                    <ArrowLeft className={`w-5 h-5 ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
-                    }`} />
+                    <ArrowLeft className="h-5 w-5 text-content-secondary" />
                   </button>
-                  <h3 className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
-                  }`}>
+                  <h3 className="text-lg font-semibold text-content-primary">
                     {insuranceStep === 'picker' ? 'Select Insurance Provider' : `Connect ${selectedProvider?.name}`}
                   </h3>
                 </div>
 
                 {insuranceStep === 'picker' && (
                   <>
-                    <div className={`relative mb-4 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
-                      <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
-                      }`} />
+                    <div className="relative mb-4 text-content-primary">
+                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-content-secondary" />
                       <input
                         type="text"
                         placeholder="Search providers..."
                         value={providerSearchQuery}
                         onChange={(e) => setProviderSearchQuery(e.target.value)}
-                        className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
-                          darkMode
-                            ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                            : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
-                        }`}
+                        className="w-full rounded-lg border border-stroke-default bg-surface-sunken py-3 pl-10 pr-4 text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-stroke-focus"
                       />
                     </div>
 
                     {loadingProviders ? (
                       <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                        <Loader2 className="h-8 w-8 animate-spin text-action-primary" />
                       </div>
                     ) : (
                       <>
                         {providers.filter(p => p.isPopular && (!providerSearchQuery || p.name.toLowerCase().includes(providerSearchQuery.toLowerCase()))).length > 0 && (
                           <div className="mb-6">
-                            <h4 className={`text-sm font-medium mb-3 ${
-                              darkMode ? 'text-stone-400' : 'text-stone-600'
-                            }`}>
+                            <h4 className="mb-3 text-sm font-medium text-content-secondary">
                               Popular Providers
                             </h4>
                             <div className="grid grid-cols-2 gap-2">
@@ -1047,11 +1049,7 @@ export function AIAssistantPanel({
                                   <button
                                     key={provider.id}
                                     onClick={() => handleSelectProvider(provider)}
-                                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                                      darkMode
-                                        ? 'border-stone-700 hover:bg-stone-800 hover:border-indigo-600'
-                                        : 'border-stone-200 hover:bg-stone-50 hover:border-indigo-600'
-                                    }`}
+                                    className="flex items-center gap-3 rounded-lg border border-stroke-default p-3 text-left transition-all hover:border-stroke-strong hover:bg-surface-sunken"
                                   >
                                     {provider.logoUrl && (
                                       <img
@@ -1060,9 +1058,7 @@ export function AIAssistantPanel({
                                         className="w-8 h-8 rounded"
                                       />
                                     )}
-                                    <span className={`text-sm font-medium ${
-                                      darkMode ? 'text-white' : 'text-stone-900'
-                                    }`}>
+                                    <span className="text-sm font-medium text-content-primary">
                                       {provider.name}
                                     </span>
                                   </button>
@@ -1073,9 +1069,7 @@ export function AIAssistantPanel({
 
                         {providers.filter(p => !p.isPopular && (!providerSearchQuery || p.name.toLowerCase().includes(providerSearchQuery.toLowerCase()))).length > 0 && (
                           <div>
-                            <h4 className={`text-sm font-medium mb-3 ${
-                              darkMode ? 'text-stone-400' : 'text-stone-600'
-                            }`}>
+                            <h4 className="mb-3 text-sm font-medium text-content-secondary">
                               All Providers
                             </h4>
                             <div className="space-y-2">
@@ -1085,11 +1079,7 @@ export function AIAssistantPanel({
                                   <button
                                     key={provider.id}
                                     onClick={() => handleSelectProvider(provider)}
-                                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                                      darkMode
-                                        ? 'border-stone-700 hover:bg-stone-800'
-                                        : 'border-stone-200 hover:bg-stone-50'
-                                    }`}
+                                    className="flex w-full items-center gap-3 rounded-lg border border-stroke-default p-3 text-left transition-all hover:border-stroke-strong hover:bg-surface-sunken"
                                   >
                                     {provider.logoUrl && (
                                       <img
@@ -1098,9 +1088,7 @@ export function AIAssistantPanel({
                                         className="w-8 h-8 rounded"
                                       />
                                     )}
-                                    <span className={`font-medium ${
-                                      darkMode ? 'text-white' : 'text-stone-900'
-                                    }`}>
+                                    <span className="font-medium text-content-primary">
                                       {provider.name}
                                     </span>
                                   </button>
@@ -1125,7 +1113,7 @@ export function AIAssistantPanel({
                 {savingCoverage && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-                    <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <p className="text-sm text-content-secondary">
                       Saving your coverage...
                     </p>
                   </div>
@@ -1155,62 +1143,42 @@ export function AIAssistantPanel({
                       </div>
                     </div>
 
-                    <div className={`rounded-lg border p-6 ${
-                      darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
-                    }`}>
-                      <h4 className={`text-sm font-semibold mb-4 ${
-                        darkMode ? 'text-white' : 'text-stone-900'
-                      }`}>
+                    <div className="rounded-lg border border-stroke-default bg-surface-sunken p-6">
+                      <h4 className="mb-4 text-sm font-semibold text-content-primary">
                         Coverage Summary
                       </h4>
                       <div className="space-y-3">
                         <div>
-                          <label className={`text-xs font-medium ${
-                            darkMode ? 'text-stone-400' : 'text-stone-500'
-                          }`}>
+                          <label className="text-xs font-medium text-content-secondary">
                             Provider
                           </label>
-                          <p className={`text-sm mt-1 ${
-                            darkMode ? 'text-white' : 'text-stone-900'
-                          }`}>
+                          <p className="text-sm mt-1 text-content-primary">
                             {selectedProvider.name}
                           </p>
                         </div>
                         <div>
-                          <label className={`text-xs font-medium ${
-                            darkMode ? 'text-stone-400' : 'text-stone-500'
-                          }`}>
+                          <label className="text-xs font-medium text-content-secondary">
                             Plan Name
                           </label>
-                          <p className={`text-sm mt-1 ${
-                            darkMode ? 'text-white' : 'text-stone-900'
-                          }`}>
+                          <p className="text-sm mt-1 text-content-primary">
                             {submittedCoverage.planName}
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Member ID
                             </label>
-                            <p className={`text-sm mt-1 font-mono ${
-                              darkMode ? 'text-white' : 'text-stone-900'
-                            }`}>
+                            <p className="text-sm mt-1 font-mono text-content-primary">
                               {submittedCoverage.memberId}
                             </p>
                           </div>
                           {submittedCoverage.groupNumber && (
                             <div>
-                              <label className={`text-xs font-medium ${
-                                darkMode ? 'text-stone-400' : 'text-stone-500'
-                              }`}>
+                              <label className="text-xs font-medium text-content-secondary">
                                 Group Number
                               </label>
-                              <p className={`text-sm mt-1 font-mono ${
-                                darkMode ? 'text-white' : 'text-stone-900'
-                              }`}>
+                              <p className="text-sm mt-1 font-mono text-content-primary">
                                 {submittedCoverage.groupNumber}
                               </p>
                             </div>
@@ -1220,28 +1188,20 @@ export function AIAssistantPanel({
                           <div className="grid grid-cols-2 gap-4">
                             {submittedCoverage.bin && (
                               <div>
-                                <label className={`text-xs font-medium ${
-                                  darkMode ? 'text-stone-400' : 'text-stone-500'
-                                }`}>
+                                <label className="text-xs font-medium text-content-secondary">
                                   BIN
                                 </label>
-                                <p className={`text-sm mt-1 font-mono ${
-                                  darkMode ? 'text-white' : 'text-stone-900'
-                                }`}>
+                                <p className="text-sm mt-1 font-mono text-content-primary">
                                   {submittedCoverage.bin}
                                 </p>
                               </div>
                             )}
                             {submittedCoverage.pcn && (
                               <div>
-                                <label className={`text-xs font-medium ${
-                                  darkMode ? 'text-stone-400' : 'text-stone-500'
-                                }`}>
+                                <label className="text-xs font-medium text-content-secondary">
                                   PCN
                                 </label>
-                                <p className={`text-sm mt-1 font-mono ${
-                                  darkMode ? 'text-white' : 'text-stone-900'
-                                }`}>
+                                <p className="text-sm mt-1 font-mono text-content-primary">
                                   {submittedCoverage.pcn}
                                 </p>
                               </div>
@@ -1250,26 +1210,18 @@ export function AIAssistantPanel({
                         )}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Relationship
                             </label>
-                            <p className={`text-sm mt-1 capitalize ${
-                              darkMode ? 'text-white' : 'text-stone-900'
-                            }`}>
+                            <p className="text-sm mt-1 capitalize text-content-primary">
                               {submittedCoverage.relationship}
                             </p>
                           </div>
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Effective Start
                             </label>
-                            <p className={`text-sm mt-1 ${
-                              darkMode ? 'text-white' : 'text-stone-900'
-                            }`}>
+                            <p className="text-sm mt-1 text-content-primary">
                               {submittedCoverage.effectiveStart ? new Date(submittedCoverage.effectiveStart).toLocaleDateString() : 'N/A'}
                             </p>
                           </div>
@@ -1278,46 +1230,36 @@ export function AIAssistantPanel({
                     </div>
 
                     {selectedProvider && (
-                      <div className={`rounded-lg border p-6 ${
-                        darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
-                      }`}>
-                        <h4 className={`text-sm font-semibold mb-4 ${
-                          darkMode ? 'text-white' : 'text-stone-900'
-                        }`}>
+                      <div className="rounded-lg border border-stroke-default bg-surface-sunken p-6">
+                        <h4 className="mb-4 text-sm font-semibold text-content-primary">
                           Provider Contact Information
                         </h4>
                         <div className="space-y-3 text-sm">
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Customer Service
                             </label>
-                            <p className={`mt-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                            <p className="mt-1 text-content-primary">
                               Available Monday - Friday, 8:00 AM - 8:00 PM EST
                             </p>
                           </div>
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Phone
                             </label>
-                            <a href="tel:1-800-555-0100" className="block mt-1 text-indigo-600 hover:text-indigo-700">
+                            <a href="tel:1-800-555-0100" className="mt-1 block text-action-primary hover:text-action-primary-hover">
                               1-800-555-0100
                             </a>
                           </div>
                           <div>
-                            <label className={`text-xs font-medium ${
-                              darkMode ? 'text-stone-400' : 'text-stone-500'
-                            }`}>
+                            <label className="text-xs font-medium text-content-secondary">
                               Website
                             </label>
                             <a
                               href={`https://www.${selectedProvider.slug || selectedProvider.name.toLowerCase().replace(/\s+/g, '')}.com`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="block mt-1 text-indigo-600 hover:text-indigo-700"
+                              className="mt-1 block text-action-primary hover:text-action-primary-hover"
                             >
                               View Member Portal
                             </a>
@@ -1328,7 +1270,7 @@ export function AIAssistantPanel({
 
                     <button
                       onClick={handleInsuranceComplete}
-                      className="w-full px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                      className="w-full rounded-lg bg-action-primary px-6 py-3 font-medium text-content-on-action transition-colors hover:bg-action-primary-hover"
                     >
                       Done
                     </button>
@@ -1339,17 +1281,17 @@ export function AIAssistantPanel({
               <>
                 {messages.length === 1 && (
                   <div className="space-y-6">
-                    <div className="bg-stone-50 rounded-2xl p-6">
-                      <p className="text-base leading-relaxed text-stone-900">
+                    <div className="bg-surface-sunken rounded-2xl p-6">
+                      <p className="text-base leading-relaxed text-content-primary">
                         Hello! I'm your AI health assistant. I can help you manage your health records, schedule appointments, track vitals, and answer medical questions.
                       </p>
-                      <p className="text-sm text-stone-500 mt-2">Just now</p>
+                      <p className="text-sm text-content-secondary mt-2">Just now</p>
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-stone-400" />
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                        <Sparkles className="w-4 h-4 text-content-secondary" />
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-content-secondary">
                           Suggestions
                         </h3>
                       </div>
@@ -1357,7 +1299,7 @@ export function AIAssistantPanel({
                         <button
                           key={index}
                           onClick={() => handleQuickAction(suggestion)}
-                          className="w-full text-left px-5 py-3.5 rounded-xl bg-white border border-stone-200 text-stone-700 text-sm hover:bg-stone-50 hover:border-stone-300 transition-all"
+                          className="hv-surface-card hv-surface-card--interactive w-full rounded-xl px-5 py-3.5 text-left text-sm text-content-primary transition-all hover:bg-action-secondary"
                         >
                           {suggestion}
                         </button>
@@ -1371,21 +1313,21 @@ export function AIAssistantPanel({
                     {messages.map((msg, index) => (
                       <div key={index} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.type === 'assistant' && (
-                          <div className="bg-stone-50 rounded-2xl px-5 py-4 max-w-[85%]">
-                            <p className="text-sm leading-relaxed text-stone-900 whitespace-pre-wrap">{msg.message}</p>
+                          <div className="bg-surface-sunken rounded-2xl px-5 py-4 max-w-[85%]">
+                            <p className="text-sm leading-relaxed text-content-primary whitespace-pre-wrap">{msg.message}</p>
                           </div>
                         )}
                         {msg.type === 'user' && (
-                          <div className="bg-stone-900 rounded-2xl px-5 py-4 max-w-[85%]">
-                            <p className="text-sm text-white leading-relaxed">{msg.message}</p>
+                          <div className="max-w-[85%] rounded-2xl bg-action-primary px-5 py-4">
+                            <p className="text-sm leading-relaxed text-content-on-action">{msg.message}</p>
                           </div>
                         )}
                       </div>
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-stone-50 rounded-2xl px-5 py-4">
-                          <Loader2 className="w-4 h-4 animate-spin text-stone-600" />
+                        <div className="bg-surface-sunken rounded-2xl px-5 py-4">
+                          <Loader2 className="w-4 h-4 animate-spin text-content-secondary" />
                         </div>
                       </div>
                     )}
@@ -1408,7 +1350,7 @@ export function AIAssistantPanel({
           </div>
 
           {!showInsuranceFlow && (
-            <div className="p-6 border-t flex-shrink-0 border-stone-200 bg-white">
+            <div className="flex-shrink-0 border-t border-stroke-default bg-transparent p-6">
               <div className="flex gap-3 items-end">
                 <input
                   type="text"
@@ -1417,15 +1359,15 @@ export function AIAssistantPanel({
                   onKeyPress={handleKeyPress}
                   placeholder="Ask your health assistant anything..."
                   disabled={isLoading}
-                  className={`flex-1 px-4 py-3.5 border border-stone-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent bg-white text-stone-900 placeholder:text-stone-400 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  className={`flex-1 rounded-xl border border-stroke-default bg-surface-sunken px-4 py-3.5 text-sm text-content-primary placeholder:text-content-tertiary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-stroke-focus ${
+                    isLoading ? 'cursor-not-allowed opacity-50' : ''
                   }`}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={isLoading}
-                  className={`flex items-center justify-center w-12 h-12 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-all flex-shrink-0 hover:scale-105 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-action-primary text-content-on-action transition-all hover:scale-105 hover:bg-action-primary-hover ${
+                    isLoading ? 'cursor-not-allowed opacity-50' : ''
                   }`}
                 >
                   <Send className="w-5 h-5" />

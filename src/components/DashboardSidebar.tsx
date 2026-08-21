@@ -1,9 +1,8 @@
 import { Home, Heart, FileText, ClipboardList, Activity, LogOut, Sun, Moon, Settings, Menu, Globe, User, ShieldCheck, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { ProfileSettingsDrawer } from './ProfileSettingsDrawer';
-import { ToastContainer, ToastProps } from './Toast';
 import { Tooltip } from './ui/Tooltip';
 import { supabase } from '../lib/supabase';
+import { cn } from '../lib/utils';
 
 interface DashboardSidebarProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
@@ -15,6 +14,8 @@ interface DashboardSidebarProps {
   onToggleCollapse?: () => void;
   isMobileMenuOpen?: boolean;
   onMobileMenuToggle?: () => void;
+  /** Increment to refetch sidebar profile after main-column profile save */
+  profileRefreshKey?: number;
 }
 
 export function DashboardSidebar({
@@ -26,34 +27,15 @@ export function DashboardSidebar({
   isCollapsed = false,
   onToggleCollapse,
   isMobileMenuOpen = false,
-  onMobileMenuToggle
+  onMobileMenuToggle,
+  profileRefreshKey = 0,
 }: DashboardSidebarProps) {
-  const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
   const [showViewsDropdown, setShowViewsDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleProfileSave = (data: { profilePhoto: string | null; firstName: string; lastName: string }) => {
-    setProfilePhoto(data.profilePhoto);
-    setFirstName(data.firstName);
-    setLastName(data.lastName);
-
-    const toast: ToastProps = {
-      id: Date.now().toString(),
-      type: 'success',
-      message: 'Profile updated successfully',
-      onClose: removeToast
-    };
-    setToasts(prev => [...prev, toast]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -87,7 +69,7 @@ export function DashboardSidebar({
     };
 
     loadProfile();
-  }, []);
+  }, [profileRefreshKey]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -139,21 +121,19 @@ export function DashboardSidebar({
       )}
 
       <aside
+        data-steel-chrome="sidebar"
         className={`
-          border-r flex flex-col transition-all duration-300 ease-in-out
-          ${darkMode ? 'border-stone-800' : 'border-stone-200'}
+          border-r border-stroke-subtle flex flex-col transition-all duration-300 ease-in-out
+          bg-surface-raised
           fixed lg:relative inset-y-0 left-0 z-50
           w-72 ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}
           transform lg:transform-none
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
-          ${darkMode ? 'bg-stone-900' : 'bg-white'}
         `}
         aria-label="Main navigation"
       >
-      <div className={`border-b ${isCollapsed ? 'p-4' : 'p-6'} transition-all duration-300 ${
-        darkMode ? 'border-stone-800' : 'border-stone-200'
-      }`}>
+      <div className={`border-b border-stroke-subtle ${isCollapsed ? 'p-4' : 'p-6'} transition-all duration-300`}>
         <div className={`flex items-center mb-6 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="flex items-center justify-center w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
             <img
@@ -166,12 +146,8 @@ export function DashboardSidebar({
             transition-all duration-300 overflow-hidden
             ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}
           `}>
-            <h1 className={`text-base font-bold whitespace-nowrap ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Health Vault</h1>
-            <p className={`text-xs whitespace-nowrap ${
-              darkMode ? 'text-stone-400' : 'text-stone-500'
-            }`}>AI Medical Assistant</p>
+            <h1 className="text-base font-bold whitespace-nowrap text-content-primary">Health Vault</h1>
+            <p className="text-xs whitespace-nowrap text-content-tertiary">AI Medical Assistant</p>
           </div>
         </div>
       </div>
@@ -180,9 +156,7 @@ export function DashboardSidebar({
         <div className={`transition-all duration-300 ${isCollapsed ? 'p-2' : 'p-4'}`}>
           <div className="mb-4">
             {!isCollapsed && (
-              <h3 className={`text-xs font-semibold uppercase tracking-wide px-3 mb-2 transition-opacity duration-300 ${
-                darkMode ? 'text-stone-400' : 'text-stone-500'
-              }`}>
+              <h3 className="text-xs font-semibold uppercase tracking-wide px-3 mb-2 transition-opacity duration-300 text-content-tertiary">
                 Product
               </h3>
             )}
@@ -194,18 +168,11 @@ export function DashboardSidebar({
                   <button
                     key={item.name}
                     onClick={() => onPageChange?.(item.id)}
-                    className={`
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
-                      ${isCollapsed ? 'justify-center px-3 py-2' : 'gap-3 px-3 py-2'}
-                      ${isActive
-                        ? darkMode
-                          ? 'bg-stone-700 text-white'
-                          : 'bg-stone-900 text-white'
-                        : darkMode
-                          ? 'text-stone-300 hover:bg-stone-800'
-                          : 'text-stone-700 hover:bg-stone-50'
-                      }
-                    `}
+                    className={cn(
+                      'hv-nav-rail-item w-full flex items-center text-sm font-medium transition-all duration-300',
+                      isCollapsed ? 'justify-center px-3 py-2' : 'gap-3 px-3 py-2',
+                      isActive && 'hv-nav-rail-item--selected',
+                    )}
                     aria-label={item.name}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -232,9 +199,7 @@ export function DashboardSidebar({
 
           <div>
             {!isCollapsed && (
-              <h3 className={`text-xs font-semibold uppercase tracking-wide px-3 mb-2 transition-opacity duration-300 ${
-                darkMode ? 'text-stone-400' : 'text-stone-500'
-              }`}>
+              <h3 className="text-xs font-semibold uppercase tracking-wide px-3 mb-2 transition-opacity duration-300 text-content-tertiary">
                 Account
               </h3>
             )}
@@ -245,14 +210,11 @@ export function DashboardSidebar({
                     <Tooltip content="Views" position="right" className="w-full">
                       <button
                         onClick={() => setShowViewsDropdown(!showViewsDropdown)}
-                        className={`
+                        className="
                           w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                           justify-center px-3 py-2
-                          ${darkMode
-                            ? 'text-stone-300 hover:bg-stone-800'
-                            : 'text-stone-700 hover:bg-stone-50'
-                          }
-                        `}
+                          text-content-secondary hover:bg-action-secondary
+                        "
                         aria-label="Toggle views menu"
                         aria-expanded={showViewsDropdown}
                       >
@@ -261,11 +223,7 @@ export function DashboardSidebar({
                     </Tooltip>
                     {showViewsDropdown && (
                       <div
-                        className={`absolute left-full ml-2 bottom-0 rounded-lg shadow-lg border w-48 overflow-hidden ${
-                          darkMode
-                            ? 'bg-stone-900 border-stone-700'
-                            : 'bg-white border-stone-200'
-                        }`}
+                        className="absolute left-full ml-2 bottom-0 rounded-lg shadow-hv-card border border-stroke-default bg-surface-overlay w-48 overflow-hidden"
                         style={{ zIndex: 50 }}
                       >
                         <button
@@ -273,11 +231,7 @@ export function DashboardSidebar({
                             onViewChange?.('design-system');
                             setShowViewsDropdown(false);
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                            darkMode
-                              ? 'text-stone-300 hover:bg-stone-800'
-                              : 'text-stone-700 hover:bg-stone-50'
-                          }`}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-content-secondary hover:bg-action-secondary"
                         >
                           <Settings className="w-4 h-4 flex-shrink-0" />
                           <span>Design System</span>
@@ -287,11 +241,7 @@ export function DashboardSidebar({
                             onViewChange?.('marketing');
                             setShowViewsDropdown(false);
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                            darkMode
-                              ? 'text-stone-300 hover:bg-stone-800'
-                              : 'text-stone-700 hover:bg-stone-50'
-                          }`}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-content-secondary hover:bg-action-secondary"
                         >
                           <Globe className="w-4 h-4 flex-shrink-0" />
                           <span>Marketing Site</span>
@@ -302,14 +252,11 @@ export function DashboardSidebar({
                   <Tooltip content="Log Out" position="right" className="w-full">
                     <button
                       onClick={handleSignOut}
-                      className={`
-                        w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                      className="
+                        w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                         justify-center px-3 py-2
-                        ${darkMode
-                          ? 'text-stone-300 hover:bg-stone-800'
-                          : 'text-stone-700 hover:bg-stone-50'
-                        }
-                      `}
+                        text-content-secondary hover:bg-action-secondary
+                      "
                       aria-label="Log Out"
                     >
                       <LogOut className="w-4 h-4 flex-shrink-0" />
@@ -318,14 +265,11 @@ export function DashboardSidebar({
                   <Tooltip content={darkMode ? 'Light Mode' : 'Dark Mode'} position="right" className="w-full">
                     <button
                       onClick={onToggleDarkMode}
-                      className={`
+                      className="
                         w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                         justify-center px-3 py-2
-                        ${darkMode
-                          ? 'text-stone-300 hover:bg-stone-800'
-                          : 'text-stone-700 hover:bg-stone-50'
-                        }
-                      `}
+                        text-content-secondary hover:bg-action-secondary
+                      "
                       aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                     >
                       {darkMode ? <Sun className="w-4 h-4 flex-shrink-0" /> : <Moon className="w-4 h-4 flex-shrink-0" />}
@@ -336,14 +280,11 @@ export function DashboardSidebar({
                 <>
                   <button
                     onClick={() => onViewChange?.('design-system')}
-                    className={`
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                    className="
+                      w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
-                      ${darkMode
-                        ? 'text-stone-300 hover:bg-stone-800'
-                        : 'text-stone-700 hover:bg-stone-50'
-                      }
-                    `}
+                      text-content-secondary hover:bg-action-secondary
+                    "
                     aria-label="Design System"
                   >
                     <Settings className="w-4 h-4 flex-shrink-0" />
@@ -353,14 +294,11 @@ export function DashboardSidebar({
                   </button>
                   <button
                     onClick={() => onViewChange?.('marketing')}
-                    className={`
-                      w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
+                    className="
+                      w-full flex items-center rounded-hv-button text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
-                      ${darkMode
-                        ? 'text-stone-300 hover:bg-stone-800'
-                        : 'text-stone-700 hover:bg-stone-50'
-                      }
-                    `}
+                      text-content-secondary hover:bg-action-secondary
+                    "
                     aria-label="Marketing Site"
                   >
                     <Globe className="w-4 h-4 flex-shrink-0" />
@@ -370,14 +308,11 @@ export function DashboardSidebar({
                   </button>
                   <button
                     onClick={handleSignOut}
-                    className={`
+                    className="
                       w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
-                      ${darkMode
-                        ? 'text-stone-300 hover:bg-stone-800'
-                        : 'text-stone-700 hover:bg-stone-50'
-                      }
-                    `}
+                      text-content-secondary hover:bg-action-secondary
+                    "
                     aria-label="Log Out"
                   >
                     <LogOut className="w-4 h-4 flex-shrink-0" />
@@ -387,14 +322,11 @@ export function DashboardSidebar({
                   </button>
                   <button
                     onClick={onToggleDarkMode}
-                    className={`
+                    className="
                       w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                       gap-3 px-3 py-2
-                      ${darkMode
-                        ? 'text-stone-300 hover:bg-stone-800'
-                        : 'text-stone-700 hover:bg-stone-50'
-                      }
-                    `}
+                      text-content-secondary hover:bg-action-secondary
+                    "
                     aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                   >
                     {darkMode ? <Sun className="w-4 h-4 flex-shrink-0" /> : <Moon className="w-4 h-4 flex-shrink-0" />}
@@ -409,23 +341,18 @@ export function DashboardSidebar({
         </div>
       </div>
 
-      <div className={`border-t ${
-        darkMode ? 'border-stone-800' : 'border-stone-200'
-      }`}>
+      <div className="border-t border-stroke-subtle">
         {onToggleCollapse && (
-          <div className={`p-4 ${darkMode ? 'border-b border-stone-800' : 'border-b border-stone-200'}`}>
+          <div className="p-4 border-b border-stroke-subtle">
             {isCollapsed ? (
               <Tooltip content="Expand sidebar" position="right" className="w-full">
                 <button
                   onClick={onToggleCollapse}
-                  className={`
+                  className="
                     w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                     justify-center px-3 py-2
-                    ${darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-700 hover:bg-stone-50'
-                    }
-                  `}
+                    text-content-secondary hover:bg-action-secondary
+                  "
                   aria-label="Expand sidebar"
                   aria-expanded={false}
                 >
@@ -435,14 +362,11 @@ export function DashboardSidebar({
             ) : (
               <button
                 onClick={onToggleCollapse}
-                className={`
+                className="
                   w-full flex items-center rounded-lg text-sm font-medium transition-all duration-300
                   gap-3 px-3 py-2
-                  ${darkMode
-                    ? 'text-stone-300 hover:bg-stone-800'
-                    : 'text-stone-700 hover:bg-stone-50'
-                  }
-                `}
+                  text-content-secondary hover:bg-action-secondary
+                "
                 aria-label="Collapse sidebar"
                 aria-expanded={true}
               >
@@ -459,12 +383,14 @@ export function DashboardSidebar({
           {isCollapsed ? (
             <Tooltip content={`${firstName} ${lastName}`} position="right" className="w-full">
               <button
-                onClick={() => setShowProfileSettings(true)}
-                className={`
-                  w-full flex items-center rounded-lg transition-all duration-300
+                onClick={() => {
+                  onPageChange?.('profile-settings');
+                }}
+                className="
+                  w-full flex items-center rounded-hv-button transition-all duration-300
                   justify-center p-0
-                  ${darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-50'}
-                `}
+                  hover:bg-action-secondary
+                "
                 aria-label="Open profile settings"
               >
                 {profilePhoto ? (
@@ -474,24 +400,22 @@ export function DashboardSidebar({
                     className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 ${
-                    darkMode ? 'bg-stone-800' : 'bg-stone-100'
-                  }`}>
-                    <span className={`text-sm font-bold ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
-                    }`}>{firstName[0]}{lastName[0]}</span>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 bg-surface-sunken">
+                    <span className="text-sm font-bold text-content-secondary">{firstName[0]}{lastName[0]}</span>
                   </div>
                 )}
               </button>
             </Tooltip>
           ) : (
             <button
-              onClick={() => setShowProfileSettings(true)}
-              className={`
-                w-full flex items-center rounded-lg transition-all duration-300
+              onClick={() => {
+                onPageChange?.('profile-settings');
+              }}
+              className="
+                w-full flex items-center rounded-hv-button transition-all duration-300
                 gap-3 p-0
-                ${darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-50'}
-              `}
+                hover:bg-action-secondary
+              "
               aria-label="Open profile settings"
             >
               {profilePhoto ? (
@@ -501,36 +425,19 @@ export function DashboardSidebar({
                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 />
               ) : (
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 ${
-                  darkMode ? 'bg-stone-800' : 'bg-stone-100'
-                }`}>
-                  <span className={`text-sm font-bold ${
-                    darkMode ? 'text-stone-300' : 'text-stone-700'
-                  }`}>{firstName[0]}{lastName[0]}</span>
+                <div className="flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 bg-surface-sunken">
+                  <span className="text-sm font-bold text-content-secondary">{firstName[0]}{lastName[0]}</span>
                 </div>
               )}
               <div className="flex-1 min-w-0 transition-all duration-300 overflow-hidden w-auto opacity-100">
-                <p className={`text-sm font-semibold truncate whitespace-nowrap ${
-                  darkMode ? 'text-white' : 'text-stone-900'
-                }`}>{firstName} {lastName}</p>
-                <p className={`text-xs truncate whitespace-nowrap ${
-                  darkMode ? 'text-stone-400' : 'text-stone-500'
-                }`}>{userEmail}</p>
+                <p className="text-sm font-semibold truncate whitespace-nowrap text-content-primary">{firstName} {lastName}</p>
+                <p className="text-xs truncate whitespace-nowrap text-content-tertiary">{userEmail}</p>
               </div>
             </button>
           )}
         </div>
       </div>
 
-      <ProfileSettingsDrawer
-        isOpen={showProfileSettings}
-        onClose={() => setShowProfileSettings(false)}
-        darkMode={darkMode}
-        onSave={handleProfileSave}
-        onSignOut={handleSignOut}
-      />
-
-      <ToastContainer toasts={toasts} onClose={removeToast} />
     </aside>
     </>
   );

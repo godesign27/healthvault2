@@ -135,18 +135,18 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
     }
   };
 
-  const inputClasses = 'w-full px-3 py-2.5 rounded-lg border border-stone-200 text-sm text-stone-900 placeholder-stone-400 outline-none focus:border-stone-400 transition-colors bg-white';
+  const inputClasses = 'w-full px-3 py-2.5 rounded-lg border border-stroke-subtle text-sm text-content-primary placeholder:text-content-placeholder outline-none focus:border-stroke-strong transition-colors bg-white';
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+    <div className="rounded-2xl border border-stroke-subtle bg-white overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-stroke-subtle bg-surface-sunken">
         <div className="flex items-center gap-2">
-          <Mail className="w-4 h-4 text-stone-500" />
-          <span className="text-sm font-semibold text-stone-800">Request Health Records</span>
+          <Mail className="w-4 h-4 text-content-secondary" />
+          <span className="text-sm font-semibold text-content-primary">Request Health Records</span>
         </div>
         <button
           onClick={onCancel}
-          className="p-1 rounded-md hover:bg-stone-200 transition-colors text-stone-400 hover:text-stone-600"
+          className="p-1 rounded-md hover:bg-surface-overlay transition-colors text-content-secondary hover:text-content-secondary"
         >
           <X className="w-4 h-4" />
         </button>
@@ -154,7 +154,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
 
       <div className="p-4 space-y-4">
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Provider / Facility *</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Provider / Facility *</label>
           <input
             type="text"
             value={providerName}
@@ -165,7 +165,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Provider Email *</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Provider Email *</label>
           <input
             type="email"
             value={providerEmail}
@@ -176,7 +176,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Doctor's Name</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Doctor's Name</label>
           <input
             type="text"
             value={doctorName}
@@ -187,7 +187,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Record Types *</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Record Types *</label>
           <div className="flex flex-wrap gap-2">
             {RECORD_TYPES.map(({ kind, label, icon: Icon }) => {
               const selected = selectedTypes.includes(kind);
@@ -197,8 +197,8 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
                   onClick={() => toggleType(kind)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                     selected
-                      ? 'border-stone-800 bg-stone-800 text-white'
-                      : 'border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50'
+                      ? 'border-stroke-subtle bg-surface-sunken text-white'
+                      : 'border-stroke-subtle bg-white text-content-secondary hover:border-stroke-default hover:bg-surface-sunken'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -210,14 +210,14 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Priority</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Priority</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setUrgency('routine')}
               className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium border transition-all ${
                 urgency === 'routine'
-                  ? 'border-stone-800 bg-stone-800 text-white'
-                  : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                  ? 'border-stroke-subtle bg-surface-sunken text-white'
+                  : 'border-stroke-subtle text-content-secondary hover:border-stroke-default'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
@@ -228,7 +228,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
               className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium border transition-all ${
                 urgency === 'urgent'
                   ? 'border-amber-600 bg-amber-600 text-white'
-                  : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                  : 'border-stroke-subtle text-content-secondary hover:border-stroke-default'
               }`}
             >
               <Send className="w-3.5 h-3.5" />
@@ -238,7 +238,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-600 mb-1.5">Message to Provider</label>
+          <label className="block text-xs font-medium text-content-secondary mb-1.5">Message to Provider</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -266,13 +266,13 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
           <div className="px-3 py-3 space-y-2.5">
             {!profileLoaded ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-400" />
-                <span className="text-xs text-stone-500">Loading verification info...</span>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-content-secondary" />
+                <span className="text-xs text-content-secondary">Loading verification info...</span>
               </div>
             ) : (
               <>
                 {identityComplete ? (
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-content-secondary">
                     Your date of birth, phone, and email will be included to help verify your identity.
                   </p>
                 ) : (
@@ -282,7 +282,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
                 )}
                 <div className="space-y-2">
                   <div>
-                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Date of Birth</label>
+                    <label className="block text-[11px] font-medium text-content-secondary mb-1">Date of Birth</label>
                     <input
                       type="date"
                       value={editDob}
@@ -291,7 +291,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Phone Number</label>
+                    <label className="block text-[11px] font-medium text-content-secondary mb-1">Phone Number</label>
                     <input
                       type="tel"
                       value={editPhone}
@@ -301,7 +301,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-medium text-stone-500 mb-1">Email Address</label>
+                    <label className="block text-[11px] font-medium text-content-secondary mb-1">Email Address</label>
                     <input
                       type="email"
                       value={editEmail}
@@ -332,7 +332,7 @@ export function InlineRecordRequestForm({ onComplete, onCancel, onRequestSent }:
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || submitting}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-stone-900 text-white text-sm font-medium hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-surface-raised text-white text-sm font-medium hover:bg-surface-sunken disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {submitting ? (
             <>

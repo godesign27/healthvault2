@@ -1,0 +1,10 @@
+{
+  "name": "@health-vault/auth",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "dependencies": {
+    "expo-local-authentication": "^14.0.0",
+    "expo-secure-store": "^13.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}

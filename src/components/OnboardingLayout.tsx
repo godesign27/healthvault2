@@ -26,11 +26,9 @@ export function OnboardingLayout({
 }: OnboardingLayoutProps) {
   return (
     <div className={`min-h-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
+      darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
     }`}>
-      <header className={`sticky top-0 z-50 border-b ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-      }`}>
+      <header className="sticky top-0 z-50 border-b border-stroke-subtle hv-surface-card-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-4">
@@ -39,8 +37,8 @@ export function OnboardingLayout({
                   onClick={onBack}
                   className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
                     darkMode
-                      ? 'hover:bg-stone-800 text-stone-400'
-                      : 'hover:bg-stone-100 text-stone-500'
+                      ? 'hover:bg-surface-sunken text-content-secondary'
+                      : 'hover:bg-surface-sunken text-content-secondary'
                   }`}
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -55,7 +53,7 @@ export function OnboardingLayout({
                   />
                 </div>
                 <span className={`text-sm font-bold ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>Health Vault</span>
               </div>
             </div>
@@ -78,8 +76,8 @@ export function OnboardingLayout({
                             ? 'bg-emerald-500 text-white'
                             : 'bg-emerald-600 text-white'
                           : darkMode
-                            ? 'bg-stone-800 text-stone-400 border border-stone-700'
-                            : 'bg-white text-stone-400 border border-stone-300'
+                            ? 'bg-surface-sunken text-content-secondary border border-stroke-default'
+                            : 'bg-white text-content-secondary border border-stroke-default'
                     }`}>
                       {step.number < currentStep ? (
                         <Check className="w-5 h-5" />
@@ -90,7 +88,7 @@ export function OnboardingLayout({
                     <span className={`text-xs mt-2 ${
                       step.number === currentStep
                         ? darkMode ? 'text-emerald-400' : 'text-emerald-600'
-                        : darkMode ? 'text-stone-500' : 'text-stone-500'
+                        : darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {step.label}
                     </span>
@@ -100,8 +98,8 @@ export function OnboardingLayout({
                       step.number < currentStep
                         ? 'bg-emerald-600'
                         : darkMode
-                          ? 'bg-stone-800'
-                          : 'bg-stone-300'
+                          ? 'bg-surface-sunken'
+                          : 'bg-surface-overlay'
                     }`} />
                   )}
                 </div>

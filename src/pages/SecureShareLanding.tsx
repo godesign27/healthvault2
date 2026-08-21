@@ -197,7 +197,7 @@ export default function SecureShareLanding() {
                 </p>
 
                 {/* Intended Recipient */}
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-4">
+                <div className="hv-surface-card hv-surface-card--flat p-6 mb-4">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-slate-500">
                       <User className="w-4 h-4" />
@@ -270,7 +270,7 @@ export default function SecureShareLanding() {
 
                   {/* Individual Form Cards */}
                   {data.forms.map((form) => (
-                    <div key={form.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                    <div key={form.id} className="hv-surface-card hv-surface-card--flat p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="space-y-1">
                           <h3 className="text-slate-900 font-semibold">{form.title}</h3>

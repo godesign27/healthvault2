@@ -99,16 +99,12 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
     try {
       const alreadyAdded = pharmacies.find(p => p.name === np.name);
       if (alreadyAdded) {
-        await setPreferredPharmacyApi(
-          '00000000-0000-0000-0000-000000000000',
-          alreadyAdded.id
-        );
+        await setPreferredPharmacyApi(undefined, alreadyAdded.id);
       } else {
         if (preferredPharmacy) {
           await updatePharmacy(preferredPharmacy.id, { preferred: false });
         }
         await addPharmacy({
-          userId: '00000000-0000-0000-0000-000000000000',
           name: np.name,
           chain: np.chain,
           phone: np.phone.replace(/[^\d]/g, ''),
@@ -129,10 +125,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
   const handleSetSavedPreferred = async (pharmacy: Pharmacy) => {
     setAddingId(pharmacy.id);
     try {
-      await setPreferredPharmacyApi(
-        '00000000-0000-0000-0000-000000000000',
-        pharmacy.id
-      );
+      await setPreferredPharmacyApi(undefined, pharmacy.id);
       await loadData();
     } catch {
       // handled silently
@@ -157,9 +150,9 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className={`text-sm font-medium uppercase tracking-wider ${
-              darkMode ? 'text-stone-400' : 'text-stone-500'
+              'text-content-secondary'
             }`}>Your Addresses</h3>
-            <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+            <p className={`text-xs mt-0.5 ${'text-content-secondary'}`}>
               Used to find nearby pharmacies
             </p>
           </div>
@@ -168,7 +161,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
               onClick={() => { setEditingAddress(null); setShowAddAddress(true); }}
               className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
                 darkMode
-                  ? 'text-blue-400 hover:bg-stone-800'
+                  ? 'text-blue-400 hover:bg-surface-sunken'
                   : 'text-blue-600 hover:bg-blue-50'
               }`}
             >
@@ -183,21 +176,21 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
             onClick={() => { setEditingAddress(null); setShowAddAddress(true); }}
             className={`w-full p-6 rounded-xl border-2 border-dashed text-center transition-colors group ${
               darkMode
-                ? 'border-stone-700 hover:border-stone-600'
-                : 'border-stone-300 hover:border-blue-400'
+                ? 'border-stroke-default hover:border-stroke-default'
+                : 'border-stroke-default hover:border-blue-400'
             }`}
           >
             <div className={`w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center transition-colors ${
               darkMode
-                ? 'bg-stone-800 text-stone-500 group-hover:text-blue-400'
-                : 'bg-stone-100 text-stone-400 group-hover:text-blue-600'
+                ? 'bg-surface-sunken text-content-secondary group-hover:text-blue-400'
+                : 'bg-surface-sunken text-content-secondary group-hover:text-blue-600'
             }`}>
               <MapPin className="w-6 h-6" />
             </div>
-            <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <p className={`font-medium mb-1 ${'text-content-primary'}`}>
               Add your first address
             </p>
-            <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+            <p className={`text-sm ${'text-content-secondary'}`}>
               Home, second home, or work -- used to find pharmacies near you
             </p>
           </button>
@@ -208,14 +201,14 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
               return (
                 <div
                   key={addr.id}
-                  className={`relative rounded-xl border p-4 transition-all ${
+                  className={`relative p-4 transition-all ${
                     addr.isActive
                       ? darkMode
-                        ? 'border-blue-600 bg-blue-950/20 ring-1 ring-blue-600/30'
-                        : 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
+                        ? 'rounded-xl border border-blue-600 bg-blue-950/20 ring-1 ring-blue-600/30'
+                        : 'rounded-xl border border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
                       : darkMode
-                        ? 'border-stone-700 bg-stone-900'
-                        : 'border-stone-200 bg-white'
+                        ? 'hv-surface-card'
+                        : 'rounded-xl border border-stroke-subtle bg-white'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -224,13 +217,13 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                         addr.isActive
                           ? 'bg-blue-600 text-white'
                           : darkMode
-                            ? 'bg-stone-800 text-stone-400'
-                            : 'bg-stone-100 text-stone-500'
+                            ? 'bg-surface-sunken text-content-secondary'
+                            : 'bg-surface-sunken text-content-secondary'
                       }`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className={`text-sm font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                        <p className={`text-sm font-semibold truncate ${'text-content-primary'}`}>
                           {addr.label}
                         </p>
                         {addr.isActive && (
@@ -244,7 +237,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                           onClick={() => handleSetActive(addr)}
                           title="Use for pharmacy search"
                           className={`p-1.5 rounded-md transition-colors ${
-                            darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-blue-400' : 'hover:bg-stone-100 text-stone-400 hover:text-blue-600'
+                            'hover:bg-surface-sunken text-content-secondary hover:text-blue-500'
                           }`}
                         >
                           <Radio className="w-3.5 h-3.5" />
@@ -254,7 +247,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                         onClick={() => { setEditingAddress(addr); setShowAddAddress(true); }}
                         title="Edit"
                         className={`p-1.5 rounded-md transition-colors ${
-                          darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-stone-300' : 'hover:bg-stone-100 text-stone-400 hover:text-stone-600'
+                          'hover:bg-surface-sunken text-content-secondary hover:text-content-primary'
                         }`}
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -263,14 +256,14 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                         onClick={() => handleDeleteAddress(addr)}
                         title="Remove"
                         className={`p-1.5 rounded-md transition-colors ${
-                          darkMode ? 'hover:bg-stone-800 text-stone-500 hover:text-red-400' : 'hover:bg-stone-100 text-stone-400 hover:text-red-500'
+                          'hover:bg-surface-sunken text-content-secondary hover:text-red-400'
                         }`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <p className={`text-xs leading-relaxed ${'text-content-secondary'}`}>
                     {addr.addressLine1}
                     {addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
                     <br />
@@ -289,7 +282,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
         }`}>
           <div className="flex items-center gap-2 mb-3">
             <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-            <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <h3 className={`font-semibold ${'text-content-primary'}`}>
               Your Preferred Pharmacy
             </h3>
           </div>
@@ -298,16 +291,16 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
               <Pill className="w-5 h-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <h4 className={`font-semibold ${'text-content-primary'}`}>
                 {preferredPharmacy.name}
               </h4>
               {preferredPharmacy.address && (
-                <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                <p className={`text-sm mt-0.5 ${'text-content-secondary'}`}>
                   {preferredPharmacy.address}
                 </p>
               )}
               {preferredPharmacy.phone && (
-                <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                <p className={`text-sm mt-0.5 ${'text-content-secondary'}`}>
                   {preferredPharmacy.phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
                 </p>
               )}
@@ -336,7 +329,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
       {pharmacies.length > 0 && pharmacies.filter(p => !p.preferred).length > 0 && (
         <section>
           <h3 className={`text-sm font-medium uppercase tracking-wider mb-3 ${
-            darkMode ? 'text-stone-400' : 'text-stone-500'
+            'text-content-secondary'
           }`}>Other Saved Pharmacies</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {pharmacies.filter(p => !p.preferred).map(pharmacy => (
@@ -352,8 +345,8 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                     disabled={addingId === pharmacy.id}
                     className={`absolute top-3 right-3 flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-colors z-10 ${
                       darkMode
-                        ? 'bg-stone-700 text-stone-300 hover:bg-stone-600'
-                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                        ? 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
+                        : 'bg-surface-sunken text-content-secondary hover:bg-surface-overlay'
                     }`}
                   >
                     <Star className="w-3 h-3" />
@@ -370,7 +363,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-red-500" />
-            <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <h2 className={`text-lg font-semibold ${'text-content-primary'}`}>
               Nearby Pharmacies
             </h2>
           </div>
@@ -386,13 +379,13 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
 
         {hasAddress ? (
           <>
-            <p className={`text-sm mb-5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            <p className={`text-sm mb-5 ${'text-content-secondary'}`}>
               Based on your saved address in {cityLabel}
               {insurance.connected && `. ${insurance.name} network status shown.`}
             </p>
 
             <div className={`rounded-xl overflow-hidden border mb-6 ${
-              darkMode ? 'border-stone-700' : 'border-stone-200'
+              'border-stroke-subtle'
             }`}>
               <div className="relative w-full h-64 lg:h-72">
                 <iframe
@@ -403,7 +396,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                   title={`Pharmacy locations near ${cityLabel}`}
                 />
                 <div className={`absolute bottom-3 left-3 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium shadow-lg ${
-                  darkMode ? 'bg-stone-900 text-stone-300' : 'bg-white text-stone-700'
+                  darkMode ? 'bg-surface-sunken text-content-primary' : 'bg-surface-raised text-content-primary'
                 }`}>
                   <Navigation className="w-3.5 h-3.5 text-blue-600" />
                   {cityLabel}
@@ -416,14 +409,12 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : nearbyPharmacies.length === 0 ? (
-              <div className={`text-center py-16 rounded-xl border ${
-                darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
-              }`}>
-                <Pill className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
-                <p className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <div className="hv-surface-card py-16 text-center">
+                <Pill className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
+                <p className={`font-medium ${'text-content-primary'}`}>
                   No pharmacies found nearby
                 </p>
-                <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                <p className={`text-sm mt-1 ${'text-content-secondary'}`}>
                   You can add a pharmacy manually to your profile.
                 </p>
               </div>
@@ -452,14 +443,12 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
             )}
           </>
         ) : (
-          <div className={`text-center py-12 rounded-xl border mt-4 ${
-            darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
-          }`}>
-            <MapPin className={`w-10 h-10 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
-            <p className={`font-medium mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <div className="hv-surface-card mt-4 py-12 text-center">
+            <MapPin className={`w-10 h-10 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
+            <p className={`font-medium mb-1 ${'text-content-primary'}`}>
               Add an address to see nearby pharmacies
             </p>
-            <p className={`text-sm max-w-sm mx-auto mb-4 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            <p className={`text-sm max-w-sm mx-auto mb-4 ${'text-content-secondary'}`}>
               Use the address section above, or add a pharmacy manually.
             </p>
             <div className="flex items-center justify-center gap-3">
@@ -474,8 +463,8 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
                 onClick={onOpenManualAdd}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   darkMode
-                    ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken'
+                    : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                 }`}
               >
                 + Add Pharmacy
@@ -512,23 +501,23 @@ function PharmacyResultCard({
   return (
     <div
       onClick={onSelect}
-      className={`rounded-xl border p-5 transition-all cursor-pointer ${
+      className={`cursor-pointer p-5 transition-all ${
         isDesignated
           ? darkMode
-            ? 'border-emerald-700 bg-emerald-950/20'
-            : 'border-emerald-300 bg-emerald-50/50'
+            ? 'rounded-xl border border-emerald-700 bg-emerald-950/20'
+            : 'rounded-xl border border-emerald-300 bg-emerald-50/50'
           : isSelected
-          ? darkMode
-            ? 'border-blue-600 bg-blue-950/20'
-            : 'border-blue-300 bg-blue-50/30'
-          : darkMode
-          ? 'border-stone-700 bg-stone-900 hover:border-stone-600'
-          : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
+            ? darkMode
+              ? 'rounded-xl border border-blue-600 bg-blue-950/20'
+              : 'rounded-xl border border-blue-300 bg-blue-50/30'
+            : darkMode
+              ? 'hv-surface-card hv-surface-card--interactive'
+              : 'rounded-xl border border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
       }`}
     >
       <div className="flex items-start gap-4">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
-          isDesignated ? 'bg-emerald-600' : pharmacy.inNetwork ? 'bg-blue-600' : 'bg-stone-500'
+          isDesignated ? 'bg-emerald-600' : pharmacy.inNetwork ? 'bg-blue-600' : 'bg-hv-neutral-500'
         }`}>
           {pharmacy.distance === 'Mail'
             ? <Package className="w-5 h-5" />
@@ -539,7 +528,7 @@ function PharmacyResultCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <div className="flex items-center gap-2 min-w-0">
-              <h3 className={`font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <h3 className={`font-semibold truncate ${'text-content-primary'}`}>
                 {pharmacy.name}
               </h3>
               {isDesignated && <Star className="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" />}
@@ -547,7 +536,7 @@ function PharmacyResultCard({
             <div className="flex items-center gap-2 shrink-0">
               {pharmacy.distance !== 'Mail' && (
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  darkMode ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-600'
+                  'bg-surface-sunken text-content-secondary'
                 }`}>
                   {pharmacy.distance}
                 </span>
@@ -566,11 +555,11 @@ function PharmacyResultCard({
             </div>
           </div>
 
-          <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+          <p className={`text-sm ${'text-content-secondary'}`}>
             {pharmacy.chain !== 'Independent' ? pharmacy.chain : 'Independent Pharmacy'}
           </p>
 
-          <div className={`space-y-1 mt-2 text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <div className={`space-y-1 mt-2 text-xs ${'text-content-secondary'}`}>
             <div className="flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 shrink-0" />
               <span>{pharmacy.address}</span>
@@ -588,7 +577,7 @@ function PharmacyResultCard({
           <div className="flex items-center gap-2 mt-2">
             {pharmacy.deliveryOptions.map(opt => (
               <span key={opt} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                darkMode ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-600'
+                'bg-surface-sunken text-content-secondary'
               }`}>
                 {opt}
               </span>
@@ -597,7 +586,7 @@ function PharmacyResultCard({
 
           <div
             className={`flex items-center gap-3 mt-3 pt-3 border-t ${
-              darkMode ? 'border-stone-800' : 'border-stone-200'
+              'border-stroke-subtle'
             }`}
             onClick={e => e.stopPropagation()}
           >
@@ -626,7 +615,7 @@ function PharmacyResultCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  darkMode ? 'text-stone-300 hover:bg-stone-800' : 'text-stone-600 hover:bg-stone-100'
+                  darkMode ? 'text-content-secondary hover:bg-surface-sunken' : 'text-content-secondary hover:bg-surface-sunken'
                 }`}
               >
                 <ExternalLink className="w-3.5 h-3.5" />

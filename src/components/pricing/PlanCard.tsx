@@ -27,8 +27,8 @@ export function PlanCard({
     <div
       className={`relative rounded-2xl p-8 shadow-sm border ${
         darkMode
-          ? 'bg-stone-800 border-stone-700'
-          : 'bg-white border-stone-200'
+          ? 'bg-surface-sunken border-stroke-default'
+          : 'bg-white border-stroke-subtle'
       }`}
     >
       {badge && (
@@ -45,19 +45,19 @@ export function PlanCard({
 
       <div className="text-center mb-6">
         <h3 className={`text-xl font-semibold mb-2 ${
-          darkMode ? 'text-white' : 'text-stone-900'
+          darkMode ? 'text-white' : 'text-content-primary'
         }`}>
           {title}
         </h3>
         <div className="flex items-baseline justify-center gap-1">
           <span className={`text-4xl font-bold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             {price}
           </span>
           {period && (
             <span className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               {period}
             </span>
@@ -72,7 +72,7 @@ export function PlanCard({
               darkMode ? 'text-emerald-400' : 'text-emerald-600'
             }`} />
             <span className={`text-sm ${
-              darkMode ? 'text-stone-300' : 'text-stone-700'
+              darkMode ? 'text-content-primary' : 'text-content-primary'
             }`}>
               {feature}
             </span>
@@ -97,7 +97,7 @@ export function PlanCard({
 
       {subtext && (
         <p className={`mt-4 text-xs text-center ${
-          darkMode ? 'text-stone-500' : 'text-stone-500'
+          darkMode ? 'text-content-secondary' : 'text-content-secondary'
         }`}>
           {subtext}
         </p>

@@ -5,35 +5,35 @@ export function TabsPage() {
   const [activeTab, setActiveTab] = useState('tab1');
 
   const exampleTabs = [
-    { id: 'tab1', label: 'Tab 1', content: <div className="text-gray-700">Content for Tab 1</div> },
-    { id: 'tab2', label: 'Tab 2', content: <div className="text-gray-700">Content for Tab 2</div> },
-    { id: 'tab3', label: 'Tab 3', content: <div className="text-gray-700">Content for Tab 3</div> },
-    { id: 'tab4', label: 'Tab 4', content: <div className="text-gray-700">Content for Tab 4</div> },
-    { id: 'tab5', label: 'Tab 5', content: <div className="text-gray-700">Content for Tab 5</div> }
+    { id: 'tab1', label: 'Tab 1', content: <div className="text-content-secondary">Content for Tab 1</div> },
+    { id: 'tab2', label: 'Tab 2', content: <div className="text-content-secondary">Content for Tab 2</div> },
+    { id: 'tab3', label: 'Tab 3', content: <div className="text-content-secondary">Content for Tab 3</div> },
+    { id: 'tab4', label: 'Tab 4', content: <div className="text-content-secondary">Content for Tab 4</div> },
+    { id: 'tab5', label: 'Tab 5', content: <div className="text-content-secondary">Content for Tab 5</div> }
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Tabs</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Tabs</h1>
+          <p className="text-content-secondary">
             Navigation component for switching between different views
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Master Components <span className="text-base font-normal text-gray-500">(for UI Kit building only)</span>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">
+              Master Components <span className="text-base font-normal text-content-secondary">(for UI Kit building only)</span>
             </h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Normal (16)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Normal (16)</h3>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">NORMAL LIST</div>
+                    <div className="text-xs text-content-secondary mb-2">NORMAL LIST</div>
                     <div className="border-2 border-dashed border-[#9B85D8] rounded p-4 space-y-2">
                       <div className="flex gap-2">
                         <SimpleTab label="Tab 1" active size="normal" style="solid" />
@@ -43,7 +43,7 @@ export function TabsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">OUTLINE</div>
+                    <div className="text-xs text-content-secondary mb-2">OUTLINE</div>
                     <div className="border-2 border-dashed border-[#9B85D8] rounded p-4 space-y-2">
                       <div className="flex gap-2">
                         <SimpleTab label="Tab 1" active size="normal" style="outline" />
@@ -55,10 +55,10 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Small (14)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Small (14)</h3>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">SMALL LIST</div>
+                    <div className="text-xs text-content-secondary mb-2">SMALL LIST</div>
                     <div className="border-2 border-dashed border-[#9B85D8] rounded p-4 space-y-2">
                       <div className="flex gap-2">
                         <SimpleTab label="Tab 1" active size="small" style="solid" />
@@ -68,7 +68,7 @@ export function TabsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">SMALL LIST</div>
+                    <div className="text-xs text-content-secondary mb-2">SMALL LIST</div>
                     <div className="border-2 border-dashed border-[#9B85D8] rounded p-4 space-y-2">
                       <div className="flex gap-2">
                         <SimpleTab label="Tab 1" active size="small" style="outline" />
@@ -80,9 +80,9 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Vertical Tab</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Vertical Tab</h3>
                 <div className="border-2 border-dashed border-[#9B85D8] rounded p-4 inline-block">
-                  <div className="flex flex-col border-r border-gray-200">
+                  <div className="flex flex-col border-r border-stroke-subtle">
                     <SimpleTab label="Normal tab" active size="normal" style="outline" className="border-b-0 border-r-2 border-r-[indigo-600]" />
                     <SimpleTab label="Normal tab" size="normal" style="outline" className="border-b-0 border-r-2 border-r-transparent" />
                   </div>
@@ -91,88 +91,88 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Solid Tab</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid Tab</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 bg-gray-100 p-2">Normal (16)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Normal (16)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b-2 border-gray-300">
-                        <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase"></th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Active</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Hover</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Pressed</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Focused Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Disabled</th>
+                      <tr className="border-b-2 border-stroke-default">
+                        <th className="text-left p-4 text-xs font-semibold text-content-secondary uppercase"></th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Active</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Hover</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Pressed</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Focused Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Disabled</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Default</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Default</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="solid" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active size="normal" style="solid" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="solid" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="solid" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="solid" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled size="normal" style="solid" />
                           </div>
                         </td>
                       </tr>
 
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Closeable</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Closeable</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="solid" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active closeable size="normal" style="solid" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="solid" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="solid" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="solid" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled closeable size="normal" style="solid" />
                           </div>
@@ -184,83 +184,83 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 bg-gray-100 p-2">Small (14)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Small (14)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b-2 border-gray-300">
-                        <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase"></th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Active</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Hover</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Pressed</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Focused Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Disabled</th>
+                      <tr className="border-b-2 border-stroke-default">
+                        <th className="text-left p-4 text-xs font-semibold text-content-secondary uppercase"></th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Active</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Hover</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Pressed</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Focused Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Disabled</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Default</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Default</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="solid" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active size="small" style="solid" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="solid" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="solid" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="solid" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled size="small" style="solid" />
                           </div>
                         </td>
                       </tr>
 
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Closeable</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Closeable</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="solid" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active closeable size="small" style="solid" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="solid" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="solid" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="solid" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled closeable size="small" style="solid" />
                           </div>
@@ -273,88 +273,88 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Outline Tab</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Outline Tab</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 bg-gray-100 p-2">Normal (16)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Normal (16)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b-2 border-gray-300">
-                        <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase"></th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Active</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Hover</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Pressed</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Focused Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Disabled</th>
+                      <tr className="border-b-2 border-stroke-default">
+                        <th className="text-left p-4 text-xs font-semibold text-content-secondary uppercase"></th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Active</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Hover</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Pressed</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Focused Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Disabled</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Default</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Default</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="outline" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active size="normal" style="outline" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="outline" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="outline" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="normal" style="outline" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled size="normal" style="outline" />
                           </div>
                         </td>
                       </tr>
 
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Closeable</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Closeable</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="outline" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active closeable size="normal" style="outline" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="outline" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="outline" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="normal" style="outline" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled closeable size="normal" style="outline" />
                           </div>
@@ -366,83 +366,83 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 bg-gray-100 p-2">Small (14)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4 bg-surface-sunken p-2">Small (14)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b-2 border-gray-300">
-                        <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase"></th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Active</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Hover</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Pressed</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Focused Default</th>
-                        <th className="text-center p-4 text-xs font-semibold text-gray-500 uppercase">Disabled</th>
+                      <tr className="border-b-2 border-stroke-default">
+                        <th className="text-left p-4 text-xs font-semibold text-content-secondary uppercase"></th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Active</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Hover</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Pressed</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Focused Default</th>
+                        <th className="text-center p-4 text-xs font-semibold text-content-secondary uppercase">Disabled</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Default</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Default</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="outline" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active size="small" style="outline" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="outline" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="outline" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" size="small" style="outline" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled size="small" style="outline" />
                           </div>
                         </td>
                       </tr>
 
-                      <tr className="border-b border-gray-200">
-                        <td className="p-4 text-sm font-medium text-gray-700 bg-gray-50">Closeable</td>
-                        <td className="p-4 text-center bg-gray-50">
+                      <tr className="border-b border-stroke-subtle">
+                        <td className="p-4 text-sm font-medium text-content-secondary bg-surface-sunken">Closeable</td>
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="outline" state="default" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" active closeable size="small" style="outline" state="active" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="outline" state="hover" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="outline" state="pressed" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" closeable size="small" style="outline" state="focused" />
                           </div>
                         </td>
-                        <td className="p-4 text-center bg-gray-50">
+                        <td className="p-4 text-center bg-surface-sunken">
                           <div className="flex justify-center">
                             <SimpleTab label="Tab 1" disabled closeable size="small" style="outline" />
                           </div>
@@ -455,12 +455,12 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Examples</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Examples</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Solid Tabs</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Solid Tabs</h3>
                 <Tabs
                   tabs={exampleTabs}
                   activeTab={activeTab}
@@ -471,7 +471,7 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Outline Tabs</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Outline Tabs</h3>
                 <Tabs
                   tabs={exampleTabs}
                   style="outline"
@@ -480,7 +480,7 @@ export function TabsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Small Tabs</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Small Tabs</h3>
                 <Tabs
                   tabs={exampleTabs}
                   style="solid"
@@ -490,10 +490,10 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Vertical Tab</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Vertical Tab</h2>
 
-            <div className="border border-gray-200 rounded inline-block">
+            <div className="border border-stroke-subtle rounded inline-block">
               <Tabs
                 tabs={exampleTabs}
                 style="outline"
@@ -503,10 +503,10 @@ export function TabsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

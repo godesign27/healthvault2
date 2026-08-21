@@ -6,8 +6,8 @@ import { RequestRecordDrawer } from '../components/records/RequestRecordDrawer';
 import { RecordRequestDetailDrawer } from '../components/records/RecordRequestDetailDrawer';
 import { HealthRecord, RecordKind } from '../lib/records/types';
 import { listRecords } from '../lib/records/query';
-import { AIResultCard } from '../components/records/AIResultCard';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
+import { supabase } from '../lib/supabase';
 
 interface HealthRecordsPageProps {
   darkMode?: boolean;
@@ -39,14 +39,13 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
   const [currentFilter, setCurrentFilter] = useState<RecordKind | 'all'>('all');
-  const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestDrawerOpen, setRequestDrawerOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<RecordRequestRow | null>(null);
   const [requests, setRequests] = useState<RecordRequestRow[]>([]);
   const [stats, setStats] = useState({
-    lastSynced: new Date().toLocaleDateString(),
-    connectedProviders: 3,
+    lastSynced: 'Never',
+    connectedProviders: 0,
     totalRecords: 0
   });
 
@@ -61,7 +60,32 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
   useEffect(() => {
     loadRecords();
     loadRequests();
+    loadStats();
   }, []);
+
+  const loadStats = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vault-stats`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+        },
+      });
+      if (!res.ok) return;
+      const s = await res.json();
+      setStats(prev => ({
+        ...prev,
+        connectedProviders: s.connectedProviders ?? 0,
+        lastSynced: s.lastSyncedAt
+          ? new Date(s.lastSyncedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : 'Never',
+      }));
+    } catch {
+      /* non-blocking */
+    }
+  };
 
   useEffect(() => {
     if (currentFilter === 'all') {
@@ -100,10 +124,6 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
     }
   }, []);
 
-  const handleShowInsight = (insight: any) => {
-    setInsights(prev => [insight, ...prev]);
-  };
-
   const activeRequests = requests.filter(r => r.status !== 'received');
   const receivedRequests = requests.filter(r => r.status === 'received');
   const pendingCount = activeRequests.length;
@@ -133,36 +153,30 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="min-w-0">
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <FileText className="w-7 h-7 shrink-0" />
             Health Records
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className="text-content-secondary">
             Your labs, scans, and medical documents — all in one place.
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={onConnectProvider}
-            className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-stone-900 text-white rounded-xl font-medium hover:bg-stone-800 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-colors shadow-sm"
           >
             <Link2 className="w-4 h-4" />
             <span className="hidden sm:inline">Connect Provider</span>
           </button>
           <button
             onClick={() => setRequestDrawerOpen(true)}
-            className={`relative inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 border rounded-xl font-medium transition-colors shadow-sm ${
-              darkMode
-                ? 'border-stone-700 text-stone-300 hover:bg-stone-800'
-                : 'border-stone-300 text-stone-700 hover:bg-stone-50'
-            }`}
+            className="relative inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 border border-stroke-default rounded-xl font-medium text-content-secondary transition-colors shadow-sm hover:bg-action-secondary"
           >
             <SendHorizonal className="w-4 h-4" />
             <span className="hidden sm:inline">Request Manually</span>
             {pendingCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-hv-orange-500 text-content-on-action text-[10px] font-bold flex items-center justify-center">
                 {pendingCount}
               </span>
             )}
@@ -171,15 +185,15 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-stone-900 text-white">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-action-primary text-content-on-action">
           <Database className="w-3.5 h-3.5" />
           Last Synced: {stats.lastSynced}
         </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-stone-900 text-white">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-action-primary text-content-on-action">
           <Link2 className="w-3.5 h-3.5" />
           Connected Providers: {stats.connectedProviders}
         </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-stone-900 text-white">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-action-primary text-content-on-action">
           <Upload className="w-3.5 h-3.5" />
           Total Records: {stats.totalRecords}
         </div>
@@ -209,10 +223,8 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
             onClick={() => setCurrentFilter(filter.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               currentFilter === filter.value
-                ? 'bg-emerald-600 text-white'
-                : darkMode
-                  ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                ? 'bg-emerald-600 text-content-on-action'
+                : 'bg-surface-sunken text-content-secondary hover:bg-action-secondary'
             }`}
           >
             {filter.label}
@@ -220,23 +232,9 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
         ))}
       </div>
 
-      {insights.length > 0 && (
-        <div className="space-y-3 mb-6">
-          {insights.map((insight) => (
-            <AIResultCard
-              key={insight.id}
-              insight={insight}
-              darkMode={darkMode}
-            />
-          ))}
-        </div>
-      )}
-
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className={`text-center ${
-            darkMode ? 'text-stone-400' : 'text-stone-500'
-          }`}>
+          <div className="text-center text-content-tertiary">
             Loading records...
           </div>
         </div>
@@ -332,12 +330,10 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <h2 className={`text-sm font-semibold uppercase tracking-wider ${
-          darkMode ? 'text-stone-400' : 'text-stone-500'
-        }`}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-content-tertiary">
           Pending Requests
         </h2>
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-hv-orange-500 text-content-on-action">
           {requests.length} active
         </span>
       </div>
@@ -347,14 +343,12 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
           <button
             key={req.id}
             onClick={() => onRequestClick(req)}
-            className={`rounded-xl border p-4 transition-all text-left cursor-pointer ${
+            className={`p-4 text-left transition-all cursor-pointer ${
               req.status === 'received'
                 ? darkMode
-                  ? 'border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
-                  : 'border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
-                : darkMode
-                  ? 'border-stone-700 bg-stone-900 hover:border-stone-600'
-                  : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
+                  ? 'rounded-xl border border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
+                  : 'rounded-xl border border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
+                : 'hv-surface-card hv-surface-card--interactive hover:shadow-sm'
             }`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
@@ -364,16 +358,16 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
                     ? 'bg-emerald-100 text-emerald-600'
                     : req.status === 'sent'
                       ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
-                      : darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
+                      : 'bg-surface-sunken text-content-tertiary'
                 }`}>
                   <Building2 className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-sm font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <p className="text-sm font-semibold truncate text-content-primary">
                     {req.doctor_name || req.provider_name}
                   </p>
                   {req.doctor_name && (
-                    <p className={`text-xs truncate ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                    <p className="text-xs truncate text-content-tertiary">
                       {req.provider_name}
                     </p>
                   )}
@@ -384,20 +378,18 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
 
             <div className="flex flex-wrap gap-1 mb-2">
               {req.record_types?.map(type => (
-                <span key={type} className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                  darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
-                }`}>
+                <span key={type} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-surface-sunken text-content-tertiary">
                   {KIND_LABELS[type] || type}
                 </span>
               ))}
             </div>
 
             <div className="flex items-center justify-between">
-              <span className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+              <span className="text-xs text-content-tertiary">
                 {timeAgo(req.created_at)}
               </span>
               {req.opened_at && req.status !== 'received' && (
-                <span className={`flex items-center gap-1 text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                <span className="flex items-center gap-1 text-xs text-content-tertiary">
                   <Eye className="w-3 h-3" />
                   Opened
                 </span>

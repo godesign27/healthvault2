@@ -1,0 +1,343 @@
+/* ─── Theme: Steel (frosted glass + blue/teal wash) ─────────────────────────
+   Applied via data-surface="steel" on a container (design-system gallery).
+   Dark appearance: pair with html data-theme="dark" from ThemeProvider.
+   Structural hooks: data-steel-chrome="sidebar" | "main", data-steel-glass on demo wrapper.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+[data-surface="steel"] {
+  isolation: isolate;
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(at 12% 18%, rgba(20, 184, 166, 0.2) 0, transparent 45%),
+    radial-gradient(at 88% 12%, rgba(99, 102, 241, 0.18) 0, transparent 45%),
+    radial-gradient(at 78% 92%, rgba(20, 184, 166, 0.16) 0, transparent 45%),
+    radial-gradient(at 8% 88%, rgba(99, 102, 241, 0.14) 0, transparent 45%),
+    #fafafa;
+  background-attachment: fixed;
+
+  /* Semantic remaps — light Steel */
+  --hv-color-surface-page: transparent;
+  --hv-color-surface-raised: rgba(255, 255, 255, 0.78);
+  --hv-color-surface-sunken: rgba(255, 255, 255, 0.55);
+  --hv-color-surface-overlay: rgba(255, 255, 255, 0.88);
+
+  --hv-color-text-primary: #0f172a;
+  --hv-color-text-secondary: #475569;
+  --hv-color-text-tertiary: #64748b;
+  --hv-color-text-placeholder: #94a3b8;
+  --hv-color-text-disabled: #94a3b8;
+  --hv-color-text-inverse: #f8fafc;
+  --hv-color-text-on-action: #ffffff;
+  --hv-color-text-link: var(--hv-color-brand-700);
+  --hv-color-text-link-hover: var(--hv-color-brand-800);
+
+  --hv-color-border-subtle: rgba(15, 23, 42, 0.06);
+  --hv-color-border-default: rgba(15, 23, 42, 0.1);
+  --hv-color-border-strong: rgba(15, 23, 42, 0.14);
+
+  /* Steel light: brand blue CTAs (not indigo) */
+  --hv-color-action-primary-default: var(--hv-color-brand-600);
+  --hv-color-action-primary-hover: var(--hv-color-brand-700);
+  --hv-color-action-primary-active: var(--hv-color-brand-800);
+  --hv-color-action-primary-disabled: rgba(148, 163, 184, 0.6);
+  --hv-color-action-primary-subtle: var(--hv-color-brand-100);
+
+  --hv-color-action-secondary-default: rgba(15, 23, 42, 0.06);
+  --hv-color-action-secondary-hover: rgba(15, 23, 42, 0.1);
+  --hv-color-action-secondary-active: rgba(15, 23, 42, 0.14);
+  --hv-color-action-secondary-disabled: rgba(15, 23, 42, 0.04);
+
+  --hv-color-action-ghost-hover: rgba(35, 100, 199, 0.1);
+  --hv-color-action-ghost-active: rgba(35, 100, 199, 0.16);
+
+  --hv-component-card-radius-default: 1rem;
+  --hv-component-card-shadow-default:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 8px 24px rgba(15, 23, 42, 0.04);
+
+  /* Pill-shaped actions + nav rows for Steel */
+  --hv-component-button-radius-default: var(--hv-component-button-radius-pill);
+  --hv-component-nav-item-radius: var(--hv-component-button-radius-pill);
+  --hv-component-nav-segment-track-radius: var(--hv-component-button-radius-pill);
+  --hv-component-nav-segment-thumb-radius: var(--hv-component-button-radius-pill);
+
+  /* Rail labels read clearly on frosted chrome */
+  --hv-component-nav-item-text-default: var(--hv-color-text-primary);
+
+  /* Reverse-out selection (light frosted UI): white pill + brand text */
+  --hv-component-nav-item-background-selected: rgba(255, 255, 255, 0.98);
+  --hv-component-nav-item-text-selected: var(--hv-color-brand-700);
+  --hv-component-nav-item-icon-selected: var(--hv-color-brand-600);
+  --hv-component-nav-item-selected-overlay:
+    inset 0 0 0 1px rgba(35, 100, 199, 0.18),
+    0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+[data-surface="steel"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Ambient layer (Steel dark only — toggled below) */
+[data-surface='steel']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+/* Demo pages: stack above shell grid */
+[data-surface="steel"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-surface="steel"] [data-steel-chrome="sidebar"] {
+  /* Closer to transparent main canvas — lighter frost than raised panels */
+  background: rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-right-color: rgba(15, 23, 42, 0.05);
+  box-shadow: none;
+}
+
+[data-surface="steel"] [data-steel-chrome="main"],
+[data-surface="steel"] [data-steel-chrome="assistant"] {
+  background: transparent;
+}
+
+[data-surface="steel"] [data-steel-glass="true"] {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  border-radius: 1rem;
+  margin: 0.5rem 0.75rem 0.75rem 0;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+/* Optional: gradient heading (use class on specific headings in demos/docs) */
+.hv-steel-text-grad {
+  background: linear-gradient(90deg, var(--hv-color-brand-500) 0%, #14b8a6 50%, var(--hv-color-brand-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Steel + html dark (“midnight glass” — not flat gray) ─────────────────── */
+[data-theme='dark'] [data-surface='steel'] {
+  /* Deep indigo-slate base + aurora washes (reads as Steel, not generic dark) */
+  background:
+    radial-gradient(ellipse 130% 90% at 50% -35%, rgba(79, 70, 229, 0.38) 0%, transparent 58%),
+    radial-gradient(at 10% 20%, rgba(45, 212, 191, 0.16) 0%, transparent 46%),
+    radial-gradient(at 92% 8%, rgba(129, 140, 248, 0.28) 0%, transparent 50%),
+    radial-gradient(at 82% 92%, rgba(20, 184, 166, 0.12) 0%, transparent 48%),
+    radial-gradient(at 6% 88%, rgba(99, 102, 241, 0.2) 0%, transparent 44%),
+    linear-gradient(168deg, #070b14 0%, #0b1020 42%, #060a12 100%);
+  background-attachment: fixed;
+
+  --hv-color-surface-page: transparent;
+  /* Opaque “flood” read of the midnight canvas / chrome stack (for rail reverse-out type) */
+  --hv-color-steel-chrome-flood: #060a12;
+  /* Glass tiers: indigo-tinted translucency so panels float over the wash */
+  --hv-color-surface-raised: rgba(36, 32, 86, 0.48);
+  --hv-color-surface-sunken: rgba(15, 23, 42, 0.62);
+  --hv-color-surface-overlay: rgba(28, 32, 64, 0.78);
+
+  --hv-color-text-primary: #eef2ff;
+  --hv-color-text-secondary: #c7d2fe;
+  --hv-color-text-tertiary: #94a3b8;
+  --hv-color-text-placeholder: #64748b;
+  --hv-color-text-disabled: #64748b;
+  --hv-color-text-inverse: #0f172a;
+  --hv-color-text-on-action: #f8fafc;
+  --hv-color-text-link: var(--hv-color-brand-300);
+  --hv-color-text-link-hover: var(--hv-color-brand-200);
+
+  --hv-color-border-subtle: rgba(255, 255, 255, 0.08);
+  --hv-color-border-default: rgba(255, 255, 255, 0.12);
+  --hv-color-border-strong: rgba(199, 210, 254, 0.22);
+
+  --hv-color-action-primary-default: var(--hv-color-brand-500);
+  --hv-color-action-primary-hover: var(--hv-color-brand-400);
+  --hv-color-action-primary-active: var(--hv-color-brand-300);
+  --hv-color-action-primary-disabled: rgba(100, 116, 139, 0.45);
+  --hv-color-action-primary-subtle: rgba(59, 156, 255, 0.22);
+
+  --hv-color-action-secondary-default: rgba(255, 255, 255, 0.07);
+  --hv-color-action-secondary-hover: rgba(255, 255, 255, 0.12);
+  --hv-color-action-secondary-active: rgba(255, 255, 255, 0.16);
+  --hv-color-action-secondary-disabled: rgba(255, 255, 255, 0.04);
+
+  --hv-color-action-ghost-hover: rgba(59, 156, 255, 0.16);
+  --hv-color-action-ghost-active: rgba(59, 156, 255, 0.24);
+
+  --hv-component-button-radius-default: var(--hv-component-button-radius-pill);
+  --hv-component-nav-item-radius: var(--hv-component-button-radius-pill);
+  --hv-component-nav-segment-track-radius: var(--hv-component-button-radius-pill);
+  --hv-component-nav-segment-thumb-radius: var(--hv-component-button-radius-pill);
+
+  --hv-component-nav-item-text-default: var(--hv-color-text-secondary);
+
+  --hv-component-nav-item-background-selected: rgba(255, 255, 255, 0.94);
+  /* Selected pill: type matches chrome flood (tone-on-tone with sidebar wash), not brand blue */
+  --hv-component-nav-item-text-selected: var(--hv-color-steel-chrome-flood);
+  --hv-component-nav-item-icon-selected: var(--hv-color-steel-chrome-flood);
+  --hv-component-nav-item-selected-overlay:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 2px 14px rgba(0, 0, 0, 0.35);
+
+  --hv-component-card-shadow-default:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 12px 40px rgba(0, 0, 0, 0.38),
+    0 0 80px rgba(99, 102, 241, 0.1);
+}
+
+[data-theme='dark'] [data-surface='steel']::before {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 88% 72% at 50% 48%, black 22%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 88% 72% at 50% 48%, black 22%, transparent 70%);
+}
+
+/* Soft floor + corner bloom so the canvas feels lit, not empty */
+[data-theme='dark'] [data-surface='steel']::after {
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 100% 55% at 50% 115%, rgba(20, 184, 166, 0.14) 0%, transparent 52%),
+    radial-gradient(ellipse 45% 35% at 100% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(129, 140, 248, 0.1) 0%, transparent 55%);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='sidebar'] {
+  /* Match main chrome so the rail sits tone-on-tone with content */
+  background: linear-gradient(
+    195deg,
+    rgba(32, 28, 58, 0.55) 0%,
+    rgba(16, 18, 36, 0.72) 45%,
+    rgba(4, 6, 14, 0.88) 100%
+  );
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Main content + AI assistant rail: same frosted-glass stack */
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='main'],
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='assistant'] {
+  background: linear-gradient(
+    195deg,
+    rgba(32, 28, 58, 0.55) 0%,
+    rgba(16, 18, 36, 0.72) 45%,
+    rgba(4, 6, 14, 0.88) 100%
+  );
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-chrome='assistant'] {
+  border-left-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Nested data-theme=dark (e.g. Health Vault) — same chrome as html-level dark */
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='main'],
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='assistant'] {
+  background: linear-gradient(
+    195deg,
+    rgba(32, 28, 58, 0.55) 0%,
+    rgba(16, 18, 36, 0.72) 45%,
+    rgba(4, 6, 14, 0.88) 100%
+  );
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+[data-surface='steel'] [data-theme='dark'] [data-steel-chrome='assistant'] {
+  border-left-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Ensure midnight flood token exists under nested dark wrappers (Health Vault) */
+[data-surface='steel'] [data-theme='dark'] {
+  --hv-color-steel-chrome-flood: #060a12;
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-steel-glass='true'] {
+  background: linear-gradient(
+    145deg,
+    rgba(99, 102, 241, 0.12) 0%,
+    rgba(15, 23, 42, 0.45) 42%,
+    rgba(20, 184, 166, 0.08) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    0 16px 48px rgba(0, 0, 0, 0.38),
+    0 0 100px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme='dark'] [data-surface='steel'] .hv-steel-text-grad {
+  background: linear-gradient(90deg, var(--hv-color-brand-300) 0%, #5eead4 50%, var(--hv-color-brand-300) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Floating voice / chat FAB (Health Vault) ───────────────────────────────
+   Stronger glass + border so the cluster reads above Steel canvas; chat chip ink
+   matches midnight flood (same family as nav reverse-out) for contrast on white.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface='steel'] [data-hv-floating-chat-bar] {
+  --hv-component-floating-chat-chrome-background: rgba(255, 255, 255, 0.9);
+  --hv-component-floating-chat-chrome-border: rgba(15, 23, 42, 0.12);
+  --hv-component-floating-chat-chrome-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 12px 40px rgba(15, 23, 42, 0.2);
+}
+
+[data-theme='dark'] [data-surface='steel'] [data-hv-floating-chat-bar],
+[data-surface='steel'] [data-theme='dark'] [data-hv-floating-chat-bar] {
+  --hv-component-floating-chat-chrome-background: rgba(14, 16, 30, 0.86);
+  --hv-component-floating-chat-chrome-border: rgba(255, 255, 255, 0.14);
+  --hv-component-floating-chat-chrome-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+  --hv-component-floating-chat-secondary-fill: rgba(255, 255, 255, 0.98);
+  /* Fallback when html theme is light but a nested data-theme=dark wrapper is used */
+  --hv-component-floating-chat-secondary-ink: var(--hv-color-steel-chrome-flood, #060a12);
+  --hv-component-floating-chat-secondary-border: rgba(6, 10, 18, 0.22);
+}

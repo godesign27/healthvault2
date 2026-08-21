@@ -116,7 +116,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
   ];
 
   return (
-    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
         <svg
@@ -124,7 +124,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
           className={`absolute inset-0 -z-10 h-full w-full ${
             darkMode
               ? 'stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
-              : 'stroke-stone-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
+              : 'stroke-subtle [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
           }`}
         >
           <defs>
@@ -139,7 +139,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
               <path d="M.5 200V.5H200" fill="none" />
             </pattern>
           </defs>
-          <svg x="50%" y="-1" className={`overflow-visible ${darkMode ? 'fill-stone-800/20' : 'fill-stone-50'}`}>
+          <svg x="50%" y="-1" className={`overflow-visible ${darkMode ? 'fill-hv-neutral-800/20' : 'fill-surface-sunken'}`}>
             <path
               d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
               strokeWidth="0"
@@ -189,7 +189,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
 
           <div className="text-center">
             <h1 className={`text-5xl font-bold tracking-tight sm:text-7xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Empower your patients.
               <br />
@@ -198,7 +198,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
               </span>
             </h1>
             <p className={`mt-6 text-lg leading-8 sm:text-xl ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               A secure, AI-powered provider portal with read-only patient vaults, population analytics, and preventive insights—while patients keep lifelong ownership.
             </p>
@@ -214,7 +214,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 onClick={() => handleCTAClick('providers_start_trial', 'Start Free Trial')}
                 data-analytics-id="providers_start_trial"
                 className={`text-base font-semibold leading-6 ${
-                  darkMode ? 'text-white hover:text-stone-200' : 'text-stone-900 hover:text-stone-700'
+                  darkMode ? 'text-white hover:text-content-primary' : 'text-content-primary hover:text-content-primary'
                 } transition-colors`}
               >
                 Start Free Trial <span aria-hidden="true">→</span>
@@ -225,16 +225,16 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* How It Works Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               How It Works
             </h2>
             <p className={`mt-4 text-lg leading-8 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Four simple principles that transform patient-provider data sharing
             </p>
@@ -243,8 +243,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
           <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:max-w-none lg:grid-cols-2 xl:gap-8">
             <div className={`rounded-2xl p-8 ring-1 ${
               darkMode
-                ? 'bg-stone-800/50 ring-stone-700/50'
-                : 'bg-stone-50 ring-stone-900/5'
+                ? 'bg-surface-sunken/50 ring-stroke-default/50'
+                : 'bg-surface-sunken ring-stroke-subtle/40'
             }`}>
               <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                 darkMode ? 'bg-emerald-500/10' : 'bg-emerald-100'
@@ -252,12 +252,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Users className={`h-6 w-6 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Patient-Owned Accounts
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 Patients connect once and keep their vault for life. You get read-only access while in-network.
               </p>
@@ -265,8 +265,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
 
             <div className={`rounded-2xl p-8 ring-1 ${
               darkMode
-                ? 'bg-stone-800/50 ring-stone-700/50'
-                : 'bg-stone-50 ring-stone-900/5'
+                ? 'bg-surface-sunken/50 ring-stroke-default/50'
+                : 'bg-surface-sunken ring-stroke-subtle/40'
             }`}>
               <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                 darkMode ? 'bg-cyan-500/10' : 'bg-cyan-100'
@@ -274,12 +274,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Activity className={`h-6 w-6 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Provider Dashboard
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 One secure workspace to review shared forms, labs, meds, and visit summaries.
               </p>
@@ -287,8 +287,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
 
             <div className={`rounded-2xl p-8 ring-1 ${
               darkMode
-                ? 'bg-stone-800/50 ring-stone-700/50'
-                : 'bg-stone-50 ring-stone-900/5'
+                ? 'bg-surface-sunken/50 ring-stroke-default/50'
+                : 'bg-surface-sunken ring-stroke-subtle/40'
             }`}>
               <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                 darkMode ? 'bg-indigo-500/10' : 'bg-indigo-100'
@@ -296,12 +296,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Brain className={`h-6 w-6 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 AI-Powered Insights
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 Preventive-care flags, visit prep summaries, and pattern detection across your panel.
               </p>
@@ -309,8 +309,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
 
             <div className={`rounded-2xl p-8 ring-1 ${
               darkMode
-                ? 'bg-stone-800/50 ring-stone-700/50'
-                : 'bg-stone-50 ring-stone-900/5'
+                ? 'bg-surface-sunken/50 ring-stroke-default/50'
+                : 'bg-surface-sunken ring-stroke-subtle/40'
             }`}>
               <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                 darkMode ? 'bg-purple-500/10' : 'bg-purple-100'
@@ -318,12 +318,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Heart className={`h-6 w-6 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Family Health Context
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 Opt-in family link view to support early screening and risk stratification.
               </p>
@@ -333,16 +333,16 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* Key Features Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-950' : 'bg-stone-50'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-page' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Key Features
             </h2>
             <p className={`mt-4 text-lg leading-8 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Everything you need to deliver better care with patient-owned data
             </p>
@@ -356,8 +356,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                   key={index}
                   className={`rounded-2xl p-8 ring-1 shadow-sm ${
                     darkMode
-                      ? 'bg-stone-900 ring-stone-800'
-                      : 'bg-white ring-stone-200'
+                      ? 'bg-surface-raised ring-stroke-default'
+                      : 'bg-white ring-stroke-subtle'
                   }`}
                 >
                   <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
@@ -366,12 +366,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                     <Icon className={`h-5 w-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                   </div>
                   <h3 className={`mt-6 text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>
                     {feature.title}
                   </h3>
                   <p className={`mt-2 text-sm leading-6 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`}>
                     {feature.description}
                   </p>
@@ -383,16 +383,16 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* Provider Benefits Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Provider Benefits
             </h2>
             <p className={`mt-4 text-lg leading-8 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Transform your practice with patient-owned data
             </p>
@@ -406,12 +406,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Clock className={`h-6 w-6 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Save Time
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 Eliminate repetitive intake processes and data wrangling. Access complete patient histories instantly with verified, up-to-date information.
               </p>
@@ -424,12 +424,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <TrendingUp className={`h-6 w-6 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Improve Outcomes
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 AI-driven preventive prompts and comprehensive panel management help you deliver proactive, personalized care at scale.
               </p>
@@ -442,12 +442,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 <Zap className={`h-6 w-6 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
               </div>
               <h3 className={`mt-6 text-xl font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Differentiate Your Practice
               </h3>
               <p className={`mt-2 text-base leading-7 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 Stand out with transparent, patient-owned data practices. Build trust and attract patients who value data ownership and privacy.
               </p>
@@ -457,16 +457,16 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* Roadmap Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-950' : 'bg-stone-50'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-page' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Roadmap
             </h2>
             <p className={`mt-4 text-lg leading-8 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Our vision for the future of provider-patient data collaboration
             </p>
@@ -479,8 +479,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                   key={index}
                   className={`relative flex gap-6 rounded-2xl p-6 ring-1 ${
                     darkMode
-                      ? 'bg-stone-900 ring-stone-800'
-                      : 'bg-white ring-stone-200'
+                      ? 'bg-surface-raised ring-stroke-default'
+                      : 'bg-white ring-stroke-subtle'
                   }`}
                 >
                   <div className="flex-shrink-0">
@@ -494,19 +494,19 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                   </div>
                   <div className="flex-1">
                     <h3 className={`text-lg font-semibold ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       {item.title}
                     </h3>
                     <p className={`mt-2 text-sm leading-6 ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {item.description}
                     </p>
                   </div>
                   {index < roadmapItems.length - 1 && (
                     <div className={`absolute left-12 top-full h-8 w-0.5 ${
-                      darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                      darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
                     }`} />
                   )}
                 </div>
@@ -517,7 +517,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* Security & Compliance Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className={`rounded-3xl p-10 ring-1 ${
             darkMode
@@ -532,12 +532,12 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
               </div>
               <div className="flex-1">
                 <h2 className={`text-2xl font-bold sm:text-3xl ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>
                   Security & Compliance
                 </h2>
                 <p className={`mt-4 text-lg leading-8 ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
+                  darkMode ? 'text-content-primary' : 'text-content-primary'
                 }`}>
                   HIPAA-ready processes, encryption in transit and at rest, patient-consent gating, and comprehensive audit logs ensure your practice meets the highest security standards.
                 </p>
@@ -547,7 +547,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                       darkMode ? 'text-emerald-400' : 'text-emerald-600'
                     }`} />
                     <span className={`text-sm font-medium ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       End-to-end encryption
                     </span>
@@ -557,7 +557,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                       darkMode ? 'text-emerald-400' : 'text-emerald-600'
                     }`} />
                     <span className={`text-sm font-medium ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       Patient consent management
                     </span>
@@ -567,7 +567,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                       darkMode ? 'text-emerald-400' : 'text-emerald-600'
                     }`} />
                     <span className={`text-sm font-medium ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       Comprehensive audit trails
                     </span>
@@ -577,7 +577,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                       darkMode ? 'text-emerald-400' : 'text-emerald-600'
                     }`} />
                     <span className={`text-sm font-medium ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       HIPAA compliance ready
                     </span>
@@ -590,13 +590,13 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* CTA Band */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-950' : 'bg-stone-900'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-page' : 'bg-surface-raised'}`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
               Be part of the movement toward patient-owned healthcare.
             </h2>
-            <p className="mt-6 text-lg leading-8 text-stone-300">
+            <p className="mt-6 text-lg leading-8 text-content-primary">
               Join forward-thinking providers who are transforming the future of healthcare data.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -610,7 +610,7 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
               <button
                 onClick={() => handleCTAClick('providers_book_demo', 'Book a Demo')}
                 data-analytics-id="providers_book_demo"
-                className="text-base font-semibold leading-6 text-white hover:text-stone-200 transition-colors"
+                className="text-base font-semibold leading-6 text-white hover:text-content-primary transition-colors"
               >
                 Book a Demo <span aria-hidden="true">→</span>
               </button>
@@ -620,11 +620,11 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
       </div>
 
       {/* FAQ Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Frequently Asked Questions
             </h2>
@@ -636,8 +636,8 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                 key={index}
                 className={`rounded-2xl ring-1 overflow-hidden ${
                   darkMode
-                    ? 'bg-stone-800/50 ring-stone-700'
-                    : 'bg-stone-50 ring-stone-200'
+                    ? 'bg-surface-sunken/50 ring-stroke-default'
+                    : 'bg-surface-sunken ring-stroke-subtle'
                 }`}
               >
                 <button
@@ -646,19 +646,19 @@ export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPagePro
                   aria-expanded={openFaq === index}
                 >
                   <span className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>
                     {faq.question}
                   </span>
                   <ChevronDown
                     className={`h-5 w-5 flex-shrink-0 transition-transform ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     } ${openFaq === index ? 'rotate-180' : ''}`}
                   />
                 </button>
                 {openFaq === index && (
                   <div className={`px-6 pb-6 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`}>
                     <p className="text-base leading-7">{faq.answer}</p>
                   </div>

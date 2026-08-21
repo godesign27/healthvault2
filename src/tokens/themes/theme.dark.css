@@ -41,6 +41,12 @@
   --hv-color-border-default: #475569;
   --hv-color-border-strong:  #64748B;
 
+  /* Card surfaces follow component tokens (overrides card.css → surface-raised) */
+  --hv-component-card-background-default: rgba(255, 255, 255, 0.04);
+
+  /* White chat chip needs dark ink (primary text is near-white in dark) */
+  --hv-component-floating-chat-secondary-ink: var(--hv-color-text-inverse);
+
   /* ── Semantic: Feedback surface overrides (subtler in dark mode) ── */
   --hv-color-surface-feedback-error:   rgba(193, 41, 46, 0.15);
   --hv-color-surface-feedback-success: rgba(11, 132, 87, 0.15);

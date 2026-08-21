@@ -9,77 +9,77 @@ export function BreadcrumbsPage() {
   ];
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Breadcrumbs</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Breadcrumbs</h1>
+          <p className="text-content-secondary">
             Navigation component showing the current page location within the site hierarchy
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
-            <p className="text-sm text-gray-600 mb-6">For UI kit building only</p>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
+            <p className="text-sm text-content-secondary mb-6">For UI kit building only</p>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Normal</h3>
+                <h3 className="text-lg font-semibold text-content-primary mb-4">Normal</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Active Page</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Active Page</div>
                     <BreadcrumbLink label="Page name" isActive size="normal" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Previous Page Link</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Previous Page Link</div>
                     <BreadcrumbLink label="Page name" isPrevious size="normal" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Separator</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Separator</div>
                     <BreadcrumbSeparator size="normal" theme="light" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Small</h3>
+                <h3 className="text-lg font-semibold text-content-primary mb-4">Small</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Active Page</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Active Page</div>
                     <BreadcrumbLink label="Page name" isActive size="small" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Previous Page Link</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Previous Page Link</div>
                     <BreadcrumbLink label="Page name" isPrevious size="small" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Separator</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Separator</div>
                     <BreadcrumbSeparator size="small" theme="light" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">X-Small</h3>
+                <h3 className="text-lg font-semibold text-content-primary mb-4">X-Small</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Active Page</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Active Page</div>
                     <BreadcrumbLink label="Page name" isActive size="x-small" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Previous Page Link</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Previous Page Link</div>
                     <BreadcrumbLink label="Page name" isPrevious size="x-small" theme="light" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Separator</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Separator</div>
                     <BreadcrumbSeparator size="x-small" theme="light" />
                   </div>
                 </div>
               </div>
 
               <div className="border-t pt-6">
-                <div className="text-xs font-medium text-gray-600 mb-2">Input Field (for reference)</div>
+                <div className="text-xs font-medium text-content-secondary mb-2">Input Field (for reference)</div>
                 <input
                   type="text"
                   placeholder="Search..."
@@ -89,15 +89,15 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Breadcrumbs/Parts/Link: Normal</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: Normal</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Light Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Default</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
@@ -109,7 +109,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Hover</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
@@ -121,7 +121,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Focus</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
@@ -133,7 +133,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Disabled</div>
                     <div className="flex items-center gap-3 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="light" />
@@ -150,7 +150,7 @@ export function BreadcrumbsPage() {
                 <h3 className="text-sm font-semibold text-white mb-4">Dark Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Default</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
@@ -162,7 +162,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Hover</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
@@ -174,7 +174,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Focus</div>
                     <div className="flex items-center gap-3">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
@@ -186,7 +186,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Disabled</div>
                     <div className="flex items-center gap-3 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="normal" theme="dark" />
@@ -201,15 +201,15 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Breadcrumbs/Parts/Link: Small</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: Small</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Light Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Default</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
@@ -221,7 +221,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Hover</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
@@ -233,7 +233,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Focus</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
@@ -245,7 +245,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Disabled</div>
                     <div className="flex items-center gap-2 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="light" />
@@ -262,7 +262,7 @@ export function BreadcrumbsPage() {
                 <h3 className="text-sm font-semibold text-white mb-4">Dark Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Default</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
@@ -274,7 +274,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Hover</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
@@ -286,7 +286,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Focus</div>
                     <div className="flex items-center gap-2">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
@@ -298,7 +298,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Disabled</div>
                     <div className="flex items-center gap-2 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="small" theme="dark" />
@@ -313,15 +313,15 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Breadcrumbs/Parts/Link: X-Small</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Breadcrumbs/Parts/Link: X-Small</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Light Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Default</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
@@ -333,7 +333,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Hover</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
@@ -345,7 +345,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Focus</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
@@ -357,7 +357,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-600 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-secondary mb-2">Disabled</div>
                     <div className="flex items-center gap-1.5 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="light" />
@@ -374,7 +374,7 @@ export function BreadcrumbsPage() {
                 <h3 className="text-sm font-semibold text-white mb-4">Dark Theme</h3>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Default</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Default</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
@@ -386,7 +386,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Hover</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Hover</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
@@ -398,7 +398,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Focus</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Focus</div>
                     <div className="flex items-center gap-1.5">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
@@ -410,7 +410,7 @@ export function BreadcrumbsPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-400 mb-2">Disabled</div>
+                    <div className="text-xs font-medium text-content-tertiary mb-2">Disabled</div>
                     <div className="flex items-center gap-1.5 opacity-50">
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
                       <BreadcrumbLink label="Active page" isActive size="x-small" theme="dark" />
@@ -425,12 +425,12 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Complete Breadcrumb Examples</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Complete Breadcrumb Examples</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Normal Size - Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Normal Size - Light Theme</h3>
                 <div className="space-y-4">
                   <Breadcrumb
                     items={exampleItems}
@@ -470,7 +470,7 @@ export function BreadcrumbsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Small Size - Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Small Size - Light Theme</h3>
                 <div className="space-y-4">
                   <Breadcrumb
                     items={exampleItems}
@@ -490,7 +490,7 @@ export function BreadcrumbsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">X-Small Size - Light Theme</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">X-Small Size - Light Theme</h3>
                 <div className="space-y-4">
                   <Breadcrumb
                     items={exampleItems}
@@ -511,10 +511,10 @@ export function BreadcrumbsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

@@ -115,20 +115,20 @@ export function ShareFormsDrawer({
       position="right"
       size="large"
       title="Share selected forms"
-      className={`${darkMode ? '!bg-stone-900' : '!bg-white'} !max-w-2xl !w-full ${darkMode ? '[&_.border-gray-200]:!border-stone-700' : ''} ${darkMode ? '[&_h2]:!text-white' : ''} ${darkMode ? '[&>div>div:first-child]:!border-stone-700' : ''} [&>div>div:first-child_button]:${darkMode ? '!text-stone-400 hover:!text-white hover:!bg-stone-800' : ''} [&>div>div:nth-child(2)]:!border-l-0`}
+      className={`${darkMode ? '!bg-surface-overlay' : '!bg-surface-overlay'} !max-w-2xl !w-full ${darkMode ? '[&_.border-gray-200]:!border-stroke-subtle' : ''} ${darkMode ? '[&_h2]:!text-content-primary' : ''} ${darkMode ? '[&>div>div:first-child]:!border-stroke-subtle' : ''} [&>div>div:first-child_button]:${darkMode ? '!text-content-secondary hover:!text-content-primary hover:!bg-surface-sunken' : ''} [&>div>div:nth-child(2)]:!border-l-0`}
     >
-      <div className={`flex-1 overflow-y-auto p-4 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`flex-1 overflow-y-auto p-4 ${'bg-surface-raised'}`}>
         <div className="space-y-6">
-            <div className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <div className={`text-sm font-bold ${'text-content-primary'}`}>
               Patient
             </div>
 
             <HorizontalMedicalIDCard darkMode={darkMode} />
 
-            <div className={`border-t ${darkMode ? 'border-stone-700' : 'border-stone-200'}`} />
+            <div className={`border-t ${'border-stroke-subtle'}`} />
 
             <section>
-              <h3 className={`text-sm font-medium mb-3 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <h3 className={`text-sm font-medium mb-3 ${'text-content-primary'}`}>
                 Included forms
               </h3>
               <ul className="space-y-2">
@@ -137,19 +137,19 @@ export function ShareFormsDrawer({
                     key={f.id}
                     className={`flex items-center justify-between rounded-lg border p-3 ${
                       darkMode
-                        ? 'border-stone-700 bg-stone-800'
-                        : 'border-stone-200 bg-white'
+                        ? 'border-stroke-default bg-surface-sunken'
+                        : 'border-stroke-subtle bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${darkMode ? 'bg-stone-700' : 'bg-indigo-50'}`}>
-                        <FileText className={`w-4 h-4 ${darkMode ? 'text-stone-400' : 'text-indigo-600'}`} />
+                      <div className={`p-2 rounded-lg ${'bg-surface-sunken'}`}>
+                        <FileText className={`w-4 h-4 ${'text-content-secondary'}`} />
                       </div>
                       <div>
-                        <div className={`font-medium text-sm ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                        <div className={`font-medium text-sm ${'text-content-primary'}`}>
                           {f.title}
                         </div>
-                        <div className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                        <div className={`text-xs ${'text-content-secondary'}`}>
                           v{f.version}
                           {f.signedAt && ` • signed ${new Date(f.signedAt).toLocaleString()}`}
                         </div>
@@ -158,8 +158,8 @@ export function ShareFormsDrawer({
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded ${
                         darkMode
-                          ? 'bg-stone-700 text-stone-300'
-                          : 'bg-stone-100 text-stone-700'
+                          ? 'bg-surface-sunken text-content-primary'
+                          : 'bg-surface-sunken text-content-primary'
                       }`}
                     >
                       PDF + FHIR
@@ -169,16 +169,16 @@ export function ShareFormsDrawer({
               </ul>
             </section>
 
-            <div className={`border-t ${darkMode ? 'border-stone-700' : 'border-stone-200'}`} />
+            <div className={`border-t ${'border-stroke-subtle'}`} />
 
             <section className="space-y-4">
-              <h3 className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <h3 className={`text-sm font-medium ${'text-content-primary'}`}>
                 Recipient
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="recipientName" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                  <label htmlFor="recipientName" className={`block text-sm font-medium mb-1 ${'text-content-primary'}`}>
                     Name
                   </label>
                   <input
@@ -191,13 +191,13 @@ export function ShareFormsDrawer({
                     }
                     className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                       darkMode
-                        ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                        : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                        ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                        : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                     }`}
                   />
                 </div>
                 <div>
-                  <label htmlFor="org" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                  <label htmlFor="org" className={`block text-sm font-medium mb-1 ${'text-content-primary'}`}>
                     Organization (optional)
                   </label>
                   <input
@@ -210,15 +210,15 @@ export function ShareFormsDrawer({
                     }
                     className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                       darkMode
-                        ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                        : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                        ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                        : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                     }`}
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label htmlFor="email" className={`block text-sm font-medium mb-1 ${'text-content-primary'}`}>
                   Recipient email
                 </label>
                 <input
@@ -231,14 +231,14 @@ export function ShareFormsDrawer({
                   }
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     darkMode
-                      ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                      : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                   }`}
                 />
               </div>
 
               <div>
-                <label htmlFor="note" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label htmlFor="note" className={`block text-sm font-medium mb-1 ${'text-content-primary'}`}>
                   Message (optional)
                 </label>
                 <textarea
@@ -249,17 +249,17 @@ export function ShareFormsDrawer({
                   rows={3}
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     darkMode
-                      ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                      : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                   }`}
                 />
-                <p className={`text-xs mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                <p className={`text-xs mt-1 ${'text-content-secondary'}`}>
                   Attachments: PDF packet + FHIR Bundle (JSON).
                 </p>
               </div>
             </section>
 
-            <div className={`border-t ${darkMode ? 'border-stone-700' : 'border-stone-200'}`} />
+            <div className={`border-t ${'border-stroke-subtle'}`} />
 
             <section className="space-y-3 pb-6">
               <Checkbox
@@ -267,7 +267,7 @@ export function ShareFormsDrawer({
                 onChange={setAgree}
                 label="I authorize sharing the selected forms for treatment purposes. I understand I can revoke link access later in the 'Shared With' tab."
                 size="16px"
-                className={darkMode ? 'text-stone-300' : ''}
+                className={darkMode ? 'text-content-secondary' : ''}
               />
 
               {(error || ack) && (
@@ -295,7 +295,7 @@ export function ShareFormsDrawer({
       </div>
 
       <div className={`sticky bottom-0 p-4 border-t ${
-        darkMode ? 'bg-stone-900 border-stone-700' : 'bg-white border-stone-200'
+        darkMode ? 'bg-surface-overlay border-stroke-subtle' : 'bg-surface-raised border-stroke-subtle'
       }`}>
         <div className="flex gap-3">
           <Button

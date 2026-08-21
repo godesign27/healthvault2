@@ -47,7 +47,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
   ];
 
   return (
-    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
         <svg
@@ -55,7 +55,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
           className={`absolute inset-0 -z-10 h-full w-full ${
             darkMode
               ? 'stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
-              : 'stroke-stone-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
+              : 'stroke-subtle [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]'
           }`}
         >
           <defs>
@@ -70,7 +70,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
               <path d="M.5 200V.5H200" fill="none" />
             </pattern>
           </defs>
-          <svg x="50%" y="-1" className={`overflow-visible ${darkMode ? 'fill-stone-800/20' : 'fill-stone-50'}`}>
+          <svg x="50%" y="-1" className={`overflow-visible ${darkMode ? 'fill-hv-neutral-800/20' : 'fill-surface-sunken'}`}>
             <path
               d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
               strokeWidth="0"
@@ -101,7 +101,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
               </span>
             </h1>
             <p className={`mt-6 text-lg leading-8 sm:text-xl ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Individuals own their health data for life. Providers pay per active patient—no feature gating, ever.
             </p>
@@ -123,7 +123,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
           role="tabpanel"
           id="individual-panel"
           aria-labelledby="individual-tab"
-          className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}
+          className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}
         >
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -186,7 +186,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
 
             <div className="mt-12 text-center max-w-3xl mx-auto">
               <p className={`text-sm leading-6 ${
-                darkMode ? 'text-stone-500' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 No add-ons or hidden fees — every plan includes the full AI assistant and sharing tools.
                 We believe access to your own health data should be universal, regardless of insurance status.
@@ -202,18 +202,18 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
           role="tabpanel"
           id="business-panel"
           aria-labelledby="business-tab"
-          className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}
+          className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}
         >
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             {/* Pricing Description */}
             <div className="mx-auto max-w-3xl text-center mb-16">
               <h2 className={`text-3xl font-bold tracking-tight sm:text-4xl mb-6 ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Full platform at every size. No feature gating.
               </h2>
               <div className={`space-y-2 text-lg ${
-                darkMode ? 'text-stone-300' : 'text-stone-700'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>
                 <p>
                   <span className="font-semibold">$1.00</span> / active patient / month for panels up to 20,000
@@ -222,7 +222,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
                   <span className="font-semibold">$0.50</span> / active patient / month once you exceed 20,000 — the reduced rate applies to <span className="underline">all</span> patients
                 </p>
                 <p className={`text-sm mt-4 ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   "Active" = a patient with at least one connection, update, or shared item during the last 12 months.
                 </p>
@@ -232,11 +232,11 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
             {/* Feature Parity Strip */}
             <div className={`rounded-2xl p-8 mb-16 ${
               darkMode
-                ? 'bg-stone-800/50 border border-stone-700'
-                : 'bg-stone-50 border border-stone-200'
+                ? 'bg-surface-sunken/50 border border-stroke-default'
+                : 'bg-surface-sunken border border-stroke-subtle'
             }`}>
               <h3 className={`text-center text-sm font-semibold uppercase tracking-wide mb-6 ${
-                darkMode ? 'text-stone-400' : 'text-stone-600'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               }`}>
                 All features included for every Business customer
               </h3>
@@ -257,7 +257,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
                         darkMode ? 'text-emerald-400' : 'text-emerald-600'
                       }`} />
                       <span className={`text-sm ${
-                        darkMode ? 'text-stone-300' : 'text-stone-700'
+                        darkMode ? 'text-content-primary' : 'text-content-primary'
                       }`}>
                         {feature.label}
                       </span>
@@ -309,7 +309,7 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
 
             {/* Compliance Strip */}
             <div className={`mt-16 text-center text-sm ${
-              darkMode ? 'text-stone-500' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                 <span className="flex items-center gap-2">
@@ -335,11 +335,11 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
       )}
 
       {/* FAQ Section */}
-      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-stone-950' : 'bg-stone-50'}`}>
+      <div className={`py-20 sm:py-32 ${darkMode ? 'bg-surface-page' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center mb-16">
             <h2 className={`text-3xl font-bold tracking-tight sm:text-5xl ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Frequently Asked Questions
             </h2>
@@ -351,8 +351,8 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
                 key={index}
                 className={`rounded-2xl ring-1 overflow-hidden ${
                   darkMode
-                    ? 'bg-stone-900 ring-stone-800'
-                    : 'bg-white ring-stone-200'
+                    ? 'bg-surface-raised ring-stroke-default'
+                    : 'bg-white ring-stroke-subtle'
                 }`}
               >
                 <button
@@ -361,19 +361,19 @@ export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }:
                   aria-expanded={openFaq === index}
                 >
                   <span className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>
                     {faq.question}
                   </span>
                   <ChevronDown
                     className={`h-5 w-5 flex-shrink-0 transition-transform ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     } ${openFaq === index ? 'rotate-180' : ''}`}
                   />
                 </button>
                 {openFaq === index && (
                   <div className={`px-6 pb-6 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`}>
                     <p className="text-base leading-7">{faq.answer}</p>
                   </div>

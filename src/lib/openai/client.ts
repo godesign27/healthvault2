@@ -49,15 +49,5 @@ export async function sendChatMessage(params: {
   };
 }
 
-export async function sendAssistantMessage(params: {
-  message: string;
-  page?: string;
-  pageContext?: Record<string, unknown>;
-  previousResponseId?: string;
-}): Promise<ChatResponse & { responseId?: string }> {
-  return sendChatMessage({
-    message: params.message,
-    page: params.page,
-    pageContext: params.pageContext,
-  });
-}
+// sendAssistantMessage removed — use sendChatMessage which routes through the
+// authenticated Edge Function (no API key in browser).

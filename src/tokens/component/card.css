@@ -2,6 +2,9 @@
    References semantic tokens only.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
+  --hv-component-card-radius-default: 0.75rem;
+  --hv-component-card-shadow-default: 0 1px 3px rgba(0, 0, 0, 0.08);
+
   --hv-component-card-background-default:  var(--hv-color-surface-raised);
   --hv-component-card-background-sunken:   var(--hv-color-surface-sunken);
   --hv-component-card-background-selected: var(--hv-color-action-primary-subtle);
@@ -14,4 +17,34 @@
 
   --hv-component-card-text-title:       var(--hv-color-text-primary);
   --hv-component-card-text-description: var(--hv-color-text-secondary);
+}
+
+/* Layout / demo shells: use instead of bg-surface-raised + ad-hoc borders so themes
+   (e.g. Steel dark) can retune --hv-component-card-* once and every card updates. */
+.hv-surface-card {
+  border-radius: var(--hv-component-card-radius-default);
+  border: 1px solid var(--hv-component-card-border-default);
+  background: var(--hv-component-card-background-default);
+  box-shadow: var(--hv-component-card-shadow-default);
+}
+
+.hv-surface-card--flat {
+  box-shadow: none;
+}
+
+/* Panel / drawer / chrome fills: same card background token without border radius or shadow */
+.hv-surface-card-bg {
+  background: var(--hv-component-card-background-default);
+}
+
+.hv-surface-card--interactive {
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.hv-surface-card--interactive:hover {
+  border-color: var(--hv-component-card-border-hover);
 }

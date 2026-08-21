@@ -58,62 +58,62 @@ export function HorizontalMedicalIDCard({ darkMode = false }: HorizontalMedicalI
 
   return (
     <div className={`rounded-lg border p-4 ${
-      darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-stone-200'
+      darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
     }`}>
       <div className={`text-xs font-semibold uppercase tracking-wide mb-3 ${
-        darkMode ? 'text-stone-400' : 'text-stone-500'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
         Medical ID Card
       </div>
 
       <div className="flex items-start gap-4">
         <div className={`flex items-center justify-center w-16 h-16 rounded-full flex-shrink-0 ${
-          darkMode ? 'bg-stone-700' : 'bg-stone-100'
+          darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
         }`}>
           <span className={`text-xl font-bold ${
-            darkMode ? 'text-stone-300' : 'text-stone-700'
+            darkMode ? 'text-content-primary' : 'text-content-primary'
           }`}>{data?.initials || '?'}</span>
         </div>
 
         <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
           <div>
             <div className={`font-bold mb-2 ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>{data?.name || '—'}</div>
             <div className="flex justify-between">
-              <span className={darkMode ? 'text-stone-400' : 'text-stone-600'}>DOB:</span>
+              <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>DOB:</span>
               <span className={`font-medium ${
-                darkMode ? 'text-stone-200' : 'text-stone-900'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>{data?.dob || '—'}</span>
             </div>
           </div>
 
           <div className="space-y-2.5">
             <div className="flex justify-between">
-              <span className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Blood Type:</span>
+              <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>Blood Type:</span>
               <span className={`font-medium ${
-                darkMode ? 'text-stone-200' : 'text-stone-900'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>{data?.bloodType || '—'}</span>
             </div>
             <div className="flex justify-between">
-              <span className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Allergies:</span>
+              <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>Allergies:</span>
               <span className={`font-medium ${
-                darkMode ? 'text-stone-200' : 'text-stone-900'
+                darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>{data?.allergies || '—'}</span>
             </div>
           </div>
 
           <div className="flex justify-between">
-            <span className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Emergency:</span>
+            <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>Emergency:</span>
             <span className={`font-medium ${
-              darkMode ? 'text-stone-200' : 'text-stone-900'
+              darkMode ? 'text-content-primary' : 'text-content-primary'
             }`}>{data?.emergency || '—'}</span>
           </div>
 
           <div className="flex justify-between">
-            <span className={darkMode ? 'text-stone-400' : 'text-stone-600'}>Conditions:</span>
+            <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>Conditions:</span>
             <span className={`font-medium ${
-              darkMode ? 'text-stone-200' : 'text-stone-900'
+              darkMode ? 'text-content-primary' : 'text-content-primary'
             }`}>{data?.conditions || '—'}</span>
           </div>
         </div>

@@ -24,3 +24,6 @@ dist-ssr
 
 # Supabase CLI local artifacts
 supabase/.temp/
+
+# Cursor agent worktrees (local-only, embedded git repos)
+.claude/worktrees/

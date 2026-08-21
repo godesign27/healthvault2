@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from 'react';
 
-type SurfaceName = 'default' | 'bold' | 'subdued' | 'overlay';
+type SurfaceName = 'default' | 'bold' | 'subdued' | 'overlay' | 'steel';
 
 interface SurfaceContextValue {
   surface: SurfaceName;
@@ -28,6 +28,7 @@ interface SurfaceProps {
  *   <Surface name="subdued">  ← sidebar, nav panels
  *   <Surface name="bold">     ← hero sections, branded headers
  *   <Surface name="overlay">  ← modals, drawers, popovers
+ *   <Surface name="steel">    ← design-system frosted-glass gallery
  */
 export function Surface({
   name,

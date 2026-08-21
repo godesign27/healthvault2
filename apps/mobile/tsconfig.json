@@ -1,0 +1,32 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@health-vault/types": [
+        "../../packages/types/src/index.ts"
+      ],
+      "@health-vault/types/*": [
+        "../../packages/types/src/*"
+      ],
+      "@health-vault/api-client": [
+        "../../packages/api-client/src/index.ts"
+      ],
+      "@health-vault/api-client/*": [
+        "../../packages/api-client/src/*"
+      ]
+    },
+    "baseUrl": "."
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind-env.d.ts"
+  ]
+}

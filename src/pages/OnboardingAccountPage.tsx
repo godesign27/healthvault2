@@ -83,30 +83,25 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Why do I need to create an account?",
-      onClick: () => alert("Creating an account allows you to securely store and access your health information from anywhere. Your data is encrypted and protected with HIPAA-compliant security.")
-    },
-    {
-      label: "What if I already have an account?",
-      onClick: () => alert("If you already have an account, please use the 'Log In' button instead of 'Get Started'.")
-    },
-    {
-      label: "Use demo data",
-      onClick: fillDemoData
-    }
+    { label: "Use demo data", onClick: fillDemoData },
+  ];
+
+  const suggestedQuestions = [
+    "Why do I need to create an account?",
+    "What if I already have an account?",
+    "How is my password protected?",
   ];
 
   const inputClass = (fieldName: string) => `w-full px-4 py-2 pr-12 rounded-lg border ${
     errors[fieldName]
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
   } focus:outline-none focus:ring-2`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -120,19 +115,18 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
           title="Create Your Account"
           message="Let's start by creating your secure Health Vault account. You'll use this email and password to access your health information anytime, anywhere."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }
     >
-      <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-      }`}>
+            <div className="hv-surface-card hv-surface-card--flat p-8">
         <button
           onClick={onBack}
           className={`flex items-center gap-2 mb-6 text-sm font-medium transition-colors ${
             darkMode
-              ? 'text-stone-400 hover:text-stone-300'
-              : 'text-stone-600 hover:text-stone-900'
+              ? 'text-content-secondary hover:text-content-primary'
+              : 'text-content-secondary hover:text-content-primary'
           }`}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -141,12 +135,12 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
 
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Create Your Account
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             All fields marked with * are required
           </p>
@@ -166,8 +160,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                 errors.email
                   ? 'border-red-500 focus:ring-red-500'
                   : darkMode
-                    ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-                    : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+                    ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+                    : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
               } focus:outline-none focus:ring-2`}
             />
             {errors.email && (
@@ -193,8 +187,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
                     darkMode
-                      ? 'text-stone-400 hover:text-stone-300'
-                      : 'text-stone-600 hover:text-stone-900'
+                      ? 'text-content-secondary hover:text-content-primary'
+                      : 'text-content-secondary hover:text-content-primary'
                   }`}
                   tabIndex={-1}
                 >
@@ -227,8 +221,8 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
                     darkMode
-                      ? 'text-stone-400 hover:text-stone-300'
-                      : 'text-stone-600 hover:text-stone-900'
+                      ? 'text-content-secondary hover:text-content-primary'
+                      : 'text-content-secondary hover:text-content-primary'
                   }`}
                   tabIndex={-1}
                 >
@@ -246,10 +240,10 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
           </div>
 
           <div className={`p-4 rounded-lg ${
-            darkMode ? 'bg-stone-800' : 'bg-stone-50'
+            darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
           }`}>
             <p className={`text-sm ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>
               Your password must be at least 8 characters long and should include a mix of letters, numbers, and symbols for better security.
             </p>

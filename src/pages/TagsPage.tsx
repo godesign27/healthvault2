@@ -15,22 +15,22 @@ export function TagsPage() {
   };
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Tags</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Tags</h1>
+          <p className="text-content-secondary">
             Labels for categorizing and organizing content
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Sizes</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Sizes</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Small</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag size="small" variant="default">Default</Tag>
                   <Tag size="small" variant="primary">Primary</Tag>
@@ -42,7 +42,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Medium (Default)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Medium (Default)</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag size="medium" variant="default">Default</Tag>
                   <Tag size="medium" variant="primary">Primary</Tag>
@@ -54,7 +54,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Large</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Large</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag size="large" variant="default">Default</Tag>
                   <Tag size="large" variant="primary">Primary</Tag>
@@ -67,12 +67,12 @@ export function TagsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Styles</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Styles</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Filled</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Filled</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag style="filled" variant="default">Default</Tag>
                   <Tag style="filled" variant="primary">Primary</Tag>
@@ -84,7 +84,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Outlined</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Outlined</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag style="outlined" variant="default">Default</Tag>
                   <Tag style="outlined" variant="primary">Primary</Tag>
@@ -96,7 +96,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Subtle</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-4">Subtle</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag style="subtle" variant="default">Default</Tag>
                   <Tag style="subtle" variant="primary">Primary</Tag>
@@ -109,12 +109,12 @@ export function TagsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Removable Tags</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Removable Tags</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Filled with Close</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Filled with Close</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag removable onRemove={() => alert('Remove default')} variant="default">Default</Tag>
                   <Tag removable onRemove={() => alert('Remove primary')} variant="primary">Primary</Tag>
@@ -126,7 +126,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Outlined with Close</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Outlined with Close</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag removable style="outlined" onRemove={() => {}} variant="default">Default</Tag>
                   <Tag removable style="outlined" onRemove={() => {}} variant="primary">Primary</Tag>
@@ -138,7 +138,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Subtle with Close</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Subtle with Close</h3>
                 <div className="flex flex-wrap gap-3">
                   <Tag removable style="subtle" onRemove={() => {}} variant="default">Default</Tag>
                   <Tag removable style="subtle" onRemove={() => {}} variant="primary">Primary</Tag>
@@ -151,12 +151,12 @@ export function TagsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Tag Groups</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Tag Groups</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Simple Group</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Simple Group</h3>
                 <TagGroup
                   tags={tags}
                   onRemove={handleRemove}
@@ -166,7 +166,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Outlined Group</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Outlined Group</h3>
                 <TagGroup
                   tags={[
                     { id: '1', label: 'React', variant: 'primary' },
@@ -180,7 +180,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Subtle Group</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Subtle Group</h3>
                 <TagGroup
                   tags={[
                     { id: '1', label: 'Frontend', variant: 'primary' },
@@ -194,7 +194,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">With Max Display (showing 3 of 8)</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">With Max Display (showing 3 of 8)</h3>
                 <TagGroup
                   tags={[
                     { id: '1', label: 'JavaScript', variant: 'primary' },
@@ -213,7 +213,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Small Tags</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Small Tags</h3>
                 <TagGroup
                   tags={[
                     { id: '1', label: 'Tag 1', variant: 'default' },
@@ -228,7 +228,7 @@ export function TagsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">Large Tags</h3>
+                <h3 className="text-sm font-semibold text-content-secondary uppercase mb-3">Large Tags</h3>
                 <TagGroup
                   tags={[
                     { id: '1', label: 'Tag 1', variant: 'default' },
@@ -242,10 +242,10 @@ export function TagsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Specifications</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Sizes</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -258,7 +258,7 @@ export function TagsPage() {
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Variants</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
-                  <li><strong className="text-gray-600]">Default:</strong> Neutral gray for general purpose tags</li>
+                  <li><strong className="text-content-secondary]">Default:</strong> Neutral gray for general purpose tags</li>
                   <li><strong className="text-[indigo-600]">Primary:</strong> Teal for main categories or important items</li>
                   <li><strong className="text-[#10B981]">Success:</strong> Green for positive states or completed items</li>
                   <li><strong className="text-[#EAB308]">Warning:</strong> Yellow for cautionary or pending items</li>
@@ -290,10 +290,10 @@ export function TagsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -335,7 +335,7 @@ export function TagsPage() {
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Variant Selection</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
-                  <li><strong className="text-gray-600">Default:</strong> General categories, neutral labels</li>
+                  <li><strong className="text-content-secondary">Default:</strong> General categories, neutral labels</li>
                   <li><strong className="text-[indigo-600]">Primary:</strong> Key categories, important classifications</li>
                   <li><strong className="text-[#10B981]">Success:</strong> Completed, approved, or positive states</li>
                   <li><strong className="text-[#EAB308]">Warning:</strong> Pending, review needed, or cautionary states</li>

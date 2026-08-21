@@ -259,11 +259,11 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
 
   const inputClasses = `w-full px-4 py-3 rounded-lg border transition-colors ${
     darkMode
-      ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500 focus:border-purple-500'
-      : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400 focus:border-purple-500'
+      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-purple-500'
+      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-purple-500'
   } outline-none`;
 
-  const labelClasses = `block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`;
+  const labelClasses = `block text-sm font-medium mb-2 ${darkMode ? 'text-content-primary' : 'text-content-primary'}`;
 
   const isManualFlow = step === 'manual';
 
@@ -273,23 +273,19 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
         onClick={handleClose}
       />
-      <div className={`fixed right-0 top-0 h-full w-full max-w-xl z-50 ${
-        darkMode ? 'bg-stone-900' : 'bg-white'
-      } shadow-2xl transform transition-transform duration-300 ease-out ${
+      <div className={`fixed right-0 top-0 h-full w-full max-w-xl z-50 hv-surface-card-bg shadow-2xl transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {isManualFlow ? (
             <ManualEntryHeader darkMode={darkMode} onBack={() => setStep('provider')} onClose={handleClose} />
           ) : (
-            <div className={`sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b ${
-              darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-            }`}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-stroke-subtle hv-surface-card-bg">
               <div>
-                <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   Request Health Record
                 </h2>
-                <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                <p className={`text-sm mt-0.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                   {step === 'provider' && 'Select a provider to request records from'}
                   {step === 'details' && `From ${selectedProvider?.name}`}
                   {step === 'submitted' && 'Your request has been sent'}
@@ -298,7 +294,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
               <button
                 onClick={handleClose}
                 className={`p-2 rounded-lg transition-colors ${
-                  darkMode ? 'hover:bg-stone-800 text-stone-400' : 'hover:bg-stone-100 text-stone-500'
+                  darkMode ? 'hover:bg-surface-sunken text-content-secondary' : 'hover:bg-surface-sunken text-content-secondary'
                 }`}
               >
                 <X className="w-5 h-5" />
@@ -307,17 +303,17 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
           )}
 
           {(step === 'provider' || step === 'details') && (
-            <div className={`px-6 py-3 border-b ${darkMode ? 'border-stone-800' : 'border-stone-100'}`}>
+            <div className={`px-6 py-3 border-b ${darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'}`}>
               <div className="flex items-center gap-3">
                 <StepIndicator step={1} active={step === 'provider'} completed={step === 'details'} darkMode={darkMode} />
-                <div className={`flex-1 h-px ${step === 'details' ? 'bg-purple-500' : darkMode ? 'bg-stone-700' : 'bg-stone-200'}`} />
+                <div className={`flex-1 h-px ${step === 'details' ? 'bg-purple-500' : darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'}`} />
                 <StepIndicator step={2} active={step === 'details'} completed={false} darkMode={darkMode} />
               </div>
               <div className="flex justify-between mt-1.5">
-                <span className={`text-xs ${step === 'provider' ? (darkMode ? 'text-white' : 'text-stone-900') : (darkMode ? 'text-stone-500' : 'text-stone-400')} font-medium`}>
+                <span className={`text-xs ${step === 'provider' ? (darkMode ? 'text-white' : 'text-content-primary') : (darkMode ? 'text-content-secondary' : 'text-content-secondary')} font-medium`}>
                   Provider
                 </span>
-                <span className={`text-xs ${step === 'details' ? (darkMode ? 'text-white' : 'text-stone-900') : (darkMode ? 'text-stone-500' : 'text-stone-400')} font-medium`}>
+                <span className={`text-xs ${step === 'details' ? (darkMode ? 'text-white' : 'text-content-primary') : (darkMode ? 'text-content-secondary' : 'text-content-secondary')} font-medium`}>
                   Details
                 </span>
               </div>
@@ -410,9 +406,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
           </div>
 
           {step === 'details' && (
-            <div className={`px-6 py-4 border-t ${
-              darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'
-            }`}>
+            <div className="px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
               {submitError && (
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
                   darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
@@ -425,7 +419,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
                 <button
                   onClick={() => setStep('provider')}
                   className={`flex-1 px-6 py-3 rounded-xl font-medium transition-colors ${
-                    darkMode ? 'bg-stone-800 text-stone-300 hover:bg-stone-700' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    darkMode ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken' : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                   }`}
                 >
                   Back
@@ -452,9 +446,7 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
           )}
 
           {step === 'manual' && (
-            <div className={`px-6 py-4 border-t ${
-              darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'
-            }`}>
+            <div className="px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
               {submitError && (
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-3 text-sm ${
                   darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
@@ -490,29 +482,27 @@ export function RequestRecordDrawer({ isOpen, onClose, onRequestSent, darkMode =
 
 function ManualEntryHeader({ darkMode, onBack, onClose }: { darkMode: boolean; onBack: () => void; onClose: () => void }) {
   return (
-    <div className={`sticky top-0 z-10 flex items-center gap-3 px-6 py-5 border-b ${
-      darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-    }`}>
+    <div className="sticky top-0 z-10 flex items-center gap-3 px-6 py-5 border-b border-stroke-subtle hv-surface-card-bg">
       <button
         onClick={onBack}
         className={`p-2 -ml-2 rounded-lg transition-colors ${
-          darkMode ? 'hover:bg-stone-800 text-stone-400' : 'hover:bg-stone-100 text-stone-500'
+          darkMode ? 'hover:bg-surface-sunken text-content-secondary' : 'hover:bg-surface-sunken text-content-secondary'
         }`}
       >
         <ArrowLeft className="w-5 h-5" />
       </button>
       <div className="flex-1">
-        <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+        <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
           Manual Request
         </h2>
-        <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+        <p className={`text-sm mt-0.5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
           Enter provider details to send a request
         </p>
       </div>
       <button
         onClick={onClose}
         className={`p-2 rounded-lg transition-colors ${
-          darkMode ? 'hover:bg-stone-800 text-stone-400' : 'hover:bg-stone-100 text-stone-500'
+          darkMode ? 'hover:bg-surface-sunken text-content-secondary' : 'hover:bg-surface-sunken text-content-secondary'
         }`}
       >
         <X className="w-5 h-5" />
@@ -535,7 +525,7 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
       <div className="flex-1 overflow-y-auto p-6 pb-0">
         <div className="relative mb-4">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-            darkMode ? 'text-stone-500' : 'text-stone-400'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`} />
           <input
             ref={searchInputRef}
@@ -545,8 +535,8 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
             placeholder="Search by provider name, specialty, or clinic..."
           className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-colors ${
             darkMode
-              ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500 focus:border-purple-500'
-              : 'bg-stone-50 border-stone-200 text-stone-900 placeholder-stone-400 focus:border-purple-500'
+              ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-purple-500'
+              : 'bg-surface-sunken border-stroke-subtle text-content-primary placeholder:text-content-placeholder focus:border-purple-500'
           } outline-none`}
         />
       </div>
@@ -558,35 +548,35 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
             onClick={() => onSelectProvider(provider)}
             className={`w-full p-4 rounded-xl border-2 text-left transition-all group ${
               darkMode
-                ? 'border-stone-800 hover:border-purple-600 hover:bg-stone-800/60'
-                : 'border-stone-100 hover:border-purple-500 hover:bg-purple-50/50'
+                ? 'border-stroke-subtle hover:border-purple-600 hover:bg-surface-sunken/60'
+                : 'border-stroke-subtle hover:border-purple-500 hover:bg-purple-50/50'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                darkMode ? 'bg-stone-800 group-hover:bg-purple-900/30' : 'bg-stone-100 group-hover:bg-purple-100'
+                darkMode ? 'bg-surface-sunken group-hover:bg-purple-900/30' : 'bg-surface-sunken group-hover:bg-purple-100'
               } transition-colors`}>
                 <Building2 className={`w-5 h-5 ${
-                  darkMode ? 'text-stone-400 group-hover:text-purple-400' : 'text-stone-500 group-hover:text-purple-600'
+                  darkMode ? 'text-content-secondary group-hover:text-purple-400' : 'text-content-secondary group-hover:text-purple-600'
                 } transition-colors`} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   {provider.name}
                 </div>
-                <div className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                   {provider.specialty} -- {provider.clinic}
                 </div>
               </div>
               <ChevronRight className={`w-4 h-4 shrink-0 ${
-                darkMode ? 'text-stone-600 group-hover:text-purple-400' : 'text-stone-300 group-hover:text-purple-500'
+                darkMode ? 'text-content-secondary group-hover:text-purple-400' : 'text-content-primary group-hover:text-purple-500'
               } transition-colors`} />
             </div>
           </button>
         ))}
 
         {filteredProviders.length === 0 && (
-          <div className={`text-center py-12 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+          <div className={`text-center py-12 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             <Search className="w-10 h-10 mx-auto mb-3 opacity-50" />
             <p className="font-medium">No providers found</p>
             <p className="text-sm mt-1">Try a different search term or enter details manually</p>
@@ -596,33 +586,33 @@ function ProviderStep({ darkMode, searchQuery, setSearchQuery, searchInputRef, f
 
       </div>
 
-      <div className={`shrink-0 px-6 py-4 border-t ${darkMode ? 'border-stone-800 bg-stone-900' : 'border-stone-100 bg-white'}`}>
+      <div className="shrink-0 px-6 py-4 border-t border-stroke-subtle hv-surface-card-bg">
         <button
           onClick={onManualEntry}
           className={`w-full p-4 rounded-xl border-2 border-dashed text-left transition-all group ${
             darkMode
-              ? 'border-stone-700 hover:border-stone-500 hover:bg-stone-800/60'
-              : 'border-stone-200 hover:border-stone-400 hover:bg-stone-50'
+              ? 'border-stroke-default hover:border-stroke-strong hover:bg-surface-sunken/60'
+              : 'border-stroke-subtle hover:border-stroke-strong hover:bg-surface-sunken'
           }`}
         >
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-              darkMode ? 'bg-stone-800 group-hover:bg-stone-700' : 'bg-stone-100 group-hover:bg-stone-200'
+              darkMode ? 'bg-surface-sunken group-hover:bg-surface-sunken' : 'bg-surface-sunken group-hover:bg-surface-overlay'
             } transition-colors`}>
               <PenLine className={`w-5 h-5 ${
-                darkMode ? 'text-stone-400' : 'text-stone-500'
+                darkMode ? 'text-content-secondary' : 'text-content-secondary'
               } transition-colors`} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                 Enter provider details manually
               </div>
-              <div className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+              <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                 Send a request via email to any provider
               </div>
             </div>
             <ChevronRight className={`w-4 h-4 shrink-0 ${
-              darkMode ? 'text-stone-600' : 'text-stone-300'
+              darkMode ? 'text-content-secondary' : 'text-content-primary'
             } transition-colors`} />
           </div>
         </button>
@@ -714,30 +704,30 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
                       ? 'border-purple-600 bg-purple-900/20'
                       : 'border-purple-500 bg-purple-50'
                     : darkMode
-                      ? 'border-stone-800 hover:border-stone-600'
-                      : 'border-stone-100 hover:border-stone-300'
+                      ? 'border-stroke-subtle hover:border-stroke-default'
+                      : 'border-stroke-subtle hover:border-stroke-default'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                   selected
                     ? darkMode ? 'bg-purple-900/40' : 'bg-purple-100'
-                    : darkMode ? 'bg-stone-800' : 'bg-stone-100'
+                    : darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
                 }`}>
                   <Icon className={`w-4 h-4 ${
                     selected
                       ? darkMode ? 'text-purple-400' : 'text-purple-600'
-                      : darkMode ? 'text-stone-400' : 'text-stone-500'
+                      : darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={`text-sm font-medium ${
                     selected
                       ? darkMode ? 'text-purple-300' : 'text-purple-800'
-                      : darkMode ? 'text-stone-200' : 'text-stone-800'
+                      : darkMode ? 'text-content-primary' : 'text-content-primary'
                   }`}>
                     {label}
                   </div>
-                  <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                  <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     {description}
                   </div>
                 </div>
@@ -763,21 +753,21 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
                   ? 'border-purple-600 bg-purple-900/20'
                   : 'border-purple-500 bg-purple-50'
                 : darkMode
-                  ? 'border-stone-800 hover:border-stone-600'
-                  : 'border-stone-100 hover:border-stone-300'
+                  ? 'border-stroke-subtle hover:border-stroke-default'
+                  : 'border-stroke-subtle hover:border-stroke-default'
             }`}
           >
             <Clock className={`w-5 h-5 mx-auto mb-1 ${
               urgency === 'routine'
                 ? darkMode ? 'text-purple-400' : 'text-purple-600'
-                : darkMode ? 'text-stone-500' : 'text-stone-400'
+                : darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
             <div className={`text-sm font-medium ${
               urgency === 'routine'
                 ? darkMode ? 'text-purple-300' : 'text-purple-800'
-                : darkMode ? 'text-stone-300' : 'text-stone-600'
+                : darkMode ? 'text-content-primary' : 'text-content-secondary'
             }`}>Routine</div>
-            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>5-10 business days</div>
+            <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>5-10 business days</div>
           </button>
           <button
             onClick={() => onSetUrgency('urgent')}
@@ -787,21 +777,21 @@ function ManualEntryForm({ darkMode, providerName, doctorName, email, message, s
                   ? 'border-amber-600 bg-amber-900/20'
                   : 'border-amber-500 bg-amber-50'
                 : darkMode
-                  ? 'border-stone-800 hover:border-stone-600'
-                  : 'border-stone-100 hover:border-stone-300'
+                  ? 'border-stroke-subtle hover:border-stroke-default'
+                  : 'border-stroke-subtle hover:border-stroke-default'
             }`}
           >
             <Send className={`w-5 h-5 mx-auto mb-1 ${
               urgency === 'urgent'
                 ? darkMode ? 'text-amber-400' : 'text-amber-600'
-                : darkMode ? 'text-stone-500' : 'text-stone-400'
+                : darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
             <div className={`text-sm font-medium ${
               urgency === 'urgent'
                 ? darkMode ? 'text-amber-300' : 'text-amber-800'
-                : darkMode ? 'text-stone-300' : 'text-stone-600'
+                : darkMode ? 'text-content-primary' : 'text-content-secondary'
             }`}>Urgent</div>
-            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>1-3 business days</div>
+            <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>1-3 business days</div>
           </button>
         </div>
       </div>
@@ -859,7 +849,7 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
   return (
     <div className="p-6 space-y-6">
       <div className={`p-4 rounded-xl flex items-center gap-3 ${
-        darkMode ? 'bg-stone-800' : 'bg-stone-50'
+        darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
       }`}>
         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
           darkMode ? 'bg-purple-900/30' : 'bg-purple-100'
@@ -867,17 +857,17 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
           <Building2 className={`w-5 h-5 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-content-primary'}`}>
             {selectedProvider?.name}
           </div>
-          <div className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             {selectedProvider?.clinic}
           </div>
         </div>
         <button
           onClick={onChangeProvider}
           className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-            darkMode ? 'text-purple-400 hover:bg-stone-700' : 'text-purple-600 hover:bg-purple-50'
+            darkMode ? 'text-purple-400 hover:bg-surface-sunken' : 'text-purple-600 hover:bg-purple-50'
           }`}
         >
           Change
@@ -899,30 +889,30 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
                       ? 'border-purple-600 bg-purple-900/20'
                       : 'border-purple-500 bg-purple-50'
                     : darkMode
-                      ? 'border-stone-800 hover:border-stone-600'
-                      : 'border-stone-100 hover:border-stone-300'
+                      ? 'border-stroke-subtle hover:border-stroke-default'
+                      : 'border-stroke-subtle hover:border-stroke-default'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                   selected
                     ? darkMode ? 'bg-purple-900/40' : 'bg-purple-100'
-                    : darkMode ? 'bg-stone-800' : 'bg-stone-100'
+                    : darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
                 }`}>
                   <Icon className={`w-4 h-4 ${
                     selected
                       ? darkMode ? 'text-purple-400' : 'text-purple-600'
-                      : darkMode ? 'text-stone-400' : 'text-stone-500'
+                      : darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={`text-sm font-medium ${
                     selected
                       ? darkMode ? 'text-purple-300' : 'text-purple-800'
-                      : darkMode ? 'text-stone-200' : 'text-stone-800'
+                      : darkMode ? 'text-content-primary' : 'text-content-primary'
                   }`}>
                     {label}
                   </div>
-                  <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                  <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     {description}
                   </div>
                 </div>
@@ -941,7 +931,7 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
         <label className={labelClasses}>Date Range (optional)</label>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={`block text-xs mb-1 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>From</label>
+            <label className={`block text-xs mb-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>From</label>
             <input
               type="date"
               value={dateFrom}
@@ -950,7 +940,7 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
             />
           </div>
           <div>
-            <label className={`block text-xs mb-1 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>To</label>
+            <label className={`block text-xs mb-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>To</label>
             <input
               type="date"
               value={dateTo}
@@ -972,21 +962,21 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
                   ? 'border-purple-600 bg-purple-900/20'
                   : 'border-purple-500 bg-purple-50'
                 : darkMode
-                  ? 'border-stone-800 hover:border-stone-600'
-                  : 'border-stone-100 hover:border-stone-300'
+                  ? 'border-stroke-subtle hover:border-stroke-default'
+                  : 'border-stroke-subtle hover:border-stroke-default'
             }`}
           >
             <Clock className={`w-5 h-5 mx-auto mb-1 ${
               urgency === 'routine'
                 ? darkMode ? 'text-purple-400' : 'text-purple-600'
-                : darkMode ? 'text-stone-500' : 'text-stone-400'
+                : darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
             <div className={`text-sm font-medium ${
               urgency === 'routine'
                 ? darkMode ? 'text-purple-300' : 'text-purple-800'
-                : darkMode ? 'text-stone-300' : 'text-stone-600'
+                : darkMode ? 'text-content-primary' : 'text-content-secondary'
             }`}>Routine</div>
-            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>5-10 business days</div>
+            <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>5-10 business days</div>
           </button>
           <button
             onClick={() => onSetUrgency('urgent')}
@@ -996,21 +986,21 @@ function DetailsStep({ darkMode, selectedProvider, selectedTypes, dateFrom, date
                   ? 'border-amber-600 bg-amber-900/20'
                   : 'border-amber-500 bg-amber-50'
                 : darkMode
-                  ? 'border-stone-800 hover:border-stone-600'
-                  : 'border-stone-100 hover:border-stone-300'
+                  ? 'border-stroke-subtle hover:border-stroke-default'
+                  : 'border-stroke-subtle hover:border-stroke-default'
             }`}
           >
             <Send className={`w-5 h-5 mx-auto mb-1 ${
               urgency === 'urgent'
                 ? darkMode ? 'text-amber-400' : 'text-amber-600'
-                : darkMode ? 'text-stone-500' : 'text-stone-400'
+                : darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
             <div className={`text-sm font-medium ${
               urgency === 'urgent'
                 ? darkMode ? 'text-amber-300' : 'text-amber-800'
-                : darkMode ? 'text-stone-300' : 'text-stone-600'
+                : darkMode ? 'text-content-primary' : 'text-content-secondary'
             }`}>Urgent</div>
-            <div className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>1-3 business days</div>
+            <div className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>1-3 business days</div>
           </button>
         </div>
       </div>
@@ -1063,10 +1053,10 @@ function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, ema
           <AlertCircle className={`w-8 h-8 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
         )}
       </div>
-      <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+      <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
         {emailSent ? 'Request Sent' : 'Request Saved'}
       </h3>
-      <p className={`text-sm max-w-xs mb-2 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+      <p className={`text-sm max-w-xs mb-2 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
         {emailSent ? (
           <>Your request has been sent to <span className="font-medium">{selectedProvider?.name}</span>. You'll be notified when records are available.</>
         ) : (
@@ -1085,29 +1075,29 @@ function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, ema
             Email delivery failed
           </p>
           {emailError && (
-            <p className={`text-[11px] mt-2 max-w-xs break-all ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+            <p className={`text-[11px] mt-2 max-w-xs break-all ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
               {emailError}
             </p>
           )}
         </div>
       )}
       <div className={`w-full max-w-sm p-4 rounded-xl text-left ${
-        darkMode ? 'bg-stone-800' : 'bg-stone-50'
+        darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
       }`}>
         <div className={`text-xs font-medium uppercase tracking-wider mb-3 ${
-          darkMode ? 'text-stone-500' : 'text-stone-400'
+          darkMode ? 'text-content-secondary' : 'text-content-secondary'
         }`}>Request Summary</div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Provider</span>
-            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>{selectedProvider?.name}</span>
+            <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Provider</span>
+            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>{selectedProvider?.name}</span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Records</span>
-            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>{selectedTypes.length} type{selectedTypes.length !== 1 ? 's' : ''}</span>
+            <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Records</span>
+            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>{selectedTypes.length} type{selectedTypes.length !== 1 ? 's' : ''}</span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Priority</span>
+            <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Priority</span>
             <span className={`text-sm font-medium capitalize ${
               urgency === 'urgent'
                 ? darkMode ? 'text-amber-400' : 'text-amber-600'
@@ -1115,8 +1105,8 @@ function SubmittedStep({ darkMode, selectedProvider, selectedTypes, urgency, ema
             }`}>{urgency}</span>
           </div>
           <div className="flex justify-between">
-            <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Est. Delivery</span>
-            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Est. Delivery</span>
+            <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
               {urgency === 'urgent' ? '1-3 business days' : '5-10 business days'}
             </span>
           </div>
@@ -1145,10 +1135,10 @@ function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone,
 }) {
   if (!profileLoaded) {
     return (
-      <div className={`p-4 rounded-xl border ${darkMode ? 'border-stone-700 bg-stone-800/50' : 'border-stone-200 bg-stone-50'}`}>
+      <div className={`p-4 rounded-xl border ${darkMode ? 'border-stroke-default bg-surface-sunken/50' : 'border-stroke-subtle bg-surface-sunken'}`}>
         <div className="flex items-center gap-2">
-          <div className={`w-4 h-4 border-2 rounded-full animate-spin ${darkMode ? 'border-stone-600 border-t-stone-400' : 'border-stone-300 border-t-stone-500'}`} />
-          <span className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Loading your verification info...</span>
+          <div className={`w-4 h-4 border-2 rounded-full animate-spin ${darkMode ? 'border-stroke-default border-t-content-secondary' : 'border-stroke-default border-t-content-secondary'}`} />
+          <span className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Loading your verification info...</span>
         </div>
       </div>
     );
@@ -1182,7 +1172,7 @@ function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone,
       </div>
       <div className="px-4 py-3 space-y-3">
         {allComplete ? (
-          <p className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <p className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
             Your date of birth, phone, and email will be included in the request to help the provider verify your identity.
           </p>
         ) : (
@@ -1193,7 +1183,7 @@ function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone,
         <div className="grid grid-cols-1 gap-2.5">
           {(!editDob || !allComplete) && (
             <div>
-              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Date of Birth</label>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Date of Birth</label>
               <input
                 type="date"
                 value={editDob}
@@ -1204,7 +1194,7 @@ function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone,
           )}
           {(!editPhone || !allComplete) && (
             <div>
-              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Phone Number</label>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Phone Number</label>
               <input
                 type="tel"
                 value={editPhone}
@@ -1216,7 +1206,7 @@ function IdentityVerificationCard({ darkMode, profileLoaded, editDob, editPhone,
           )}
           {(!editEmail || !allComplete) && (
             <div>
-              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Email Address</label>
+              <label className={`block text-[11px] font-medium mb-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Email Address</label>
               <input
                 type="email"
                 value={editEmail}
@@ -1250,7 +1240,7 @@ function StepIndicator({ step, active, completed, darkMode }: { step: number; ac
     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
       active
         ? 'bg-purple-600 text-white'
-        : darkMode ? 'bg-stone-800 text-stone-500' : 'bg-stone-200 text-stone-400'
+        : darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-overlay text-content-secondary'
     }`}>
       {step}
     </div>

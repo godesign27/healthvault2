@@ -2,21 +2,21 @@ import { Header } from '../components/ui/Header';
 
 export function HeadersPage() {
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Headers</h1>
-          <p className="text-gray-600">Page headers with context, actions, and navigation elements</p>
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Headers</h1>
+          <p className="text-content-secondary">Page headers with context, actions, and navigation elements</p>
         </div>
 
         <div className="space-y-12">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Header Variations</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Header Variations</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Full Header</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Full Header</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden">
                   <Header
                     title="ALIGNMENTS"
                     showStatus={true}
@@ -25,14 +25,14 @@ export function HeadersPage() {
                     showLanguage={true}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Complete header with title badge, status indicator, date, action menu, and language selector.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">With Search and Filter</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">With Search and Filter</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden">
                   <Header
                     title="ALIGNMENTS"
                     showStatus={true}
@@ -43,14 +43,14 @@ export function HeadersPage() {
                     showLanguage={true}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Header with additional search and filter controls for data-heavy interfaces.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">Minimal Header</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">Minimal Header</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden">
                   <Header
                     title="DASHBOARD"
                     showStatus={false}
@@ -59,14 +59,14 @@ export function HeadersPage() {
                     showLanguage={false}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Simplified header with just the title badge, suitable for simple pages.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">With Status and Date Only</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">With Status and Date Only</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden">
                   <Header
                     title="REPORTS"
                     showStatus={true}
@@ -75,14 +75,14 @@ export function HeadersPage() {
                     showLanguage={false}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Header focused on context information without action elements.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">With Language Selector</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-lg font-semibold text-content-secondary mb-4">With Language Selector</h3>
+                <div className="border border-stroke-subtle rounded-lg overflow-hidden">
                   <Header
                     title="SETTINGS"
                     showStatus={false}
@@ -91,19 +91,19 @@ export function HeadersPage() {
                     showLanguage={true}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Header with language localization dropdown for international applications.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Header Elements</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Header Elements</h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">Title Badge</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-3">Title Badge</h3>
                 <div className="flex gap-4">
                   <span className="bg-[#EC7200] text-white px-4 py-1.5 rounded font-semibold text-sm uppercase">
                     ALIGNMENTS
@@ -115,13 +115,13 @@ export function HeadersPage() {
                     REPORTS
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Orange secondary color used to identify the current section or module. Always uppercase.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">Status Indicator</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-3">Status Indicator</h3>
                 <div className="flex gap-4">
                   <span className="bg-[#2364C7] text-white px-4 py-1.5 rounded font-semibold text-sm">
                     ACTIVE
@@ -136,13 +136,13 @@ export function HeadersPage() {
                     PENDING
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Status badges using semantic colors to indicate the current state or mode.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">Action Buttons</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-3">Action Buttons</h3>
                 <div className="space-y-3">
                   <div className="flex gap-4">
                     <button className="flex items-center gap-2 px-4 py-1.5 bg-[indigo-600] text-white rounded hover:bg-[#156570] transition-colors text-sm font-medium">
@@ -151,25 +151,25 @@ export function HeadersPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button className="p-2 hover:bg-surface-sunken rounded transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button className="p-2 hover:bg-surface-sunken rounded transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                       </svg>
                     </button>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-content-secondary">
                     Teal primary buttons for primary actions with dropdown menus. Icon buttons for secondary actions.
                   </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">Language Dropdown</h3>
+                <h3 className="text-lg font-semibold text-content-secondary mb-3">Language Dropdown</h3>
                 <div className="inline-block">
                   <button className="flex items-center gap-2 px-4 py-1.5 bg-[indigo-600] text-white rounded hover:bg-[#156570] transition-colors text-sm font-medium">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,17 +181,17 @@ export function HeadersPage() {
                     </svg>
                   </button>
                 </div>
-                <p className="text-sm text-gray-600 mt-3">
+                <p className="text-sm text-content-secondary mt-3">
                   Localization selector for switching between supported languages.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -253,20 +253,20 @@ export function HeadersPage() {
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Design Tokens</h3>
                 <div className="grid md:grid-cols-3 gap-4 mt-3">
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[#EC7200] rounded mb-2"></div>
                     <p className="text-xs font-medium">Title Badge</p>
-                    <p className="text-xs text-gray-500 font-mono">#EC7200</p>
+                    <p className="text-xs text-content-secondary font-mono">#EC7200</p>
                   </div>
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[indigo-600] rounded mb-2"></div>
                     <p className="text-xs font-medium">Primary Actions</p>
-                    <p className="text-xs text-gray-500 font-mono">indigo-600</p>
+                    <p className="text-xs text-content-secondary font-mono">indigo-600</p>
                   </div>
-                  <div className="border border-gray-200 rounded p-4">
+                  <div className="border border-stroke-subtle rounded p-4">
                     <div className="h-12 bg-[#2364C7] rounded mb-2"></div>
                     <p className="text-xs font-medium">Active Status</p>
-                    <p className="text-xs text-gray-500 font-mono">#2364C7</p>
+                    <p className="text-xs text-content-secondary font-mono">#2364C7</p>
                   </div>
                 </div>
               </div>

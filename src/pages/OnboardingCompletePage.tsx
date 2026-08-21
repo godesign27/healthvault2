@@ -12,6 +12,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
   const [hasInsurance, setHasInsurance] = useState(false);
   const [hasPreferences, setHasPreferences] = useState(false);
   const [isCompleting, setIsCompleting] = useState(true);
+  const [completionError, setCompletionError] = useState<string | null>(null);
 
   useEffect(() => {
     const completeOnboarding = async () => {
@@ -64,7 +65,8 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
             {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'Authorization': `Bearer ${session.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
@@ -78,6 +80,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
         }
       } catch (error) {
         console.error('Failed to complete onboarding:', error);
+        setCompletionError('We had trouble saving your setup. Please try again.');
       } finally {
         setIsCompleting(false);
       }
@@ -89,11 +92,11 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
   if (isCompleting) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${
-        darkMode ? 'bg-stone-950' : 'bg-stone-50'
+        darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
       }`}>
         <div className="text-center">
           <div className={`text-lg ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             Completing setup...
           </div>
@@ -104,11 +107,9 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
 
   return (
     <div className={`min-h-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
+      darkMode ? 'bg-surface-page' : 'bg-surface-sunken'
     }`}>
-      <header className={`sticky top-0 z-50 border-b ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-      }`}>
+      <header className="sticky top-0 z-50 border-b border-stroke-subtle hv-surface-card-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14">
             <div className="flex items-center gap-2.5">
@@ -120,7 +121,7 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                 />
               </div>
               <span className={`text-sm font-bold ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>Health Vault</span>
             </div>
           </div>
@@ -131,20 +132,18 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
       <div className="max-w-6xl w-full mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className={`rounded-lg border p-8 ${
-              darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-            }`}>
+            <div className="hv-surface-card hv-surface-card--flat p-8">
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-4">
                   <CheckCircle className="w-12 h-12 text-emerald-600" />
                 </div>
                 <h1 className={`text-3xl font-bold mb-2 ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>
                   Your Health Vault is Ready
                 </h1>
                 <p className={`text-lg ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   You're all set to start managing your health information
                 </p>
@@ -159,12 +158,12 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Identity Verified
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       Your identity has been verified and your account is secure.
                     </p>
@@ -177,26 +176,26 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                       ? 'bg-emerald-500/10 border border-emerald-500/20'
                       : 'bg-emerald-50 border border-emerald-200'
                     : darkMode
-                      ? 'bg-stone-800'
-                      : 'bg-stone-50'
+                      ? 'bg-surface-sunken'
+                      : 'bg-surface-sunken'
                 }`}>
                   <div className="flex-shrink-0">
                     {hasInsurance ? (
                       <CheckCircle className="w-6 h-6 text-emerald-600" />
                     ) : (
                       <Shield className={`w-6 h-6 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
+                        darkMode ? 'text-content-secondary' : 'text-content-secondary'
                       }`} />
                     )}
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Insurance
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {hasInsurance
                         ? 'Your insurance information has been added.'
@@ -211,26 +210,26 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                       ? 'bg-emerald-500/10 border border-emerald-500/20'
                       : 'bg-emerald-50 border border-emerald-200'
                     : darkMode
-                      ? 'bg-stone-800'
-                      : 'bg-stone-50'
+                      ? 'bg-surface-sunken'
+                      : 'bg-surface-sunken'
                 }`}>
                   <div className="flex-shrink-0">
                     {hasPreferences ? (
                       <CheckCircle className="w-6 h-6 text-emerald-600" />
                     ) : (
                       <Settings className={`w-6 h-6 ${
-                        darkMode ? 'text-stone-500' : 'text-stone-400'
+                        darkMode ? 'text-content-secondary' : 'text-content-secondary'
                       }`} />
                     )}
                   </div>
                   <div>
                     <h3 className={`font-semibold mb-1 ${
-                      darkMode ? 'text-white' : 'text-stone-900'
+                      darkMode ? 'text-white' : 'text-content-primary'
                     }`}>
                       Preferences
                     </h3>
                     <p className={`text-sm ${
-                      darkMode ? 'text-stone-400' : 'text-stone-600'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       {hasPreferences
                         ? 'Your health preferences have been saved.'
@@ -241,15 +240,15 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
               </div>
 
               <div className={`p-4 rounded-lg mb-6 ${
-                darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
               }`}>
                 <h3 className={`font-semibold mb-2 ${
-                  darkMode ? 'text-white' : 'text-stone-900'
+                  darkMode ? 'text-white' : 'text-content-primary'
                 }`}>
                   What's Next?
                 </h3>
                 <ul className={`space-y-2 text-sm ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   <li className="flex items-start gap-2">
                     <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -266,12 +265,34 @@ export function OnboardingCompletePage({ darkMode = false, onGoToDashboard }: On
                 </ul>
               </div>
 
-              <button
-                onClick={onGoToDashboard}
-                className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
-              >
-                Go to Dashboard
-              </button>
+              {completionError ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-red-600 text-center">{completionError}</p>
+                  <button
+                    onClick={() => {
+                      setIsCompleting(true);
+                      setCompletionError(null);
+                      // Re-run the completion flow
+                      supabase.auth.getSession().then(async ({ data: { session } }) => {
+                        if (!session?.user?.id) { setCompletionError('No session found. Please sign in again.'); setIsCompleting(false); return; }
+                        const { error } = await supabase.from('user_profiles').update({ onboarding_complete: true }).eq('user_id', session.user.id);
+                        if (error) { setCompletionError('Still having trouble. Please try again.'); } else { setCompletionError(null); }
+                        setIsCompleting(false);
+                      });
+                    }}
+                    className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onGoToDashboard}
+                  className="w-full px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm"
+                >
+                  Go to Dashboard
+                </button>
+              )}
             </div>
           </div>
 

@@ -73,30 +73,30 @@ export function ProviderPickerDrawer({
         onClick={onClose}
       />
       <div className={`relative w-full max-w-[480px] h-[80vh] rounded-xl shadow-xl flex flex-col ${
-        darkMode ? 'bg-stone-900' : 'bg-white'
+        darkMode ? 'bg-surface-raised' : 'bg-white'
       }`}>
         <div className={`flex items-center justify-between p-6 border-b ${
-          darkMode ? 'border-stone-800' : 'border-stone-200'
+          darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
         }`}>
           <h2 className={`text-xl font-semibold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Select Insurance Provider
           </h2>
           <button
             onClick={onClose}
             className={`p-2 rounded-lg transition-colors ${
-              darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'
+              darkMode ? 'hover:bg-surface-sunken' : 'hover:bg-surface-sunken'
             }`}
           >
-            <X className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <X className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
           </button>
         </div>
 
         <div className="p-6">
-          <div className={`relative ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+          <div className={`relative ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
             <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-              darkMode ? 'text-stone-500' : 'text-stone-400'
+              darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`} />
             <input
               type="text"
@@ -105,8 +105,8 @@ export function ProviderPickerDrawer({
               onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                 darkMode
-                  ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                  : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                  ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                  : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
               }`}
             />
           </div>
@@ -122,7 +122,7 @@ export function ProviderPickerDrawer({
               {popularProviders.length > 0 && (
                 <div className="mb-8">
                   <h3 className={`text-sm font-medium mb-4 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`}>
                     Popular Providers
                   </h3>
@@ -133,8 +133,8 @@ export function ProviderPickerDrawer({
                         onClick={() => onSelectProvider(provider)}
                         className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
                           darkMode
-                            ? 'border-stone-700 hover:bg-stone-800 hover:border-indigo-600'
-                            : 'border-stone-200 hover:bg-stone-50 hover:border-indigo-600'
+                            ? 'border-stroke-default hover:bg-surface-sunken hover:border-indigo-600'
+                            : 'border-stroke-subtle hover:bg-surface-sunken hover:border-indigo-600'
                         }`}
                       >
                         {provider.logoUrl && (
@@ -145,7 +145,7 @@ export function ProviderPickerDrawer({
                           />
                         )}
                         <span className={`text-sm font-medium text-left ${
-                          darkMode ? 'text-white' : 'text-stone-900'
+                          darkMode ? 'text-white' : 'text-content-primary'
                         }`}>
                           {provider.name}
                         </span>
@@ -158,7 +158,7 @@ export function ProviderPickerDrawer({
               {otherProviders.length > 0 && (
                 <div>
                   <h3 className={`text-sm font-medium mb-4 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-600'
+                    darkMode ? 'text-content-secondary' : 'text-content-secondary'
                   }`}>
                     All Providers
                   </h3>
@@ -169,8 +169,8 @@ export function ProviderPickerDrawer({
                         onClick={() => onSelectProvider(provider)}
                         className={`w-full flex items-center gap-3 p-4 rounded-lg border transition-all text-left ${
                           darkMode
-                            ? 'border-stone-700 hover:bg-stone-800'
-                            : 'border-stone-200 hover:bg-stone-50'
+                            ? 'border-stroke-default hover:bg-surface-sunken'
+                            : 'border-stroke-subtle hover:bg-surface-sunken'
                         }`}
                       >
                         {provider.logoUrl && (
@@ -181,7 +181,7 @@ export function ProviderPickerDrawer({
                           />
                         )}
                         <span className={`font-medium ${
-                          darkMode ? 'text-white' : 'text-stone-900'
+                          darkMode ? 'text-white' : 'text-content-primary'
                         }`}>
                           {provider.name}
                         </span>
@@ -193,7 +193,7 @@ export function ProviderPickerDrawer({
 
               {filteredProviders.length === 0 && !loading && (
                 <div className={`text-center py-12 ${
-                  darkMode ? 'text-stone-400' : 'text-stone-600'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   <p>No providers found</p>
                 </div>

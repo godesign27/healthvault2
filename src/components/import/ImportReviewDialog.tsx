@@ -96,10 +96,10 @@ export function ImportReviewDialog({
   if (!open) return null;
 
   return (
-    <div className={`flex flex-col h-full ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
-      <div className={`p-6 border-b ${darkMode ? 'border-stone-800' : 'border-gray-200'}`}>
+    <div className={`flex flex-col h-full ${'bg-surface-raised'}`}>
+      <div className={`p-6 border-b ${'border-stroke-subtle'}`}>
         <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Review Import</h3>
-        <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-gray-600'}`}>
+        <p className={`text-sm mt-1 ${'text-content-secondary'}`}>
           From {connection.name} • {totalSelected} items selected
         </p>
       </div>
@@ -127,7 +127,7 @@ export function ImportReviewDialog({
         </div>
       )}
 
-      <div className={`border-b px-6 ${darkMode ? 'border-stone-800' : 'border-gray-200'}`}>
+      <div className={`border-b px-6 ${'border-stroke-subtle'}`}>
         <div className="flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -136,12 +136,12 @@ export function ImportReviewDialog({
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? darkMode ? 'border-blue-500 text-blue-400' : 'border-blue-600 text-blue-600'
-                  : darkMode ? 'border-transparent text-stone-400 hover:text-stone-200' : 'border-transparent text-gray-600 hover:text-gray-900'
+                  : darkMode ? 'border-transparent text-content-secondary hover:text-content-primary' : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
               {tab.label}
               {tab.count > 0 && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${darkMode ? 'bg-stone-800 text-stone-400' : 'bg-gray-100 text-gray-600'}`}>
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'}`}>
                   {tab.count}
                 </span>
               )}
@@ -153,7 +153,7 @@ export function ImportReviewDialog({
       <div className="flex-1 overflow-y-auto p-6">
         {currentData.unique.length === 0 ? (
           <div className="text-center py-12">
-            <p className={darkMode ? 'text-stone-500' : 'text-gray-500'}>No {activeTab} to import</p>
+            <p className={'text-content-secondary'}>No {activeTab} to import</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -163,7 +163,7 @@ export function ImportReviewDialog({
                 className={`p-4 border rounded-lg transition-all cursor-pointer ${
                   currentSelected.has(index)
                     ? darkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50'
-                    : darkMode ? 'border-stone-700 hover:border-stone-600' : 'border-gray-200 hover:border-gray-300'
+                    : darkMode ? 'border-stroke-default hover:border-stroke-strong' : 'border-stroke-subtle hover:border-stroke-default'
                 }`}
                 onClick={() => toggleItem(index)}
               >
@@ -172,7 +172,7 @@ export function ImportReviewDialog({
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                       currentSelected.has(index)
                         ? 'bg-blue-600 border-blue-600'
-                        : darkMode ? 'border-stone-600' : 'border-gray-300'
+                        : darkMode ? 'border-stroke-default' : 'border-stroke-default'
                     }`}
                   >
                     {currentSelected.has(index) && <Check className="w-3 h-3 text-white" />}
@@ -188,12 +188,12 @@ export function ImportReviewDialog({
 
         {showDuplicates && currentData.duplicates.length > 0 && (
           <div className="mt-6">
-            <h4 className={`text-sm font-semibold mb-3 ${darkMode ? 'text-stone-300' : 'text-gray-700'}`}>Duplicate Records</h4>
+            <h4 className={`text-sm font-semibold mb-3 ${'text-content-primary'}`}>Duplicate Records</h4>
             <div className="space-y-3 opacity-60">
               {currentData.duplicates.map((item, index) => (
                 <div
                   key={`dup-${index}`}
-                  className={`p-4 border rounded-lg ${darkMode ? 'border-stone-700 bg-stone-800' : 'border-gray-200 bg-gray-50'}`}
+                  className={`p-4 border rounded-lg ${darkMode ? 'border-stroke-subtle bg-surface-sunken' : 'border-stroke-subtle bg-surface-sunken'}`}
                 >
                   <ItemDisplay item={item} type={activeTab} darkMode={darkMode} />
                 </div>
@@ -203,12 +203,12 @@ export function ImportReviewDialog({
         )}
       </div>
 
-      <div className={`p-6 border-t flex gap-3 ${darkMode ? 'bg-stone-900 border-stone-800' : 'bg-gray-50 border-gray-200'}`}>
+      <div className={`p-6 border-t flex gap-3 ${darkMode ? 'bg-surface-raised border-stroke-subtle' : 'bg-surface-sunken border-stroke-subtle'}`}>
         <button
           onClick={onClose}
           disabled={confirming}
           className={`flex-1 px-4 py-2 border rounded-lg font-medium transition-colors disabled:opacity-50 ${
-            darkMode ? 'border-stone-700 hover:bg-stone-800 text-stone-300' : 'border-gray-300 hover:bg-gray-100 text-gray-700'
+            darkMode ? 'border-stroke-default hover:bg-surface-sunken text-content-primary' : 'border-stroke-default hover:bg-surface-sunken text-content-primary'
           }`}
         >
           Cancel
@@ -228,8 +228,8 @@ export function ImportReviewDialog({
 
 function ItemDisplay({ item, type, darkMode = false }: { item: any; type: TabType; darkMode?: boolean }) {
   const textPrimary = darkMode ? 'text-white' : 'text-gray-900';
-  const textSecondary = darkMode ? 'text-stone-400' : 'text-gray-600';
-  const badgeBg = darkMode ? 'bg-stone-800' : 'bg-gray-100';
+  const textSecondary = 'text-content-secondary';
+  const badgeBg = darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken';
 
   switch (type) {
     case 'conditions':

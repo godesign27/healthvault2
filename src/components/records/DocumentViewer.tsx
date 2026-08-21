@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, FileText, Share2, Sparkles, ExternalLink } from 'lucide-react';
+import { X, FileText, Share2, Sparkles, ExternalLink, Loader2 } from 'lucide-react';
 import { HealthRecord } from '../../lib/records/types';
 import { ShareInput } from '../../lib/records/zod';
 import { shareRecord } from '../../lib/records/query';
+import { supabase } from '../../lib/supabase';
 
 interface DocumentViewerProps {
   record: HealthRecord | null;
@@ -18,6 +19,9 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
   const [shareMessage, setShareMessage] = useState('');
   const [shareHours, setShareHours] = useState(72);
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightResult, setInsightResult] = useState<string | null>(null);
+  const [insightError, setInsightError] = useState<string | null>(null);
   const isOpen = !!record;
 
   useEffect(() => {
@@ -31,7 +35,39 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setInsightResult(record?.aiSummary ?? null);
+    setInsightError(null);
+    setInsightLoading(false);
+  }, [record?.id]);
+
   if (!record) return null;
+
+  const handleGenerateInsight = async () => {
+    setInsightLoading(true);
+    setInsightError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Please sign in to generate insights.');
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-record`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recordId: record.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not analyze this record.');
+      setInsightResult(data.summary || 'No insight available for this record.');
+      onRequestInsight?.(record.id);
+    } catch (err) {
+      setInsightError(err instanceof Error ? err.message : 'Could not analyze this record.');
+    } finally {
+      setInsightLoading(false);
+    }
+  };
 
   const handleShare = async () => {
     if (!shareEmail) return;
@@ -67,12 +103,12 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
       <div className={`fixed top-0 right-0 h-full w-full max-w-2xl shadow-2xl transition-transform duration-300 ease-in-out z-50 flex flex-col ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      } ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      } ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className={`flex items-center justify-between p-6 border-b ${
-          darkMode ? 'border-stone-700' : 'border-stone-200'
+          darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           <h2 className={`text-lg font-semibold ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             {record.title}
           </h2>
@@ -80,8 +116,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
             onClick={onClose}
             className={`p-2 rounded-lg transition-colors ${
               darkMode
-                ? 'hover:bg-stone-800 text-stone-400'
-                : 'hover:bg-stone-100 text-stone-600'
+                ? 'hover:bg-surface-sunken text-content-secondary'
+                : 'hover:bg-surface-sunken text-content-secondary'
             }`}
           >
             <X className="w-5 h-5" />
@@ -89,7 +125,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
         </div>
 
         <div className={`flex border-b ${
-          darkMode ? 'border-stone-700' : 'border-stone-200'
+          darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           {(['summary', 'document', 'insights'] as const).map((tab) => (
             <button
@@ -104,8 +140,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                     ? 'border-emerald-500 text-emerald-400'
                     : 'border-emerald-600 text-emerald-600'
                   : darkMode
-                    ? 'border-transparent text-stone-400 hover:text-stone-300'
-                    : 'border-transparent text-stone-500 hover:text-stone-700'
+                    ? 'border-transparent text-content-secondary hover:text-content-primary'
+                    : 'border-transparent text-content-secondary hover:text-content-primary'
               }`}
             >
               {tab}
@@ -117,10 +153,10 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
           {activeTab === 'summary' && (
             <div className="space-y-4">
               <div className={`p-4 rounded-lg ${
-                darkMode ? 'bg-stone-800' : 'bg-stone-50'
+                darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'
               }`}>
                 <div className={`text-sm space-y-2 ${
-                  darkMode ? 'text-stone-300' : 'text-stone-600'
+                  darkMode ? 'text-content-primary' : 'text-content-secondary'
                 }`}>
                   <div className="flex justify-between">
                     <span className="font-medium">Provider:</span>
@@ -144,8 +180,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
               {record.aiSummary && (
                 <div className={`p-4 rounded-lg border ${
                   darkMode
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-stone-200'
-                    : 'bg-emerald-50 border-emerald-200 text-stone-700'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-content-primary'
+                    : 'bg-emerald-50 border-emerald-200 text-content-primary'
                 }`}>
                   <div className="flex items-start gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-emerald-500 mt-0.5" />
@@ -165,18 +201,18 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                     <img
                       src={record.previewUrl}
                       alt={record.title}
-                      className="w-full rounded-lg border border-stone-200"
+                      className="w-full rounded-lg border border-stroke-subtle"
                     />
                   ) : record.fileType === 'pdf' ? (
                     <iframe
                       src={record.previewUrl}
                       title={record.title}
-                      className="w-full rounded-lg border border-stone-200"
+                      className="w-full rounded-lg border border-stroke-subtle"
                       style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
                     />
                   ) : (
                     <div className={`flex flex-col items-center justify-center py-12 ${
-                      darkMode ? 'text-stone-400' : 'text-stone-500'
+                      darkMode ? 'text-content-secondary' : 'text-content-secondary'
                     }`}>
                       <FileText className="w-16 h-16 mb-4" />
                       <p className="text-center mb-4">Preview not available for {record.fileType.toUpperCase()} files</p>
@@ -186,8 +222,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                         rel="noopener noreferrer"
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                           darkMode
-                            ? 'bg-stone-800 hover:bg-stone-700 text-white'
-                            : 'bg-stone-100 hover:bg-stone-200 text-stone-900'
+                            ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
+                            : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
                         }`}
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -202,8 +238,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       rel="noopener noreferrer"
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                         darkMode
-                          ? 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'
-                          : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'
+                          ? 'text-content-secondary hover:text-content-primary hover:bg-surface-sunken'
+                          : 'text-content-secondary hover:text-content-primary hover:bg-surface-sunken'
                       }`}
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -213,20 +249,27 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                 </div>
               ) : (
                 <div className={`flex flex-col items-center justify-center py-12 ${
-                  darkMode ? 'text-stone-400' : 'text-stone-500'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   <FileText className="w-16 h-16 mb-4" />
                   {record.fileType === 'dicom' ? (
                     <>
-                      <p className="text-center mb-4">DICOM viewer integration coming soon</p>
-                      <button className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                        darkMode
-                          ? 'bg-stone-800 hover:bg-stone-700 text-white'
-                          : 'bg-stone-100 hover:bg-stone-200 text-stone-900'
-                      }`}>
-                        <ExternalLink className="w-4 h-4" />
-                        Open in External Viewer
-                      </button>
+                      <p className="text-center mb-2">DICOM viewing is not yet supported in-browser.</p>
+                      <p className="text-sm text-center mb-4">Download the file and open it with a DICOM viewer such as <strong>OsiriX</strong>, <strong>RadiAnt</strong>, or <strong>3D Slicer</strong>.</p>
+                      {record.previewUrl && (
+                        <a
+                          href={record.previewUrl}
+                          download
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                            darkMode
+                              ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
+                              : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
+                          }`}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Download DICOM File
+                        </a>
+                      )}
                     </>
                   ) : (
                     <p className="text-center">
@@ -243,24 +286,61 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
           {activeTab === 'insights' && (
             <div className="space-y-4">
               <button
-                onClick={() => onRequestInsight?.(record.id)}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
+                onClick={handleGenerateInsight}
+                disabled={insightLoading}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-60 ${
                   darkMode
                     ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400'
                     : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
                 }`}
               >
-                <Sparkles className="w-5 h-5" />
-                Generate AI Insights
+                {insightLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Analyzing record...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    {insightResult ? 'Regenerate AI Insights' : 'Generate AI Insights'}
+                  </>
+                )}
               </button>
 
-              <div className={`p-4 rounded-lg text-center ${
-                darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-50 text-stone-600'
-              }`}>
-                <p className="text-sm">
-                  Ask the AI assistant to analyze this record, explain findings, or compare with previous results.
-                </p>
-              </div>
+              {insightError && (
+                <div className={`p-4 rounded-lg text-sm ${
+                  darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-700'
+                }`}>
+                  {insightError}
+                </div>
+              )}
+
+              {insightResult ? (
+                <div className={`p-4 rounded-lg border ${
+                  darkMode
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-content-primary'
+                    : 'bg-emerald-50 border-emerald-200 text-content-primary'
+                }`}>
+                  <div className="flex items-start gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-emerald-500 mt-0.5" />
+                    <span className="font-medium text-emerald-600">AI Insight</span>
+                  </div>
+                  <p className="text-sm leading-relaxed">{insightResult}</p>
+                  <p className={`text-xs mt-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`}>
+                    AI-generated summary. Not medical advice.
+                  </p>
+                </div>
+              ) : (
+                !insightLoading && (
+                  <div className={`p-4 rounded-lg text-center ${
+                    darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
+                  }`}>
+                    <p className="text-sm">
+                      Generate a plain-language summary of this record. Not medical advice.
+                    </p>
+                  </div>
+                )
+              )}
             </div>
           )}
 
@@ -278,7 +358,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                 <>
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       Recipient Email
                     </label>
@@ -289,15 +369,15 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       placeholder="doctor@example.com"
                       className={`w-full px-4 py-2 rounded-lg border ${
                         darkMode
-                          ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                          : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                          ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                          : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                       }`}
                     />
                   </div>
 
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       Message (optional)
                     </label>
@@ -308,15 +388,15 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       rows={3}
                       className={`w-full px-4 py-2 rounded-lg border resize-none ${
                         darkMode
-                          ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500'
-                          : 'bg-white border-stone-300 text-stone-900 placeholder-stone-400'
+                          ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
+                          : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
                       }`}
                     />
                   </div>
 
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-stone-300' : 'text-stone-700'
+                      darkMode ? 'text-content-primary' : 'text-content-primary'
                     }`}>
                       Link Expires In
                     </label>
@@ -325,8 +405,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       onChange={(e) => setShareHours(Number(e.target.value))}
                       className={`w-full px-4 py-2 rounded-lg border ${
                         darkMode
-                          ? 'bg-stone-800 border-stone-700 text-white'
-                          : 'bg-white border-stone-300 text-stone-900'
+                          ? 'bg-surface-sunken border-stroke-default text-white'
+                          : 'bg-white border-stroke-default text-content-primary'
                       }`}
                     >
                       <option value={24}>24 hours</option>
@@ -342,8 +422,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
                       !shareEmail
                         ? darkMode
-                          ? 'bg-stone-800 text-stone-500 cursor-not-allowed'
-                          : 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                          ? 'bg-surface-sunken text-content-secondary cursor-not-allowed'
+                          : 'bg-surface-sunken text-content-secondary cursor-not-allowed'
                         : darkMode
                           ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                           : 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -359,7 +439,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
         </div>
 
         <div className={`absolute bottom-0 left-0 right-0 p-6 border-t ${
-          darkMode ? 'bg-stone-900 border-stone-700' : 'bg-white border-stone-200'
+          darkMode ? 'bg-surface-raised border-stroke-default' : 'bg-white border-stroke-subtle'
         }`}>
           <button
             onClick={handleShareClick}

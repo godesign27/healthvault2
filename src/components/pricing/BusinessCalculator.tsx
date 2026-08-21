@@ -23,11 +23,11 @@ export function BusinessCalculator({ darkMode = false }: BusinessCalculatorProps
   return (
     <div className={`max-w-md mx-auto mt-10 p-6 rounded-2xl shadow-sm border ${
       darkMode
-        ? 'bg-stone-800 border-stone-700'
-        : 'bg-white border-stone-200'
+        ? 'bg-surface-sunken border-stroke-default'
+        : 'bg-white border-stroke-subtle'
     }`}>
       <h3 className={`text-xl font-semibold mb-4 text-center ${
-        darkMode ? 'text-white' : 'text-stone-900'
+        darkMode ? 'text-white' : 'text-content-primary'
       }`}>
         Estimate your monthly cost
       </h3>
@@ -35,7 +35,7 @@ export function BusinessCalculator({ darkMode = false }: BusinessCalculatorProps
       <label
         htmlFor="patients"
         className={`block text-sm font-medium mb-1 ${
-          darkMode ? 'text-stone-300' : 'text-stone-700'
+          darkMode ? 'text-content-primary' : 'text-content-primary'
         }`}
       >
         Active patients
@@ -50,22 +50,22 @@ export function BusinessCalculator({ darkMode = false }: BusinessCalculatorProps
         onChange={handleChange}
         className={`w-full mb-4 px-3 py-2 rounded-lg border text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
           darkMode
-            ? 'bg-stone-900 border-stone-700 text-white'
-            : 'bg-white border-stone-300 text-stone-900'
+            ? 'bg-surface-raised border-stroke-default text-white'
+            : 'bg-white border-stroke-default text-content-primary'
         }`}
       />
 
       <div className="text-center mb-4">
-        <p className={`${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+        <p className={`${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
           Rate applied: <span className="font-semibold">${rate.toFixed(2)} / patient / month</span>
         </p>
         <p className={`text-3xl font-bold mt-1 ${
-          darkMode ? 'text-white' : 'text-stone-900'
+          darkMode ? 'text-white' : 'text-content-primary'
         }`}>
           ${monthly.toLocaleString()}
         </p>
         <p className={`text-sm mt-1 ${
-          darkMode ? 'text-stone-500' : 'text-stone-500'
+          darkMode ? 'text-content-secondary' : 'text-content-secondary'
         }`}>
           {patients <= 20000
             ? 'Standard rate applies up to 20,000 active patients.'
@@ -96,7 +96,7 @@ export function BusinessCalculator({ darkMode = false }: BusinessCalculatorProps
       )}
 
       <p className={`mt-3 text-xs text-center ${
-        darkMode ? 'text-stone-500' : 'text-stone-500'
+        darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
         Full platform included at every size—no feature gating.
       </p>

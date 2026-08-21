@@ -30,14 +30,16 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
           - Subtle shadow adds depth and hierarchy
           - Transition ensures smooth state changes
         */}
-        <div className={`
+        <div
+          data-hv-floating-chat-bar
+          className={`
+          hv-floating-chat-chrome
           relative flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2
-          bg-stone-900/95 backdrop-blur-sm
           rounded-full
-          shadow-2xl shadow-stone-900/50
           transition-all duration-300 ease-out
-          ${isHoveringGroup ? 'bg-stone-950 shadow-2xl shadow-stone-900/70 scale-[1.02]' : ''}
-        `}>
+          ${isHoveringGroup ? 'scale-[1.02]' : ''}
+        `}
+        >
 
           {/* Talk Button - Primary Action with Eye-Catching Gradient */}
           <button
@@ -94,13 +96,17 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
             />
 
             {/* Icon with smooth scale transition */}
-            <Mic className="
+            <Mic
+              className="
               w-5 h-5
               relative z-20
+              text-white
               transition-transform duration-300
               group-hover:scale-110
-              drop-shadow-lg
-            " />
+              drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]
+            "
+              strokeWidth={2.25}
+            />
 
             {/* Text label — hidden on mobile, visible on sm+ */}
             <span className="
@@ -117,16 +123,16 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
           <button
             onClick={onOpenChat}
             className={`
+              hv-floating-chat__secondary
               group
               relative flex items-center justify-center
               w-11 h-11 sm:w-14 sm:h-14
-              bg-white text-stone-700
               rounded-full
-              border-2 border-white/20
+              border-2
               shadow-lg shadow-black/20
               overflow-hidden
               transition-all duration-300 ease-out
-              hover:bg-stone-50
+              hover:bg-surface-sunken
               hover:border-orange-300
               hover:shadow-xl hover:shadow-orange-400/30
               hover:scale-105
@@ -144,13 +150,16 @@ export function FloatingChatActions({ onOpenChat, darkMode = false, context = 'd
             " />
 
             {/* Icon with smooth rotation on hover */}
-            <MessageCircle className="
+            <MessageCircle
+              className="
               w-5 h-5 sm:w-6 sm:h-6
               relative z-10
               transition-transform duration-300
               group-hover:rotate-12
               group-hover:scale-110
-            " />
+            "
+              strokeWidth={2.25}
+            />
           </button>
         </div>
       </div>

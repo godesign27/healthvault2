@@ -91,7 +91,6 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
     setAddingId(dp.id);
     try {
       await addProvider({
-        userId: '00000000-0000-0000-0000-000000000000',
         npi: dp.npi,
         name: dp.name,
         specialty: dp.specialty,
@@ -127,13 +126,13 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
         <section>
           <button
             onClick={() => setShowMyProviders(!showMyProviders)}
-            className={`flex items-center justify-between w-full mb-4 group ${darkMode ? 'text-white' : 'text-stone-900'}`}
+            className={`flex items-center justify-between w-full mb-4 group ${'text-content-primary'}`}
           >
             <div className="flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-blue-600" />
               <h2 className="text-lg font-semibold">Your Care Team</h2>
               <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-                darkMode ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-600'
+                'bg-surface-sunken text-content-secondary'
               }`}>
                 {providers.length}
               </span>
@@ -149,7 +148,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
               {primaryProviders.length > 0 && (
                 <div>
                   <h3 className={`text-sm font-medium uppercase tracking-wider mb-3 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-500'
+                    'text-content-secondary'
                   }`}>Primary Care</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {primaryProviders.map(p => (
@@ -167,7 +166,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
               {specialistProviders.length > 0 && (
                 <div>
                   <h3 className={`text-sm font-medium uppercase tracking-wider mb-3 ${
-                    darkMode ? 'text-stone-400' : 'text-stone-500'
+                    'text-content-secondary'
                   }`}>Specialists</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {specialistProviders.map(p => (
@@ -187,13 +186,13 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
         </section>
       ) : (
         <section className={`rounded-xl border-2 border-dashed p-8 text-center ${
-          darkMode ? 'border-stone-700 bg-stone-900/30' : 'border-stone-300 bg-stone-50/50'
+          'border-stroke-subtle bg-surface-sunken/50'
         }`}>
-          <UserPlus className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-600' : 'text-stone-400'}`} />
-          <h3 className={`font-semibold text-lg mb-1 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+          <UserPlus className={`w-12 h-12 mx-auto mb-3 ${'text-content-tertiary'}`} />
+          <h3 className={`font-semibold text-lg mb-1 ${'text-content-primary'}`}>
             Your care team is empty
           </h3>
-          <p className={`text-sm mb-4 max-w-md mx-auto ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <p className={`text-sm mb-4 max-w-md mx-auto ${'text-content-secondary'}`}>
             Start by adding your primary care doctor. You can browse the directory below or add a provider manually.
           </p>
           <button
@@ -210,7 +209,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <Stethoscope className="w-5 h-5 text-emerald-600" />
-            <h2 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <h2 className={`text-lg font-semibold ${'text-content-primary'}`}>
               {insurance.connected
                 ? `${insurance.name} In-Network Directory`
                 : 'Provider Directory'
@@ -226,7 +225,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
             + Add manually
           </button>
         </div>
-        <p className={`text-sm mb-5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+        <p className={`text-sm mb-5 ${'text-content-secondary'}`}>
           {insurance.connected
             ? `Showing providers matched to your connected ${insurance.name} plan`
             : 'Browse providers and add them to your care team. Connect insurance on the Insurance page for in-network filtering.'
@@ -235,7 +234,7 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
 
         <div className="relative mb-5">
           <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
-            darkMode ? 'text-stone-500' : 'text-stone-400'
+            'text-content-secondary'
           }`} />
           <input
             type="text"
@@ -244,8 +243,8 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
             placeholder="Search by name, specialty, or clinic..."
             className={`w-full pl-12 pr-4 py-3 rounded-xl border text-sm transition-colors ${
               darkMode
-                ? 'bg-stone-800 border-stone-700 text-white placeholder-stone-500 focus:border-blue-500'
-                : 'bg-white border-stone-200 text-stone-900 placeholder-stone-400 focus:border-blue-500'
+                ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-blue-500'
+                : 'bg-white border-stroke-subtle text-content-primary placeholder:text-content-placeholder focus:border-blue-500'
             } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
           />
         </div>
@@ -259,15 +258,15 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
                 selectedCategory === category
                   ? 'bg-blue-600 text-white shadow-sm'
                   : darkMode
-                  ? 'bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700'
-                  : 'bg-white text-stone-600 hover:bg-stone-50 border border-stone-200'
+                  ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken border border-stroke-default'
+                  : 'bg-white text-content-secondary hover:bg-surface-sunken border border-stroke-subtle'
               }`}
             >
               {category}
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                 selectedCategory === category
                   ? 'bg-blue-500 text-white'
-                  : darkMode ? 'bg-stone-700 text-stone-400' : 'bg-stone-100 text-stone-500'
+                  : darkMode ? 'bg-surface-sunken text-content-secondary' : 'bg-surface-sunken text-content-secondary'
               }`}>
                 {categoryCounts[category] || 0}
               </span>
@@ -280,18 +279,16 @@ export function ProvidersTab({ darkMode, onRemoveProvider, onOpenManualAdd }: Pr
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : filteredDirectory.length === 0 ? (
-          <div className={`text-center py-16 rounded-xl border ${
-            darkMode ? 'border-stone-800 bg-stone-900/50' : 'border-stone-200 bg-white'
-          }`}>
-            <Search className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-stone-700' : 'text-stone-300'}`} />
-            <p className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>No providers found</p>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <div className="hv-surface-card py-16 text-center">
+            <Search className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`} />
+            <p className={`font-medium ${'text-content-primary'}`}>No providers found</p>
+            <p className={`text-sm mt-1 ${'text-content-secondary'}`}>
               Try adjusting your search or filter criteria
             </p>
           </div>
         ) : (
           <>
-            <p className={`text-sm mb-4 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            <p className={`text-sm mb-4 ${'text-content-secondary'}`}>
               {filteredDirectory.length} provider{filteredDirectory.length !== 1 ? 's' : ''} found
             </p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -367,25 +364,27 @@ function DirectoryCard({
     .slice(0, 2)
     .toUpperCase();
 
-  const avatarColor = CATEGORY_COLORS[provider.category] || 'bg-stone-600';
+  const avatarColor = CATEGORY_COLORS[provider.category] || 'bg-surface-overlay';
 
   return (
-    <div className={`rounded-xl border p-5 transition-all ${
-      isAdded
-        ? darkMode
-          ? 'border-emerald-800/50 bg-emerald-950/20'
-          : 'border-emerald-200 bg-emerald-50/30'
-        : darkMode
-        ? 'border-stone-700 bg-stone-900 hover:border-stone-600'
-        : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
-    }`}>
+    <div
+      className={`p-5 transition-all ${
+        isAdded
+          ? darkMode
+            ? 'rounded-xl border border-emerald-800/50 bg-emerald-950/20'
+            : 'rounded-xl border border-emerald-200 bg-emerald-50/30'
+          : darkMode
+            ? 'hv-surface-card hv-surface-card--interactive'
+            : 'rounded-xl border border-stroke-subtle bg-white hover:border-stroke-default hover:shadow-sm'
+      }`}
+    >
       <div className="flex gap-4">
         <div className={`w-11 h-11 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
           {initials}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className={`font-semibold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <h3 className={`font-semibold truncate ${'text-content-primary'}`}>
               {provider.name}
             </h3>
             <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 whitespace-nowrap shrink-0">
@@ -394,11 +393,11 @@ function DirectoryCard({
             </span>
           </div>
 
-          <p className={`text-sm font-medium mb-0.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+          <p className={`text-sm font-medium mb-0.5 ${'text-content-primary'}`}>
             {provider.specialty}
           </p>
 
-          <div className={`space-y-1 mt-2 text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+          <div className={`space-y-1 mt-2 text-xs ${'text-content-secondary'}`}>
             <div className="flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{provider.clinic}</span>
@@ -420,7 +419,7 @@ function DirectoryCard({
           </div>
 
           <div className={`flex items-center justify-between mt-3 pt-3 border-t ${
-            darkMode ? 'border-stone-800' : 'border-stone-200'
+            'border-stroke-subtle'
           }`}>
             <div className="flex items-center gap-2">
               {provider.acceptingNewPatients ? (
@@ -431,12 +430,12 @@ function DirectoryCard({
                 </span>
               ) : (
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  darkMode ? 'bg-stone-800 text-stone-400' : 'bg-stone-100 text-stone-500'
+                  'bg-surface-sunken text-content-secondary'
                 }`}>
                   Not accepting
                 </span>
               )}
-              <span className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+              <span className={`text-xs ${'text-content-secondary'}`}>
                 {provider.distance}
               </span>
             </div>

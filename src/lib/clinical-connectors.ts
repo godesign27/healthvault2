@@ -9,7 +9,7 @@ export async function searchInNetworkProviders(
   const mockResults: Provider[] = [
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. Sarah Johnson',
       specialty: 'Internal Medicine',
       clinic: 'Springfield Medical Group',
@@ -21,7 +21,7 @@ export async function searchInNetworkProviders(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. Robert Martinez',
       specialty: 'Family Medicine',
       clinic: 'Springfield Family Health',
@@ -33,7 +33,7 @@ export async function searchInNetworkProviders(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. Lisa Thompson',
       specialty: 'Family Medicine',
       clinic: 'Community Health Center',
@@ -45,7 +45,7 @@ export async function searchInNetworkProviders(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. Michael Chen',
       specialty: 'Orthopedic Surgery',
       clinic: 'Orthopedic Specialists',
@@ -57,7 +57,7 @@ export async function searchInNetworkProviders(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. Jennifer Lee',
       specialty: 'Cardiology',
       clinic: 'Heart & Vascular Institute',
@@ -69,7 +69,7 @@ export async function searchInNetworkProviders(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Dr. David Kumar',
       specialty: 'Pediatrics',
       clinic: 'Children\'s Medical Group',
@@ -93,7 +93,7 @@ export async function searchPublicProviders(query: string): Promise<Provider[]> 
   const mockResults: Provider[] = [
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       npi: '1234567890',
       name: 'Dr. Emily Rodriguez',
       specialty: 'Dermatology',
@@ -106,7 +106,7 @@ export async function searchPublicProviders(query: string): Promise<Provider[]> 
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       npi: '0987654321',
       name: 'Dr. James Wilson',
       specialty: 'Ophthalmology',
@@ -119,7 +119,7 @@ export async function searchPublicProviders(query: string): Promise<Provider[]> 
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       npi: '1122334455',
       name: 'Dr. Amanda Foster',
       specialty: 'Family Medicine',
@@ -132,7 +132,7 @@ export async function searchPublicProviders(query: string): Promise<Provider[]> 
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       npi: '6677889900',
       name: 'Dr. Brian Park',
       specialty: 'Neurology',
@@ -145,7 +145,7 @@ export async function searchPublicProviders(query: string): Promise<Provider[]> 
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       npi: '3344556677',
       name: 'Dr. Patricia Green',
       specialty: 'Endocrinology',
@@ -173,7 +173,7 @@ export async function searchInNetworkPharmacies(
   const mockResults: Pharmacy[] = [
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'CVS Pharmacy #1234',
       chain: 'CVS',
       phone: '5559991111',
@@ -184,7 +184,7 @@ export async function searchInNetworkPharmacies(
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Walgreens #5678',
       chain: 'Walgreens',
       phone: '5552223333',
@@ -207,7 +207,7 @@ export async function searchPublicPharmacies(query: string): Promise<Pharmacy[]>
   const mockResults: Pharmacy[]  = [
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Community Pharmacy',
       chain: 'Independent',
       phone: '5554445555',
@@ -218,7 +218,7 @@ export async function searchPublicPharmacies(query: string): Promise<Pharmacy[]>
     },
     {
       id: crypto.randomUUID(),
-      userId: '00000000-0000-0000-0000-000000000000',
+      userId: '', // mock — real userId assigned on save
       name: 'Rite Aid #9999',
       chain: 'Rite Aid',
       phone: '5556667777',
@@ -240,7 +240,7 @@ export function mapFhirToProvider(fhirResource: unknown): Provider {
 
   return {
     id: crypto.randomUUID(),
-    userId: '00000000-0000-0000-0000-000000000000',
+    userId: '', // mock — real userId assigned on save
     npi: resource.identifier?.find((id: any) => id.system?.includes('npi'))?.value,
     name: resource.name?.[0]?.text || 'Unknown Provider',
     specialty: resource.specialty?.[0]?.coding?.[0]?.display,

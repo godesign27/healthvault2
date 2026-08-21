@@ -116,30 +116,25 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
   };
 
   const quickActions: QuickAction[] = [
-    {
-      label: "Why do you need my address?",
-      onClick: () => alert("Your address helps verify your identity and ensures we can securely match your health records. It's required for HIPAA compliance.")
-    },
-    {
-      label: "Can I change this later?",
-      onClick: () => alert("Yes! You can update your identity information anytime from your Profile settings in the Dashboard.")
-    },
-    {
-      label: "Use demo data",
-      onClick: fillDemoData
-    }
+    { label: "Use demo data", onClick: fillDemoData },
+  ];
+
+  const suggestedQuestions = [
+    "Why do you need my address?",
+    "Can I change my information later?",
+    "How is my identity information protected?",
   ];
 
   const inputClass = (fieldName: string) => `w-full px-4 py-2 rounded-lg border ${
     errors[fieldName]
       ? 'border-red-500 focus:ring-red-500'
       : darkMode
-        ? 'bg-stone-800 border-stone-700 text-white focus:ring-emerald-500'
-        : 'bg-white border-stone-300 text-stone-900 focus:ring-emerald-500'
+        ? 'bg-surface-sunken border-stroke-default text-white focus:ring-emerald-500'
+        : 'bg-white border-stroke-default text-content-primary focus:ring-emerald-500'
   } focus:outline-none focus:ring-2`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    darkMode ? 'text-stone-300' : 'text-stone-700'
+    darkMode ? 'text-content-primary' : 'text-content-primary'
   }`;
 
   return (
@@ -153,21 +148,20 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
           title="Identity Verification"
           message="We need to verify your identity to protect your health information and comply with HIPAA regulations. This is a one-time process that ensures your records stay secure."
           quickActions={quickActions}
+          suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
         />
       }
     >
-      <div className={`rounded-lg border p-8 ${
-        darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
-      }`}>
+      <div className="hv-surface-card hv-surface-card--flat p-8">
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Verify Your Identity
           </h2>
           <p className={`text-sm ${
-            darkMode ? 'text-stone-400' : 'text-stone-600'
+            darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
             All fields marked with * are required
           </p>
@@ -341,8 +335,8 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
               onClick={onBack}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
+                  : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
               }`}
             >
               <ArrowLeft className="w-4 h-4" />

@@ -61,18 +61,18 @@ export function ColorsPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Loading colors...</div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="text-content-secondary">Loading colors...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Color System</h1>
-          <p className="text-gray-600">Comprehensive color palette for the Health Vault design system</p>
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Color System</h1>
+          <p className="text-content-secondary">Comprehensive color palette for the Health Vault design system</p>
         </div>
 
         <div className="space-y-12">
@@ -80,8 +80,8 @@ export function ColorsPage() {
             const families = groupByFamily(categoryTokens);
 
             return (
-              <section key={category} className="bg-white rounded-lg shadow-sm p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">{getCategoryTitle(category)}</h2>
+              <section key={category} className="hv-surface-card p-8">
+                <h2 className="text-2xl font-bold text-content-primary mb-6">{getCategoryTitle(category)}</h2>
 
                 <div className="space-y-8">
                   {Object.entries(families).map(([family, familyTokens]) => {
@@ -96,10 +96,10 @@ export function ColorsPage() {
                     return (
                       <div key={family}>
                         <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-gray-800 capitalize mb-1">
+                          <h3 className="text-lg font-semibold text-content-primary capitalize mb-1">
                             {family.replace(/-/g, ' ')}
                           </h3>
-                          <p className="text-sm text-gray-600">{mainColor.description}</p>
+                          <p className="text-sm text-content-secondary">{mainColor.description}</p>
                         </div>
 
                         <div className="grid grid-cols-10 gap-2">
@@ -112,18 +112,18 @@ export function ColorsPage() {
                                 <div
                                   className={`
                                     h-20 rounded transition-all cursor-pointer
-                                    ${isMainColor ? 'ring-2 ring-gray-900 ring-offset-2' : 'hover:ring-2 hover:ring-gray-400 hover:ring-offset-2'}
+                                    ${isMainColor ? 'ring-2 ring-stroke-strong ring-offset-2 ring-offset-surface-page' : 'hover:ring-2 hover:ring-stroke-default hover:ring-offset-2 hover:ring-offset-surface-page'}
                                   `}
                                   style={{ backgroundColor: token.value }}
                                   title={`${token.name}: ${token.value}`}
                                 />
                                 <div className="mt-2 text-center">
-                                  <p className="text-xs font-medium text-gray-700">{shade}</p>
-                                  <p className="text-xs text-gray-500 font-mono">{token.value}</p>
+                                  <p className="text-xs font-medium text-content-secondary">{shade}</p>
+                                  <p className="text-xs text-content-secondary font-mono">{token.value}</p>
                                 </div>
 
                                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                                  <div className="bg-surface-overlay text-content-primary text-xs rounded py-1 px-2 whitespace-nowrap border border-stroke-subtle shadow-md">
                                     {token.name}
                                   </div>
                                 </div>
@@ -139,10 +139,10 @@ export function ColorsPage() {
             );
           })}
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Color Categories</h3>
 
@@ -163,7 +163,7 @@ export function ColorsPage() {
                     </p>
                   </div>
 
-                  <div className="border-l-4 border-gray-600 pl-4">
+                  <div className="border-l-4 border-stroke-strong pl-4">
                     <h4 className="font-semibold">Neutral Colors</h4>
                     <p className="text-sm">
                       Neutral colors including Slate, Gray, Zinc, Neutral, and Stone are used for backgrounds,

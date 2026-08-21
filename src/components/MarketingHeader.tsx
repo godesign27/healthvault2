@@ -59,8 +59,8 @@ export function MarketingHeader({
     <>
       <header className={`sticky top-0 z-50 border-b ${
         darkMode
-          ? 'bg-stone-900 border-stone-800'
-          : 'bg-white border-stone-200'
+          ? 'bg-surface-raised border-stroke-subtle'
+          : 'bg-white border-stroke-subtle'
       }`}>
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -75,7 +75,7 @@ export function MarketingHeader({
                 </div>
                 <div>
                   <span className={`text-base font-bold ${
-                    darkMode ? 'text-white' : 'text-stone-900'
+                    darkMode ? 'text-white' : 'text-content-primary'
                   }`}>Health Vault</span>
                 </div>
               </div>
@@ -88,11 +88,11 @@ export function MarketingHeader({
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       currentPage === item.id
                         ? darkMode
-                          ? 'bg-stone-800 text-white'
-                          : 'bg-stone-100 text-stone-900'
+                          ? 'bg-surface-sunken text-white'
+                          : 'bg-surface-sunken text-content-primary'
                         : darkMode
-                        ? 'text-stone-300 hover:bg-stone-800 hover:text-white'
-                        : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                        ? 'text-content-primary hover:bg-surface-sunken hover:text-white'
+                        : 'text-content-secondary hover:bg-surface-sunken hover:text-content-primary'
                     }`}
                   >
                     {item.label}
@@ -105,7 +105,7 @@ export function MarketingHeader({
               {isAuthenticated && (
                 <>
                   <div className={`hidden md:flex items-center gap-1 mr-2 pr-3 border-r ${
-                    darkMode ? 'border-stone-700' : 'border-stone-200'
+                    darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
                   }`}>
                     {viewButtons.map((view) => {
                       const Icon = view.icon;
@@ -120,8 +120,8 @@ export function MarketingHeader({
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-indigo-600 text-white'
                               : darkMode
-                              ? 'hover:bg-stone-800 text-stone-400'
-                              : 'hover:bg-stone-100 text-stone-600'
+                              ? 'hover:bg-surface-sunken text-content-secondary'
+                              : 'hover:bg-surface-sunken text-content-secondary'
                           }`}
                           title={view.label}
                         >
@@ -138,8 +138,8 @@ export function MarketingHeader({
                   onClick={onToggleDarkMode}
                   className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
                     darkMode
-                      ? 'hover:bg-stone-800 text-stone-400'
-                      : 'hover:bg-stone-100 text-stone-600'
+                      ? 'hover:bg-surface-sunken text-content-secondary'
+                      : 'hover:bg-surface-sunken text-content-secondary'
                   }`}
                   title={darkMode ? 'Light mode' : 'Dark mode'}
                 >
@@ -154,8 +154,8 @@ export function MarketingHeader({
                       onClick={onLoginClick}
                       className={`hidden sm:block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
                         darkMode
-                          ? 'text-stone-300 hover:bg-stone-800'
-                          : 'text-stone-700 hover:bg-stone-100'
+                          ? 'text-content-primary hover:bg-surface-sunken'
+                          : 'text-content-primary hover:bg-surface-sunken'
                       }`}
                     >
                       Log In
@@ -174,17 +174,17 @@ export function MarketingHeader({
 
               {isAuthenticated && (
                 <div className={`hidden sm:flex items-center gap-3 pl-3 ml-3 border-l ${
-                  darkMode ? 'border-stone-700' : 'border-stone-200'
+                  darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
                 }`}>
                   <button
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                       darkMode
-                        ? 'hover:bg-stone-800 text-stone-300'
-                        : 'hover:bg-stone-100 text-stone-700'
+                        ? 'hover:bg-surface-sunken text-content-primary'
+                        : 'hover:bg-surface-sunken text-content-primary'
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                      darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
                     }`}>
                       <User className="w-4 h-4" />
                     </div>
@@ -197,8 +197,8 @@ export function MarketingHeader({
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className={`lg:hidden p-2 rounded-lg transition-colors ${
                   darkMode
-                    ? 'hover:bg-stone-800 text-stone-400'
-                    : 'hover:bg-stone-100 text-stone-600'
+                    ? 'hover:bg-surface-sunken text-content-secondary'
+                    : 'hover:bg-surface-sunken text-content-secondary'
                 }`}
               >
                 {isMobileMenuOpen ? (
@@ -215,8 +215,8 @@ export function MarketingHeader({
       {isMobileMenuOpen && (
         <div className={`lg:hidden border-b ${
           darkMode
-            ? 'bg-stone-900 border-stone-800'
-            : 'bg-white border-stone-200'
+            ? 'bg-surface-raised border-stroke-subtle'
+            : 'bg-white border-stroke-subtle'
         }`}>
           <div className="px-4 py-4 space-y-2">
             {navItems.map((item) => (
@@ -226,11 +226,11 @@ export function MarketingHeader({
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   currentPage === item.id
                     ? darkMode
-                      ? 'bg-stone-800 text-white'
-                      : 'bg-stone-100 text-stone-900'
+                      ? 'bg-surface-sunken text-white'
+                      : 'bg-surface-sunken text-content-primary'
                     : darkMode
-                    ? 'text-stone-300 hover:bg-stone-800'
-                    : 'text-stone-600 hover:bg-stone-50'
+                    ? 'text-content-primary hover:bg-surface-sunken'
+                    : 'text-content-secondary hover:bg-surface-sunken'
                 }`}
               >
                 {item.label}
@@ -240,10 +240,10 @@ export function MarketingHeader({
             {isAuthenticated && (
               <>
                 <div className={`my-4 border-t ${
-                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                  darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 <div className={`text-xs font-semibold uppercase tracking-wide px-4 mb-2 ${
-                  darkMode ? 'text-stone-500' : 'text-stone-500'
+                  darkMode ? 'text-content-secondary' : 'text-content-secondary'
                 }`}>
                   Quick Access
                 </div>
@@ -260,8 +260,8 @@ export function MarketingHeader({
                             ? 'bg-indigo-600 text-white'
                             : 'bg-indigo-600 text-white'
                           : darkMode
-                          ? 'text-stone-300 hover:bg-stone-800'
-                          : 'text-stone-600 hover:bg-stone-50'
+                          ? 'text-content-primary hover:bg-surface-sunken'
+                          : 'text-content-secondary hover:bg-surface-sunken'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -275,15 +275,15 @@ export function MarketingHeader({
             {!isAuthenticated && (onLoginClick || onGetStarted) && (
               <>
                 <div className={`my-4 border-t ${
-                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                  darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 {onLoginClick && (
                   <button
                     onClick={onLoginClick}
                     className={`w-full px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors mb-2 ${
                       darkMode
-                        ? 'text-stone-300 hover:bg-stone-800 border border-stone-700'
-                        : 'text-stone-700 hover:bg-stone-100 border border-stone-300'
+                        ? 'text-content-primary hover:bg-surface-sunken border border-stroke-default'
+                        : 'text-content-primary hover:bg-surface-sunken border border-stroke-default'
                     }`}
                   >
                     Log In
@@ -303,17 +303,17 @@ export function MarketingHeader({
             {isAuthenticated && (
               <>
                 <div className={`my-4 border-t ${
-                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                  darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 <button
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-600 hover:bg-stone-50'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-secondary hover:bg-surface-sunken'
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    darkMode ? 'bg-stone-800' : 'bg-stone-200'
+                    darkMode ? 'bg-surface-sunken' : 'bg-surface-overlay'
                   }`}>
                     <User className="w-4 h-4" />
                   </div>
@@ -325,14 +325,14 @@ export function MarketingHeader({
             {onToggleDarkMode && (
               <>
                 <div className={`my-4 border-t sm:hidden ${
-                  darkMode ? 'border-stone-800' : 'border-stone-200'
+                  darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 <button
                   onClick={onToggleDarkMode}
                   className={`w-full sm:hidden flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
-                      ? 'text-stone-300 hover:bg-stone-800'
-                      : 'text-stone-600 hover:bg-stone-50'
+                      ? 'text-content-primary hover:bg-surface-sunken'
+                      : 'text-content-secondary hover:bg-surface-sunken'
                   }`}
                 >
                   {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

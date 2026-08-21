@@ -113,12 +113,26 @@ Deno.serve(async (req: Request) => {
       }
 
       const formResponseIds = shareEvent.form_response_ids || [];
-      const forms = formResponseIds.map((formId: string) => ({
-        id: formId,
-        title: getFormTitle(formId),
-        version: '2025.01',
-        signedAt: shareEvent.sent_at || new Date().toISOString(),
-      }));
+      // form_response_ids are form_responses UUIDs; resolve titles via their template_id.
+      let formRows: any[] = [];
+      if (formResponseIds.length > 0) {
+        const { data: frs } = await supabase
+          .from('form_responses')
+          .select('id, template_id, signed_at')
+          .in('id', formResponseIds);
+        formRows = frs || [];
+      }
+      const formRowById = new Map(formRows.map((fr: any) => [fr.id, fr]));
+      const forms = formResponseIds.map((formId: string) => {
+        const fr = formRowById.get(formId);
+        const templateId = fr?.template_id || formId;
+        return {
+          id: formId,
+          title: getFormTitle(templateId),
+          version: '2025.01',
+          signedAt: fr?.signed_at || shareEvent.sent_at || new Date().toISOString(),
+        };
+      });
 
       const payload = {
         id: shareEvent.id,
@@ -126,7 +140,7 @@ Deno.serve(async (req: Request) => {
         patient: {
           id: shareEvent.patient_id,
           name: shareEvent.recipient?.patientName || 'Unknown',
-          birthDate: '1985-06-22',
+          birthDate: shareEvent.patient_dob || null,
         },
         recipient: {
           displayName: shareEvent.recipient?.providerName || shareEvent.recipient?.displayName || 'Unknown',
@@ -159,52 +173,86 @@ Deno.serve(async (req: Request) => {
 
     if (req.method === 'POST' && pathParts.length === 2 && pathParts[1] === 'opened') {
       const shareId = pathParts[0];
+      const body = await req.json().catch(() => ({}));
+      const token = body.token || url.searchParams.get('token');
+
+      // Validate share token before marking as opened (recipient-side action)
+      const { data: shareEvent } = await supabase
+        .from('share_events')
+        .select('id, share_token')
+        .eq('id', shareId)
+        .maybeSingle();
+
+      if (!shareEvent) {
+        return new Response(JSON.stringify({ error: 'Share not found' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (token && token !== shareEvent.share_token) {
+        return new Response(JSON.stringify({ error: 'Invalid token' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       const { error } = await supabase
         .from('share_events')
-        .update({
-          status: 'opened',
-          opened_at: new Date().toISOString(),
-        })
+        .update({ status: 'opened', opened_at: new Date().toISOString() })
         .eq('id', shareId);
 
       if (error) throw error;
 
       return new Response(
         JSON.stringify({ success: true }),
-        {
-          status: 200,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json',
-          },
-        }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (req.method === 'POST' && pathParts.length === 2 && pathParts[1] === 'revoke') {
       const shareId = pathParts[0];
 
+      // Auth check: only the patient who created the share can revoke it
+      const authHeader = req.headers.get('Authorization');
+      const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+        global: { headers: { Authorization: authHeader || '' } }
+      });
+      const { data: { user } } = await authenticatedSupabase.auth.getUser(
+        authHeader?.split(' ')[1] || ''
+      );
+
+      if (!user) {
+        return new Response(JSON.stringify({ error: 'Authentication required' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Verify ownership before revoking
+      const { data: shareEvent } = await supabase
+        .from('share_events')
+        .select('id, patient_id')
+        .eq('id', shareId)
+        .maybeSingle();
+
+      if (!shareEvent) {
+        return new Response(JSON.stringify({ error: 'Share not found' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (shareEvent.patient_id !== user.id) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const { error } = await supabase
         .from('share_events')
-        .update({
-          status: 'revoked',
-          is_revoked: true,
-          revoked_at: new Date().toISOString(),
-        })
+        .update({ status: 'revoked', is_revoked: true, revoked_at: new Date().toISOString() })
         .eq('id', shareId);
 
       if (error) throw error;
 
       return new Response(
         JSON.stringify({ success: true }),
-        {
-          status: 200,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json',
-          },
-        }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -225,6 +273,23 @@ Deno.serve(async (req: Request) => {
         note,
         options,
       });
+
+      // Fetch patient DOB to store with the share event
+      const { data: patientProfile } = await supabase
+        .from('user_profiles')
+        .select('date_of_birth, first_name, last_name')
+        .eq('user_id', patientId)
+        .maybeSingle();
+      const patientDob = patientProfile?.date_of_birth || null;
+      const patientFullName = patientProfile
+        ? `${patientProfile.first_name || ''} ${patientProfile.last_name || ''}`.trim()
+        : (recipient?.patientName || 'Unknown');
+
+      // Fetch real form_responses data for the forms being shared
+      const { data: formResponses } = await supabase
+        .from('form_responses')
+        .select('id, template_id, answers_json, status, signed_at')
+        .in('id', formIds);
 
       const shareEventId = crypto.randomUUID();
       const shareToken = crypto.randomUUID();
@@ -283,17 +348,53 @@ Deno.serve(async (req: Request) => {
         console.error('Error uploading bundle:', bundleUploadError);
       }
 
-      // Generate PDF content
-      const pdfContent = `Medical Forms Packet
-Patient: ${recipient.patientName || 'Unknown'}
-Generated: ${new Date().toLocaleString()}
+      // Generate PDF packet from real form_responses data
+      const formSections = (formResponses || []).map((fr: any) => {
+        const formTitle = getFormTitle(fr.template_id) || fr.template_id || 'Medical Form';
+        const answers = fr.answers_json || {};
+        const answerLines = Object.entries(answers)
+          .filter(([, v]) => v !== null && v !== undefined && v !== '')
+          .map(([k, v]) => {
+            const label = k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+            return `<tr><td style="padding:6px 12px;font-weight:600;color:#374151;width:35%;vertical-align:top">${label}</td><td style="padding:6px 12px;color:#1f2937">${String(v)}</td></tr>`;
+          })
+          .join('');
+        return `
+          <div style="margin-bottom:32px;page-break-inside:avoid">
+            <h2 style="font-size:16px;font-weight:700;color:#111827;border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px">${formTitle}</h2>
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+              ${answerLines || '<tr><td style="padding:6px 12px;color:#9ca3af" colspan="2">No answers recorded.</td></tr>'}
+            </table>
+          </div>`;
+      }).join('');
 
-Included Forms:
-${forms.map((f: any) => `- ${f.title} (v${f.version})`).join('\n')}
+      const pdfHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Medical Forms Packet — Health Vault</title>
+<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1f2937}</style>
+</head>
+<body>
+<div style="text-align:center;margin-bottom:32px;border-bottom:3px solid #10b981;padding-bottom:24px">
+  <h1 style="font-size:24px;font-weight:700;color:#111827;margin:0 0 8px">Medical Forms Packet</h1>
+  <p style="color:#6b7280;margin:4px 0">Health Vault — Secure Health Records Platform</p>
+</div>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:32px">
+  <p style="margin:4px 0"><strong>Patient:</strong> ${patientFullName}</p>
+  ${patientDob ? `<p style="margin:4px 0"><strong>Date of Birth:</strong> ${patientDob}</p>` : ''}
+  <p style="margin:4px 0"><strong>Shared With:</strong> ${recipient?.providerName || recipient?.displayName || 'Unknown'}</p>
+  <p style="margin:4px 0"><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+  <p style="margin:4px 0"><strong>Forms Included:</strong> ${forms.length}</p>
+</div>
+${formSections}
+<div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#9ca3af;text-align:center">
+  Shared securely via Health Vault. This document contains protected health information.
+</div>
+</body>
+</html>`;
 
-This is a placeholder PDF. In production, this would contain the actual form data.`;
-
-      const pdfBlob = new Blob([pdfContent], { type: 'text/plain' });
+      const pdfBlob = new Blob([pdfHtml], { type: 'text/html' });
       const { error: pdfUploadError } = await supabase.storage
         .from('shares')
         .upload(`${shareEventId}/packet.pdf`, pdfBlob, {
@@ -310,9 +411,10 @@ This is a placeholder PDF. In production, this would contain the actual form dat
         .insert({
           id: shareEventId,
           patient_id: patientId,
+          patient_dob: patientDob,
           form_response_ids: formIds,
           method: recipient.method,
-          recipient: recipient,
+          recipient: { ...recipient, patientName: patientFullName },
           bundle_url: bundleUrl,
           pdf_url: pdfUrl,
           status: 'delivered',

@@ -8,22 +8,22 @@ export function DatePickerPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Date Picker</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Date Picker</h1>
+          <p className="text-content-secondary">
             Calendar component for selecting dates with various sizes and states
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Date Picker Sizes</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Date Picker Sizes</h2>
 
             <div className="grid grid-cols-3 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Normal</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Normal</h3>
                 <DatePicker
                   label="Date picker label"
                   value={normalDate}
@@ -33,7 +33,7 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">Small</h3>
                 <DatePicker
                   label="Date picker label"
                   value={smallDate}
@@ -43,7 +43,7 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">X-Small</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4 uppercase">X-Small</h3>
                 <DatePicker
                   label="Date picker label"
                   value={xsmallDate}
@@ -54,83 +54,83 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components (For UI Kit building only)</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components (For UI Kit building only)</h2>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Current Date States</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Current Date States</h3>
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Default</p>
+                    <p className="text-xs text-content-secondary mb-2">Default</p>
                     <DatePickerDay day={31} isCurrentDate state="default" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Hover</p>
+                    <p className="text-xs text-content-secondary mb-2">Hover</p>
                     <DatePickerDay day={31} isCurrentDate state="hover" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Pressed</p>
+                    <p className="text-xs text-content-secondary mb-2">Pressed</p>
                     <DatePickerDay day={31} isCurrentDate state="pressed" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Selected</p>
+                    <p className="text-xs text-content-secondary mb-2">Selected</p>
                     <DatePickerDay day={31} isCurrentDate state="selected" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Highlight</p>
+                    <p className="text-xs text-content-secondary mb-2">Highlight</p>
                     <DatePickerDay day={31} isCurrentDate state="highlight" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Focused</p>
+                    <p className="text-xs text-content-secondary mb-2">Focused</p>
                     <DatePickerDay day={31} isCurrentDate state="focused" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Inactive Date States</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Inactive Date States</h3>
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Default</p>
+                    <p className="text-xs text-content-secondary mb-2">Default</p>
                     <DatePickerDay day={31} state="default" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Hover</p>
+                    <p className="text-xs text-content-secondary mb-2">Hover</p>
                     <DatePickerDay day={31} state="hover" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Pressed</p>
+                    <p className="text-xs text-content-secondary mb-2">Pressed</p>
                     <DatePickerDay day={31} state="pressed" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Disabled</p>
+                    <p className="text-xs text-content-secondary mb-2">Disabled</p>
                     <DatePickerDay day={31} state="disabled" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Navigation Buttons</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Navigation Buttons</h3>
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Back Button - Default</p>
-                    <button className="p-2 rounded-full border-2 border-transparent hover:bg-gray-100 transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <p className="text-xs text-content-secondary mb-2">Back Button - Default</p>
+                    <button className="p-2 rounded-full border-2 border-transparent hover:bg-surface-sunken transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Back Button - Hover</p>
-                    <button className="p-2 rounded-full bg-gray-100 border-2 border-transparent transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <p className="text-xs text-content-secondary mb-2">Back Button - Hover</p>
+                    <button className="p-2 rounded-full bg-surface-sunken border-2 border-transparent transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Back Button - Focused</p>
+                    <p className="text-xs text-content-secondary mb-2">Back Button - Focused</p>
                     <button className="p-2 rounded-full border-2 border-[indigo-600] transition-colors">
                       <svg className="w-5 h-5 text-[indigo-600]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -141,23 +141,23 @@ export function DatePickerPage() {
 
                 <div className="flex items-center gap-4 mt-4">
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Forward Button - Default</p>
-                    <button className="p-2 rounded-full border-2 border-transparent hover:bg-gray-100 transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <p className="text-xs text-content-secondary mb-2">Forward Button - Default</p>
+                    <button className="p-2 rounded-full border-2 border-transparent hover:bg-surface-sunken transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Forward Button - Hover</p>
-                    <button className="p-2 rounded-full bg-gray-100 border-2 border-transparent transition-colors">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <p className="text-xs text-content-secondary mb-2">Forward Button - Hover</p>
+                    <button className="p-2 rounded-full bg-surface-sunken border-2 border-transparent transition-colors">
+                      <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-gray-600 mb-2">Forward Button - Focused</p>
+                    <p className="text-xs text-content-secondary mb-2">Forward Button - Focused</p>
                     <button className="p-2 rounded-full border-2 border-[indigo-600] transition-colors">
                       <svg className="w-5 h-5 text-[indigo-600]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -168,15 +168,15 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Month/Year Dropdown</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Month/Year Dropdown</h3>
                 <div className="flex gap-4">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-[#1C2938] text-white rounded border-2 border-gray-300 hover:bg-[#2A3F52] transition-colors">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-[#1C2938] text-white rounded border-2 border-stroke-default hover:bg-[#2A3F52] transition-colors">
                     <span className="text-sm">December</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-[#1C2938] text-white rounded border-2 border-gray-300 hover:bg-[#2A3F52] transition-colors">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-[#1C2938] text-white rounded border-2 border-stroke-default hover:bg-[#2A3F52] transition-colors">
                     <span className="text-sm">2020</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -186,10 +186,10 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Day of the Week</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Day of the Week</h3>
                 <div className="flex gap-2">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-                    <div key={idx} className="w-10 h-10 flex items-center justify-center text-xs font-semibold text-gray-600">
+                    <div key={idx} className="w-10 h-10 flex items-center justify-center text-xs font-semibold text-content-secondary">
                       {day}
                     </div>
                   ))}
@@ -197,25 +197,25 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Today Button</h3>
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Today Button</h3>
                 <button className="text-sm text-[indigo-600] hover:text-[indigo-700] font-medium transition-colors">
                   Today
                 </button>
               </div>
 
               <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-4">Footer</h3>
-                <div className="flex items-center justify-between border-t-2 border-gray-200 pt-4">
-                  <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <h3 className="text-base font-semibold text-content-secondary mb-4">Footer</h3>
+                <div className="flex items-center justify-between border-t-2 border-stroke-subtle pt-4">
+                  <button className="p-2 rounded-full hover:bg-surface-sunken transition-colors">
+                    <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
                   <button className="text-sm text-[indigo-600] hover:text-[indigo-700] font-medium transition-colors">
                     Today
                   </button>
-                  <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button className="p-2 rounded-full hover:bg-surface-sunken transition-colors">
+                    <svg className="w-5 h-5 text-content-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -224,12 +224,12 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Calendar Views</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Calendar Views</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Normal Size</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Normal Size</h3>
                 <DatePickerCalendar
                   selectedDate={selectedDate}
                   onDateSelect={setSelectedDate}
@@ -238,7 +238,7 @@ export function DatePickerPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">Small Size</h3>
+                <h3 className="text-sm font-semibold text-content-secondary mb-4">Small Size</h3>
                 <DatePickerCalendar
                   selectedDate={selectedDate}
                   onDateSelect={setSelectedDate}
@@ -248,8 +248,8 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Action Field with Date Picker</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Action Field with Date Picker</h2>
 
             <div className="max-w-sm">
               <DatePicker
@@ -260,10 +260,10 @@ export function DatePickerPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

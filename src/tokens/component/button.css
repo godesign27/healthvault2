@@ -3,6 +3,12 @@
    Structure: component.button.[property].[variant].[state]
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
+  /* Shape / Focus */
+  --hv-component-button-radius-default: 0.5rem;
+  --hv-component-button-radius-pill: 9999px;
+  --hv-component-button-focus-ring-default: var(--hv-color-border-focus);
+  --hv-component-button-focus-ring-offset: var(--hv-color-surface-page);
+
   /* Background */
   --hv-component-button-background-primary-default:    var(--hv-color-action-primary-default);
   --hv-component-button-background-primary-hover:      var(--hv-color-action-primary-hover);

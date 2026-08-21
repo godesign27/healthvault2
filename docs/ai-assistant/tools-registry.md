@@ -1,6 +1,8 @@
 # HealthVault Tools Registry
 
-Complete reference of all 26 backend tools available to the AI assistant. Each tool is registered in both the frontend registry (`src/lib/ai-tools/registry.ts`) and the edge function (`supabase/functions/ai-health-assistant/tools.ts`).
+Complete reference of all 26 tools available to the AI assistant. The **Edge Function is the single source of truth** (`supabase/functions/ai-health-assistant/tools.ts`).
+
+> **Architecture note (updated 2026-06-05):** The browser-side AI path (`src/api/assistant/run.ts`, `src/lib/openai/tools.ts`) has been deprecated and removed from active use. `AIAssistantPanel` now routes all messages exclusively through the authenticated Edge Function via `sendChatMessage` in `src/lib/openai/client.ts`. The legacy `src/lib/ai-tools/*.ts` handler files are also unused — the Edge Function manages its own tool execution. Both should be deleted in a future cleanup.
 
 ---
 
@@ -187,23 +189,36 @@ Complete reference of all 26 backend tools available to the AI assistant. Each t
 
 ## Implementation Locations
 
-| Layer | Location | Count |
-|-------|----------|-------|
-| Frontend registry | `src/lib/ai-tools/registry.ts` | 26 tools |
-| Frontend handlers | `src/lib/ai-tools/*.ts` (7 files) | 26 handlers |
-| Edge function definitions | `supabase/functions/ai-health-assistant/tools.ts` | 26 tools |
-| Tool contracts | `docs/ai-assistant/tool-contracts.md` | 26 numbered sections (index order differs) |
+| Layer | Location | Count | Status |
+|-------|----------|-------|--------|
+| **Edge function (active)** | `supabase/functions/ai-health-assistant/tools.ts` | 26 tools | ✅ Active |
+| Tool contracts | `docs/ai-assistant/tool-contracts.md` | 26 sections | ✅ Active |
+| Browser registry (deprecated) | `src/lib/openai/tools.ts` | 32 tools | ⚠️ Deprecated — delete |
+| Browser handlers (deprecated) | `src/lib/ai-tools/*.ts` (7 files) | 26 handlers | ⚠️ Deprecated — delete |
+| Browser run path (deprecated) | `src/api/assistant/run.ts` | — | ⚠️ Deprecated — delete |
+
+---
+
+## Capability gaps (tools needed in Edge Function)
+
+The deprecated browser registry included tools not yet in the Edge Function. These should be added when the features are built:
+
+| Capability | Missing tool | Notes |
+|---|---|---|
+| Medical ID card data | `getMedicalID` | Returns blood type, organ donor, emergency contact |
+| Preventive care | `getPreventiveCare` | Reads `preventive_care` table |
+| Appointments | `getAppointments` | Table/feature not yet built |
+| Care encounters | `getEncounters` | Table/feature not yet built |
+| Provider record connection | `resolveProviderRecordConnection`, `startProviderConnection`, `startEpicConnection`, `fetchProviderRecordPreview` | EHR connection flow |
+| Provider org search | `searchProviderOrganizations` | NPI/org directory search |
+| Connected providers list | `getConnectedProviders` | Lists EHR-connected providers |
 
 ---
 
 ## Adding a New Tool
 
-1. Create the handler function in the appropriate `src/lib/ai-tools/[domain].ts` file
-2. Define a Zod input schema and export both
-3. Register in `src/lib/ai-tools/registry.ts`
-4. Export from `src/lib/ai-tools/index.ts`
-5. Add the tool handler to `supabase/functions/ai-health-assistant/tools.ts`
-6. Deploy the edge function
-7. Document the contract in `docs/ai-assistant/tool-contracts.md`
-8. Add to this registry
-9. Update system prompt if the tool changes page behavior
+1. Add the tool handler inside `supabase/functions/ai-health-assistant/tools.ts`
+2. Deploy: `npx supabase functions deploy ai-health-assistant`
+3. Document the contract in `docs/ai-assistant/tool-contracts.md`
+4. Add to this registry index table
+5. Update system prompt if the tool changes page behavior

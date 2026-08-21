@@ -1,3 +1,8 @@
+// @deprecated — This browser-side tool registry is no longer used.
+// All assistant tool execution happens inside the Edge Function
+// (supabase/functions/ai-health-assistant/tools.ts).
+// This file and src/lib/ai-tools/*.ts can be deleted after review.
+// @ts-nocheck
 import { getIncompleteForms } from "../tools/getIncompleteForms";
 import { getHealthRecords } from "../tools/getHealthRecords";
 import { getHealthRecordRequests } from "../tools/getHealthRecordRequests";

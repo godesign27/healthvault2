@@ -1,5 +1,7 @@
-import { FileText, Activity, Calendar, Pill, Heart, ArrowRight, Sparkles, Send, X, Home, Menu, CheckCircle } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { FileText, Activity, Calendar, Pill, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useTheme } from '../providers/ThemeProvider';
+import { Surface } from '../providers/SurfaceProvider';
 import { fetchRecordRequests, type RecordRequestRow } from '../lib/records/requests-api';
 import { supabase } from '../lib/supabase';
 import { MedicalIDCard } from '../components/MedicalIDCard';
@@ -14,24 +16,39 @@ import { MedicalProfilePage } from './MedicalProfilePage';
 import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
-import type { PageContext } from '../lib/voice/context-messages';
+import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
 }
 
-const PAGE_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  care: 'Care History',
-  'medical-forms': 'Medical Forms',
-  'medical-profile': 'Medical Profile',
-  network: 'Care Network',
-  insurance: 'Insurance',
-  'health-records': 'Health Records',
-  vitals: 'Vitals',
-};
+interface ActivityItem {
+  id: string;
+  kind: 'record' | 'request' | 'medication';
+  title: string;
+  subtitle: string;
+  timestamp: string;
+}
+
+function relativeTime(iso: string | null): string {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const diffMs = Date.now() - then;
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`;
+  const weeks = Math.round(days / 7);
+  if (weeks < 5) return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 export default function DashboardPage({ onViewChange }: DashboardPageProps) {
+  const { setTheme: setGlobalTheme } = useTheme();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -76,12 +93,16 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   const [receivedRequests, setReceivedRequests] = useState<RecordRequestRow[]>([]);
   const [userFirstName, setUserFirstName] = useState<string | null>(null);
   const [dashboardStats, setDashboardStats] = useState({ records: 0, medications: 0, appointments: 0 });
+  const [formsCount, setFormsCount] = useState<number | null>(null);
+  const [vaultStats, setVaultStats] = useState<{ connectedProviders: number; pendingRequests: number; lastSyncedAt: string | null } | null>(null);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [dismissedDashboardBanners, setDismissedDashboardBanners] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem('dismissedRecordBanners');
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch { return new Set(); }
   });
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
   useEffect(() => {
     if (dismissedDashboardBanners.size > 0) {
@@ -101,11 +122,12 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       if (!session?.user?.id) return;
       const userId = session.user.id;
 
-      const [profileRes, recordsRes, medsRes, apptRes] = await Promise.all([
+      const [profileRes, recordsRes, medsRes, apptRes, patientRes] = await Promise.all([
         supabase.from('user_profiles').select('first_name').eq('user_id', userId).maybeSingle(),
         supabase.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'scheduled'),
+        supabase.from('patient_profiles').select('id').eq('user_id', userId).maybeSingle(),
       ]);
 
       if (profileRes.data?.first_name) setUserFirstName(profileRes.data.first_name);
@@ -114,6 +136,76 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         medications: medsRes.count ?? 0,
         appointments: apptRes.count ?? 0,
       });
+
+      // Completed medical forms count (form_responses is keyed by patient_profiles.id)
+      if (patientRes.data?.id) {
+        const { count: formsDone } = await supabase
+          .from('form_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('patient_id', patientRes.data.id)
+          .in('status', ['completed', 'signed']);
+        setFormsCount(formsDone ?? 0);
+      } else {
+        setFormsCount(0);
+      }
+
+      // Connected providers / pending requests / last sync via vault-stats
+      try {
+        const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vault-stats`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        if (res.ok) {
+          const s = await res.json();
+          setVaultStats({
+            connectedProviders: s.connectedProviders ?? 0,
+            pendingRequests: s.pendingRequests ?? 0,
+            lastSyncedAt: s.lastSyncedAt ?? null,
+          });
+        }
+      } catch { /* non-blocking */ }
+
+      // Recent activity feed from real data (records + received requests + medications)
+      const [recRows, reqRows, medRows] = await Promise.all([
+        supabase.from('health_records').select('id, title, kind, provider_name, received_at, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('health_record_requests').select('id, provider_name, doctor_name, status, submitted_at, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('medications').select('id, name, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(5),
+      ]);
+
+      const activity: ActivityItem[] = [];
+      for (const r of recRows.data ?? []) {
+        activity.push({
+          id: `rec-${r.id}`,
+          kind: 'record',
+          title: r.title || 'Health record added',
+          subtitle: r.provider_name || (r.kind ? String(r.kind) : 'Health record'),
+          timestamp: r.received_at || r.created_at,
+        });
+      }
+      for (const r of reqRows.data ?? []) {
+        if (r.status === 'received') {
+          activity.push({
+            id: `req-${r.id}`,
+            kind: 'request',
+            title: `Records received from ${r.doctor_name || r.provider_name}`,
+            subtitle: 'Requested records are now available',
+            timestamp: r.submitted_at || r.created_at,
+          });
+        }
+      }
+      for (const m of medRows.data ?? []) {
+        activity.push({
+          id: `med-${m.id}`,
+          kind: 'medication',
+          title: `Medication added: ${m.name}`,
+          subtitle: 'Added to your medications',
+          timestamp: m.created_at,
+        });
+      }
+      activity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      setRecentActivity(activity.slice(0, 4));
     };
     loadUserData().catch(() => {});
   }, []);
@@ -121,6 +213,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  useEffect(() => {
+    setGlobalTheme(darkMode ? 'dark' : 'light');
+  }, [darkMode, setGlobalTheme]);
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
@@ -134,7 +230,25 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  const handleProfileSignOut = async () => {
+    await supabase.auth.signOut();
+    onViewChange?.('marketing');
+  };
+
   const renderMainContent = () => {
+    if (currentPage === 'profile-settings') {
+      return (
+        <ProfileSettingsDrawer
+          layout="inline"
+          isOpen
+          darkMode={darkMode}
+          onClose={() => setCurrentPage('dashboard')}
+          onSave={() => setProfileRefreshKey((k) => k + 1)}
+          onSignOut={handleProfileSignOut}
+        />
+      );
+    }
+
     if (currentPage === 'care') {
       return <CarePage darkMode={darkMode} actionsRef={careActionsRef} />;
     }
@@ -172,28 +286,16 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       return (
         <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
           <div className="mb-8">
-            <h1 className={`text-2xl font-bold ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Vitals</h1>
-            <p className={`mt-1 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Track your vital signs and health metrics</p>
+            <h1 className="text-2xl font-bold text-content-primary">Vitals</h1>
+            <p className="mt-1 text-content-secondary">Track your vital signs and health metrics</p>
           </div>
 
           <div className="flex flex-col items-center justify-center py-24">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-              darkMode ? 'bg-stone-800' : 'bg-stone-100'
-            }`}>
-              <Activity className={`w-8 h-8 ${
-                darkMode ? 'text-stone-400' : 'text-stone-500'
-              }`} />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-surface-sunken">
+              <Activity className="w-8 h-8 text-content-tertiary" />
             </div>
-            <h2 className={`text-xl font-semibold mb-2 ${
-              darkMode ? 'text-white' : 'text-stone-900'
-            }`}>Coming Soon</h2>
-            <p className={`text-center max-w-md ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>
+            <h2 className="text-xl font-semibold mb-2 text-content-primary">Coming Soon</h2>
+            <p className="text-center max-w-md text-content-secondary">
               We're working on bringing you powerful vitals tracking features. Stay tuned!
             </p>
           </div>
@@ -204,13 +306,11 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     return (
       <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
         <div className="mb-8">
-          <h1 className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
-            darkMode ? 'text-white' : 'text-stone-900'
-          }`}>
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <Home className="w-7 h-7" />
             Dashboard
           </h1>
-          <p className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+          <p className="text-content-secondary">
             Welcome back{userFirstName ? `, ${userFirstName}` : ''}! Here's your health overview.
           </p>
         </div>
@@ -274,7 +374,13 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               icon={<FileText className="w-5 h-5" />}
               title="Health Records"
               value={String(dashboardStats.records)}
-              subtitle={dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`}
+              subtitle={
+                vaultStats && vaultStats.connectedProviders > 0
+                  ? `${dashboardStats.records} total · ${vaultStats.connectedProviders} connected`
+                  : vaultStats?.lastSyncedAt
+                    ? `Last synced ${relativeTime(vaultStats.lastSyncedAt)}`
+                    : dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`
+              }
               iconBgColor="bg-indigo-50"
               iconColor="text-indigo-600"
               darkMode={darkMode}
@@ -285,8 +391,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <HealthStatsCard
               icon={<Activity className="w-5 h-5" />}
               title="Medical Forms"
-              value="—"
-              subtitle="View in Medical Forms"
+              value={formsCount === null ? '—' : String(formsCount)}
+              subtitle={formsCount ? `${formsCount} completed` : 'None completed yet'}
               iconBgColor="bg-emerald-50"
               iconColor="text-emerald-600"
               darkMode={darkMode}
@@ -318,117 +424,97 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
-          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
-            darkMode
-              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
-              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
-          }`}>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
+          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
+                <Sparkles className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
               </div>
-              <h2 className={`text-lg font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>Quick Actions</h2>
+              <h2 className="text-lg font-semibold text-content-primary">Quick Actions</h2>
             </div>
-            <p className={`text-sm mb-6 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Common tasks to manage your health data</p>
+            <p className="text-sm mb-6 text-content-secondary">Common tasks to manage your health data</p>
 
             <div className="flex flex-col gap-3 mt-auto">
-              <button className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-600/20 hover:-translate-y-0.5">
+              <button
+                onClick={() => setCurrentPage('medical-forms')}
+                className="flex items-center justify-center gap-2 rounded-lg bg-action-primary px-5 py-3 text-sm font-medium text-content-on-action transition-all hover:-translate-y-0.5 hover:bg-action-primary-hover hover:shadow-lg hover:shadow-black/20"
+              >
                 <FileText className="w-4 h-4" />
-                Download Medical Forms
+                View Medical Forms
               </button>
-              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
-                darkMode
-                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
-                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
-              }`}>
-                <div className={`flex items-center gap-2 text-sm font-medium ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
-                }`}>
+              <button
+                onClick={() => setCurrentPage('care')}
+                className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
                   <Activity className="w-4 h-4" />
                   View Care History
                 </div>
-                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                  darkMode
-                    ? 'text-stone-500 group-hover:text-stone-400'
-                    : 'text-stone-400 group-hover:text-stone-600'
-                }`} />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
-              <button className={`flex items-center justify-between px-4 py-2.5 border rounded-lg transition-all text-left group hover:-translate-y-0.5 ${
-                darkMode
-                  ? 'border-stone-700 hover:bg-stone-800 hover:border-stone-600'
-                  : 'border-stone-200 hover:bg-white hover:border-stone-300 hover:shadow-md'
-              }`}>
-                <div className={`flex items-center gap-2 text-sm font-medium ${
-                  darkMode ? 'text-stone-300' : 'text-stone-700'
-                }`}>
-                  <Calendar className="w-4 h-4" />
-                  Schedule Appointment
+              <button
+                onClick={() => setIsAIPanelOpen(true)}
+                className="flex items-center justify-between px-4 py-2.5 border border-stroke-default rounded-lg transition-all text-left group hover:-translate-y-0.5 hover:bg-action-secondary hover:border-stroke-strong hover:shadow-md"
+              >
+                <div className="flex items-center gap-2 text-sm font-medium text-content-primary">
+                  <Sparkles className="w-4 h-4" />
+                  Ask the AI Assistant
                 </div>
-                <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                  darkMode
-                    ? 'text-stone-500 group-hover:text-stone-400'
-                    : 'text-stone-400 group-hover:text-stone-600'
-                }`} />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-content-tertiary group-hover:text-content-secondary" />
               </button>
             </div>
           </div>
 
           {/* Recent Activity - Balanced layout */}
-          <div className={`md:col-span-6 lg:col-span-6 rounded-xl border p-6 h-full flex flex-col ${
-            darkMode
-              ? 'border-stone-800 bg-gradient-to-br from-stone-900/50 to-stone-900/30'
-              : 'border-stone-200 bg-gradient-to-br from-white to-stone-50/50'
-          }`}>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Activity className="w-5 h-5 text-indigo-600" />
+          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
+                <Activity className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
               </div>
-              <h2 className={`text-lg font-semibold ${
-                darkMode ? 'text-white' : 'text-stone-900'
-              }`}>Recent Activity</h2>
+              <h2 className="text-lg font-semibold text-content-primary">Recent Activity</h2>
             </div>
-            <p className={`text-sm mb-6 ${
-              darkMode ? 'text-stone-400' : 'text-stone-600'
-            }`}>Your latest health updates</p>
+            <p className="text-sm mb-6 text-content-secondary">Your latest health updates</p>
 
             <div className="space-y-3 flex-1">
-              <RecentActivityItem
-                icon={<Heart className="w-5 h-5" />}
-                title="Annual Physical Examination"
-                subtitle="Completed with Dr. Sarah Johnson"
-                time="2 days ago"
-                iconBgColor="bg-rose-50"
-                iconColor="text-rose-600"
-                darkMode={darkMode}
-              />
-              <RecentActivityItem
-                icon={<Activity className="w-5 h-5" />}
-                title="Lab Results Updated"
-                subtitle="Complete Blood Count (CBC) - Normal"
-                time="5 days ago"
-                iconBgColor="bg-emerald-50"
-                iconColor="text-emerald-600"
-                darkMode={darkMode}
-              />
-              <RecentActivityItem
-                icon={<Pill className="w-5 h-5" />}
-                title="Prescription Refilled"
-                subtitle="Albuterol Inhaler - 3 refills remaining"
-                time="1 week ago"
-                iconBgColor="bg-indigo-50"
-                iconColor="text-indigo-600"
-                darkMode={darkMode}
-              />
+              {recentActivity.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-surface-sunken">
+                    <Activity className="w-6 h-6 text-content-tertiary" />
+                  </div>
+                  <p className="text-sm text-content-secondary">No recent activity yet</p>
+                  <p className="text-xs mt-1 text-content-tertiary">Records, requests, and medications will show up here.</p>
+                </div>
+              ) : (
+                recentActivity.map(item => {
+                  const cfg = item.kind === 'request'
+                    ? { icon: <CheckCircle className="w-5 h-5" />, bg: 'bg-emerald-50', color: 'text-emerald-600' }
+                    : item.kind === 'medication'
+                      ? { icon: <Pill className="w-5 h-5" />, bg: 'bg-rose-50', color: 'text-rose-600' }
+                      : { icon: <FileText className="w-5 h-5" />, bg: 'bg-indigo-50', color: 'text-indigo-600' };
+                  return (
+                    <RecentActivityItem
+                      key={item.id}
+                      icon={cfg.icon}
+                      title={item.title}
+                      subtitle={item.subtitle}
+                      time={relativeTime(item.timestamp)}
+                      iconBgColor={cfg.bg}
+                      iconColor={cfg.color}
+                      darkMode={darkMode}
+                    />
+                  );
+                })
+              )}
             </div>
 
-            <button className="flex items-center gap-2 mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors group">
-              View All Activity
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
+            {recentActivity.length > 0 && (
+              <button
+                onClick={() => setCurrentPage('health-records')}
+                className="group mt-6 flex items-center gap-2 text-sm font-medium text-action-primary transition-colors hover:text-action-primary-hover"
+              >
+                View All Activity
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -436,9 +522,11 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   };
 
   return (
-    <div className={`flex h-dvh w-screen ${
-      darkMode ? 'bg-stone-950' : 'bg-stone-50'
-    }`}>
+    <Surface name="steel" className="h-dvh w-screen max-w-none min-h-0">
+      <div
+        data-theme={darkMode ? 'dark' : undefined}
+        className="flex h-dvh w-screen bg-surface-page text-content-primary"
+      >
       <DashboardSidebar
         onViewChange={onViewChange}
         onPageChange={(page) => {
@@ -452,25 +540,16 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         onToggleCollapse={toggleSidebarCollapse}
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        profileRefreshKey={profileRefreshKey}
       />
 
       <div className="flex-1 flex overflow-hidden min-w-0 relative">
-        <main className={`flex-1 overflow-y-auto min-w-0 relative ${
-          darkMode
-            ? 'bg-gradient-to-br from-stone-950 via-stone-950 to-stone-900'
-            : 'bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50'
-        }`}>
+        <main data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 relative bg-surface-page">
           {/* Mobile top bar — hamburger + centered logo */}
-          <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b backdrop-blur-sm ${
-            darkMode
-              ? 'bg-stone-950/95 border-stone-800'
-              : 'bg-white/95 border-stone-200'
-          }`}>
+          <div className="lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b border-stroke-subtle backdrop-blur-sm bg-surface-overlay/95">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className={`p-2.5 rounded-xl transition-all active:scale-95 ${
-                darkMode ? 'text-white hover:bg-stone-800' : 'text-stone-700 hover:bg-stone-100'
-              }`}
+              className="p-2.5 rounded-xl transition-all active:scale-95 text-content-primary hover:bg-action-secondary"
               aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -509,7 +588,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         {isAIPanelOpen && (
           <aside
             className={`
-              shrink-0 relative bg-white z-50
+              shrink-0 relative z-50 bg-transparent
               fixed lg:relative inset-y-0 right-0
               w-full lg:w-[33vw] lg:min-w-[400px]
               transition-transform duration-300 ease-in-out
@@ -518,7 +597,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           >
             <button
               onClick={() => setIsAIPanelOpen(false)}
-              className="absolute top-6 right-6 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-stone-100 active:scale-95 text-stone-500 hover:text-stone-700"
+              className="absolute top-6 right-6 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-action-secondary active:scale-95 text-content-tertiary hover:text-content-primary"
               title="Close"
               aria-label="Close assistant"
             >
@@ -555,5 +634,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         )}
       </div>
     </div>
+    </Surface>
   );
 }

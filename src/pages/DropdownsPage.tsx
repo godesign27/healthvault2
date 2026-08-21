@@ -27,31 +27,31 @@ export function DropdownsPage() {
   const [menuSelectedXSmall, setMenuSelectedXSmall] = useState('2');
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dropdowns</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Dropdowns</h1>
+          <p className="text-content-secondary">
             Select components for choosing values from lists with support for submenus
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master Components</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master Components</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Master</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Normal</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Small</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">XSmall</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Master</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Normal</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Small</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">XSmall</div>
                 </div>
 
                 <div className="grid grid-cols-4 gap-4 items-center">
-                  <div className="text-sm font-medium text-gray-700">MASTER</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="text-sm font-medium text-content-secondary">MASTER</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <Dropdown
                       options={[{ value: 'Selection', label: 'Selection' }]}
                       value={masterNormal}
@@ -60,7 +60,7 @@ export function DropdownsPage() {
                       showCheckmark={true}
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <Dropdown
                       options={[{ value: 'Selection', label: 'Selection' }]}
                       value={masterSmall}
@@ -69,7 +69,7 @@ export function DropdownsPage() {
                       showCheckmark={true}
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <Dropdown
                       options={[{ value: 'Selection', label: 'Selection' }]}
                       value={masterXSmall}
@@ -82,29 +82,29 @@ export function DropdownsPage() {
 
                 <div className="mt-4 flex justify-end">
                   <div className="w-1/4 border-2 border-[indigo-600] rounded p-4">
-                    <div className="text-xs text-gray-500 mb-2">Display Area</div>
-                    <div className="h-20 bg-white"></div>
+                    <div className="text-xs text-content-secondary mb-2">Display Area</div>
+                    <div className="h-20 bg-surface-raised"></div>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Dropdown - Outline</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Dropdown - Outline</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="text-sm font-semibold text-gray-500 uppercase"></div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Normal - 50PX</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Small - 44PX</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">XSmall - 38PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase"></div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Normal - 50PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Small - 44PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">XSmall - 38PX</div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-gray-200">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">DEFAULT</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-stroke-subtle">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">DEFAULT</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineDefault}
                       onChange={setOutlineDefault}
@@ -112,7 +112,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineDefaultSmall}
                       onChange={setOutlineDefaultSmall}
@@ -120,7 +120,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineDefaultXSmall}
                       onChange={setOutlineDefaultXSmall}
@@ -130,9 +130,9 @@ export function DropdownsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-gray-200">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">SELECTED</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-stroke-subtle">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">SELECTED</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineSelected}
                       onChange={setOutlineSelected}
@@ -140,7 +140,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineSelectedSmall}
                       onChange={setOutlineSelectedSmall}
@@ -148,7 +148,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineSelectedXSmall}
                       onChange={setOutlineSelectedXSmall}
@@ -158,9 +158,9 @@ export function DropdownsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-gray-200">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">FOCUSED</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-stroke-subtle">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">FOCUSED</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineFocused}
                       onChange={setOutlineFocused}
@@ -168,7 +168,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineFocusedSmall}
                       onChange={setOutlineFocusedSmall}
@@ -176,7 +176,7 @@ export function DropdownsPage() {
                       variant="outline"
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value={outlineFocusedXSmall}
                       onChange={setOutlineFocusedXSmall}
@@ -186,9 +186,9 @@ export function DropdownsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-gray-200">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">DISABLED</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                <div className="grid grid-cols-4 gap-4 items-center py-4 border-b border-stroke-subtle">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">DISABLED</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value=""
                       onChange={() => {}}
@@ -197,7 +197,7 @@ export function DropdownsPage() {
                       disabled
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value=""
                       onChange={() => {}}
@@ -206,7 +206,7 @@ export function DropdownsPage() {
                       disabled
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value=""
                       onChange={() => {}}
@@ -218,8 +218,8 @@ export function DropdownsPage() {
                 </div>
 
                 <div className="grid grid-cols-4 gap-4 items-center py-4">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">FILLED & DISABLED</div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">FILLED & DISABLED</div>
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value="2"
                       onChange={() => {}}
@@ -228,7 +228,7 @@ export function DropdownsPage() {
                       disabled
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value="2"
                       onChange={() => {}}
@@ -237,7 +237,7 @@ export function DropdownsPage() {
                       disabled
                     />
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4">
+                  <div className="border-2 border-dashed border-stroke-default rounded p-4">
                     <SimpleDropdown
                       value="2"
                       onChange={() => {}}
@@ -251,20 +251,20 @@ export function DropdownsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Dropdown - With Menu</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Dropdown - With Menu</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="text-sm font-semibold text-gray-500 uppercase"></div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Normal - 50PX</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">Small - 44PX</div>
-                  <div className="text-sm font-semibold text-gray-500 uppercase">XSmall - 38PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase"></div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Normal - 50PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">Small - 44PX</div>
+                  <div className="text-sm font-semibold text-content-secondary uppercase">XSmall - 38PX</div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 items-start py-4 border-b border-gray-200">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">DEFAULT</div>
+                <div className="grid grid-cols-4 gap-4 items-start py-4 border-b border-stroke-subtle">
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">DEFAULT</div>
                   <div className="border-2 border-dashed border-[indigo-600] rounded p-4">
                     <DropdownWithSubmenu
                       value={menuDefault}
@@ -289,7 +289,7 @@ export function DropdownsPage() {
                 </div>
 
                 <div className="grid grid-cols-4 gap-4 items-start py-4">
-                  <div className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2">SELECTED</div>
+                  <div className="text-sm font-medium text-content-secondary bg-surface-sunken px-4 py-2">SELECTED</div>
                   <div className="border-2 border-dashed border-[indigo-600] rounded p-4">
                     <DropdownWithSubmenu
                       value={menuSelected}
@@ -319,10 +319,10 @@ export function DropdownsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Component Specifications</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Component Specifications</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Sizes</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
@@ -377,10 +377,10 @@ export function DropdownsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">When to Use</h3>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-sm">

@@ -125,43 +125,43 @@ export function AddAddressDrawer({
       errors[field]
         ? 'border-red-400'
         : darkMode
-          ? 'border-stone-700 bg-stone-800 text-white placeholder-stone-500'
-          : 'border-stone-300 bg-white text-stone-900 placeholder-stone-400'
+          ? 'border-stroke-default bg-surface-sunken text-white placeholder:text-content-placeholder'
+          : 'border-stroke-default bg-white text-content-primary placeholder:text-content-placeholder'
     }`;
 
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
       <div className={`fixed right-0 top-0 h-full w-full max-w-lg z-50 shadow-xl flex flex-col ${
-        darkMode ? 'bg-stone-900' : 'bg-white'
+        'bg-surface-raised'
       }`}>
         <div className={`sticky top-0 z-10 flex items-center justify-between p-6 border-b ${
-          darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+          'bg-surface-raised border-stroke-subtle'
         }`}>
           <div>
-            <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+            <h2 className={`text-xl font-bold ${'text-content-primary'}`}>
               {editAddress ? 'Edit Address' : 'Add an Address'}
             </h2>
-            <p className={`text-sm mt-0.5 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+            <p className={`text-sm mt-0.5 ${'text-content-secondary'}`}>
               {editAddress ? 'Update your address details' : 'Used for nearby pharmacy search'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-stone-800' : 'hover:bg-stone-100'}`}
+            className={`p-2 rounded-lg transition-colors ${'hover:bg-surface-sunken'}`}
           >
-            <X className={`w-5 h-5 ${darkMode ? 'text-stone-400' : 'text-stone-600'}`} />
+            <X className={`w-5 h-5 ${'text-content-secondary'}`} />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 pb-32 space-y-6">
           {!editAddress && (
             <div>
-              <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+              <label className={`block text-sm font-medium mb-3 ${'text-content-primary'}`}>
                 Address Type
               </label>
               {availableTypes.length === 0 ? (
-                <p className={`text-sm ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                <p className={`text-sm ${'text-content-secondary'}`}>
                   All address types are already added.
                 </p>
               ) : (
@@ -178,16 +178,16 @@ export function AddAddressDrawer({
                           isSelected
                             ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/30'
                             : darkMode
-                              ? 'border-stone-700 hover:border-stone-600 bg-stone-800/50'
-                              : 'border-stone-200 hover:border-stone-300 bg-white'
+                              ? 'border-stroke-default hover:border-stroke-default bg-surface-sunken/50'
+                              : 'border-stroke-subtle hover:border-stroke-default bg-white'
                         }`}
                       >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           isSelected
                             ? 'bg-blue-600 text-white'
                             : darkMode
-                              ? 'bg-stone-700 text-stone-400'
-                              : 'bg-stone-100 text-stone-500'
+                              ? 'bg-surface-sunken text-content-secondary'
+                              : 'bg-surface-sunken text-content-secondary'
                         }`}>
                           <Icon className="w-5 h-5" />
                         </div>
@@ -195,11 +195,11 @@ export function AddAddressDrawer({
                           <p className={`font-medium ${
                             isSelected
                               ? darkMode ? 'text-blue-300' : 'text-blue-700'
-                              : darkMode ? 'text-white' : 'text-stone-900'
+                              : 'text-content-primary'
                           }`}>
                             {cfg.label}
                           </p>
-                          <p className={`text-xs ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                          <p className={`text-xs ${'text-content-secondary'}`}>
                             {cfg.description}
                           </p>
                         </div>
@@ -218,7 +218,7 @@ export function AddAddressDrawer({
           {(selectedType || editAddress) && (
             <>
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                   Label
                 </label>
                 <input
@@ -231,7 +231,7 @@ export function AddAddressDrawer({
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                   Street Address *
                 </label>
                 <input
@@ -245,7 +245,7 @@ export function AddAddressDrawer({
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                   Apt / Suite / Unit
                 </label>
                 <input
@@ -259,7 +259,7 @@ export function AddAddressDrawer({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                  <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                     City *
                   </label>
                   <input
@@ -272,7 +272,7 @@ export function AddAddressDrawer({
                   {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                  <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                     State *
                   </label>
                   <select
@@ -290,7 +290,7 @@ export function AddAddressDrawer({
               </div>
 
               <div className="w-1/2">
-                <label className={`block text-sm font-medium mb-1.5 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                <label className={`block text-sm font-medium mb-1.5 ${'text-content-primary'}`}>
                   ZIP Code *
                 </label>
                 <input
@@ -308,19 +308,19 @@ export function AddAddressDrawer({
                 <label className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
                   form.isActive
                     ? darkMode ? 'border-blue-600 bg-blue-950/20' : 'border-blue-300 bg-blue-50/60'
-                    : darkMode ? 'border-stone-700 bg-stone-800/50' : 'border-stone-200'
+                    : darkMode ? 'border-stroke-subtle bg-surface-sunken/50' : 'border-stroke-subtle'
                 }`}>
                   <input
                     type="checkbox"
                     checked={form.isActive}
                     onChange={e => setForm(prev => ({ ...prev, isActive: e.target.checked }))}
-                    className="w-4 h-4 rounded border-stone-300 mt-0.5"
+                    className="w-4 h-4 rounded border-stroke-default mt-0.5"
                   />
                   <div>
-                    <span className={`text-sm font-medium ${darkMode ? 'text-stone-200' : 'text-stone-800'}`}>
+                    <span className={`text-sm font-medium ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                       Use for pharmacy search
                     </span>
-                    <p className={`text-xs mt-0.5 ${darkMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                    <p className={`text-xs mt-0.5 ${'text-content-secondary'}`}>
                       Find nearby pharmacies based on this address
                     </p>
                   </div>
@@ -337,7 +337,7 @@ export function AddAddressDrawer({
         </div>
 
         <div className={`sticky bottom-0 z-10 p-6 border-t ${
-          darkMode ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'
+          'bg-surface-raised border-stroke-subtle'
         }`}>
           <div className="flex gap-3">
             <button
@@ -345,8 +345,8 @@ export function AddAddressDrawer({
               onClick={onClose}
               className={`flex-1 px-5 py-3 rounded-lg font-medium transition-colors ${
                 darkMode
-                  ? 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                  ? 'bg-surface-sunken text-content-primary hover:bg-surface-sunken'
+                  : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
               }`}
             >
               Cancel

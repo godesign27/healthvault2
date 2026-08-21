@@ -14,24 +14,24 @@ export default function DialogsPage() {
   const [fullDialog, setFullDialog] = useState(false);
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dialogs</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Dialogs</h1>
+          <p className="text-content-secondary">
             Modal dialog components for displaying important content and gathering user input
           </p>
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Master components</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Master components</h2>
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h3 className="text-sm font-medium mb-4 text-slate-600">LIGHT</h3>
+                <h3 className="text-sm font-medium mb-4 text-content-secondary">LIGHT</h3>
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 min-h-[120px]">
+                  <div className="border-2 border-dashed border-stroke-default rounded-lg p-6 min-h-[120px]">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium">HEADER</h4>
                       <button
@@ -41,25 +41,25 @@ export default function DialogsPage() {
                         Open Dialog
                       </button>
                     </div>
-                    <p className="text-sm text-slate-600">Left-Align Header</p>
+                    <p className="text-sm text-content-secondary">Left-Align Header</p>
                   </div>
 
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 min-h-[120px]">
+                  <div className="border-2 border-dashed border-stroke-default rounded-lg p-6 min-h-[120px]">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium">FOOTER</h4>
                       <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm">
                         Open Dialog
                       </button>
                     </div>
-                    <p className="text-sm text-slate-600">Optional footer text</p>
+                    <p className="text-sm text-content-secondary">Optional footer text</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-medium mb-4 text-slate-600">DARK</h3>
+                <h3 className="text-sm font-medium mb-4 text-content-secondary">DARK</h3>
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 min-h-[120px]">
+                  <div className="border-2 border-dashed border-stroke-default rounded-lg p-6 min-h-[120px]">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium">HEADER</h4>
                       <button
@@ -69,25 +69,25 @@ export default function DialogsPage() {
                         Open Dialog
                       </button>
                     </div>
-                    <p className="text-sm text-slate-600">Left-Align Header</p>
+                    <p className="text-sm text-content-secondary">Left-Align Header</p>
                   </div>
 
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 min-h-[120px]">
+                  <div className="border-2 border-dashed border-stroke-default rounded-lg p-6 min-h-[120px]">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium">FOOTER</h4>
                       <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm">
                         Open Dialog
                       </button>
                     </div>
-                    <p className="text-sm text-slate-600">Optional footer text</p>
+                    <p className="text-sm text-content-secondary">Optional footer text</p>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Examples</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Examples</h2>
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-4">
                 <button
@@ -128,7 +128,7 @@ export default function DialogsPage() {
           title="Left-Align Header"
           variant="light"
         >
-          <p className="text-slate-600">Dialog content displays here.</p>
+          <p className="text-content-secondary">Dialog content displays here.</p>
         </Dialog>
 
         <Dialog
@@ -137,7 +137,7 @@ export default function DialogsPage() {
           title="Left-Align Header"
           variant="dark"
         >
-          <p className="text-slate-600">Dialog content displays here.</p>
+          <p className="text-content-secondary">Dialog content displays here.</p>
         </Dialog>
 
         <Dialog
@@ -149,7 +149,7 @@ export default function DialogsPage() {
           iconType="warning"
           footerContent={
             <>
-              <button className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50">
+              <button className="px-4 py-2 border border-stroke-default rounded hover:bg-surface-sunken">
                 Cancel
               </button>
               <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">
@@ -158,7 +158,7 @@ export default function DialogsPage() {
             </>
           }
         >
-          <p className="text-slate-600">Dialog content displays here.</p>
+          <p className="text-content-secondary">Dialog content displays here.</p>
         </Dialog>
 
         <Dialog
@@ -168,7 +168,7 @@ export default function DialogsPage() {
           variant="light"
         >
           <div className="text-center">
-            <p className="text-slate-600">Dialog content displays here.</p>
+            <p className="text-content-secondary">Dialog content displays here.</p>
           </div>
         </Dialog>
 
@@ -181,7 +181,7 @@ export default function DialogsPage() {
         >
           <div className="space-y-4">
             <h3 className="font-semibold">Content</h3>
-            <p className="text-slate-600">
+            <p className="text-content-secondary">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function DialogsPage() {
           size="medium"
         >
           <div className="space-y-4" style={{ minHeight: '600px' }}>
-            <p className="text-slate-600">Tall dialog content...</p>
+            <p className="text-content-secondary">Tall dialog content...</p>
           </div>
         </Dialog>
       </div>

@@ -6,7 +6,7 @@ interface PersonalHealthVaultPageProps {
 
 export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaultPageProps) {
   return (
-    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+    <div className={`flex-1 overflow-y-auto ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
 
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
@@ -25,7 +25,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             <div>
               <h1 className={`text-5xl font-bold tracking-tight sm:text-7xl lg:text-8xl mb-6 ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Your Complete Health Story.{' '}
                 <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
@@ -33,7 +33,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                 </span>
               </h1>
               <p className={`text-lg sm:text-xl leading-relaxed mb-10 ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 Health Vault gives you one place to organize, manage, and securely share every part of your medical history — records, labs, medications, and forms — all controlled by you.
               </p>
@@ -44,7 +44,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                 <button className={`px-8 py-4 font-semibold rounded-xl transition-all ${
                   darkMode
                     ? 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-                    : 'bg-stone-100 text-stone-900 hover:bg-stone-200'
+                    : 'bg-surface-sunken text-content-primary hover:bg-surface-overlay'
                 }`}>
                   See How It Works
                 </button>
@@ -56,36 +56,36 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
               <div className="relative space-y-4">
                 {/* Health Records Card */}
                 <div className={`rounded-2xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300 ${
-                  darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                  darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
                 }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                       <FileText className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>Health Records</h3>
-                      <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>24 documents</p>
+                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>Health Records</h3>
+                      <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>24 documents</p>
                     </div>
                     <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                   </div>
                   <div className="space-y-2">
-                    <div className={`h-2 rounded ${darkMode ? 'bg-stone-700' : 'bg-stone-100'}`} style={{width: '80%'}}></div>
-                    <div className={`h-2 rounded ${darkMode ? 'bg-stone-700' : 'bg-stone-100'}`} style={{width: '60%'}}></div>
-                    <div className={`h-2 rounded ${darkMode ? 'bg-stone-700' : 'bg-stone-100'}`} style={{width: '90%'}}></div>
+                    <div className={`h-2 rounded ${darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'}`} style={{width: '80%'}}></div>
+                    <div className={`h-2 rounded ${darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'}`} style={{width: '60%'}}></div>
+                    <div className={`h-2 rounded ${darkMode ? 'bg-surface-sunken' : 'bg-surface-sunken'}`} style={{width: '90%'}}></div>
                   </div>
                 </div>
 
                 {/* Secure Share Card */}
                 <div className={`rounded-2xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300 ${
-                  darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                  darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
                 }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
                       <Share2 className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>Shared with Dr. Smith</h3>
-                      <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>Expires in 7 days</p>
+                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>Shared with Dr. Smith</h3>
+                      <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>Expires in 7 days</p>
                     </div>
                     <Lock className="w-5 h-5 text-emerald-500" />
                   </div>
@@ -93,15 +93,15 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
 
                 {/* Medical Forms Card */}
                 <div className={`rounded-2xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300 ${
-                  darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                  darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
                 }`}>
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                       <Clipboard className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>Medical Forms</h3>
-                      <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>All forms completed</p>
+                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>Medical Forms</h3>
+                      <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>All forms completed</p>
                     </div>
                   </div>
                 </div>
@@ -116,25 +116,25 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Problem Section */}
-      <div className={`py-24 sm:py-32 relative overflow-hidden ${darkMode ? 'bg-stone-800/50' : 'bg-stone-50'}`}>
+      <div className={`py-24 sm:py-32 relative overflow-hidden ${darkMode ? 'bg-surface-sunken/50' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Side - Text Content */}
             <div className="space-y-8">
               <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Healthcare data is scattered everywhere.
               </h2>
 
               <div className={`text-lg sm:text-xl leading-relaxed space-y-6 ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 <p>Your lab results live in one portal. Your prescriptions in another. Your specialist records somewhere else.</p>
 
                 <p>Every new doctor visit means filling out the same paperwork and trying to remember years of medical history.</p>
 
-                <p className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <p className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   Important information gets lost between systems.
                 </p>
 
@@ -151,11 +151,11 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                   <div className={`w-28 h-28 rounded-full flex items-center justify-center shadow-2xl border-4 ${
                     darkMode
-                      ? 'bg-stone-800 border-stone-600'
-                      : 'bg-white border-stone-300'
+                      ? 'bg-surface-sunken border-stroke-default'
+                      : 'bg-white border-stroke-default'
                   }`}>
                     <div className="relative">
-                      <Heart className={`w-14 h-14 ${darkMode ? 'text-stone-400' : 'text-stone-500'}`} />
+                      <Heart className={`w-14 h-14 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`} />
                       <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center animate-pulse">
                         <span className="text-white text-xs font-bold">?</span>
                       </div>
@@ -295,16 +295,16 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Solution Section */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
             <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               One place for your entire medical history.
             </h2>
             <p className={`text-lg sm:text-xl max-w-3xl mx-auto ${
-              darkMode ? 'text-stone-300' : 'text-stone-600'
+              darkMode ? 'text-content-primary' : 'text-content-secondary'
             }`}>
               The Personal Health Vault creates a secure, patient-controlled home for your health information.
             </p>
@@ -327,14 +327,14 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                   key={index}
                   className={`rounded-2xl p-6 transition-all hover:scale-105 hover:shadow-xl ${
                     darkMode
-                      ? 'bg-stone-800 border border-stone-700 hover:border-stone-600'
-                      : 'bg-white border border-stone-200 hover:border-stone-300 shadow-md'
+                      ? 'bg-surface-sunken border border-stroke-default hover:border-stroke-default'
+                      : 'bg-white border border-stroke-subtle hover:border-stroke-default shadow-md'
                   }`}
                 >
                   <div className={`p-3 rounded-xl mb-4 w-fit bg-${item.color}-100 dark:bg-${item.color}-900/30`}>
                     <Icon className={`w-6 h-6 text-${item.color}-600`} />
                   </div>
-                  <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     {item.title}
                   </h3>
                 </div>
@@ -345,22 +345,22 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Product Experience Section */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-800/50' : 'bg-stone-50'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-sunken/50' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Your health history — organized and ready when you need it.
               </h2>
               <p className={`text-lg leading-relaxed mb-6 ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 Your vault transforms scattered records into a living health timeline.
               </p>
               <p className={`text-lg leading-relaxed ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 Everything you add becomes part of a secure, structured profile that grows with you over time.
               </p>
@@ -368,21 +368,21 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
 
             <div className="space-y-6">
               <div className={`rounded-2xl overflow-hidden shadow-2xl ${
-                darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
               }`}>
-                <div className={`p-4 border-b ${darkMode ? 'border-stone-700 bg-stone-900/50' : 'border-stone-200 bg-stone-50'}`}>
+                <div className={`p-4 border-b ${darkMode ? 'border-stroke-default bg-surface-raised/50' : 'border-stroke-subtle bg-surface-sunken'}`}>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                     <div className="w-3 h-3 rounded-full bg-amber-500"></div>
                     <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                    <span className={`ml-4 text-sm font-medium ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                    <span className={`ml-4 text-sm font-medium ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                       Health Records
                     </span>
                   </div>
                 </div>
                 <div className="p-8">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                       Your Health Timeline
                     </h3>
                     <button className="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
@@ -396,17 +396,17 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                       { date: 'Jan 8, 2026', title: 'Blood Work Panel', type: 'Lab Results' },
                     ].map((record, idx) => (
                       <div key={idx} className={`p-4 rounded-xl ${
-                        darkMode ? 'bg-stone-900/50' : 'bg-stone-50'
+                        darkMode ? 'bg-surface-raised/50' : 'bg-surface-sunken'
                       }`}>
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                             <FileText className="w-4 h-4 text-indigo-600" />
                           </div>
                           <div className="flex-1">
-                            <h4 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                            <h4 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                               {record.title}
                             </h4>
-                            <p className={`text-xs ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                            <p className={`text-xs ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                               {record.type} · {record.date}
                             </p>
                           </div>
@@ -422,23 +422,23 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Smart Sharing Section */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
               <div className={`rounded-2xl p-8 shadow-2xl ${
-                darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
               }`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     Share Records
                   </h3>
-                  <button className="text-stone-400 hover:text-stone-600">×</button>
+                  <button className="text-content-secondary hover:text-content-secondary">×</button>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                       Provider Email
                     </label>
                     <input
@@ -446,20 +446,20 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                       placeholder="doctor@clinic.com"
                       className={`w-full px-4 py-2 rounded-lg border ${
                         darkMode
-                          ? 'bg-stone-900 border-stone-700 text-white placeholder-stone-500'
-                          : 'bg-white border-stone-300 text-stone-900'
+                          ? 'bg-surface-raised border-stroke-default text-white placeholder:text-content-placeholder'
+                          : 'bg-white border-stroke-default text-content-primary'
                       }`}
                     />
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                       Access Duration
                     </label>
                     <select className={`w-full px-4 py-2 rounded-lg border ${
                       darkMode
-                        ? 'bg-stone-900 border-stone-700 text-white'
-                        : 'bg-white border-stone-300 text-stone-900'
+                        ? 'bg-surface-raised border-stroke-default text-white'
+                        : 'bg-white border-stroke-default text-content-primary'
                     }`}>
                       <option>7 days</option>
                       <option>30 days</option>
@@ -468,24 +468,24 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-lg mb-6 ${darkMode ? 'bg-stone-900/50' : 'bg-stone-50'}`}>
+                <div className={`p-4 rounded-lg mb-6 ${darkMode ? 'bg-surface-raised/50' : 'bg-surface-sunken'}`}>
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span className={`font-medium ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                    <span className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                       4 items selected
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
-                    <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+                    <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>
                       Medical History Form
                     </div>
-                    <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+                    <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>
                       Recent Lab Results
                     </div>
-                    <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+                    <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>
                       Current Medications
                     </div>
-                    <div className={darkMode ? 'text-stone-400' : 'text-stone-600'}>
+                    <div className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>
                       Allergy Information
                     </div>
                   </div>
@@ -499,17 +499,17 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
 
             <div className="order-1 lg:order-2">
               <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-                darkMode ? 'text-white' : 'text-stone-900'
+                darkMode ? 'text-white' : 'text-content-primary'
               }`}>
                 Share your health history in seconds.
               </h2>
               <p className={`text-lg leading-relaxed mb-8 ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 When visiting a new doctor or specialist, simply select the records you want to share and send a secure link.
               </p>
               <p className={`text-lg leading-relaxed mb-8 ${
-                darkMode ? 'text-stone-300' : 'text-stone-600'
+                darkMode ? 'text-content-primary' : 'text-content-secondary'
               }`}>
                 The provider receives your forms and records instantly — before you even arrive.
               </p>
@@ -528,7 +528,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                       <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                         <Icon className="w-5 h-5 text-indigo-600" />
                       </div>
-                      <span className={`text-lg ${darkMode ? 'text-stone-300' : 'text-stone-700'}`}>
+                      <span className={`text-lg ${darkMode ? 'text-content-primary' : 'text-content-primary'}`}>
                         {item.text}
                       </span>
                     </li>
@@ -541,11 +541,11 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Real Life Scenario */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-800/50' : 'bg-stone-50'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-sunken/50' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center mb-16">
             <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               A better experience for every doctor visit.
             </h2>
@@ -560,15 +560,15 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
             ].map((step, idx) => (
               <div key={idx} className="relative">
                 <div className={`rounded-2xl p-6 h-full ${
-                  darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-white border border-stone-200'
+                  darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-white border border-stroke-subtle'
                 }`}>
                   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 text-white font-bold text-lg mb-4">
                     {step.num}
                   </div>
-                  <h3 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     {step.title}
                   </h3>
-                  <p className={`text-sm ${darkMode ? 'text-stone-400' : 'text-stone-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
                     {step.desc}
                   </p>
                 </div>
@@ -580,7 +580,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
           </div>
 
           <p className={`text-center text-lg mt-12 ${
-            darkMode ? 'text-stone-300' : 'text-stone-600'
+            darkMode ? 'text-content-primary' : 'text-content-secondary'
           }`}>
             Your physician receives your information before the visit, giving them the context they need to provide better care.
           </p>
@@ -588,11 +588,11 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Benefits Section */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
             <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               Benefits for Everyone
             </h2>
@@ -600,13 +600,13 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className={`rounded-2xl p-8 ${
-              darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-indigo-50 border border-indigo-100'
+              darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-indigo-50 border border-indigo-100'
             }`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-indigo-600 rounded-xl">
                   <Heart className="w-6 h-6 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   For Patients
                 </h3>
               </div>
@@ -620,7 +620,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                 ].map((benefit, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
-                    <span className={darkMode ? 'text-stone-300' : 'text-stone-700'}>
+                    <span className={darkMode ? 'text-content-primary' : 'text-content-primary'}>
                       {benefit}
                     </span>
                   </li>
@@ -629,13 +629,13 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
             </div>
 
             <div className={`rounded-2xl p-8 ${
-              darkMode ? 'bg-stone-800 border border-stone-700' : 'bg-emerald-50 border border-emerald-100'
+              darkMode ? 'bg-surface-sunken border border-stroke-default' : 'bg-emerald-50 border border-emerald-100'
             }`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-emerald-600 rounded-xl">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                   For Physicians
                 </h3>
               </div>
@@ -649,7 +649,7 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                 ].map((benefit, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className={darkMode ? 'text-stone-300' : 'text-stone-700'}>
+                    <span className={darkMode ? 'text-content-primary' : 'text-content-primary'}>
                       {benefit}
                     </span>
                   </li>
@@ -661,11 +661,11 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Supporting Features */}
-      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-stone-800/50' : 'bg-stone-50'}`}>
+      <div className={`py-24 sm:py-32 ${darkMode ? 'bg-surface-sunken/50' : 'bg-surface-sunken'}`}>
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
             <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${
-              darkMode ? 'text-white' : 'text-stone-900'
+              darkMode ? 'text-white' : 'text-content-primary'
             }`}>
               A complete platform built around your vault
             </h2>
@@ -704,17 +704,17 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
                   key={idx}
                   className={`rounded-2xl p-8 transition-all hover:scale-105 ${
                     darkMode
-                      ? 'bg-stone-800 border border-stone-700 hover:border-stone-600'
-                      : 'bg-white border border-stone-200 hover:shadow-xl'
+                      ? 'bg-surface-sunken border border-stroke-default hover:border-stroke-default'
+                      : 'bg-white border border-stroke-subtle hover:shadow-xl'
                   }`}
                 >
                   <div className={`p-3 rounded-xl w-fit mb-4 bg-${feature.color}-100 dark:bg-${feature.color}-900/30`}>
                     <Icon className={`w-7 h-7 text-${feature.color}-600`} />
                   </div>
-                  <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+                  <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     {feature.title}
                   </h3>
-                  <p className={darkMode ? 'text-stone-300' : 'text-stone-600'}>
+                  <p className={darkMode ? 'text-content-primary' : 'text-content-secondary'}>
                     {feature.desc}
                   </p>
                 </div>
@@ -725,16 +725,16 @@ export function PersonalHealthVaultPage({ darkMode = false }: PersonalHealthVaul
       </div>
 
       {/* Closing Vision */}
-      <div className={`py-32 sm:py-40 ${darkMode ? 'bg-stone-900' : 'bg-white'}`}>
+      <div className={`py-32 sm:py-40 ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
         <div className="mx-auto max-w-4xl px-6 text-center">
           <Zap className="w-16 h-16 text-indigo-600 mx-auto mb-8" />
           <h2 className={`text-4xl sm:text-6xl font-bold mb-8 ${
-            darkMode ? 'text-white' : 'text-stone-900'
+            darkMode ? 'text-white' : 'text-content-primary'
           }`}>
             Your health history is one of the most important records of your life.
           </h2>
           <p className={`text-xl sm:text-2xl leading-relaxed mb-12 ${
-            darkMode ? 'text-stone-300' : 'text-stone-600'
+            darkMode ? 'text-content-primary' : 'text-content-secondary'
           }`}>
             Health Vault ensures it is organized, protected, and always within your control.
           </p>

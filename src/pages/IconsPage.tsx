@@ -35,25 +35,25 @@ export function IconsPage() {
   const icons = filteredIcons();
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50">
+    <div className="w-full min-h-0">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Icons</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-content-primary mb-2">Icons</h1>
+          <p className="text-content-secondary">
             Complete icon library using Lucide React with {allIconNames.length} icons
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="hv-surface-card p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-content-tertiary w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search icons..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[indigo-600] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-stroke-default focus:outline-none focus:ring-2 focus:ring-[indigo-600] focus:border-transparent"
               />
             </div>
 
@@ -63,7 +63,7 @@ export function IconsPage() {
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   selectedCategory === 'all'
                     ? 'bg-[indigo-600] text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-surface-sunken text-content-secondary hover:bg-surface-overlay'
                 }`}
               >
                 All Icons
@@ -75,7 +75,7 @@ export function IconsPage() {
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     selectedCategory === category
                       ? 'bg-[indigo-600] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-surface-sunken text-content-secondary hover:bg-surface-overlay'
                   }`}
                 >
                   {category}
@@ -84,7 +84,7 @@ export function IconsPage() {
             </div>
           </div>
 
-          <div className="mb-4 text-sm text-gray-600">
+          <div className="mb-4 text-sm text-content-secondary">
             Showing {icons.length} icon{icons.length !== 1 ? 's' : ''}
           </div>
 
@@ -94,13 +94,13 @@ export function IconsPage() {
                 <button
                   key={iconName}
                   onClick={() => copyIconName(iconName)}
-                  className="group relative flex flex-col items-center justify-center p-4 border border-gray-200 hover:border-[indigo-600] hover:bg-gray-50 transition-all"
+                  className="group relative flex flex-col items-center justify-center p-4 border border-stroke-subtle hover:border-[indigo-600] hover:bg-surface-sunken transition-all"
                   title={`Click to copy: ${iconName}`}
                 >
                   <div className="mb-2">
-                    <Icon name={iconName} size={32} className="text-gray-700 group-hover:text-[indigo-600]" />
+                    <Icon name={iconName} size={32} className="text-content-secondary group-hover:text-[indigo-600]" />
                   </div>
-                  <span className="text-xs text-center text-gray-600 group-hover:text-[indigo-600] line-clamp-2 break-all">
+                  <span className="text-xs text-center text-content-secondary group-hover:text-[indigo-600] line-clamp-2 break-all">
                     {iconName}
                   </span>
 
@@ -110,7 +110,7 @@ export function IconsPage() {
                     </div>
                   ) : (
                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Copy className="w-4 h-4 text-gray-400" />
+                      <Copy className="w-4 h-4 text-content-tertiary" />
                     </div>
                   )}
                 </button>
@@ -119,79 +119,79 @@ export function IconsPage() {
           </div>
 
           {icons.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-content-secondary">
               No icons found matching "{searchQuery}"
             </div>
           )}
         </div>
 
         <div className="space-y-8">
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Icon Sizes</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Icon Sizes</h2>
 
             <div className="space-y-6">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <Icon name="Home" size={16} className="text-gray-700" />
-                  <span className="text-sm text-gray-600">16px - Small</span>
+                  <Icon name="Home" size={16} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">16px - Small</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Icon name="Home" size={20} className="text-gray-700" />
-                  <span className="text-sm text-gray-600">20px - Default</span>
+                  <Icon name="Home" size={20} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">20px - Default</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Icon name="Home" size={24} className="text-gray-700" />
-                  <span className="text-sm text-gray-600">24px - Medium</span>
+                  <Icon name="Home" size={24} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">24px - Medium</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Icon name="Home" size={32} className="text-gray-700" />
-                  <span className="text-sm text-gray-600">32px - Large</span>
+                  <Icon name="Home" size={32} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">32px - Large</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Icon name="Home" size={48} className="text-gray-700" />
-                  <span className="text-sm text-gray-600">48px - XL</span>
+                  <Icon name="Home" size={48} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">48px - XL</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Icon Colors</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Icon Colors</h2>
 
             <div className="space-y-6">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
                   <Icon name="Heart" size={32} className="text-[indigo-600]" />
-                  <span className="text-sm text-gray-600">Primary</span>
+                  <span className="text-sm text-content-secondary">Primary</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Icon name="Heart" size={32} className="text-[#EC7200]" />
-                  <span className="text-sm text-gray-600">Secondary</span>
+                  <span className="text-sm text-content-secondary">Secondary</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Icon name="Heart" size={32} className="text-[#00A663]" />
-                  <span className="text-sm text-gray-600">Success</span>
+                  <span className="text-sm text-content-secondary">Success</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Icon name="Heart" size={32} className="text-[#C17509]" />
-                  <span className="text-sm text-gray-600">Warning</span>
+                  <span className="text-sm text-content-secondary">Warning</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Icon name="Heart" size={32} className="text-[#B21111]" />
-                  <span className="text-sm text-gray-600">Error</span>
+                  <span className="text-sm text-content-secondary">Error</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Icon name="Heart" size={32} className="text-gray-600" />
-                  <span className="text-sm text-gray-600">Neutral</span>
+                  <Icon name="Heart" size={32} className="text-content-secondary" />
+                  <span className="text-sm text-content-secondary">Neutral</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Guidelines</h2>
+          <section className="hv-surface-card p-8">
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Usage Guidelines</h2>
 
-            <div className="space-y-6 text-gray-700">
+            <div className="space-y-6 text-content-secondary">
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Icon Library</h3>
                 <p className="text-sm mb-3">
@@ -237,25 +237,25 @@ export function IconsPage() {
 
               <div>
                 <h3 className="font-semibold mb-2 text-lg">Implementation</h3>
-                <div className="bg-gray-50 p-4 font-mono text-xs overflow-x-auto">
+                <div className="bg-surface-sunken p-4 font-mono text-xs overflow-x-auto">
                   <div className="mb-4">
-                    <div className="text-gray-500 mb-1">// Import the Icon component</div>
+                    <div className="text-content-secondary mb-1">// Import the Icon component</div>
                     <div>import {'{'} Icon {'}'} from '@/components/ui/Icon';</div>
                   </div>
                   <div className="mb-4">
-                    <div className="text-gray-500 mb-1">// Basic usage</div>
+                    <div className="text-content-secondary mb-1">// Basic usage</div>
                     <div>&lt;Icon name="Home" /&gt;</div>
                   </div>
                   <div className="mb-4">
-                    <div className="text-gray-500 mb-1">// With custom size</div>
+                    <div className="text-content-secondary mb-1">// With custom size</div>
                     <div>&lt;Icon name="Settings" size={'{32}'} /&gt;</div>
                   </div>
                   <div className="mb-4">
-                    <div className="text-gray-500 mb-1">// With custom color</div>
+                    <div className="text-content-secondary mb-1">// With custom color</div>
                     <div>&lt;Icon name="Heart" color="indigo-600" /&gt;</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">// With Tailwind classes</div>
+                    <div className="text-content-secondary mb-1">// With Tailwind classes</div>
                     <div>&lt;Icon name="Star" className="text-yellow-500" /&gt;</div>
                   </div>
                 </div>
