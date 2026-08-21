@@ -369,7 +369,7 @@ export interface RecordRequestResult {
 
 export async function requestHealthRecord(
   input: RequestHealthRecordInput,
-  userId: string
+  _userId: string
 ): Promise<ToolResult<RecordRequestResult>> {
   try {
     const parsed = RequestHealthRecordInputZ.safeParse(input);

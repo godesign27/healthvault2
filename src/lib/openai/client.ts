@@ -1,12 +1,5 @@
-import OpenAI from 'openai';
 import { supabase } from '../supabase';
 import type { ChatRequest, ChatResponse, ConversationMessage } from './types';
-import { POST } from '../../api/assistant/run';
-
-export const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || 'placeholder',
-  dangerouslyAllowBrowser: true,
-});
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -62,29 +55,9 @@ export async function sendAssistantMessage(params: {
   pageContext?: Record<string, unknown>;
   previousResponseId?: string;
 }): Promise<ChatResponse & { responseId?: string }> {
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const request = new Request('', {
-    method: 'POST',
-    body: JSON.stringify({
-      userId: user?.id,
-      currentPage: params.page,
-      userMessage: params.message,
-      context: params.pageContext,
-      previousResponseId: params.previousResponseId,
-    }),
+  return sendChatMessage({
+    message: params.message,
+    page: params.page,
+    pageContext: params.pageContext,
   });
-
-  const response = await POST(request);
-  const data = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.error || 'Assistant request failed');
-  }
-
-  return {
-    message: data.message || '',
-    error: data.error,
-    responseId: data.responseId,
-  };
 }

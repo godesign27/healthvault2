@@ -40,7 +40,7 @@ export async function fetchProviderRecordPreview(input: unknown) {
     if (connectionId) {
       const { data: conn } = await supabase
         .from("provider_connections")
-        .select("id, provider_organization_id, status, fhir_access_token")
+        .select("id, provider_organization_id, status")
         .eq("id", connectionId)
         .eq("user_id", userId)
         .maybeSingle();

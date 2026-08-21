@@ -50,6 +50,7 @@ import { OnboardingPreferencesPage } from './pages/OnboardingPreferencesPage';
 import { OnboardingCompletePage } from './pages/OnboardingCompletePage';
 import SuperAdminPage from './pages/SuperAdminPage';
 import ProviderAdminPage from './pages/ProviderAdminPage';
+import { OAuthConsentPage } from './pages/OAuthConsentPage';
 import { supabase } from './lib/supabase';
 import { parseSubdomain } from './lib/subdomain';
 
@@ -57,6 +58,22 @@ type AppView = 'design-system' | 'projects' | 'health-vault' | 'marketing' | 'lo
 
 const SESSION_VIEW_KEY = 'hv-current-view';
 const SESSION_DEMO_KEY = 'hv-demo-mode';
+
+// Runs at module load time so sessionStorage is set before any useState reads it
+const IS_DEMO_MODE = (() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('demo')) {
+      sessionStorage.setItem(SESSION_DEMO_KEY, 'true');
+      sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
+      window.history.replaceState({}, '', window.location.pathname);
+      return true;
+    }
+    return sessionStorage.getItem(SESSION_DEMO_KEY) === 'true';
+  } catch {
+    return false;
+  }
+})();
 
 function getSavedView(): AppView {
   try {
@@ -74,15 +91,12 @@ function App() {
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete'>('start');
   const [onboardingEmail, setOnboardingEmail] = useState<string>('');
-  const [authState, setAuthState] = useState(() => {
-    const demoMode = sessionStorage.getItem(SESSION_DEMO_KEY) === 'true';
-    return {
-      isAuthenticated: false,
-      authChecked: false,
-      onboardingComplete: demoMode,
-      onboardingChecked: false
-    };
-  });
+  const [authState, setAuthState] = useState(() => ({
+    isAuthenticated: IS_DEMO_MODE,
+    authChecked: IS_DEMO_MODE,
+    onboardingComplete: IS_DEMO_MODE,
+    onboardingChecked: IS_DEMO_MODE
+  }));
 
   const initializingRef = useRef(false);
   const authSubscriptionRef = useRef<any>(null);
@@ -94,6 +108,7 @@ function App() {
   }, [currentView]);
 
   useEffect(() => {
+    if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
     if (
       authState.authChecked &&
       !authState.isAuthenticated &&
@@ -108,6 +123,7 @@ function App() {
     initializingRef.current = true;
 
     const initialize = async () => {
+      if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
       const { data: { session } } = await supabase.auth.getSession();
       const authenticated = !!session;
 
@@ -137,7 +153,8 @@ function App() {
 
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
       const authenticated = !!session;
 
       if (!authenticated) {
@@ -216,10 +233,12 @@ function App() {
 
   const handleDirectHealthVaultAccess = () => {
     try { sessionStorage.setItem(SESSION_DEMO_KEY, 'true'); } catch {}
-    setAuthState(prev => ({
-      ...prev,
-      onboardingComplete: true
-    }));
+    setAuthState({
+      isAuthenticated: true,
+      authChecked: true,
+      onboardingComplete: true,
+      onboardingChecked: true
+    });
     setCurrentView('health-vault');
   };
 
@@ -453,6 +472,10 @@ function App() {
   const isRecordRequestRoute = window.location.pathname.startsWith('/record-request/');
   if (isRecordRequestRoute) {
     return <ProviderRecordSubmitPage />;
+  }
+
+  if (window.location.pathname === '/oauth/consent') {
+    return <OAuthConsentPage />;
   }
 
   const subdomainInfo = parseSubdomain();

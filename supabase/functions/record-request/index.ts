@@ -38,6 +38,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -46,7 +47,18 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (req.method === "POST" && pathParts.length === 0) {
-      return await handleCreateRequest(req, supabase, supabaseUrl);
+      const authHeader = req.headers.get("Authorization");
+      const token = authHeader?.replace(/^Bearer\s+/i, "") || "";
+      const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader || "" } },
+      });
+      const { data: { user } } = await userClient.auth.getUser(token);
+
+      if (!user) {
+        return jsonResponse({ error: "Unauthorized" }, 401);
+      }
+
+      return await handleCreateRequest(req, supabase, supabaseUrl, user.id);
     }
 
     if (req.method === "GET" && pathParts.length === 1) {
@@ -180,11 +192,11 @@ function formatRequestDate(iso: string): string {
 async function handleCreateRequest(
   req: Request,
   supabase: any,
-  supabaseUrl: string
+  supabaseUrl: string,
+  authenticatedUserId: string
 ) {
   const body = await req.json();
   const {
-    userId,
     providerName,
     providerEmail,
     doctorName,
@@ -204,7 +216,7 @@ async function handleCreateRequest(
     );
   }
 
-  const resolvedUserId = userId || "00000000-0000-0000-0000-000000000000";
+  const resolvedUserId = authenticatedUserId;
 
   const patient = await fetchPatientIdentity(
     supabase,

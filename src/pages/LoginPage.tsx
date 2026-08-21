@@ -7,9 +7,20 @@ interface LoginPageProps {
   onCancel: () => void;
   onCreateAccount?: () => void;
   darkMode?: boolean;
+  title?: string;
+  description?: string;
+  allowSignup?: boolean;
 }
 
-export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode = false }: LoginPageProps) {
+export function LoginPage({
+  onLoginSuccess,
+  onCancel,
+  onCreateAccount,
+  darkMode = false,
+  title,
+  description,
+  allowSignup = true,
+}: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,12 +80,12 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
           <h2 className={`text-2xl font-bold text-center mb-2 ${
             darkMode ? 'text-white' : 'text-stone-900'
           }`}>
-            {isSignup ? 'Create Admin Account' : 'Admin Login'}
+            {title || (isSignup ? 'Create Admin Account' : 'Admin Login')}
           </h2>
           <p className={`text-center mb-8 ${
             darkMode ? 'text-stone-400' : 'text-stone-600'
           }`}>
-            {isSignup ? 'Sign up to create your admin account' : 'Sign in to access the Health Vault dashboard'}
+            {description || (isSignup ? 'Sign up to create your admin account' : 'Sign in to access the Health Vault dashboard')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -150,7 +161,7 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
             </div>
           </form>
 
-          <div className={`mt-6 pt-6 border-t text-center ${
+          {allowSignup && <div className={`mt-6 pt-6 border-t text-center ${
             darkMode ? 'border-stone-700' : 'border-stone-200'
           }`}>
             <p className={`text-sm ${
@@ -177,7 +188,7 @@ export function LoginPage({ onLoginSuccess, onCancel, onCreateAccount, darkMode 
                 {isSignup ? 'Sign in' : 'Create an account'}
               </button>
             </p>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

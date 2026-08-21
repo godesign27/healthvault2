@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { supabase } from "../supabase";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const requestHealthRecordInputSchema = z.object({
   userId: z.string().min(1),
@@ -35,8 +36,10 @@ export async function requestHealthRecord(input: unknown) {
     return { success: false, error: "Record request requires confirmation." };
   }
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    return { success: false, error: "Server Supabase configuration missing." };
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!supabaseUrl || !supabaseAnonKey || !session?.access_token) {
+    return { success: false, error: "You must be signed in to request records." };
   }
 
   try {
@@ -44,10 +47,10 @@ export async function requestHealthRecord(input: unknown) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${serviceRoleKey}`,
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({
-        userId: args.userId,
         providerName: args.providerName,
         providerEmail: args.providerEmail,
         providerId: args.providerId,
