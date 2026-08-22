@@ -90,8 +90,8 @@ export async function fetchUserProfileData(userId: string): Promise<UserProfileD
         medications: patientProfile.medications || [],
         allergies: patientProfile.allergies || [],
         bloodType: patientProfile.blood_type,
-        height: patientProfile.height,
-        weight: patientProfile.weight,
+        height: patientProfile.height_cm == null ? undefined : `${patientProfile.height_cm} cm`,
+        weight: patientProfile.weight_kg == null ? undefined : `${patientProfile.weight_kg} kg`,
       };
     }
 

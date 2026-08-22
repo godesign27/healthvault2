@@ -67,6 +67,17 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .private-detail span { display: block; color: #78716c; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
     .private-detail strong { display: block; margin-top: 2px; overflow-wrap: anywhere; }
     .medical-id-actions { display: flex; justify-content: flex-start; }
+    .setup-disclosure { border-top: 1px solid #eceae8; }
+    .setup-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 0 10px; cursor: pointer; }
+    .setup-heading:hover { color: #2563eb; }
+    .setup-heading:focus-visible { outline: 2px solid #0b8063; outline-offset: 3px; }
+    .setup-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .setup-title h2 { margin: 0; }
+    .setup-chevron { width: 16px; flex: 0 0 16px; color: #2563eb; font-size: 16px; line-height: 1; text-align: center; }
+    .setup-chevron::before { content: '↓'; }
+    .setup-disclosure[open] .setup-chevron::before { content: '↑'; }
+    .setup-progress { flex: 0 0 auto; color: #008a68; font-size: 12px; font-weight: 750; }
+    .setup-panel { padding-bottom: 4px; }
     .actions { display: flex; gap: 10px; padding: 16px 18px 18px; }
     button { width: 100%; border: 0; border-radius: 8px; padding: 12px 14px; cursor: pointer; font: inherit; font-weight: 700; color: white; background: #17213a; transition: background .18s ease, transform .12s ease; }
     button:hover { background: #24304f; }
@@ -81,9 +92,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .stat { background: #191e21; border-color: #343a3e; }
       .value { color: #eef1f3; }
       .label, .meta { color: #9ea6aa; }
-      .row, .detail-section, .detail-item { border-color: #343a3e; }
+      .row, .detail-section, .detail-item, .setup-disclosure { border-color: #343a3e; }
       .detail-count { color: #9ea6aa; }
-      .collapse-all, .detail-heading:hover, .detail-chevron, .view-more { color: #8ab4ff; background: transparent; }
+      .collapse-all, .detail-heading:hover, .detail-chevron, .view-more, .setup-heading:hover, .setup-chevron { color: #8ab4ff; background: transparent; }
       .collapse-all:hover, .view-more:hover { color: #b8d1ff; background: transparent; }
       .view-more { color: #75d8ba; background: transparent; }
       .view-more:hover { color: #a2ead5; background: transparent; }
@@ -107,7 +118,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
   <main id="app" class="card"><div class="empty">Loading your Health Vault…</div></main>
   <script>
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const uiState = { details: {}, viewMore: {}, medicalId: false };
+    const uiState = { details: {}, viewMore: {}, medicalId: false, setupOpen: null };
     const openVault = () => {
       const href = 'https://healthvault27.com/?app=dashboard&source=chatgpt';
       if (window.openai?.openExternal) window.openai.openExternal({ href });
@@ -169,6 +180,10 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + (item.complete ? '' : 'todo') + '">' + (item.complete ? 'Complete' : (item.optional ? 'Optional' : 'Needs attention'))
         + '</span></div>'
       ).join('');
+      const setupCompleteCount = checklist.filter((item) => item.complete).length;
+      const setupPercent = checklist.length ? Math.round((setupCompleteCount / checklist.length) * 100) : 0;
+      const setupComplete = checklist.length > 0 && setupCompleteCount === checklist.length;
+      const setupOpen = uiState.setupOpen === null ? !setupComplete : uiState.setupOpen;
       const privateRows = [
         ['Date of birth', formatDate(privateProfile.dateOfBirth)],
         ['Email', privateProfile.email],
@@ -200,7 +215,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<section class="section"><h2>Medical ID</h2><div class="medical-id"><p class="medical-id-note">Private details stay concealed until you choose to show them. Check your surroundings before revealing.</p>'
         + '<details class="medical-id-disclosure"' + (uiState.medicalId ? ' open' : '') + '><summary class="view-more"><span class="more-label">Show Medical ID</span><span class="less-label">Hide Medical ID</span></summary>'
         + '<div class="medical-id-grid">' + privateHtml + '</div></details></div></section>'
-        + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
+        + '<section class="section"><details id="vault-setup" class="setup-disclosure"' + (setupOpen ? ' open' : '') + '><summary class="setup-heading">'
+        + '<span class="setup-title"><span class="setup-chevron" aria-hidden="true"></span><h2>Vault setup</h2></span>'
+        + '<span class="setup-progress">' + setupPercent + '%</span></summary><div class="setup-panel">' + checklistHtml + '</div></details></section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
       document.getElementById('profile-photo')?.addEventListener('error', (event) => {
@@ -227,6 +244,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       });
       document.querySelector('.medical-id-disclosure')?.addEventListener('toggle', (event) => {
         uiState.medicalId = event.currentTarget.open;
+      });
+      document.getElementById('vault-setup')?.addEventListener('toggle', (event) => {
+        uiState.setupOpen = event.currentTarget.open;
       });
       document.getElementById('toggle-all-details')?.addEventListener('click', () => {
         const sections = [...document.querySelectorAll('[data-detail-section]')];

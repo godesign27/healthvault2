@@ -15,6 +15,18 @@ import {
   ONBOARDING_WIDGET_HTML,
   ONBOARDING_WIDGET_URI,
 } from "../../../packages/health-vault-mcp/src/onboarding-widget.ts";
+import {
+  APPOINTMENT_PREP_WIDGET_HTML,
+  APPOINTMENT_PREP_WIDGET_URI,
+} from "../../../packages/health-vault-mcp/src/appointment-prep-widget.ts";
+import {
+  DIET_CONFIRMATION_WIDGET_HTML,
+  DIET_CONFIRMATION_WIDGET_URI,
+} from "../../../packages/health-vault-mcp/src/diet-confirmation-widget.ts";
+import {
+  LIFE_SIGNAL_WIDGET_HTML,
+  LIFE_SIGNAL_WIDGET_URI,
+} from "../../../packages/health-vault-mcp/src/life-signal-widget.ts";
 import { buildOnboardingStatus } from "../../../packages/health-vault-mcp/src/onboarding.ts";
 import {
   getAllergies,
@@ -49,6 +61,7 @@ import { createAppointmentPrep } from "../../../packages/health-vault-mcp/src/ap
 import {
   getDietSummary,
   listLifeSignals,
+  logDietEntries,
   logDietEntry,
   logLifeSignal,
   previewDietLog,
@@ -216,7 +229,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.5.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -285,6 +298,63 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         text: ONBOARDING_WIDGET_HTML,
         _meta: {
           "openai/widgetDescription": "A compact, privacy-first five-stage Health Vault onboarding and resume card.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
+  server.registerResource(
+    "health-vault-appointment-prep",
+    APPOINTMENT_PREP_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault appointment-prep brief" },
+    async () => ({
+      contents: [{
+        uri: APPOINTMENT_PREP_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: APPOINTMENT_PREP_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A concise appointment brief with visit priorities, questions, and confirmed Health Vault context.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
+  server.registerResource(
+    "health-vault-life-signal",
+    LIFE_SIGNAL_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault Life Signal check-in" },
+    async () => ({
+      contents: [{
+        uri: LIFE_SIGNAL_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: LIFE_SIGNAL_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "An accessible five-slider Life Signal check-in with a single Log button.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
+  server.registerResource(
+    "health-vault-diet-confirmation",
+    DIET_CONFIRMATION_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault diet-log confirmation" },
+    async () => ({
+      contents: [{
+        uri: DIET_CONFIRMATION_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: DIET_CONFIRMATION_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A single confirmation card for one or more diet entries that becomes a Wellness summary after saving.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
@@ -455,6 +525,11 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       }),
       outputSchema: z.object({ brief: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": APPOINTMENT_PREP_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Preparing your appointment brief",
+        "openai/toolInvocation/invoked": "Appointment brief ready",
+      },
     },
     async ({ concerns, questions }) => {
       try {
@@ -596,6 +671,32 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     }
   });
 
+  const compactConfirmedTool = <T>(
+    name: string,
+    title: string,
+    description: string,
+    schema: z.ZodType<T>,
+    save: (input: T) => Promise<unknown>,
+    successMessage: string,
+  ) => server.registerTool(name, {
+    title,
+    description,
+    inputSchema: schema,
+    outputSchema: z.object({ saved: z.unknown(), confirmationState: z.literal("confirmed") }),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    _meta: { "openai/widgetAccessible": true },
+  }, async (input) => {
+    try {
+      const saved = await save(input as T);
+      return {
+        structuredContent: { saved, confirmationState: "confirmed" as const },
+        content: [{ type: "text", text: successMessage }],
+      };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : `Unable to ${title}` }] };
+    }
+  });
+
   const oneToFive = z.number().int().min(1).max(5);
   const lifeSignalSchema = z.object({
     energy: oneToFive,
@@ -606,8 +707,23 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     note: z.string().trim().max(2000).optional(),
     recordedAt: z.string().datetime({ offset: true }).optional(),
   });
+  server.registerTool("start_life_signal_check_in", {
+    title: "Start Life Signal check-in",
+    description: "Use whenever the user wants to log a Life Signal but has not provided all five ratings. Show sliders for sleep, energy, mood, stress, and pain. The widget's Log button is explicit confirmation.",
+    inputSchema: z.object({}),
+    outputSchema: z.object({ checkIn: z.unknown() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    _meta: {
+      "openai/outputTemplate": LIFE_SIGNAL_WIDGET_URI,
+      "openai/toolInvocation/invoking": "Opening your Life Signal check-in",
+      "openai/toolInvocation/invoked": "Life Signal check-in ready",
+    },
+  }, async () => ({
+    structuredContent: { checkIn: { scaleMin: 1, scaleMax: 5, signals: ["sleep", "energy", "mood", "stress", "pain"] } },
+    content: [{ type: "text", text: "Use the sliders in the Life Signal card, then select Log Life Signal." }],
+  }));
   previewTool("preview_life_signal", "Preview Life Signal", "Preview a Life Signal check-in without saving it. Explain the 1–5 scale and request explicit confirmation before log_life_signal.", lifeSignalSchema, previewLifeSignal);
-  confirmedTool("log_life_signal", "Save confirmed Life Signal", "Save only after preview_life_signal and explicit confirmation.", lifeSignalSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logLifeSignal(supabase, userId, input), () => ({ title: "Life Signal saved", message: "Today's confirmed check-in is now in Health Vault." }));
+  compactConfirmedTool("log_life_signal", "Save confirmed Life Signal", "Save only after preview_life_signal, explicit chat confirmation, or the user selects Log in the Life Signal widget.", lifeSignalSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logLifeSignal(supabase, userId, input), "Life Signal saved. Today's confirmed check-in is now in Health Vault.");
   registerReadTool("list_life_signals", "Review Life Signals", "Review recent confirmed Life Signal check-ins and summarize patterns without diagnosing the user.", z.object({ days: z.number().int().min(1).max(90).default(14) }), ({ days }) => listLifeSignals(supabase, days));
 
   const dietLogSchema = z.object({
@@ -621,8 +737,42 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     waterMl: z.number().int().min(0).max(20_000).optional(),
     notes: z.string().trim().max(2000).optional(),
   });
-  previewTool("preview_diet_log", "Preview diet entry", "Preview a meal, snack, or drink without saving it. Show the foods, approximate amounts, and time, then request explicit confirmation before log_diet_entry.", dietLogSchema, previewDietLog);
-  confirmedTool("log_diet_entry", "Save confirmed diet entry", "Save only after preview_diet_log and explicit confirmation. Never infer unmentioned foods, quantities, calories, or nutrients.", dietLogSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logDietEntry(supabase, userId, input), () => ({ title: "Diet entry saved", message: "The confirmed meal or drink is now in your Health Vault diet log." }));
+  server.registerTool("preview_diet_entries", {
+    title: "Preview diet log",
+    description: "Preferred diet preview tool. Group every food and drink from the user's message into one entries array, even when they describe multiple meals. This shows one confirmation card and saves nothing.",
+    inputSchema: z.object({ entries: z.array(dietLogSchema).min(1).max(20) }),
+    outputSchema: z.object({ preview: z.unknown() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    _meta: {
+      "openai/outputTemplate": DIET_CONFIRMATION_WIDGET_URI,
+      "openai/toolInvocation/invoking": "Preparing your diet log",
+      "openai/toolInvocation/invoked": "Diet log ready to confirm",
+    },
+  }, async ({ entries }) => ({
+    structuredContent: { preview: { entries: entries.map(previewDietLog), requiresConfirmation: true } },
+    content: [{ type: "text", text: "Review the diet-log card and select Confirm Diet Log to save all entries once." }],
+  }));
+  server.registerTool("log_diet_entries", {
+    title: "Save confirmed diet log",
+    description: "Save one or more diet entries in one operation only after preview_diet_entries and explicit confirmation from its button. Never infer unmentioned foods, quantities, calories, or nutrients.",
+    inputSchema: z.object({ entries: z.array(dietLogSchema).min(1).max(20), confirmed: z.literal(true) }),
+    outputSchema: z.object({ saved: z.unknown(), wellness: z.unknown(), confirmationState: z.literal("confirmed") }),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    _meta: { "openai/widgetAccessible": true },
+  }, async ({ entries }) => {
+    try {
+      const saved = await logDietEntries(supabase, userId, entries);
+      const [diet, lifeSignals] = await Promise.all([getDietSummary(supabase, 7), listLifeSignals(supabase, 7)]);
+      return {
+        structuredContent: { saved, wellness: { diet, lifeSignals }, confirmationState: "confirmed" as const },
+        content: [{ type: "text", text: `${saved.length} confirmed diet ${saved.length === 1 ? "entry was" : "entries were"} saved. The Wellness summary is displayed in the card.` }],
+      };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to save diet log" }] };
+    }
+  });
+  previewTool("preview_diet_log", "Preview one diet entry", "Legacy single-entry preview. Prefer preview_diet_entries so all foods in one user message share one confirmation card.", dietLogSchema, previewDietLog);
+  compactConfirmedTool("log_diet_entry", "Save one confirmed diet entry", "Legacy single-entry save. Prefer log_diet_entries after preview_diet_entries. Never use this repeatedly for foods from the same user message.", dietLogSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logDietEntry(supabase, userId, input), "Diet entry saved in Wellness.");
   registerReadTool("get_diet_summary", "Review diet log", "Summarize recent user-reported diet entries and offer general, non-diagnostic wellness observations. Do not prescribe a medical diet or claim nutrient totals that were not logged.", z.object({ days: z.number().int().min(1).max(30).default(7) }), ({ days }) => getDietSummary(supabase, days));
 
   previewTool("preview_condition", "Preview condition", "Prepare a condition for review without saving it. Show the exact details and request explicit confirmation before add_condition.", conditionSchema, previewCondition);
