@@ -1,4 +1,4 @@
-export const DASHBOARD_WIDGET_URI = "ui://widget/health-vault-dashboard-v2.html";
+export const DASHBOARD_WIDGET_URI = "ui://widget/health-vault-dashboard-v3.html";
 
 export const DASHBOARD_WIDGET_HTML = `<!doctype html>
 <html lang="en">
