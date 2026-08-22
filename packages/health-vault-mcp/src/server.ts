@@ -27,6 +27,7 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
         _meta: {
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],

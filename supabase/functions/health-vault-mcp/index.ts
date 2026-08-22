@@ -228,6 +228,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
@@ -249,6 +250,11 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A compact confirmation card for a scoped, expiring Health Vault share.",
           "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": {
+            connect_domains: [],
+            resource_domains: [],
+          },
         },
       }],
     }),
@@ -261,6 +267,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       description:
         "Get a concise overview of the authenticated user's Health Vault, including active conditions, medications, allergies, record count, and next appointment.",
       inputSchema: z.object({}),
+      outputSchema: z.object({ summary: z.unknown() }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -300,6 +307,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       title,
       description,
       inputSchema,
+      outputSchema: z.object({ result: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async (input) => {
@@ -356,6 +364,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       title: "Preview appointment",
       description: "Prepare an appointment for review. This never saves data. Show the complete preview and ask the user to explicitly confirm before calling create_appointment.",
       inputSchema: z.object(appointmentSchema),
+      outputSchema: z.object({ preview: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async (input) => {
@@ -375,6 +384,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       title: "Add confirmed appointment",
       description: "Save an appointment only after preview_appointment has been shown and the user explicitly confirms the exact details. Never call this from an initial request or implied consent.",
       inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
+      outputSchema: z.object({ summary: z.unknown(), recentChange: z.unknown() }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       _meta: {
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
@@ -435,6 +445,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       title,
       description,
       inputSchema: schema,
+      outputSchema: z.object({ preview: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     }, async (input) => {
       try {
@@ -456,6 +467,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     title,
     description,
     inputSchema: schema,
+    outputSchema: z.object({ summary: z.unknown(), recentChange: z.unknown() }),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     _meta: { "openai/outputTemplate": DASHBOARD_WIDGET_URI },
   }, async (input) => {
@@ -481,6 +493,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     title: "Preview appointment cancellation",
     description: "Load the exact scheduled appointment and ask the user to explicitly confirm before cancel_appointment.",
     inputSchema: z.object({ appointmentId: z.string().uuid() }),
+    outputSchema: z.object({ preview: z.unknown() }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ appointmentId }) => {
     try {
@@ -503,6 +516,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     title: "Preview secure health share",
     description: "Preview the recipient, selected categories, and expiration in a compact confirmation card without creating a link. The user confirms from the card before create_health_share.",
     inputSchema: shareSchema,
+    outputSchema: z.object({ preview: z.unknown() }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     _meta: {
       "openai/outputTemplate": SHARE_WIDGET_URI,
@@ -524,6 +538,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     title: "Create confirmed secure health share",
     description: "Create a revocable, expiring link only after preview_health_share and explicit user confirmation. Return the link to the user; do not send it automatically.",
     inputSchema: shareSchema.extend({ confirmed: z.literal(true) }),
+    outputSchema: z.object({ share: z.unknown() }),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     _meta: { "openai/widgetAccessible": true },
   }, async ({ confirmed: _confirmed, ...input }) => {
@@ -538,6 +553,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     title: "Revoke secure health share",
     description: "Revoke an existing secure share only after the user explicitly asks to revoke that exact share ID.",
     inputSchema: z.object({ shareId: z.string().uuid(), confirmed: z.literal(true) }),
+    outputSchema: z.object({ revoked: z.unknown() }),
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
   }, async ({ shareId }) => {
     try {
