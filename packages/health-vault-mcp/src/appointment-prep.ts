@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.js";
+import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.ts";
 
 export async function createAppointmentPrep(supabase: SupabaseClient, concerns: string[], questions: string[]) {
   const now = new Date().toISOString();
