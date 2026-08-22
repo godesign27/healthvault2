@@ -3,6 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { getHealthSummary } from "./health-summary.js";
 import { DASHBOARD_WIDGET_HTML, DASHBOARD_WIDGET_URI } from "./dashboard-widget.js";
+import { ONBOARDING_WIDGET_HTML, ONBOARDING_WIDGET_URI } from "./onboarding-widget.js";
+import { buildOnboardingStatus } from "./onboarding.js";
 import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.js";
 import { createAppointment, previewAppointment } from "./appointments.js";
 
@@ -35,6 +37,52 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
         },
       }],
     }),
+  );
+
+  server.registerResource(
+    "health-vault-onboarding",
+    ONBOARDING_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault onboarding status" },
+    async () => ({
+      contents: [{
+        uri: ONBOARDING_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: ONBOARDING_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A compact, privacy-first five-stage Health Vault onboarding and resume card.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
+  server.registerTool(
+    "get_onboarding_status",
+    {
+      title: "Continue Health Vault setup",
+      description: "Start, continue, resume, or check the authenticated user's privacy-first Health Vault onboarding.",
+      inputSchema: z.object({}),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": ONBOARDING_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Checking your Health Vault setup",
+        "openai/toolInvocation/invoked": "Health Vault setup ready",
+      },
+    },
+    async () => {
+      try {
+        const onboarding = buildOnboardingStatus(await getHealthSummary(supabase));
+        return {
+          structuredContent: { onboarding },
+          content: [{ type: "text", text: `Recommended next step: ${onboarding.recommendedAction.label}.` }],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to read onboarding status";
+        return { isError: true, content: [{ type: "text", text: message }] };
+      }
+    },
   );
 
   server.registerTool(

@@ -12,6 +12,11 @@ import {
   SHARE_WIDGET_URI,
 } from "../../../packages/health-vault-mcp/src/share-widget.ts";
 import {
+  ONBOARDING_WIDGET_HTML,
+  ONBOARDING_WIDGET_URI,
+} from "../../../packages/health-vault-mcp/src/onboarding-widget.ts";
+import { buildOnboardingStatus } from "../../../packages/health-vault-mcp/src/onboarding.ts";
+import {
   getAllergies,
   getConditions,
   getHealthRecords,
@@ -208,10 +213,10 @@ async function getHealthSummary(supabase: SupabaseClient) {
 
 function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
   const server = new McpServer(
-    { name: "health-vault", version: "0.4.0" },
+    { name: "health-vault", version: "0.5.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. The server supports dashboard and profile reads, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -269,6 +274,25 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     }),
   );
 
+  server.registerResource(
+    "health-vault-onboarding",
+    ONBOARDING_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault onboarding status" },
+    async () => ({
+      contents: [{
+        uri: ONBOARDING_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: ONBOARDING_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A compact, privacy-first five-stage Health Vault onboarding and resume card.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
   server.registerTool(
     "get_health_vault_capabilities",
     {
@@ -280,6 +304,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async () => {
       const actions = [
+        { title: "Continue setup", prompt: "Health Vault, continue my setup.", category: "onboarding" },
         { title: "View my health snapshot", prompt: "Health Vault, show me what you know about me.", category: "review" },
         { title: "Prepare for an appointment", prompt: "Health Vault, create a prep brief for my next appointment.", category: "prepare" },
         { title: "Complete a Life Signal", prompt: "Health Vault, guide me through today's Life Signal check-in.", category: "check_in" },
@@ -289,8 +314,43 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       ];
       return {
         structuredContent: { actions, summary: "Choose one of these Health Vault tasks to get started." },
-        content: [{ type: "text", text: "Here are a few things I can do today: show your health snapshot, prepare for an appointment, complete a Life Signal check-in, log your diet, add confirmed health information, or create a secure share. Which would you like to do?" }],
+        content: [{ type: "text", text: "Here are a few things I can do today: continue your setup, show your health snapshot, prepare for an appointment, complete a Life Signal check-in, log your diet, add confirmed health information, or create a secure share. Which would you like to do?" }],
       };
+    },
+  );
+
+  server.registerTool(
+    "get_onboarding_status",
+    {
+      title: "Continue Health Vault setup",
+      description: "Use when the user wants to start, continue, resume, or check Health Vault onboarding. Returns a five-stage status card and the safest next action. Sensitive identity and insurance steps link to the secure Health Vault web app.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ onboarding: z.unknown() }),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": ONBOARDING_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Checking your Health Vault setup",
+        "openai/toolInvocation/invoked": "Health Vault setup ready",
+      },
+    },
+    async () => {
+      try {
+        const summary = await getSharedHealthSummary(supabase);
+        const onboarding = buildOnboardingStatus(summary);
+        const next = onboarding.recommendedAction;
+        return {
+          structuredContent: { onboarding },
+          content: [{
+            type: "text",
+            text: onboarding.complete
+              ? "Your Health Vault setup is complete. You can review your health snapshot or choose another task."
+              : `Your resumable Health Vault setup is displayed above. Recommended next step: ${next.label}. ${next.prompt ? `Try: “${next.prompt}”` : "Use the secure card link to continue."}`,
+          }],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to read onboarding status";
+        return { isError: true, content: [{ type: "text", text: message }] };
+      }
     },
   );
 

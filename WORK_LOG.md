@@ -7,6 +7,12 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-08-22 (ChatGPT onboarding increment)
+
+- **supabase + web** — Added a read-only `get_onboarding_status` MCP tool and compact five-stage onboarding card covering connection, secure profile, first health context, assistant preferences, and first snapshot. The card resumes from live Supabase state rather than inventing a parallel onboarding record.
+- **web** — Added step-aware `?app=onboarding&step=...&source=chatgpt` handoffs for identity, insurance, and preferences. Sensitive identity and coverage entry stays in the authenticated web experience; unauthenticated deep links safely fall back to onboarding start.
+- **infra** — Full Vite production build passes. MCP typecheck passes with `allowImportingTsExtensions`; the package's default typecheck remains blocked by a pre-existing `.ts` import in `appointment-prep.ts`.
+
 ## 2026-08-21 (ChatGPT app MVP)
 
 - **supabase** — Added a two-step conversational appointment flow to `health-vault-mcp`: `preview_appointment` validates and displays future appointment details without writing, while `create_appointment` requires the confirmed payload and inserts through the authenticated user's RLS-scoped client. No service-role key is used. Deployed as function version 7; unauthenticated access remains blocked with 401.

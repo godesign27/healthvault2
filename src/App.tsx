@@ -62,6 +62,22 @@ const SESSION_VIEW_KEY = 'hv-current-view';
 const SESSION_DEMO_KEY = 'hv-demo-mode';
 const SESSION_DS_SURFACE_KEY = 'hv-ds-surface-theme';
 const SESSION_RETURN_TO_KEY = 'hv-return-to';
+const SESSION_ONBOARDING_STEP_KEY = 'hv-onboarding-step';
+
+type OnboardingStep = 'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete';
+
+function isOnboardingStep(value: unknown): value is OnboardingStep {
+  return ['start', 'account', 'verify-email', 'identity', 'insurance', 'preferences', 'complete'].includes(String(value));
+}
+
+function getRequestedOnboardingStep(): OnboardingStep {
+  try {
+    const requested = sessionStorage.getItem(SESSION_ONBOARDING_STEP_KEY);
+    sessionStorage.removeItem(SESSION_ONBOARDING_STEP_KEY);
+    if (isOnboardingStep(requested)) return requested;
+  } catch {}
+  return 'start';
+}
 
 type DesignSystemSurface = 'default' | 'bold' | 'steel';
 
@@ -97,6 +113,10 @@ const IS_DEMO_MODE = (() => {
     if (requestedApp === 'onboarding') {
       sessionStorage.removeItem(SESSION_DEMO_KEY);
       sessionStorage.setItem(SESSION_VIEW_KEY, 'onboarding');
+      const requestedStep = params.get('step');
+      if (isOnboardingStep(requestedStep)) {
+        sessionStorage.setItem(SESSION_ONBOARDING_STEP_KEY, requestedStep);
+      }
       window.history.replaceState({}, '', window.location.pathname);
       return false;
     }
@@ -127,7 +147,7 @@ function App() {
   const [designSystemSurface, setDesignSystemSurface] = useState<DesignSystemSurface>(getSavedDesignSystemSurface);
   const [currentPage, setCurrentPage] = useState<string>('accordions');
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
-  const [onboardingStep, setOnboardingStep] = useState<'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete'>('start');
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(getRequestedOnboardingStep);
   const [onboardingEmail, setOnboardingEmail] = useState<string>('');
   const [authState, setAuthState] = useState(() => ({
     isAuthenticated: IS_DEMO_MODE,
@@ -161,6 +181,17 @@ function App() {
       setCurrentView(currentView === 'health-vault' ? 'login' : 'marketing');
     }
   }, [authState.isAuthenticated, authState.authChecked, currentView]);
+
+  useEffect(() => {
+    if (
+      currentView === 'onboarding' &&
+      authState.authChecked &&
+      !authState.isAuthenticated &&
+      ['identity', 'insurance', 'preferences', 'complete'].includes(onboardingStep)
+    ) {
+      setOnboardingStep('start');
+    }
+  }, [authState.authChecked, authState.isAuthenticated, currentView, onboardingStep]);
 
   useEffect(() => {
     if (
