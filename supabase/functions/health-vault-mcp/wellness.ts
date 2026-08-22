@@ -98,6 +98,26 @@ export async function logDietEntry(supabase: SupabaseClient, userId: string, inp
   return data;
 }
 
+export async function logDietEntries(supabase: SupabaseClient, userId: string, inputs: DietLogInput[]) {
+  const rows = inputs.map((input) => {
+    const preview = previewDietLog(input);
+    return {
+      user_id: userId,
+      meal_type: preview.mealType,
+      consumed_at: preview.consumedAt,
+      items: preview.items,
+      water_ml: preview.waterMl,
+      notes: preview.notes,
+      source: "chatgpt",
+      confirmation_status: "confirmed",
+    };
+  });
+  const { data, error } = await supabase.from("diet_log_entries").insert(rows)
+    .select("id, meal_type, consumed_at, items, water_ml, notes, source, confirmation_status");
+  if (error) throw new Error(`Unable to save diet entries: ${error.message}`);
+  return data ?? [];
+}
+
 export async function getDietSummary(supabase: SupabaseClient, days: number) {
   const since = new Date(Date.now() - days * 86_400_000).toISOString();
   const { data, error } = await supabase.from("diet_log_entries")
@@ -125,4 +145,3 @@ export async function getDietSummary(supabase: SupabaseClient, days: number) {
     provenance: { source: "user_reported", confirmationStatus: "confirmed" },
   };
 }
-
