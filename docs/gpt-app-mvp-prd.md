@@ -13,6 +13,10 @@ Let an authenticated Health Vault member safely review and maintain a concise pe
 5. The assistant previews every proposed write, asks for explicit confirmation, saves only after confirmation, and returns a refreshed dashboard highlighting the change.
 6. Duplicate condition, medication, allergy, and record entries are blocked at creation and collapsed in dashboard summaries.
 7. A member can preview and create a revocable, expiring share containing only explicitly selected health-data categories.
+8. A member can ask what Health Vault can do and receive concise, actionable task prompts.
+9. A member can create a lightweight appointment-prep brief from confirmed Vault data.
+10. A member can preview and confirm a daily Life Signal check-in covering energy, sleep, mood, stress, and pain.
+11. A member can preview and confirm meals, snacks, drinks, and water in a daily diet log, then review general non-diagnostic patterns.
 
 ## Confirmation-gated writes
 
@@ -22,6 +26,8 @@ Let an authenticated Health Vault member safely review and maintain a concise pe
 - Add a medication.
 - Add an allergy.
 - Add structured health-record information.
+- Log a Life Signal check-in.
+- Log a diet entry.
 
 Each flow must follow `preview → explicit confirmation → write → refreshed dashboard`. A first request, ambiguous approval, or inferred consent is insufficient.
 
@@ -52,6 +58,7 @@ Before creation, ChatGPT must show the recipient, categories, and expiration and
 - Public share access requires the exact unguessable token and returns `Cache-Control: no-store`.
 - Secret or service-role credentials never enter browser bundles, tool output, logs, or ChatGPT context.
 - Tool errors must not echo tokens, credentials, or full sensitive payloads.
+- Diet observations remain general wellness information and must not be presented as diagnosis, treatment, or a personalized medical nutrition plan.
 
 ## Acceptance tests
 
@@ -62,6 +69,8 @@ Before creation, ChatGPT must show the recipient, categories, and expiration and
 - Repeating the same write produces a duplicate warning and no new row.
 - A share exposes only selected categories and stops working after revocation or expiration.
 - User A cannot read, modify, or revoke User B's share events.
+- Life Signal and diet entries cannot be saved before explicit confirmation and cannot be read by another member.
+- Appointment prep identifies its confirmed Health Vault sources and warns the member to review the brief for accuracy.
 
 ## Next after MVP
 
@@ -71,3 +80,4 @@ Before creation, ChatGPT must show the recipient, categories, and expiration and
 - Fine-grained item selection within a category.
 - Patient-visible share history and access audit export.
 - Provider acknowledgement and FHIR delivery receipts.
+- Trend cards for Life Signals and diet patterns after sufficient longitudinal data exists.
