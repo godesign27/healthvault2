@@ -88,13 +88,18 @@ export function OAuthConsentPage() {
   };
 
   if (state.status === 'login-required') {
+    const startOnboarding = () => {
+      const returnTo = `${window.location.pathname}${window.location.search}`;
+      window.location.assign(`/?app=onboarding&source=chatgpt&return_to=${encodeURIComponent(returnTo)}`);
+    };
     return (
       <LoginPage
         onLoginSuccess={() => void loadAuthorization()}
         onCancel={() => window.location.assign('/')}
         title="Sign in to connect Health Vault"
         description="Use your Health Vault account to review this access request."
-        allowSignup={false}
+        onCreateAccount={startOnboarding}
+        allowSignup
       />
     );
   }

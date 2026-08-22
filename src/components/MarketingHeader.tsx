@@ -1,4 +1,4 @@
-import { Menu, X, Eye, Globe, Moon, Sun, LogIn, User, ChevronDown } from 'lucide-react';
+import { Menu, X, Eye, Globe, Moon, Sun, LogIn, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface MarketingHeaderProps {
@@ -9,6 +9,7 @@ interface MarketingHeaderProps {
   darkMode?: boolean;
   onToggleDarkMode?: () => void;
   onLoginClick?: () => void;
+  onLogoutClick?: () => void;
   onGetStarted?: () => void;
   isAuthenticated?: boolean;
   currentView?: string;
@@ -22,6 +23,7 @@ export function MarketingHeader({
   darkMode = false,
   onToggleDarkMode,
   onLoginClick,
+  onLogoutClick,
   onGetStarted,
   isAuthenticated = false,
   currentView = 'marketing',
@@ -37,7 +39,7 @@ export function MarketingHeader({
   ];
 
   const viewButtons = [
-    { id: 'health-vault', label: 'Health Vault', icon: Eye },
+    { id: 'health-vault', label: 'Dashboard', icon: Eye },
     { id: 'marketing', label: 'Marketing', icon: Globe },
   ];
 
@@ -173,10 +175,13 @@ export function MarketingHeader({
               )}
 
               {isAuthenticated && (
-                <div className={`hidden sm:flex items-center gap-3 pl-3 ml-3 border-l ${
+                <div className={`hidden sm:flex items-center gap-2 pl-3 ml-3 border-l ${
                   darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
                 }`}>
                   <button
+                    type="button"
+                    onClick={() => handleViewClick('health-vault')}
+                    aria-label="Open Health Dashboard"
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                       darkMode
                         ? 'hover:bg-surface-sunken text-content-primary'
@@ -188,8 +193,18 @@ export function MarketingHeader({
                     }`}>
                       <User className="w-4 h-4" />
                     </div>
-                    <ChevronDown className="w-4 h-4" />
+                    <span className="text-sm font-semibold">Health Dashboard</span>
                   </button>
+                  {onLogoutClick && (
+                    <button
+                      type="button"
+                      onClick={onLogoutClick}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Log out
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -306,6 +321,8 @@ export function MarketingHeader({
                   darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 <button
+                  type="button"
+                  onClick={() => handleViewClick('health-vault')}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
                       ? 'text-content-primary hover:bg-surface-sunken'
@@ -317,8 +334,21 @@ export function MarketingHeader({
                   }`}>
                     <User className="w-4 h-4" />
                   </div>
-                  <span>Profile</span>
+                  <span>Health Dashboard</span>
                 </button>
+                {onLogoutClick && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onLogoutClick();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Log out</span>
+                  </button>
+                )}
               </>
             )}
 

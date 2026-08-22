@@ -154,6 +154,7 @@ Deno.serve(async (req: Request) => {
         expiresAt: shareEvent.expires_at,
         openedAt: shareEvent.opened_at,
         revokedAt: shareEvent.revoked_at,
+        healthData: shareEvent.options?.healthShare || null,
       };
 
       return new Response(
@@ -188,7 +189,7 @@ Deno.serve(async (req: Request) => {
           status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (token && token !== shareEvent.share_token) {
+      if (!token || token !== shareEvent.share_token) {
         return new Response(JSON.stringify({ error: 'Invalid token' }), {
           status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -448,7 +449,6 @@ ${formSections}
         if (!resendApiKey) {
           emailError = 'RESEND_API_KEY not configured';
           console.error(emailError);
-          console.log('Share URL would be:', shareUrl);
         } else {
           const emailPayload = {
             from: 'Health Vault <team@healthvault27.com>',
