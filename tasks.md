@@ -8,6 +8,18 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ---
 
+# ChatGPT App MVP
+
+- [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
+- [x] Interactive dashboard widget with live summary, next appointment, and onboarding checklist.
+- [x] Read-only detail tools for conditions, medications, allergies, and recent records.
+- [~] Updated `health-vault-mcp` deployed as version 6; verify the widget and new tool discovery in an authenticated ChatGPT conversation.
+- [ ] Test RLS isolation with a second Health Vault account before broader distribution.
+- [ ] Add first-run empty states and guided deep links for users who have not completed Health Vault onboarding.
+- [ ] Audit Edge Functions for asymmetric JWT verification, rotate the Supabase signing key, then re-enable OIDC in the ChatGPT app.
+
+---
+
 # Mobile App
 
 ## 0. Current state (read first)

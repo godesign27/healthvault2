@@ -7,6 +7,14 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-08-21 (ChatGPT app MVP)
+
+- **supabase + web** — Extended the authenticated `health-vault-mcp` server with an Apps SDK dashboard resource. `get_health_summary` now returns an interactive Health Vault card with live counts, next appointment, and a PRD-aligned onboarding checklist; the card links to the full web app for edits.
+- **supabase** — Added four read-only, RLS-scoped MCP tools: `list_conditions`, `list_medications`, `list_allergies`, and `list_health_records`. No mutation or service-role access was added.
+- **infra** — Local MCP typecheck/build and full Vite production build pass. Deployed only `health-vault-mcp` as version 6 with its existing self-validated OAuth configuration (`verify_jwt: false`); public metadata responds and unauthenticated MCP requests correctly return 401. Authenticated ChatGPT widget verification remains pending.
+
+---
+
 ## 2026-06-06 (session 4 — autonomous fixes)
 
 - **supabase** — Fixed siloed insurance models. Created migration `20260606000001_backfill_insurance_policies_to_coverages.sql` that copies existing `insurance_policies` rows into `insurance_coverages` (find-or-create `insurance_providers` by name). Updated `OnboardingInsurancePage` to write directly to `insurance_coverages` going forward; still writes to `insurance_policies` (non-blocking) for backward compatibility / card image storage. Deploy migration: `npx supabase db push`.
