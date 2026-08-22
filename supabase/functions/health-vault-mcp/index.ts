@@ -22,6 +22,58 @@ import { getHealthSummary as getSharedHealthSummary } from "../../../packages/he
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/health-vault-mcp`;
+const PROFILE_PHOTO_PATH = "/storage/v1/object/public/profile-images/";
+const profilePhotoCache = new Map<string, string>();
+
+async function getProfilePhotoDataUrl(photoUrl: unknown): Promise<string | null> {
+  if (typeof photoUrl !== "string" || !photoUrl) return null;
+
+  let source: URL;
+  try {
+    source = new URL(photoUrl);
+  } catch {
+    return null;
+  }
+
+  const allowedOrigin = new URL(SUPABASE_URL).origin;
+  if (source.origin !== allowedOrigin || !source.pathname.startsWith(PROFILE_PHOTO_PATH)) return null;
+
+  const cached = profilePhotoCache.get(photoUrl);
+  if (cached) return cached;
+
+  source.pathname = source.pathname.replace(
+    "/storage/v1/object/public/",
+    "/storage/v1/render/image/public/",
+  );
+  source.searchParams.set("width", "128");
+  source.searchParams.set("height", "128");
+  source.searchParams.set("resize", "cover");
+  source.searchParams.set("quality", "70");
+
+  try {
+    const response = await fetch(source, { signal: AbortSignal.timeout(4_000) });
+    const contentType = response.headers.get("content-type")?.split(";", 1)[0] ?? "";
+    if (!response.ok || !contentType.startsWith("image/")) return null;
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (!bytes.length || bytes.length > 100_000) return null;
+
+    let binary = "";
+    for (let index = 0; index < bytes.length; index += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+    }
+    const dataUrl = `data:${contentType};base64,${btoa(binary)}`;
+    profilePhotoCache.set(photoUrl, dataUrl);
+    return dataUrl;
+  } catch {
+    return null;
+  }
+}
+
+async function dashboardMetadata(summary: { profile?: { photoUrl?: unknown } | null }) {
+  const profilePhotoDataUrl = await getProfilePhotoDataUrl(summary.profile?.photoUrl);
+  return profilePhotoDataUrl ? { profilePhotoDataUrl } : {};
+}
 
 function jsonResponse(body: unknown, status = 200, headers?: HeadersInit): Response {
   return new Response(JSON.stringify(body), {
@@ -187,6 +239,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         return {
           structuredContent: { summary },
           content: [{ type: "text", text: "The current Health Vault dashboard is displayed in the widget." }],
+          _meta: await dashboardMetadata(summary),
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to read health summary";
@@ -296,6 +349,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         return {
           structuredContent: { appointment, summary },
           content: [{ type: "text", text: "The appointment was saved and the refreshed Health Vault dashboard is displayed in the widget." }],
+          _meta: await dashboardMetadata(summary),
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to add appointment";

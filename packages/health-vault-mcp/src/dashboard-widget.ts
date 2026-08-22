@@ -13,6 +13,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .hero { display: flex; align-items: center; gap: 14px; padding: 22px 20px; color: white; background: #17213a; border-bottom: 3px solid #0b8063; }
     .avatar { width: 58px; height: 58px; flex: 0 0 58px; border: 2px solid rgba(255,255,255,.32); border-radius: 12px; object-fit: cover; background: #24304f; }
     .avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 750; color: #fff; }
+    .avatar[hidden] { display: none; }
     .hero-copy { min-width: 0; }
     .eyebrow { margin: 0 0 7px; font-size: 11px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; color: #9ee3cf; }
     h1 { margin: 0; font-size: 24px; letter-spacing: -.025em; line-height: 1.2; }
@@ -102,10 +103,17 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const details = summary.details ?? {};
       const profile = summary.profile ?? {};
       const privateProfile = profile.private ?? {};
+      const responseMetadata = window.openai?.toolResponseMetadata ?? {};
+      const hiddenMetadata = responseMetadata?.mcp_tool_result?._meta
+        ?? responseMetadata?.call_tool_result?._meta
+        ?? responseMetadata?._meta
+        ?? {};
+      const profilePhotoSource = hiddenMetadata.profilePhotoDataUrl || profile.photoUrl;
       const formatDate = (value) => value ? new Date(value + (String(value).length === 10 ? 'T00:00:00' : '')).toLocaleDateString() : '';
       const initials = String(summary.patientName || 'Health Vault').split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
-      const avatarHtml = profile.photoUrl
-        ? '<img class="avatar" src="' + esc(profile.photoUrl) + '" alt="Profile photo">'
+      const avatarHtml = profilePhotoSource
+        ? '<img id="profile-photo" class="avatar" src="' + esc(profilePhotoSource) + '" alt="Profile photo">'
+          + '<div id="profile-photo-fallback" class="avatar avatar-fallback" aria-hidden="true" hidden>' + esc(initials) + '</div>'
         : '<div class="avatar avatar-fallback" aria-hidden="true">' + esc(initials) + '</div>';
       const publicMeta = [
         profile.location ? '<span>' + esc(profile.location) + '</span>' : '',
@@ -172,6 +180,11 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
+      document.getElementById('profile-photo')?.addEventListener('error', (event) => {
+        event.currentTarget.hidden = true;
+        const fallback = document.getElementById('profile-photo-fallback');
+        if (fallback) fallback.hidden = false;
+      }, { once: true });
       document.getElementById('toggle-medical-id')?.addEventListener('click', (event) => {
         const button = event.currentTarget;
         const panel = document.getElementById('private-profile');
@@ -180,7 +193,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         button.setAttribute('aria-expanded', String(!expanded));
         button.textContent = expanded ? 'Show Medical ID' : 'Hide Medical ID';
       });
-      document.querySelectorAll('.view-more').forEach((button) => {
+      document.querySelectorAll('.view-more[data-target]').forEach((button) => {
         button.addEventListener('click', () => {
           const target = button.dataset.target;
           const expanded = button.getAttribute('aria-expanded') === 'true';
