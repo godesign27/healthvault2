@@ -37,7 +37,7 @@ export function MarketingHeader({
   ];
 
   const viewButtons = [
-    { id: 'health-vault', label: 'Health Vault', icon: Eye },
+    { id: 'health-vault', label: 'Dashboard', icon: Eye },
     { id: 'marketing', label: 'Marketing', icon: Globe },
   ];
 

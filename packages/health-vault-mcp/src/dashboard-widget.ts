@@ -35,25 +35,31 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .change-banner strong { display: block; margin-bottom: 2px; }
     .detail-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
     .detail-toolbar h2 { margin: 0; }
-    .collapse-all { width: auto; padding: 6px 0; border-radius: 0; color: #096b55; background: transparent; font-size: 12px; }
-    .collapse-all:hover { color: #064c3d; background: transparent; }
+    .collapse-all { width: auto; padding: 6px 0; border-radius: 0; color: #2563eb; background: transparent; font-size: 12px; }
+    .collapse-all:hover { color: #1d4ed8; background: transparent; text-decoration: underline; }
     .detail-section { padding: 0; border-top: 1px solid #eceae8; }
-    .detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 0 10px; border-radius: 0; color: inherit; background: transparent; text-align: left; }
-    .detail-heading:hover { color: #096b55; background: transparent; }
+    summary { list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    .detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 0 10px; color: inherit; cursor: pointer; text-align: left; }
+    .detail-heading:hover { color: #2563eb; }
     .detail-heading:focus-visible { outline: 2px solid #0b8063; outline-offset: 3px; }
     .detail-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .detail-title h3 { margin: 0; font-size: 14px; font-weight: 750; }
-    .detail-chevron { width: 16px; flex: 0 0 16px; color: #78716c; font-size: 16px; line-height: 1; text-align: center; }
+    .detail-chevron { width: 16px; flex: 0 0 16px; color: #2563eb; font-size: 16px; line-height: 1; text-align: center; }
+    .detail-chevron::before { content: '↓'; }
+    details[open] > .detail-heading .detail-chevron::before { content: '↑'; }
     .detail-count { color: #78716c; font-size: 11px; }
-    .detail-panel[hidden] { display: none; }
     .detail-list { display: grid; padding: 6px 0 4px; }
     .detail-item { padding: 10px 0; border-bottom: 1px solid #eceeef; font-size: 13px; line-height: 1.45; }
     .detail-item:last-child { border-bottom: 0; }
     .detail-item strong { display: block; }
     .detail-item[hidden] { display: none; }
     .meta { color: #68635f; font-size: 12px; }
-    .view-more { width: auto; margin: 2px 0 8px; padding: 5px 0; border-radius: 0; color: #096b55; background: transparent; font-size: 12px; text-align: left; }
-    .view-more:hover { color: #064c3d; background: transparent; }
+    .view-more { width: auto; margin: 2px 0 8px; padding: 5px 0; border-radius: 0; color: #2563eb; background: transparent; font-size: 12px; text-align: left; cursor: pointer; }
+    .view-more:hover { color: #1d4ed8; background: transparent; text-decoration: underline; }
+    .view-more-details .less-label, .medical-id-disclosure .less-label { display: none; }
+    .view-more-details[open] .more-label, .medical-id-disclosure[open] .more-label { display: none; }
+    .view-more-details[open] .less-label, .medical-id-disclosure[open] .less-label { display: inline; }
     .medical-id { margin-top: 10px; padding: 12px 14px; border: 1px solid #eceae8; border-radius: 8px; background: #fbfbfa; }
     .medical-id-note { margin: 0; color: #68635f; font-size: 11px; line-height: 1.45; }
     .medical-id-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 18px; margin-top: 8px; }
@@ -77,8 +83,8 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .label, .meta { color: #9ea6aa; }
       .row, .detail-section, .detail-item { border-color: #343a3e; }
       .detail-count { color: #9ea6aa; }
-      .collapse-all, .detail-heading:hover { color: #75d8ba; background: transparent; }
-      .collapse-all:hover { color: #a2ead5; background: transparent; }
+      .collapse-all, .detail-heading:hover, .detail-chevron, .view-more { color: #8ab4ff; background: transparent; }
+      .collapse-all:hover, .view-more:hover { color: #b8d1ff; background: transparent; }
       .view-more { color: #75d8ba; background: transparent; }
       .view-more:hover { color: #a2ead5; background: transparent; }
       .medical-id { background: #191e21; border-color: #343a3e; }
@@ -105,7 +111,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const incomplete = window.openai?.toolOutput?.summary?.onboarding?.complete === false;
       const href = incomplete
         ? 'https://healthvault27.com/?app=onboarding&source=chatgpt'
-        : 'https://healthvault27.com/dashboard?source=chatgpt';
+        : 'https://healthvault27.com/?app=dashboard&source=chatgpt';
       if (window.openai?.openExternal) window.openai.openExternal({ href });
       else window.open(href, '_blank', 'noopener,noreferrer');
     };
@@ -122,7 +128,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const hiddenMetadata = responseMetadata?.mcp_tool_result?._meta
         ?? responseMetadata?.call_tool_result?._meta
         ?? responseMetadata?._meta
-        ?? {};
+        ?? responseMetadata;
       const profilePhotoSource = hiddenMetadata.profilePhotoDataUrl || profile.photoUrl;
       const formatDate = (value) => value ? new Date(value + (String(value).length === 10 ? 'T00:00:00' : '')).toLocaleDateString() : '';
       const initials = String(summary.patientName || 'Health Vault').split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
@@ -136,17 +142,19 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       ].filter(Boolean).join('');
       const detailSection = (id, title, rows, primary, secondary) => {
         const previewLimit = 3;
+        const item = (row) => '<div class="detail-item"><strong>' + esc(primary(row)) + '</strong>'
+          + (secondary(row) ? '<span class="meta">' + esc(secondary(row)) + '</span>' : '') + '</div>';
         const items = rows.length
-          ? rows.map((row, index) => '<div class="detail-item"' + (index >= previewLimit ? ' hidden data-extra="' + id + '"' : '') + '><strong>' + esc(primary(row)) + '</strong>'
-            + (secondary(row) ? '<span class="meta">' + esc(secondary(row)) + '</span>' : '') + '</div>').join('')
+          ? rows.slice(0, previewLimit).map(item).join('')
           : '<div class="detail-item meta">Nothing recorded yet.</div>';
         const remaining = Math.max(0, rows.length - previewLimit);
         const control = remaining
-          ? '<button class="view-more" data-target="' + id + '" data-remaining="' + remaining + '" aria-expanded="false">View ' + remaining + ' more</button>'
+          ? '<details class="view-more-details"><summary class="view-more"><span class="more-label">View ' + remaining + ' more</span><span class="less-label">Show less</span></summary>'
+            + rows.slice(previewLimit).map(item).join('') + '</details>'
           : '';
-        return '<section class="detail-section"><button class="detail-heading" data-detail-toggle="' + id + '" aria-controls="detail-panel-' + id + '" aria-expanded="true">'
-          + '<span class="detail-title"><span class="detail-chevron" aria-hidden="true">↑</span><h3>' + esc(title) + '</h3></span><span class="detail-count">' + rows.length + ' recorded</span></button>'
-          + '<div id="detail-panel-' + id + '" class="detail-panel"><div class="detail-list">' + items + '</div>' + control + '</div></section>';
+        return '<details class="detail-section" data-detail-section open><summary class="detail-heading">'
+          + '<span class="detail-title"><span class="detail-chevron" aria-hidden="true"></span><h3>' + esc(title) + '</h3></span><span class="detail-count">' + rows.length + ' recorded</span></summary>'
+          + '<div class="detail-panel"><div class="detail-list">' + items + '</div>' + control + '</div></details>';
       };
       const conditionHtml = detailSection('conditions', 'Active conditions', details.conditions ?? [], (r) => r.name || 'Condition', (r) => [r.notes, r.managing_physician ? 'Managed by ' + r.managing_physician : '', formatDate(r.diagnosed_on)].filter(Boolean).join(' · '));
       const medicationHtml = detailSection('medications', 'Medications', details.medications ?? [], (r) => r.name || 'Medication', (r) => [r.dosage, r.frequency, r.prescribed_by ? 'Prescribed by ' + r.prescribed_by : ''].filter(Boolean).join(' · '));
@@ -192,8 +200,8 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<section class="section"><div class="detail-toolbar"><h2>Your health details</h2><button id="toggle-all-details" class="collapse-all">Collapse all</button></div>'
         + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'
         + '<section class="section"><h2>Medical ID</h2><div class="medical-id"><p class="medical-id-note">Private details stay concealed until you choose to show them. Check your surroundings before revealing.</p>'
-        + '<div id="private-profile" class="medical-id-grid" hidden>' + privateHtml + '</div>'
-        + '<div class="medical-id-actions"><button id="toggle-medical-id" class="view-more" aria-expanded="false">Show Medical ID</button></div></div></section>'
+        + '<details class="medical-id-disclosure"><summary class="view-more"><span class="more-label">Show Medical ID</span><span class="less-label">Hide Medical ID</span></summary>'
+        + '<div class="medical-id-grid">' + privateHtml + '</div></details></div></section>'
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
@@ -202,48 +210,20 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         const fallback = document.getElementById('profile-photo-fallback');
         if (fallback) fallback.hidden = false;
       }, { once: true });
-      document.getElementById('toggle-medical-id')?.addEventListener('click', (event) => {
-        const button = event.currentTarget;
-        const panel = document.getElementById('private-profile');
-        const expanded = button.getAttribute('aria-expanded') === 'true';
-        panel.hidden = expanded;
-        button.setAttribute('aria-expanded', String(!expanded));
-        button.textContent = expanded ? 'Show Medical ID' : 'Hide Medical ID';
-      });
-      const setDetailExpanded = (button, expanded) => {
-        const panel = document.getElementById('detail-panel-' + button.dataset.detailToggle);
-        if (!panel) return;
-        panel.hidden = !expanded;
-        button.setAttribute('aria-expanded', String(expanded));
-        const chevron = button.querySelector('.detail-chevron');
-        if (chevron) chevron.textContent = expanded ? '↑' : '↓';
-      };
       const syncAllDetailsLabel = () => {
-        const buttons = [...document.querySelectorAll('[data-detail-toggle]')];
-        const allExpanded = buttons.every((button) => button.getAttribute('aria-expanded') === 'true');
+        const sections = [...document.querySelectorAll('[data-detail-section]')];
+        const allExpanded = sections.every((section) => section.open);
         const control = document.getElementById('toggle-all-details');
         if (control) control.textContent = allExpanded ? 'Collapse all' : 'Expand all';
       };
-      document.querySelectorAll('[data-detail-toggle]').forEach((button) => {
-        button.addEventListener('click', () => {
-          setDetailExpanded(button, button.getAttribute('aria-expanded') !== 'true');
-          syncAllDetailsLabel();
-        });
+      document.querySelectorAll('[data-detail-section]').forEach((section) => {
+        section.addEventListener('toggle', syncAllDetailsLabel);
       });
       document.getElementById('toggle-all-details')?.addEventListener('click', () => {
-        const buttons = [...document.querySelectorAll('[data-detail-toggle]')];
-        const shouldExpand = !buttons.every((button) => button.getAttribute('aria-expanded') === 'true');
-        buttons.forEach((button) => setDetailExpanded(button, shouldExpand));
+        const sections = [...document.querySelectorAll('[data-detail-section]')];
+        const shouldExpand = !sections.every((section) => section.open);
+        sections.forEach((section) => { section.open = shouldExpand; });
         syncAllDetailsLabel();
-      });
-      document.querySelectorAll('.view-more[data-target]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const target = button.dataset.target;
-          const expanded = button.getAttribute('aria-expanded') === 'true';
-          document.querySelectorAll('[data-extra="' + target + '"]').forEach((item) => { item.hidden = expanded; });
-          button.setAttribute('aria-expanded', String(!expanded));
-          button.textContent = expanded ? 'View ' + button.dataset.remaining + ' more' : 'Show less';
-        });
       });
     }
     window.addEventListener('openai:set_globals', render);

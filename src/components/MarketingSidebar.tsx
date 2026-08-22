@@ -93,7 +93,7 @@ export function MarketingSidebar({ currentPage, onPageChange, onViewChange, onCl
                   ? 'border-stroke-default hover:bg-surface-sunken'
                   : 'border-stroke-subtle hover:bg-surface-sunken'
               }`}
-              title="Health Vault"
+              title="Dashboard"
             >
               <Eye className={`w-4 h-4 ${
                 darkMode ? 'text-content-secondary' : 'text-content-secondary'

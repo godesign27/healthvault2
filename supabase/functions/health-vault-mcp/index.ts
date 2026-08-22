@@ -59,15 +59,6 @@ async function getProfilePhotoDataUrl(photoUrl: unknown): Promise<string | null>
   const cached = profilePhotoCache.get(photoUrl);
   if (cached) return cached;
 
-  source.pathname = source.pathname.replace(
-    "/storage/v1/object/public/",
-    "/storage/v1/render/image/public/",
-  );
-  source.searchParams.set("width", "128");
-  source.searchParams.set("height", "128");
-  source.searchParams.set("resize", "cover");
-  source.searchParams.set("quality", "70");
-
   try {
     const response = await fetch(source, { signal: AbortSignal.timeout(4_000) });
     const contentType = response.headers.get("content-type")?.split(";", 1)[0] ?? "";
