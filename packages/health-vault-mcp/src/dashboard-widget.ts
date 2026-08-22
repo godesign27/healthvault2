@@ -33,10 +33,19 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .appointment { padding: 13px 14px; border-left: 3px solid #0b8063; border-radius: 8px; background: #edf6f2; color: #145846; font-size: 13px; line-height: 1.5; }
     .change-banner { margin: 16px 18px 0; padding: 12px 14px; border: 1px solid #a7e1cf; border-radius: 8px; background: #edf9f5; color: #145846; font-size: 12px; line-height: 1.45; }
     .change-banner strong { display: block; margin-bottom: 2px; }
-    .detail-section { padding: 14px 0 4px; border-top: 1px solid #eceae8; }
-    .detail-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .detail-heading h3 { margin: 0; font-size: 14px; font-weight: 750; }
+    .detail-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
+    .detail-toolbar h2 { margin: 0; }
+    .collapse-all { width: auto; padding: 6px 0; border-radius: 0; color: #096b55; background: transparent; font-size: 12px; }
+    .collapse-all:hover { color: #064c3d; background: transparent; }
+    .detail-section { padding: 0; border-top: 1px solid #eceae8; }
+    .detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 0 10px; border-radius: 0; color: inherit; background: transparent; text-align: left; }
+    .detail-heading:hover { color: #096b55; background: transparent; }
+    .detail-heading:focus-visible { outline: 2px solid #0b8063; outline-offset: 3px; }
+    .detail-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .detail-title h3 { margin: 0; font-size: 14px; font-weight: 750; }
+    .detail-chevron { width: 16px; flex: 0 0 16px; color: #78716c; font-size: 16px; line-height: 1; text-align: center; }
     .detail-count { color: #78716c; font-size: 11px; }
+    .detail-panel[hidden] { display: none; }
     .detail-list { display: grid; padding: 6px 0 4px; }
     .detail-item { padding: 10px 0; border-bottom: 1px solid #eceeef; font-size: 13px; line-height: 1.45; }
     .detail-item:last-child { border-bottom: 0; }
@@ -68,6 +77,8 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .label, .meta { color: #9ea6aa; }
       .row, .detail-section, .detail-item { border-color: #343a3e; }
       .detail-count { color: #9ea6aa; }
+      .collapse-all, .detail-heading:hover { color: #75d8ba; background: transparent; }
+      .collapse-all:hover { color: #a2ead5; background: transparent; }
       .view-more { color: #75d8ba; background: transparent; }
       .view-more:hover { color: #a2ead5; background: transparent; }
       .medical-id { background: #191e21; border-color: #343a3e; }
@@ -133,8 +144,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         const control = remaining
           ? '<button class="view-more" data-target="' + id + '" data-remaining="' + remaining + '" aria-expanded="false">View ' + remaining + ' more</button>'
           : '';
-        return '<section class="detail-section"><div class="detail-heading"><h3>' + esc(title) + '</h3><span class="detail-count">' + rows.length + ' recorded</span></div>'
-          + '<div class="detail-list">' + items + '</div>' + control + '</section>';
+        return '<section class="detail-section"><button class="detail-heading" data-detail-toggle="' + id + '" aria-controls="detail-panel-' + id + '" aria-expanded="true">'
+          + '<span class="detail-title"><span class="detail-chevron" aria-hidden="true">↑</span><h3>' + esc(title) + '</h3></span><span class="detail-count">' + rows.length + ' recorded</span></button>'
+          + '<div id="detail-panel-' + id + '" class="detail-panel"><div class="detail-list">' + items + '</div>' + control + '</div></section>';
       };
       const conditionHtml = detailSection('conditions', 'Active conditions', details.conditions ?? [], (r) => r.name || 'Condition', (r) => [r.notes, r.managing_physician ? 'Managed by ' + r.managing_physician : '', formatDate(r.diagnosed_on)].filter(Boolean).join(' · '));
       const medicationHtml = detailSection('medications', 'Medications', details.medications ?? [], (r) => r.name || 'Medication', (r) => [r.dosage, r.frequency, r.prescribed_by ? 'Prescribed by ' + r.prescribed_by : ''].filter(Boolean).join(' · '));
@@ -177,7 +189,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<div class="stat"><span class="value">' + esc(summary.healthRecords) + '</span><span class="label">Health records</span></div></section>'
         + (recentChange ? '<div class="change-banner" role="status"><strong>' + esc(recentChange.title || 'Health Vault updated') + '</strong>' + esc(recentChange.message || 'Your dashboard now reflects the confirmed change.') + '</div>' : '')
         + '<section class="section"><h2>Next appointment</h2><div class="appointment">' + appointmentHtml + '</div></section>'
-        + '<section class="section"><h2>Your health details</h2>'
+        + '<section class="section"><div class="detail-toolbar"><h2>Your health details</h2><button id="toggle-all-details" class="collapse-all">Collapse all</button></div>'
         + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'
         + '<section class="section"><h2>Medical ID</h2><div class="medical-id"><p class="medical-id-note">Private details stay concealed until you choose to show them. Check your surroundings before revealing.</p>'
         + '<div id="private-profile" class="medical-id-grid" hidden>' + privateHtml + '</div>'
@@ -197,6 +209,32 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         panel.hidden = expanded;
         button.setAttribute('aria-expanded', String(!expanded));
         button.textContent = expanded ? 'Show Medical ID' : 'Hide Medical ID';
+      });
+      const setDetailExpanded = (button, expanded) => {
+        const panel = document.getElementById('detail-panel-' + button.dataset.detailToggle);
+        if (!panel) return;
+        panel.hidden = !expanded;
+        button.setAttribute('aria-expanded', String(expanded));
+        const chevron = button.querySelector('.detail-chevron');
+        if (chevron) chevron.textContent = expanded ? '↑' : '↓';
+      };
+      const syncAllDetailsLabel = () => {
+        const buttons = [...document.querySelectorAll('[data-detail-toggle]')];
+        const allExpanded = buttons.every((button) => button.getAttribute('aria-expanded') === 'true');
+        const control = document.getElementById('toggle-all-details');
+        if (control) control.textContent = allExpanded ? 'Collapse all' : 'Expand all';
+      };
+      document.querySelectorAll('[data-detail-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+          setDetailExpanded(button, button.getAttribute('aria-expanded') !== 'true');
+          syncAllDetailsLabel();
+        });
+      });
+      document.getElementById('toggle-all-details')?.addEventListener('click', () => {
+        const buttons = [...document.querySelectorAll('[data-detail-toggle]')];
+        const shouldExpand = !buttons.every((button) => button.getAttribute('aria-expanded') === 'true');
+        buttons.forEach((button) => setDetailExpanded(button, shouldExpand));
+        syncAllDetailsLabel();
       });
       document.querySelectorAll('.view-more[data-target]').forEach((button) => {
         button.addEventListener('click', () => {
