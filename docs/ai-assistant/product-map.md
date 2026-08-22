@@ -127,6 +127,14 @@ This document maps each product area in the HealthVault portal, describing its p
 - Can guide adding new conditions through the conversational flow
 - Never invent or assume medical conditions
 
+### GPT Medical ID presentation
+
+The GPT dashboard may show the user's profile photo, name, verification state, and coarse city/state context. Direct identifiers and medical identity fields—date of birth, email, phone, street address, blood type, organ-donor status, and emergency contact—must remain concealed until the user explicitly selects **Show Medical ID**. This reveal is a presentation-privacy control for in-person use, not an authorization boundary.
+
+### Planned provider-sharing flow
+
+The next GPT sharing increment should let the user select individual record categories or documents, preview the exact disclosure, identify the recipient, and explicitly confirm before sending. The resulting share must use a time-limited secure link, appear in the user's audit history, support revocation, and avoid returning raw share tokens in model-visible text. A later clinician presentation mode should use large, readable fields and automatically conceal sensitive details after a short timeout.
+
 ---
 
 ## Care Management

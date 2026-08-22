@@ -10,10 +10,15 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     * { box-sizing: border-box; }
     body { margin: 0; padding: 12px; color: #202528; background: transparent; }
     .card { border: 1px solid #e5e7e8; border-radius: 14px; background: #fff; overflow: hidden; box-shadow: 0 8px 28px rgba(28,37,44,.05); }
-    .hero { padding: 22px 20px; color: white; background: #17213a; border-bottom: 3px solid #0b8063; }
+    .hero { display: flex; align-items: center; gap: 14px; padding: 22px 20px; color: white; background: #17213a; border-bottom: 3px solid #0b8063; }
+    .avatar { width: 58px; height: 58px; flex: 0 0 58px; border: 2px solid rgba(255,255,255,.32); border-radius: 12px; object-fit: cover; background: #24304f; }
+    .avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 750; color: #fff; }
+    .hero-copy { min-width: 0; }
     .eyebrow { margin: 0 0 7px; font-size: 11px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; color: #9ee3cf; }
     h1 { margin: 0; font-size: 24px; letter-spacing: -.025em; line-height: 1.2; }
     .subtitle { margin: 7px 0 0; max-width: 52ch; font-size: 13px; line-height: 1.5; color: #cbd3e0; }
+    .profile-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; color: #b9c4d5; font-size: 11px; }
+    .verified { color: #9ee3cf; }
     .stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-bottom: 1px solid #e5e7e8; }
     .stat { padding: 16px; border-right: 1px solid #e5e7e8; background: #fbfcfc; }
     .stat:last-child { border-right: 0; }
@@ -37,6 +42,13 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .meta { color: #68635f; font-size: 12px; }
     .view-more { width: auto; margin: 2px 0 8px; padding: 5px 0; border-radius: 0; color: #096b55; background: transparent; font-size: 12px; text-align: left; }
     .view-more:hover { color: #064c3d; background: transparent; }
+    .medical-id { margin-top: 10px; padding: 12px 14px; border: 1px solid #eceae8; border-radius: 8px; background: #fbfbfa; }
+    .medical-id-note { margin: 0; color: #68635f; font-size: 11px; line-height: 1.45; }
+    .medical-id-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 18px; margin-top: 8px; }
+    .private-detail { padding: 9px 0; border-top: 1px solid #eceae8; font-size: 12px; }
+    .private-detail span { display: block; color: #78716c; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .private-detail strong { display: block; margin-top: 2px; overflow-wrap: anywhere; }
+    .medical-id-actions { display: flex; justify-content: flex-start; }
     .actions { display: flex; gap: 10px; padding: 16px 18px 18px; }
     button { width: 100%; border: 0; border-radius: 8px; padding: 12px 14px; cursor: pointer; font: inherit; font-weight: 700; color: white; background: #17213a; transition: background .18s ease, transform .12s ease; }
     button:hover { background: #24304f; }
@@ -55,6 +67,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .detail-count { color: #9ea6aa; }
       .view-more { color: #75d8ba; background: transparent; }
       .view-more:hover { color: #a2ead5; background: transparent; }
+      .medical-id { background: #191e21; border-color: #343a3e; }
+      .medical-id-note, .private-detail span { color: #9ea6aa; }
+      .private-detail { border-color: #343a3e; }
       .appointment { background: #163b32; color: #c7f2e4; border-left-color: #30b792; }
       button { color: #17213a; background: #f2f4f5; }
       button:hover { background: #dfe4e7; }
@@ -63,6 +78,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
       .stat:nth-child(2) { border-right: 0; }
       .stat:nth-child(-n+2) { border-bottom: 1px solid #e5e7e8; }
+      .medical-id-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -84,7 +100,17 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const appointment = summary.nextAppointment;
       const checklist = summary.onboarding?.checklist ?? [];
       const details = summary.details ?? {};
+      const profile = summary.profile ?? {};
+      const privateProfile = profile.private ?? {};
       const formatDate = (value) => value ? new Date(value + (String(value).length === 10 ? 'T00:00:00' : '')).toLocaleDateString() : '';
+      const initials = String(summary.patientName || 'Health Vault').split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
+      const avatarHtml = profile.photoUrl
+        ? '<img class="avatar" src="' + esc(profile.photoUrl) + '" alt="Profile photo">'
+        : '<div class="avatar avatar-fallback" aria-hidden="true">' + esc(initials) + '</div>';
+      const publicMeta = [
+        profile.location ? '<span>' + esc(profile.location) + '</span>' : '',
+        profile.identityVerified ? '<span class="verified">Identity verified</span>' : '',
+      ].filter(Boolean).join('');
       const detailSection = (id, title, rows, primary, secondary) => {
         const previewLimit = 3;
         const items = rows.length
@@ -113,10 +139,25 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + (item.complete ? '' : 'todo') + '">' + (item.complete ? 'Complete' : (item.optional ? 'Optional' : 'Needs attention'))
         + '</span></div>'
       ).join('');
+      const privateRows = [
+        ['Date of birth', formatDate(privateProfile.dateOfBirth)],
+        ['Email', privateProfile.email],
+        ['Phone', privateProfile.phone],
+        ['Address', privateProfile.address],
+        ['Blood type', privateProfile.bloodType],
+        ['Organ donor', privateProfile.organDonor === true ? 'Yes' : privateProfile.organDonor === false ? 'No' : null],
+        ['Emergency contact', privateProfile.emergencyContact
+          ? [privateProfile.emergencyContact.name, privateProfile.emergencyContact.relationship, privateProfile.emergencyContact.phone].filter(Boolean).join(' · ')
+          : null],
+      ].filter((entry) => entry[1]);
+      const privateHtml = privateRows.length
+        ? privateRows.map(([label, value]) => '<div class="private-detail"><span>' + esc(label) + '</span><strong>' + esc(value) + '</strong></div>').join('')
+        : '<div class="private-detail meta">No Medical ID details are on file.</div>';
       document.getElementById('app').innerHTML =
-        '<header class="hero"><p class="eyebrow">Health Vault</p><h1>'
+        '<header class="hero">' + avatarHtml + '<div class="hero-copy"><p class="eyebrow">Health Vault</p><h1>'
         + esc(summary.patientName || 'Your health dashboard')
-        + '</h1><p class="subtitle">A private overview from your connected Health Vault account.</p></header>'
+        + '</h1><p class="subtitle">A private overview from your connected Health Vault account.</p>'
+        + (publicMeta ? '<div class="profile-meta">' + publicMeta + '</div>' : '') + '</div></header>'
         + '<section class="stats" aria-label="Health summary">'
         + '<div class="stat"><span class="value">' + esc(summary.activeConditions) + '</span><span class="label">Active conditions</span></div>'
         + '<div class="stat"><span class="value">' + esc(summary.activeMedications) + '</span><span class="label">Active medications</span></div>'
@@ -125,9 +166,20 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<section class="section"><h2>Next appointment</h2><div class="appointment">' + appointmentHtml + '</div></section>'
         + '<section class="section"><h2>Your health details</h2>'
         + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'
+        + '<section class="section"><h2>Medical ID</h2><div class="medical-id"><p class="medical-id-note">Private details stay concealed until you choose to show them. Check your surroundings before revealing.</p>'
+        + '<div id="private-profile" class="medical-id-grid" hidden>' + privateHtml + '</div>'
+        + '<div class="medical-id-actions"><button id="toggle-medical-id" class="view-more" aria-expanded="false">Show Medical ID</button></div></div></section>'
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
+      document.getElementById('toggle-medical-id')?.addEventListener('click', (event) => {
+        const button = event.currentTarget;
+        const panel = document.getElementById('private-profile');
+        const expanded = button.getAttribute('aria-expanded') === 'true';
+        panel.hidden = expanded;
+        button.setAttribute('aria-expanded', String(!expanded));
+        button.textContent = expanded ? 'Show Medical ID' : 'Hide Medical ID';
+      });
       document.querySelectorAll('.view-more').forEach((button) => {
         button.addEventListener('click', () => {
           const target = button.dataset.target;

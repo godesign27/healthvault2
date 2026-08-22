@@ -16,11 +16,15 @@ export async function getHealthSummary(supabase: SupabaseClient) {
   const today = new Date().toISOString().slice(0, 10);
   const now = new Date().toISOString();
 
-  const [profile, conditions, medications, allergies, records, appointments, coverages, preferences] =
+  const [profile, patientProfile, conditions, medications, allergies, records, appointments, coverages, preferences] =
     await Promise.all([
       supabase
         .from("user_profiles")
-        .select("first_name, last_name, email_verified, identity_verified, onboarding_complete")
+        .select("first_name, last_name, profile_photo_url, email, phone, date_of_birth, address_line1, address_line2, city, state, postal_code, email_verified, identity_verified, onboarding_complete")
+        .maybeSingle(),
+      supabase
+        .from("patient_profiles")
+        .select("blood_type, organ_donor, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship")
         .maybeSingle(),
       supabase
         .from("conditions")
@@ -56,9 +60,25 @@ export async function getHealthSummary(supabase: SupabaseClient) {
   const profileRow = profile.data as {
     first_name?: string;
     last_name?: string;
+    profile_photo_url?: string;
+    email?: string;
+    phone?: string;
+    date_of_birth?: string;
+    address_line1?: string;
+    address_line2?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
     email_verified?: boolean;
     identity_verified?: boolean;
     onboarding_complete?: boolean;
+  } | null;
+  const patientProfileRow = patientProfile.data as {
+    blood_type?: string;
+    organ_donor?: boolean;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+    emergency_contact_relationship?: string;
   } | null;
   const appointmentRows = (appointments.data ?? []) as Array<{
     provider_name: string | null;
@@ -102,6 +122,30 @@ export async function getHealthSummary(supabase: SupabaseClient) {
   return {
     patientName:
       [profileRow?.first_name, profileRow?.last_name].filter(Boolean).join(" ") || null,
+    profile: {
+      photoUrl: profileRow?.profile_photo_url || null,
+      location: [profileRow?.city, profileRow?.state].filter(Boolean).join(", ") || null,
+      identityVerified: Boolean(profileRow?.identity_verified),
+      private: {
+        dateOfBirth: profileRow?.date_of_birth || null,
+        email: profileRow?.email || null,
+        phone: profileRow?.phone || null,
+        address: [
+          profileRow?.address_line1,
+          profileRow?.address_line2,
+          [profileRow?.city, profileRow?.state, profileRow?.postal_code].filter(Boolean).join(" "),
+        ].filter(Boolean).join(", ") || null,
+        bloodType: patientProfileRow?.blood_type || null,
+        organDonor: typeof patientProfileRow?.organ_donor === "boolean" ? patientProfileRow.organ_donor : null,
+        emergencyContact: patientProfileRow?.emergency_contact_name
+          ? {
+              name: patientProfileRow.emergency_contact_name,
+              relationship: patientProfileRow.emergency_contact_relationship || null,
+              phone: patientProfileRow.emergency_contact_phone || null,
+            }
+          : null,
+      },
+    },
     activeConditions: conditions.count ?? 0,
     activeMedications,
     allergies: allergies.count ?? 0,
