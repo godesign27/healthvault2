@@ -8,6 +8,10 @@ import {
   DASHBOARD_WIDGET_URI,
 } from "../../../packages/health-vault-mcp/src/dashboard-widget.ts";
 import {
+  SHARE_WIDGET_HTML,
+  SHARE_WIDGET_URI,
+} from "../../../packages/health-vault-mcp/src/share-widget.ts";
+import {
   getAllergies,
   getConditions,
   getHealthRecords,
@@ -228,6 +232,23 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
           },
+        },
+      }],
+    }),
+  );
+
+  server.registerResource(
+    "health-vault-share-confirmation",
+    SHARE_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Secure Health Vault share confirmation" },
+    async () => ({
+      contents: [{
+        uri: SHARE_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: SHARE_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A compact confirmation card for a scoped, expiring Health Vault share.",
+          "openai/widgetPrefersBorder": true,
         },
       }],
     }),
@@ -478,12 +499,33 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     expiresInDays: z.number().int().min(1).max(30).default(7),
     note: z.string().trim().max(1000).optional(),
   });
-  previewTool("preview_health_share", "Preview secure health share", "Preview the recipient, selected categories, and expiration without creating a link. Require explicit confirmation before create_health_share.", shareSchema, previewHealthShare);
+  server.registerTool("preview_health_share", {
+    title: "Preview secure health share",
+    description: "Preview the recipient, selected categories, and expiration in a compact confirmation card without creating a link. The user confirms from the card before create_health_share.",
+    inputSchema: shareSchema,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    _meta: {
+      "openai/outputTemplate": SHARE_WIDGET_URI,
+      "openai/toolInvocation/invoking": "Preparing secure share",
+      "openai/toolInvocation/invoked": "Secure share ready to confirm",
+    },
+  }, async (input) => {
+    try {
+      const preview = previewHealthShare(input);
+      return {
+        structuredContent: { preview },
+        content: [{ type: "text", text: "Review the secure-share card and use Confirm Secure Share to create the link." }],
+      };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to preview secure share" }] };
+    }
+  });
   server.registerTool("create_health_share", {
     title: "Create confirmed secure health share",
     description: "Create a revocable, expiring link only after preview_health_share and explicit user confirmation. Return the link to the user; do not send it automatically.",
     inputSchema: shareSchema.extend({ confirmed: z.literal(true) }),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    _meta: { "openai/widgetAccessible": true },
   }, async ({ confirmed: _confirmed, ...input }) => {
     try {
       const share = await createHealthShare(supabase, userId, "https://healthvault27.com", input);

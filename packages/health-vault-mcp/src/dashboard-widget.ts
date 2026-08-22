@@ -107,6 +107,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
   <main id="app" class="card"><div class="empty">Loading your Health Vault…</div></main>
   <script>
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const uiState = { details: {}, viewMore: {}, medicalId: false };
     const openVault = () => {
       const incomplete = window.openai?.toolOutput?.summary?.onboarding?.complete === false;
       const href = incomplete
@@ -149,10 +150,10 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
           : '<div class="detail-item meta">Nothing recorded yet.</div>';
         const remaining = Math.max(0, rows.length - previewLimit);
         const control = remaining
-          ? '<details class="view-more-details"><summary class="view-more"><span class="more-label">View ' + remaining + ' more</span><span class="less-label">Show less</span></summary>'
+          ? '<details class="view-more-details" data-view-more="' + id + '"' + (uiState.viewMore[id] ? ' open' : '') + '><summary class="view-more"><span class="more-label">View ' + remaining + ' more</span><span class="less-label">Show less</span></summary>'
             + rows.slice(previewLimit).map(item).join('') + '</details>'
           : '';
-        return '<details class="detail-section" data-detail-section open><summary class="detail-heading">'
+        return '<details class="detail-section" data-detail-section="' + id + '"' + (uiState.details[id] !== false ? ' open' : '') + '><summary class="detail-heading">'
           + '<span class="detail-title"><span class="detail-chevron" aria-hidden="true"></span><h3>' + esc(title) + '</h3></span><span class="detail-count">' + rows.length + ' recorded</span></summary>'
           + '<div class="detail-panel"><div class="detail-list">' + items + '</div>' + control + '</div></details>';
       };
@@ -200,7 +201,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<section class="section"><div class="detail-toolbar"><h2>Your health details</h2><button id="toggle-all-details" class="collapse-all">Collapse all</button></div>'
         + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'
         + '<section class="section"><h2>Medical ID</h2><div class="medical-id"><p class="medical-id-note">Private details stay concealed until you choose to show them. Check your surroundings before revealing.</p>'
-        + '<details class="medical-id-disclosure"><summary class="view-more"><span class="more-label">Show Medical ID</span><span class="less-label">Hide Medical ID</span></summary>'
+        + '<details class="medical-id-disclosure"' + (uiState.medicalId ? ' open' : '') + '><summary class="view-more"><span class="more-label">Show Medical ID</span><span class="less-label">Hide Medical ID</span></summary>'
         + '<div class="medical-id-grid">' + privateHtml + '</div></details></div></section>'
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
@@ -217,12 +218,26 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         if (control) control.textContent = allExpanded ? 'Collapse all' : 'Expand all';
       };
       document.querySelectorAll('[data-detail-section]').forEach((section) => {
-        section.addEventListener('toggle', syncAllDetailsLabel);
+        section.addEventListener('toggle', () => {
+          uiState.details[section.dataset.detailSection] = section.open;
+          syncAllDetailsLabel();
+        });
+      });
+      document.querySelectorAll('[data-view-more]').forEach((section) => {
+        section.addEventListener('toggle', () => {
+          uiState.viewMore[section.dataset.viewMore] = section.open;
+        });
+      });
+      document.querySelector('.medical-id-disclosure')?.addEventListener('toggle', (event) => {
+        uiState.medicalId = event.currentTarget.open;
       });
       document.getElementById('toggle-all-details')?.addEventListener('click', () => {
         const sections = [...document.querySelectorAll('[data-detail-section]')];
         const shouldExpand = !sections.every((section) => section.open);
-        sections.forEach((section) => { section.open = shouldExpand; });
+        sections.forEach((section) => {
+          uiState.details[section.dataset.detailSection] = shouldExpand;
+          section.open = shouldExpand;
+        });
         syncAllDetailsLabel();
       });
     }
