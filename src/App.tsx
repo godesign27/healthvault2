@@ -65,6 +65,7 @@ const SESSION_RETURN_TO_KEY = 'hv-return-to';
 const SESSION_ONBOARDING_STEP_KEY = 'hv-onboarding-step';
 const SESSION_DASHBOARD_PAGE_KEY = 'hv-dashboard-page';
 const SESSION_MEDICAL_FORM_KEY = 'hv-medical-form';
+const SESSION_MEDICAL_FORM_ACTION_KEY = 'hv-medical-form-action';
 
 type OnboardingStep = 'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete';
 
@@ -108,6 +109,8 @@ const IS_DEMO_MODE = (() => {
         sessionStorage.setItem(SESSION_DASHBOARD_PAGE_KEY, 'medical-forms');
         const requestedForm = params.get('form');
         if (requestedForm) sessionStorage.setItem(SESSION_MEDICAL_FORM_KEY, requestedForm);
+        const requestedAction = params.get('action');
+        if (requestedAction === 'upload') sessionStorage.setItem(SESSION_MEDICAL_FORM_ACTION_KEY, requestedAction);
       }
       window.history.replaceState({}, '', '/dashboard');
       return false;

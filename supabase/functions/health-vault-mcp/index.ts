@@ -78,6 +78,7 @@ import {
 import {
   confirmFormAnswers,
   getMedicalForm,
+  GPT_MEDICAL_FORM_IDS,
   listMedicalForms,
   proposeFormAnswers,
 } from "../../../packages/health-vault-mcp/src/medical-forms.ts";
@@ -243,7 +244,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.6.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, Medical History form discovery and confirmation-gated draft updates, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. For medical forms, call list_medical_forms or get_medical_form first, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation; saving a draft never completes, signs, or shares it. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated draft updates, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, call get_medical_form, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation; saving a draft never completes, signs, or shares it. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -387,7 +388,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         mimeType: "text/html+skybridge",
         text: MEDICAL_FORM_WIDGET_HTML,
         _meta: {
-          "openai/widgetDescription": "The authenticated user's supported medical forms, draft status, and secure resume links.",
+          "openai/widgetDescription": "The authenticated user's common reusable forms, completion status, and secure provider-form upload option.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
@@ -406,7 +407,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         mimeType: "text/html+skybridge",
         text: MEDICAL_FORM_REVIEW_WIDGET_HTML,
         _meta: {
-          "openai/widgetDescription": "A typed Medical History answer review with an explicit Confirm & Save Draft action.",
+          "openai/widgetDescription": "A typed reusable-form answer review with an explicit Confirm & Save Draft action.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
@@ -480,10 +481,15 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerTool(
     "list_medical_forms",
     {
-      title: "List supported medical forms",
-      description: "List the authenticated user's medical forms supported by the ChatGPT MVP, including draft status and secure resume links. Use when the user asks about incomplete forms or wants to continue one.",
+      title: "Choose a medical form",
+      description: "List the authenticated user's common stored medical forms, draft/completion status, secure resume links, and provider-form upload option. Always use first when the user asks to complete a form without naming one.",
       inputSchema: z.object({}),
-      outputSchema: z.object({ forms: z.array(z.unknown()) }),
+      outputSchema: z.object({
+        forms: z.array(z.unknown()),
+        completedCount: z.number(),
+        uploadUrl: z.string().url(),
+        allFormsUrl: z.string().url(),
+      }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       _meta: {
         "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
@@ -493,10 +499,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async () => {
       try {
-        const forms = await listMedicalForms(supabase);
+        const catalog = await listMedicalForms(supabase);
         return {
-          structuredContent: { forms },
-          content: [{ type: "text", text: forms.length ? "Your supported medical forms are displayed above." : "No supported medical forms are available." }],
+          structuredContent: catalog,
+          content: [{ type: "text", text: catalog.forms.length ? "Your common Health Vault forms are displayed above. Ask which one the user wants to complete, or offer the secure upload option for a provider PDF or photos." : "No common medical forms are available. Offer the secure upload option." }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to list medical forms" }] };
@@ -507,9 +513,9 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerTool(
     "get_medical_form",
     {
-      title: "Get Medical History form",
-      description: "Load the authenticated user's Medical History definition, saved draft answers, missing fields, and suggestions derived from confirmed Health Vault data. Never treat suggestions as confirmed form answers.",
-      inputSchema: z.object({ templateId: z.literal("medical-history") }),
+      title: "Get reusable medical form",
+      description: "Load a supported reusable form, its saved draft answers, missing fields, and suggestions derived from confirmed Health Vault data. Never treat suggestions as confirmed form answers.",
+      inputSchema: z.object({ templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]) }),
       outputSchema: z.object({ form: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
@@ -518,7 +524,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         const form = await getMedicalForm(supabase, templateId);
         return {
           structuredContent: { form },
-          content: [{ type: "text", text: "The Medical History draft is loaded. Ask only for the missing information needed for this task, and distinguish saved answers from unconfirmed Health Vault suggestions." }],
+          content: [{ type: "text", text: "The selected reusable form is loaded. Ask only for the missing information needed for this task, and distinguish saved answers from unconfirmed Health Vault suggestions." }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to load the medical form" }] };
@@ -529,10 +535,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerTool(
     "propose_form_answers",
     {
-      title: "Review Medical History answers",
-      description: "Validate and prepare one or more Medical History answers for explicit review. This never saves the answers. Call get_medical_form first and pass its exact expectedUpdatedAt value.",
+      title: "Review medical form answers",
+      description: "Validate and prepare one or more supported reusable-form answers for explicit review. This never saves the answers. Call get_medical_form first and pass its exact expectedUpdatedAt value.",
       inputSchema: z.object({
-        templateId: z.literal("medical-history"),
+        templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
         answers: z.record(z.string(), z.string()),
         expectedUpdatedAt: z.string().datetime({ offset: true }).nullable(),
       }),
@@ -541,7 +547,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       _meta: {
         "openai/outputTemplate": MEDICAL_FORM_REVIEW_WIDGET_URI,
         "openai/toolInvocation/invoking": "Preparing your form review",
-        "openai/toolInvocation/invoked": "Medical History answers ready to review",
+        "openai/toolInvocation/invoked": "Medical form answers ready to review",
       },
     },
     async ({ templateId, answers, expectedUpdatedAt }) => {
@@ -560,7 +566,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerTool(
     "confirm_form_answers",
     {
-      title: "Save confirmed Medical History draft",
+      title: "Save confirmed medical form draft",
       description: "Save the exact, unexpired answer proposal as a private draft only after the user explicitly confirms it. This never completes, signs, or shares the form.",
       inputSchema: z.object({ proposalId: z.string().uuid(), confirmed: z.literal(true) }),
       outputSchema: z.object({ saved: z.unknown() }),

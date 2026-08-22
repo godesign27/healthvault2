@@ -37,14 +37,105 @@ const MEDICAL_HISTORY_FIELDS: MedicalFormField[] = [
   { key: "other_relevant_information", label: "Other Relevant Information", type: "textarea" },
 ];
 
-export const GPT_MEDICAL_FORMS: MedicalFormDefinition[] = [{
-  id: "medical-history",
-  title: "Medical History",
-  description: "Past conditions, surgeries, hospitalizations, family history, and current health context.",
-  category: "Identification",
-  version: "2025.01",
-  fields: MEDICAL_HISTORY_FIELDS,
-}];
+const MEDICAL_ID_FIELDS: MedicalFormField[] = [
+  { key: "blood_type", label: "Blood Type", type: "select", options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] },
+  { key: "primary_language", label: "Primary Language", type: "text" },
+  { key: "preferred_pharmacy", label: "Preferred Pharmacy", type: "text" },
+  { key: "pharmacy_phone", label: "Pharmacy Phone", type: "text" },
+  { key: "primary_care_physician", label: "Primary Care Physician", type: "text" },
+  { key: "physician_phone", label: "Physician Phone", type: "text" },
+  { key: "known_allergies", label: "Known Allergies", type: "textarea" },
+  { key: "current_medications", label: "Current Medications", type: "textarea" },
+];
+
+const EMERGENCY_CONTACT_FIELDS: MedicalFormField[] = [
+  { key: "primary_contact_name", label: "Primary Contact Name", type: "text" },
+  { key: "relationship", label: "Relationship", type: "text" },
+  { key: "phone_number", label: "Phone Number", type: "text" },
+  { key: "email", label: "Email", type: "text" },
+  { key: "secondary_contact_name", label: "Secondary Contact Name", type: "text" },
+  { key: "secondary_relationship", label: "Secondary Relationship", type: "text" },
+  { key: "secondary_phone", label: "Secondary Phone", type: "text" },
+  { key: "secondary_email", label: "Secondary Email", type: "text" },
+];
+
+const CURRENT_MEDICATION_FIELDS: MedicalFormField[] = [
+  { key: "medication_1_name", label: "Medication 1 Name", type: "text" },
+  { key: "medication_1_dosage", label: "Medication 1 Dosage", type: "text" },
+  { key: "medication_1_prescriber", label: "Medication 1 Prescriber", type: "text" },
+  { key: "medication_2_name", label: "Medication 2 Name", type: "text" },
+  { key: "medication_2_dosage", label: "Medication 2 Dosage", type: "text" },
+  { key: "medication_2_prescriber", label: "Medication 2 Prescriber", type: "text" },
+  { key: "medication_3_name", label: "Medication 3 Name", type: "text" },
+  { key: "medication_3_dosage", label: "Medication 3 Dosage", type: "text" },
+  { key: "medication_3_prescriber", label: "Medication 3 Prescriber", type: "text" },
+  { key: "over_the_counter_medications", label: "Over-the-Counter Medications", type: "textarea" },
+  { key: "supplements", label: "Supplements", type: "textarea" },
+];
+
+const ALLERGY_FIELDS: MedicalFormField[] = [
+  { key: "drug_allergies", label: "Drug Allergies", type: "textarea" },
+  { key: "food_allergies", label: "Food Allergies", type: "textarea" },
+  { key: "environmental_allergies", label: "Environmental Allergies", type: "textarea" },
+  { key: "latex_allergy", label: "Latex Allergy", type: "select", options: ["Yes", "No", "Unknown"] },
+  { key: "other_allergies", label: "Other Allergies", type: "textarea" },
+  { key: "allergy_reactions", label: "Allergy Reactions", type: "textarea" },
+  { key: "carries_epipen", label: "Carries EpiPen", type: "select", options: ["Yes", "No"] },
+];
+
+export const GPT_MEDICAL_FORMS: MedicalFormDefinition[] = [
+  {
+    id: "medical-history",
+    title: "Medical History",
+    description: "Past conditions, surgeries, hospitalizations, family history, and current health context.",
+    category: "Identification",
+    version: "2025.01",
+    fields: MEDICAL_HISTORY_FIELDS,
+  },
+  {
+    id: "medical-id",
+    title: "Medical ID Information",
+    description: "Blood type, pharmacy, primary physician, allergies, and medications.",
+    category: "Identification",
+    version: "2025.01",
+    fields: MEDICAL_ID_FIELDS,
+  },
+  {
+    id: "emergency-contact",
+    title: "Emergency Contact Information",
+    description: "People to contact in case of a medical emergency.",
+    category: "Care Preferences",
+    version: "2025.01",
+    fields: EMERGENCY_CONTACT_FIELDS,
+  },
+  {
+    id: "current-medications",
+    title: "Current Medications",
+    description: "Current prescriptions, over-the-counter medications, and supplements.",
+    category: "Health & Lifestyle",
+    version: "2025.01",
+    fields: CURRENT_MEDICATION_FIELDS,
+  },
+  {
+    id: "allergy-info",
+    title: "Allergy Information",
+    description: "Medication, food, environmental, latex, and other allergies and reactions.",
+    category: "Health & Lifestyle",
+    version: "2025.01",
+    fields: ALLERGY_FIELDS,
+  },
+];
+
+const COMMON_FORM_IDS = [
+  "patient-reg",
+  "medical-history",
+  "medical-id",
+  "current-medications",
+  "allergy-info",
+  "emergency-contact",
+] as const;
+
+export const GPT_MEDICAL_FORM_IDS = GPT_MEDICAL_FORMS.map(({ id }) => id);
 
 type FormResponse = {
   id: string;
@@ -115,13 +206,23 @@ async function suggestedMedicalHistory(supabase: SupabaseClient) {
 
 export async function listMedicalForms(supabase: SupabaseClient) {
   const patientId = await getPatientProfileId(supabase);
-  const { data, error } = await supabase.from("form_responses")
+  const [{ data: templates, error: templateError }, { data, error }] = await Promise.all([
+    supabase.from("form_templates")
+      .select("id, title, description, category, version")
+      .in("id", [...COMMON_FORM_IDS]),
+    supabase.from("form_responses")
     .select("template_id, status, updated_at")
     .eq("patient_id", patientId)
-    .in("template_id", GPT_MEDICAL_FORMS.map(({ id }) => id));
+    .in("template_id", [...COMMON_FORM_IDS]),
+  ]);
+  if (templateError) throw new Error(`Unable to load the medical form catalog: ${templateError.message}`);
   if (error) throw new Error(`Unable to list medical forms: ${error.message}`);
   const responses = new Map((data ?? []).map((row) => [row.template_id, row]));
-  return GPT_MEDICAL_FORMS.map((form) => ({
+  const templateMap = new Map((templates ?? []).map((template) => [template.id, template]));
+  const forms = COMMON_FORM_IDS.flatMap((id) => {
+    const form = templateMap.get(id);
+    return form ? [form] : [];
+  }).map((form) => ({
     id: form.id,
     title: form.title,
     description: form.description,
@@ -129,8 +230,16 @@ export async function listMedicalForms(supabase: SupabaseClient) {
     version: form.version,
     status: responses.get(form.id)?.status ?? "not_started",
     updatedAt: responses.get(form.id)?.updated_at ?? null,
+    chatEditable: GPT_MEDICAL_FORM_IDS.includes(form.id),
     resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(form.id)}&source=chatgpt`,
   }));
+  const completedCount = forms.filter(({ status }) => status === "complete" || status === "completed").length;
+  return {
+    forms,
+    completedCount,
+    uploadUrl: "https://healthvault27.com/?app=medical-forms&action=upload&source=chatgpt",
+    allFormsUrl: "https://healthvault27.com/?app=medical-forms&source=chatgpt",
+  };
 }
 
 export async function getMedicalForm(supabase: SupabaseClient, templateId: string) {
@@ -189,7 +298,7 @@ export async function proposeFormAnswers(
     resultingAnswers: { ...(response?.answers_json ?? {}), ...cleanAnswers },
     expiresAt,
     confirmationState: "pending",
-    safeSummary: `${Object.keys(cleanAnswers).length} Medical History answer${Object.keys(cleanAnswers).length === 1 ? "" : "s"} ready for review. Nothing has been saved.`,
+    safeSummary: `${Object.keys(cleanAnswers).length} ${definition.title} answer${Object.keys(cleanAnswers).length === 1 ? "" : "s"} ready for review. Nothing has been saved.`,
   };
 }
 
@@ -209,7 +318,7 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
       confirmationState: "confirmed",
       savedAs: "draft",
       resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
-      safeSummary: "This Medical History proposal was already saved. Nothing was added twice.",
+      safeSummary: `This ${definitionFor(proposal.template_id).title} proposal was already saved. Nothing was added twice.`,
     };
   }
   if (new Date(proposal.expires_at).getTime() <= Date.now()) throw new Error("This form proposal expired. Prepare the answers again.");
