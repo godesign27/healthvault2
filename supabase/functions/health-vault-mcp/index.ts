@@ -544,7 +544,13 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   }, async ({ confirmed: _confirmed, ...input }) => {
     try {
       const share = await createHealthShare(supabase, userId, "https://healthvault27.com", input);
-      return { structuredContent: { share }, content: [{ type: "text", text: `Secure share created for ${share.recipientName}. It expires at ${share.expiresAt}.` }] };
+      return {
+        structuredContent: { share },
+        content: [{
+          type: "text",
+          text: `Secure share created for ${share.recipientName}. It expires at ${share.expiresAt}. Anything else I can do for you today? I can show your dashboard, review medications or allergies, add an appointment or health record, or revoke this secure share.`,
+        }],
+      };
     } catch (error) {
       return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to create secure share" }] };
     }

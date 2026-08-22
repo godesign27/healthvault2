@@ -11,12 +11,13 @@ import { PersonalHealthVaultPage } from './PersonalHealthVaultPage';
 interface MarketingSitePageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
   onLoginClick?: () => void;
+  onLogoutClick?: () => void;
   onStartOnboarding?: () => void;
   onDirectHealthVaultAccess?: () => void;
   isAuthenticated?: boolean;
 }
 
-export function MarketingSitePage({ onViewChange, onLoginClick, onStartOnboarding, onDirectHealthVaultAccess, isAuthenticated = false }: MarketingSitePageProps) {
+export function MarketingSitePage({ onViewChange, onLoginClick, onLogoutClick, onStartOnboarding, onDirectHealthVaultAccess, isAuthenticated = false }: MarketingSitePageProps) {
   const [currentPage, setCurrentPage] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -1542,6 +1543,7 @@ export function MarketingSitePage({ onViewChange, onLoginClick, onStartOnboardin
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onLoginClick={onLoginClick}
+        onLogoutClick={onLogoutClick}
         onGetStarted={onStartOnboarding}
         isAuthenticated={isAuthenticated}
         currentView="marketing"

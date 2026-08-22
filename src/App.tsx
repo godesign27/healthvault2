@@ -299,6 +299,22 @@ function App() {
     handleViewChange('health-vault');
   };
 
+  const handleMarketingLogout = async () => {
+    await supabase.auth.signOut();
+    try {
+      sessionStorage.removeItem(SESSION_VIEW_KEY);
+      sessionStorage.removeItem(SESSION_DEMO_KEY);
+    } catch {}
+    setAuthState({
+      isAuthenticated: false,
+      authChecked: true,
+      onboardingComplete: false,
+      onboardingChecked: true
+    });
+    setCurrentView('marketing');
+    window.history.replaceState({}, '', '/?app=marketing');
+  };
+
   const handleLoginSuccess = () => {
     setAuthState(prev => ({
       ...prev,
@@ -441,6 +457,7 @@ function App() {
       return <MarketingSitePage
         onViewChange={handleViewChange}
         onLoginClick={() => setCurrentView('login')}
+        onLogoutClick={handleMarketingLogout}
         onStartOnboarding={() => {
           setCurrentView('onboarding');
           setOnboardingStep('start');
