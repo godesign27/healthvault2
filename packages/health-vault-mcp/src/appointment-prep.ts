@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.ts";
+import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.js";
 
 export async function createAppointmentPrep(supabase: SupabaseClient, concerns: string[], questions: string[]) {
   const now = new Date().toISOString();
@@ -41,4 +41,3 @@ export async function createAppointmentPrep(supabase: SupabaseClient, concerns: 
     medicalDisclaimer: "Review this informational brief for accuracy. It is not medical advice or a diagnosis.",
   };
 }
-
