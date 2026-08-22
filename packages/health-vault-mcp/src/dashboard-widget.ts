@@ -25,16 +25,18 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .status { flex: 0 0 auto; font-weight: 700; color: #008a68; }
     .status.todo { color: #9a5b00; }
     .appointment { padding: 13px 14px; border-left: 3px solid #0b8063; border-radius: 8px; background: #edf6f2; color: #145846; font-size: 13px; line-height: 1.5; }
-    details { border-top: 1px solid #eceae8; }
-    summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 13px 0; font-size: 14px; font-weight: 750; }
-    summary::-webkit-details-marker { display: none; }
-    summary::after { content: '+'; color: #78716c; font-size: 18px; }
-    details[open] summary::after { content: '−'; }
-    .detail-list { display: grid; gap: 8px; padding: 0 0 13px; }
+    .detail-section { padding: 14px 0 4px; border-top: 1px solid #eceae8; }
+    .detail-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .detail-heading h3 { margin: 0; font-size: 14px; font-weight: 750; }
+    .detail-count { color: #78716c; font-size: 11px; }
+    .detail-list { display: grid; padding: 6px 0 4px; }
     .detail-item { padding: 10px 0; border-bottom: 1px solid #eceeef; font-size: 13px; line-height: 1.45; }
     .detail-item:last-child { border-bottom: 0; }
     .detail-item strong { display: block; }
+    .detail-item[hidden] { display: none; }
     .meta { color: #68635f; font-size: 12px; }
+    .view-more { width: auto; margin: 2px 0 8px; padding: 5px 0; border-radius: 0; color: #096b55; background: transparent; font-size: 12px; text-align: left; }
+    .view-more:hover { color: #064c3d; background: transparent; }
     .actions { display: flex; gap: 10px; padding: 16px 18px 18px; }
     button { width: 100%; border: 0; border-radius: 8px; padding: 12px 14px; cursor: pointer; font: inherit; font-weight: 700; color: white; background: #17213a; transition: background .18s ease, transform .12s ease; }
     button:hover { background: #24304f; }
@@ -49,7 +51,10 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .stat { background: #191e21; border-color: #343a3e; }
       .value { color: #eef1f3; }
       .label, .meta { color: #9ea6aa; }
-      .row, details, .detail-item { border-color: #343a3e; }
+      .row, .detail-section, .detail-item { border-color: #343a3e; }
+      .detail-count { color: #9ea6aa; }
+      .view-more { color: #75d8ba; background: transparent; }
+      .view-more:hover { color: #a2ead5; background: transparent; }
       .appointment { background: #163b32; color: #c7f2e4; border-left-color: #30b792; }
       button { color: #17213a; background: #f2f4f5; }
       button:hover { background: #dfe4e7; }
@@ -80,14 +85,23 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const checklist = summary.onboarding?.checklist ?? [];
       const details = summary.details ?? {};
       const formatDate = (value) => value ? new Date(value + (String(value).length === 10 ? 'T00:00:00' : '')).toLocaleDateString() : '';
-      const list = (rows, primary, secondary) => rows.length
-        ? rows.map((row) => '<div class="detail-item"><strong>' + esc(primary(row)) + '</strong>'
-          + (secondary(row) ? '<span class="meta">' + esc(secondary(row)) + '</span>' : '') + '</div>').join('')
-        : '<div class="detail-item meta">Nothing recorded yet.</div>';
-      const conditionHtml = list(details.conditions ?? [], (r) => r.name || 'Condition', (r) => [r.notes, r.managing_physician ? 'Managed by ' + r.managing_physician : '', formatDate(r.diagnosed_on)].filter(Boolean).join(' · '));
-      const medicationHtml = list(details.medications ?? [], (r) => r.name || 'Medication', (r) => [r.dosage, r.frequency, r.prescribed_by ? 'Prescribed by ' + r.prescribed_by : ''].filter(Boolean).join(' · '));
-      const allergyHtml = list(details.allergies ?? [], (r) => r.allergen || 'Allergy', (r) => [r.reaction, r.severity].filter(Boolean).join(' · '));
-      const recordHtml = list(details.recentRecords ?? [], (r) => r.title || r.kind || 'Health record', (r) => [r.provider_name, formatDate(r.service_date || r.received_at)].filter(Boolean).join(' · '));
+      const detailSection = (id, title, rows, primary, secondary) => {
+        const previewLimit = 3;
+        const items = rows.length
+          ? rows.map((row, index) => '<div class="detail-item"' + (index >= previewLimit ? ' hidden data-extra="' + id + '"' : '') + '><strong>' + esc(primary(row)) + '</strong>'
+            + (secondary(row) ? '<span class="meta">' + esc(secondary(row)) + '</span>' : '') + '</div>').join('')
+          : '<div class="detail-item meta">Nothing recorded yet.</div>';
+        const remaining = Math.max(0, rows.length - previewLimit);
+        const control = remaining
+          ? '<button class="view-more" data-target="' + id + '" data-remaining="' + remaining + '" aria-expanded="false">View ' + remaining + ' more</button>'
+          : '';
+        return '<section class="detail-section"><div class="detail-heading"><h3>' + esc(title) + '</h3><span class="detail-count">' + rows.length + ' recorded</span></div>'
+          + '<div class="detail-list">' + items + '</div>' + control + '</section>';
+      };
+      const conditionHtml = detailSection('conditions', 'Active conditions', details.conditions ?? [], (r) => r.name || 'Condition', (r) => [r.notes, r.managing_physician ? 'Managed by ' + r.managing_physician : '', formatDate(r.diagnosed_on)].filter(Boolean).join(' · '));
+      const medicationHtml = detailSection('medications', 'Medications', details.medications ?? [], (r) => r.name || 'Medication', (r) => [r.dosage, r.frequency, r.prescribed_by ? 'Prescribed by ' + r.prescribed_by : ''].filter(Boolean).join(' · '));
+      const allergyHtml = detailSection('allergies', 'Allergies', details.allergies ?? [], (r) => r.allergen || 'Allergy', (r) => [r.reaction, r.severity].filter(Boolean).join(' · '));
+      const recordHtml = detailSection('records', 'Recent records', details.recentRecords ?? [], (r) => r.title || r.kind || 'Health record', (r) => [r.provider_name, formatDate(r.service_date || r.received_at)].filter(Boolean).join(' · '));
       const appointmentHtml = appointment
         ? '<strong>' + esc(appointment.appointmentType || 'Appointment') + '</strong><br>'
           + esc(appointment.providerName || 'Provider') + ' · '
@@ -110,13 +124,19 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<div class="stat"><span class="value">' + esc(summary.healthRecords) + '</span><span class="label">Health records</span></div></section>'
         + '<section class="section"><h2>Next appointment</h2><div class="appointment">' + appointmentHtml + '</div></section>'
         + '<section class="section"><h2>Your health details</h2>'
-        + '<details><summary>Active conditions</summary><div class="detail-list">' + conditionHtml + '</div></details>'
-        + '<details><summary>Medications</summary><div class="detail-list">' + medicationHtml + '</div></details>'
-        + '<details><summary>Allergies</summary><div class="detail-list">' + allergyHtml + '</div></details>'
-        + '<details><summary>Recent records</summary><div class="detail-list">' + recordHtml + '</div></details></section>'
+        + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
+      document.querySelectorAll('.view-more').forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.dataset.target;
+          const expanded = button.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('[data-extra="' + target + '"]').forEach((item) => { item.hidden = expanded; });
+          button.setAttribute('aria-expanded', String(!expanded));
+          button.textContent = expanded ? 'View ' + button.dataset.remaining + ' more' : 'Show less';
+        });
+      });
     }
     window.addEventListener('openai:set_globals', render);
     render();
