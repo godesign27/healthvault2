@@ -41,4 +41,3 @@ export async function createAppointmentPrep(supabase: SupabaseClient, concerns: 
     medicalDisclaimer: "Review this informational brief for accuracy. It is not medical advice or a diagnosis.",
   };
 }
-

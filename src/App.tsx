@@ -63,6 +63,8 @@ const SESSION_DEMO_KEY = 'hv-demo-mode';
 const SESSION_DS_SURFACE_KEY = 'hv-ds-surface-theme';
 const SESSION_RETURN_TO_KEY = 'hv-return-to';
 const SESSION_ONBOARDING_STEP_KEY = 'hv-onboarding-step';
+const SESSION_DASHBOARD_PAGE_KEY = 'hv-dashboard-page';
+const SESSION_MEDICAL_FORM_KEY = 'hv-medical-form';
 
 type OnboardingStep = 'start' | 'account' | 'verify-email' | 'identity' | 'insurance' | 'preferences' | 'complete';
 
@@ -99,9 +101,14 @@ const IS_DEMO_MODE = (() => {
     if (returnTo?.startsWith('/oauth/consent?authorization_id=')) {
       sessionStorage.setItem(SESSION_RETURN_TO_KEY, returnTo);
     }
-    if (requestedApp === 'dashboard' || requestedDashboard) {
+    if (requestedApp === 'dashboard' || requestedApp === 'medical-forms' || requestedDashboard) {
       sessionStorage.removeItem(SESSION_DEMO_KEY);
       sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
+      if (requestedApp === 'medical-forms') {
+        sessionStorage.setItem(SESSION_DASHBOARD_PAGE_KEY, 'medical-forms');
+        const requestedForm = params.get('form');
+        if (requestedForm) sessionStorage.setItem(SESSION_MEDICAL_FORM_KEY, requestedForm);
+      }
       window.history.replaceState({}, '', '/dashboard');
       return false;
     }

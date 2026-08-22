@@ -50,7 +50,11 @@ function relativeTime(iso: string | null): string {
 
 export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   const { setTheme: setGlobalTheme } = useTheme();
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState(() => {
+    const requested = sessionStorage.getItem('hv-dashboard-page');
+    sessionStorage.removeItem('hv-dashboard-page');
+    return requested === 'medical-forms' ? requested : 'dashboard';
+  });
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {

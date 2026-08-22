@@ -86,6 +86,18 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    if (loadingForms || selectedTemplate) return;
+    const requestedForm = sessionStorage.getItem('hv-medical-form');
+    if (!requestedForm) return;
+    sessionStorage.removeItem('hv-medical-form');
+    const template = FORM_TEMPLATES.find(({ id }) => id === requestedForm);
+    if (template) {
+      setSelectedTemplate(template);
+      setDrawerOpen(true);
+    }
+  }, [loadingForms, selectedTemplate]);
+
   const refreshResponses = async () => {
     if (!patientProfileId) return;
     try {
