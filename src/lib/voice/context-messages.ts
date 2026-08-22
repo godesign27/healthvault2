@@ -6,6 +6,7 @@ export type PageContext =
   | 'medical-profile'
   | 'care'
   | 'network'
+  | 'wellness'
   | 'vitals';
 
 export const voiceMessages: Record<PageContext, string> = {
@@ -22,6 +23,8 @@ export const voiceMessages: Record<PageContext, string> = {
   care: "You're managing your care team. Want to schedule something or contact a provider?",
 
   network: "This is your healthcare network. Looking for a new provider or adding a pharmacy?",
+
+  wellness: "This is your wellness log. Want to record a meal, review recent entries, or complete a Life Signal check-in?",
 
   vitals: "You're tracking your vitals. Want to record new measurements or review trends?"
 };

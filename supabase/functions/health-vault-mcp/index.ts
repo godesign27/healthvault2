@@ -12,6 +12,11 @@ import {
   SHARE_WIDGET_URI,
 } from "./share-widget.ts";
 import {
+  ONBOARDING_WIDGET_HTML,
+  ONBOARDING_WIDGET_URI,
+} from "./onboarding-widget.ts";
+import { buildOnboardingStatus } from "./onboarding.ts";
+import {
   getAllergies,
   getConditions,
   getHealthRecords,
@@ -40,6 +45,15 @@ import {
   previewHealthShare,
   revokeHealthShare,
 } from "./health-sharing.ts";
+import { createAppointmentPrep } from "./appointment-prep.ts";
+import {
+  getDietSummary,
+  listLifeSignals,
+  logDietEntry,
+  logLifeSignal,
+  previewDietLog,
+  previewLifeSignal,
+} from "./wellness.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -199,10 +213,10 @@ async function getHealthSummary(supabase: SupabaseClient) {
 
 function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
   const server = new McpServer(
-    { name: "health-vault", version: "0.3.0" },
+    { name: "health-vault", version: "0.5.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. The server supports reading the dashboard, previewing and confirming health-data writes, and previewing, creating, and revoking secure shares. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis or emergency medical advice.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -258,6 +272,86 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         },
       }],
     }),
+  );
+
+  server.registerResource(
+    "health-vault-onboarding",
+    ONBOARDING_WIDGET_URI,
+    { mimeType: "text/html+skybridge", description: "Health Vault onboarding status" },
+    async () => ({
+      contents: [{
+        uri: ONBOARDING_WIDGET_URI,
+        mimeType: "text/html+skybridge",
+        text: ONBOARDING_WIDGET_HTML,
+        _meta: {
+          "openai/widgetDescription": "A compact, privacy-first five-stage Health Vault onboarding and resume card.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+        },
+      }],
+    }),
+  );
+
+  server.registerTool(
+    "get_health_vault_capabilities",
+    {
+      title: "Show Health Vault actions",
+      description: "Use when the user asks what Health Vault can do, asks for help getting started, or wants suggested next actions. Return concise actionable prompts the user can choose immediately.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ actions: z.array(z.unknown()), summary: z.string() }),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async () => {
+      const actions = [
+        { title: "Continue setup", prompt: "Health Vault, continue my setup.", category: "onboarding" },
+        { title: "View my health snapshot", prompt: "Health Vault, show me what you know about me.", category: "review" },
+        { title: "Prepare for an appointment", prompt: "Health Vault, create a prep brief for my next appointment.", category: "prepare" },
+        { title: "Complete a Life Signal", prompt: "Health Vault, guide me through today's Life Signal check-in.", category: "check_in" },
+        { title: "Log a meal", prompt: "Health Vault, log what I ate today.", category: "wellness" },
+        { title: "Add health information", prompt: "Health Vault, help me add a medication, allergy, condition, appointment, or health note.", category: "update" },
+        { title: "Create a secure share", prompt: "Health Vault, prepare a secure share for my provider.", category: "share" },
+      ];
+      return {
+        structuredContent: { actions, summary: "Choose one of these Health Vault tasks to get started." },
+        content: [{ type: "text", text: "Here are a few things I can do today: continue your setup, show your health snapshot, prepare for an appointment, complete a Life Signal check-in, log your diet, add confirmed health information, or create a secure share. Which would you like to do?" }],
+      };
+    },
+  );
+
+  server.registerTool(
+    "get_onboarding_status",
+    {
+      title: "Continue Health Vault setup",
+      description: "Use when the user wants to start, continue, resume, or check Health Vault onboarding. Returns a five-stage status card and the safest next action. Sensitive identity and insurance steps link to the secure Health Vault web app.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ onboarding: z.unknown() }),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": ONBOARDING_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Checking your Health Vault setup",
+        "openai/toolInvocation/invoked": "Health Vault setup ready",
+      },
+    },
+    async () => {
+      try {
+        const summary = await getSharedHealthSummary(supabase);
+        const onboarding = buildOnboardingStatus(summary);
+        const next = onboarding.recommendedAction;
+        return {
+          structuredContent: { onboarding },
+          content: [{
+            type: "text",
+            text: onboarding.complete
+              ? "Your Health Vault setup is complete. You can review your health snapshot or choose another task."
+              : `Your resumable Health Vault setup is displayed above. Recommended next step: ${next.label}. ${next.prompt ? `Try: “${next.prompt}”` : "Use the secure card link to continue."}`,
+          }],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to read onboarding status";
+        return { isError: true, content: [{ type: "text", text: message }] };
+      }
+    },
   );
 
   server.registerTool(
@@ -348,6 +442,28 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     "List the authenticated user's most recent Health Vault records with dates, type, and provider.",
     z.object({ limit: z.number().int().min(1).max(25).default(10) }),
     ({ limit }) => getHealthRecords(supabase, limit),
+  );
+
+  server.registerTool(
+    "create_appointment_prep",
+    {
+      title: "Create appointment-prep brief",
+      description: "Create a lightweight informational brief for the next scheduled appointment using confirmed Health Vault data. Ask the user for visit concerns or questions if they have not supplied them.",
+      inputSchema: z.object({
+        concerns: z.array(z.string().trim().min(1).max(500)).max(10).default([]),
+        questions: z.array(z.string().trim().min(1).max(500)).max(10).default([]),
+      }),
+      outputSchema: z.object({ brief: z.unknown() }),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ concerns, questions }) => {
+      try {
+        const brief = await createAppointmentPrep(supabase, concerns, questions);
+        return { structuredContent: { brief }, content: [{ type: "text", text: `${brief.safeSummary} Review the details for accuracy before using them at your visit.` }] };
+      } catch (error) {
+        return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to create appointment-prep brief" }] };
+      }
+    },
   );
 
   const appointmentSchema = {
@@ -479,6 +595,35 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : `Unable to ${title}` }] };
     }
   });
+
+  const oneToFive = z.number().int().min(1).max(5);
+  const lifeSignalSchema = z.object({
+    energy: oneToFive,
+    sleep: oneToFive,
+    mood: oneToFive,
+    stress: oneToFive,
+    pain: oneToFive,
+    note: z.string().trim().max(2000).optional(),
+    recordedAt: z.string().datetime({ offset: true }).optional(),
+  });
+  previewTool("preview_life_signal", "Preview Life Signal", "Preview a Life Signal check-in without saving it. Explain the 1–5 scale and request explicit confirmation before log_life_signal.", lifeSignalSchema, previewLifeSignal);
+  confirmedTool("log_life_signal", "Save confirmed Life Signal", "Save only after preview_life_signal and explicit confirmation.", lifeSignalSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logLifeSignal(supabase, userId, input), () => ({ title: "Life Signal saved", message: "Today's confirmed check-in is now in Health Vault." }));
+  registerReadTool("list_life_signals", "Review Life Signals", "Review recent confirmed Life Signal check-ins and summarize patterns without diagnosing the user.", z.object({ days: z.number().int().min(1).max(90).default(14) }), ({ days }) => listLifeSignals(supabase, days));
+
+  const dietLogSchema = z.object({
+    mealType: z.enum(["breakfast", "lunch", "dinner", "snack", "drink", "other"]),
+    consumedAt: z.string().datetime({ offset: true }).optional(),
+    items: z.array(z.object({
+      name: z.string().trim().min(1).max(160),
+      amount: z.string().trim().max(120).optional(),
+      notes: z.string().trim().max(500).optional(),
+    })).min(1).max(30),
+    waterMl: z.number().int().min(0).max(20_000).optional(),
+    notes: z.string().trim().max(2000).optional(),
+  });
+  previewTool("preview_diet_log", "Preview diet entry", "Preview a meal, snack, or drink without saving it. Show the foods, approximate amounts, and time, then request explicit confirmation before log_diet_entry.", dietLogSchema, previewDietLog);
+  confirmedTool("log_diet_entry", "Save confirmed diet entry", "Save only after preview_diet_log and explicit confirmation. Never infer unmentioned foods, quantities, calories, or nutrients.", dietLogSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => logDietEntry(supabase, userId, input), () => ({ title: "Diet entry saved", message: "The confirmed meal or drink is now in your Health Vault diet log." }));
+  registerReadTool("get_diet_summary", "Review diet log", "Summarize recent user-reported diet entries and offer general, non-diagnostic wellness observations. Do not prescribe a medical diet or claim nutrient totals that were not logged.", z.object({ days: z.number().int().min(1).max(30).default(7) }), ({ days }) => getDietSummary(supabase, days));
 
   previewTool("preview_condition", "Preview condition", "Prepare a condition for review without saving it. Show the exact details and request explicit confirmation before add_condition.", conditionSchema, previewCondition);
   confirmedTool("add_condition", "Add confirmed condition", "Save only after preview_condition and explicit user confirmation.", conditionSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => createCondition(supabase, userId, input), (saved) => ({ title: "Condition added", message: `${saved.name} is now in Health Vault.` }));

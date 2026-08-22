@@ -17,6 +17,7 @@ import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
 import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
+import { WellnessPage } from './WellnessPage';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
@@ -280,6 +281,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           }}
         />
       );
+    }
+
+    if (currentPage === 'wellness') {
+      return <WellnessPage onOpenAssistant={() => setIsAIPanelOpen(true)} />;
     }
 
     if (currentPage === 'vitals') {

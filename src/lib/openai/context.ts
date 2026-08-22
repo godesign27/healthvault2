@@ -6,6 +6,7 @@ export type PageId =
   | 'medical-profile'
   | 'care'
   | 'network'
+  | 'wellness'
   | 'vitals';
 
 export interface PageContextData {

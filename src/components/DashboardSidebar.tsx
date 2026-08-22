@@ -1,4 +1,4 @@
-import { Home, Heart, FileText, ClipboardList, Activity, LogOut, Sun, Moon, Settings, Menu, Globe, User, ShieldCheck, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Heart, FileText, ClipboardList, Activity, LogOut, Sun, Moon, Settings, Menu, Globe, User, ShieldCheck, Users, ChevronLeft, ChevronRight, Apple } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Tooltip } from './ui/Tooltip';
 import { supabase } from '../lib/supabase';
@@ -106,6 +106,7 @@ export function DashboardSidebar({
     { name: 'Insurance', icon: ShieldCheck, id: 'insurance' },
     { name: 'Health Records', icon: FileText, id: 'health-records' },
     { name: 'Medical Forms', icon: ClipboardList, id: 'medical-forms' },
+    { name: 'Wellness', icon: Apple, id: 'wellness' },
     { name: 'Vitals', icon: Activity, id: 'vitals' }
   ];
 
