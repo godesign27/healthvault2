@@ -60,7 +60,7 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
           content: [
             {
               type: "text",
-              text: JSON.stringify(summary),
+              text: "The current Health Vault dashboard is displayed in the widget.",
             },
           ],
         };
@@ -162,11 +162,20 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
       description: "Save an appointment only after preview_appointment has been shown and the user explicitly confirms the exact details. Never call this from an initial request or implied consent.",
       inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": DASHBOARD_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Saving your appointment",
+        "openai/toolInvocation/invoked": "Appointment saved and dashboard updated",
+      },
     },
     async ({ confirmed: _confirmed, ...input }) => {
       try {
         const appointment = await createAppointment(supabase, userId, input);
-        return { structuredContent: { appointment }, content: [{ type: "text", text: JSON.stringify(appointment) }] };
+        const summary = await getHealthSummary(supabase);
+        return {
+          structuredContent: { appointment, summary },
+          content: [{ type: "text", text: "The appointment was saved and the refreshed Health Vault dashboard is displayed in the widget." }],
+        };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to add appointment";
         return { isError: true, content: [{ type: "text", text: message }] };

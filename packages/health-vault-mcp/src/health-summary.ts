@@ -24,11 +24,25 @@ export async function getHealthSummary(supabase: SupabaseClient) {
         .maybeSingle(),
       supabase
         .from("conditions")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "Active"),
-      supabase.from("medications").select("id, end_date"),
-      supabase.from("allergies").select("id", { count: "exact", head: true }),
-      supabase.from("health_records").select("id", { count: "exact", head: true }),
+        .select("id, name, status, diagnosed_on, managing_physician, notes", { count: "exact" })
+        .eq("status", "Active")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("medications")
+        .select("id, name, dosage, frequency, prescribed_by, start_date, end_date")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("allergies")
+        .select("id, allergen, reaction, severity", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("health_records")
+        .select("id, title, kind, provider_name, service_date, received_at", { count: "exact" })
+        .order("service_date", { ascending: false, nullsFirst: false })
+        .limit(6),
       supabase
         .from("appointments")
         .select("provider_name, appointment_type, scheduled_at, location")
@@ -49,10 +63,13 @@ export async function getHealthSummary(supabase: SupabaseClient) {
   assertSuccessful("insurance coverages", coverages);
   assertSuccessful("preferences", preferences);
 
-  const medicationRows = (medications.data ?? []) as Array<{ end_date: string | null }>;
-  const activeMedications = medicationRows.filter(
+  const conditionRows = (conditions.data ?? []) as Array<Record<string, unknown>>;
+  const medicationRows = (medications.data ?? []) as Array<Record<string, unknown> & { end_date: string | null }>;
+  const allergyRows = (allergies.data ?? []) as Array<Record<string, unknown>>;
+  const recordRows = (records.data ?? []) as Array<Record<string, unknown>>;
+  const activeMedicationRows = medicationRows.filter(
     ({ end_date }) => !end_date || end_date >= today,
-  ).length;
+  );
   const profileRow = profile.data as {
     first_name?: string;
     last_name?: string;
@@ -72,9 +89,15 @@ export async function getHealthSummary(supabase: SupabaseClient) {
     patientName:
       [profileRow?.first_name, profileRow?.last_name].filter(Boolean).join(" ") || null,
     activeConditions: conditions.count ?? 0,
-    activeMedications,
+    activeMedications: activeMedicationRows.length,
     allergies: allergies.count ?? 0,
     healthRecords: records.count ?? 0,
+    details: {
+      conditions: conditionRows,
+      medications: activeMedicationRows,
+      allergies: allergyRows,
+      recentRecords: recordRows,
+    },
     nextAppointment: nextAppointment
       ? {
           providerName: nextAppointment.provider_name,

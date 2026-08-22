@@ -17,6 +17,7 @@ import {
   createAppointment,
   previewAppointment,
 } from "../../../packages/health-vault-mcp/src/appointments.ts";
+import { getHealthSummary as getSharedHealthSummary } from "../../../packages/health-vault-mcp/src/health-summary.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -179,10 +180,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async () => {
       try {
-        const summary = await getHealthSummary(supabase);
+        const summary = await getSharedHealthSummary(supabase);
         return {
           structuredContent: { summary },
-          content: [{ type: "text", text: JSON.stringify(summary) }],
+          content: [{ type: "text", text: "The current Health Vault dashboard is displayed in the widget." }],
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to read health summary";
@@ -279,11 +280,20 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       description: "Save an appointment only after preview_appointment has been shown and the user explicitly confirms the exact details. Never call this from an initial request or implied consent.",
       inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": DASHBOARD_WIDGET_URI,
+        "openai/toolInvocation/invoking": "Saving your appointment",
+        "openai/toolInvocation/invoked": "Appointment saved and dashboard updated",
+      },
     },
     async ({ confirmed: _confirmed, ...input }) => {
       try {
         const appointment = await createAppointment(supabase, userId, input);
-        return { structuredContent: { appointment }, content: [{ type: "text", text: JSON.stringify(appointment) }] };
+        const summary = await getSharedHealthSummary(supabase);
+        return {
+          structuredContent: { appointment, summary },
+          content: [{ type: "text", text: "The appointment was saved and the refreshed Health Vault dashboard is displayed in the widget." }],
+        };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to add appointment";
         return { isError: true, content: [{ type: "text", text: message }] };

@@ -177,6 +177,9 @@ export function MarketingHeader({
                   darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
                 }`}>
                   <button
+                    type="button"
+                    onClick={() => handleViewClick('health-vault')}
+                    aria-label="Open Health Vault dashboard"
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                       darkMode
                         ? 'hover:bg-surface-sunken text-content-primary'
@@ -306,6 +309,8 @@ export function MarketingHeader({
                   darkMode ? 'border-stroke-subtle' : 'border-stroke-subtle'
                 }`}></div>
                 <button
+                  type="button"
+                  onClick={() => handleViewClick('health-vault')}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
                       ? 'text-content-primary hover:bg-surface-sunken'

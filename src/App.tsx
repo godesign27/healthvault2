@@ -61,6 +61,7 @@ type AppView = 'design-system' | 'projects' | 'health-vault' | 'marketing' | 'lo
 const SESSION_VIEW_KEY = 'hv-current-view';
 const SESSION_DEMO_KEY = 'hv-demo-mode';
 const SESSION_DS_SURFACE_KEY = 'hv-ds-surface-theme';
+const SESSION_RETURN_TO_KEY = 'hv-return-to';
 
 type DesignSystemSurface = 'default' | 'bold' | 'steel';
 
@@ -76,6 +77,23 @@ function getSavedDesignSystemSurface(): DesignSystemSurface {
 const IS_DEMO_MODE = (() => {
   try {
     const params = new URLSearchParams(window.location.search);
+    const requestedApp = params.get('app');
+    const returnTo = params.get('return_to');
+    if (returnTo?.startsWith('/oauth/consent?authorization_id=')) {
+      sessionStorage.setItem(SESSION_RETURN_TO_KEY, returnTo);
+    }
+    if (requestedApp === 'dashboard') {
+      sessionStorage.removeItem(SESSION_DEMO_KEY);
+      sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
+      window.history.replaceState({}, '', window.location.pathname);
+      return false;
+    }
+    if (requestedApp === 'onboarding') {
+      sessionStorage.removeItem(SESSION_DEMO_KEY);
+      sessionStorage.setItem(SESSION_VIEW_KEY, 'onboarding');
+      window.history.replaceState({}, '', window.location.pathname);
+      return false;
+    }
     if (params.has('demo')) {
       sessionStorage.setItem(SESSION_DEMO_KEY, 'true');
       sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
@@ -134,7 +152,7 @@ function App() {
       !authState.isAuthenticated &&
       (currentView === 'health-vault' || currentView === 'design-system' || currentView === 'projects')
     ) {
-      setCurrentView('marketing');
+      setCurrentView(currentView === 'health-vault' ? 'login' : 'marketing');
     }
   }, [authState.isAuthenticated, authState.authChecked, currentView]);
 
@@ -252,14 +270,7 @@ function App() {
   };
 
   const handleDirectHealthVaultAccess = () => {
-    try { sessionStorage.setItem(SESSION_DEMO_KEY, 'true'); } catch {}
-    setAuthState({
-      isAuthenticated: true,
-      authChecked: true,
-      onboardingComplete: true,
-      onboardingChecked: true
-    });
-    setCurrentView('health-vault');
+    handleViewChange('health-vault');
   };
 
   const handleLoginSuccess = () => {
@@ -378,6 +389,12 @@ function App() {
                 ...prev,
                 onboardingComplete: true
               }));
+              const returnTo = sessionStorage.getItem(SESSION_RETURN_TO_KEY);
+              if (returnTo?.startsWith('/oauth/consent?authorization_id=')) {
+                sessionStorage.removeItem(SESSION_RETURN_TO_KEY);
+                window.location.assign(returnTo);
+                return;
+              }
               setCurrentView('health-vault');
             }}
           />;

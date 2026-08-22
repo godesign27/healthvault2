@@ -11,14 +11,17 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 # ChatGPT App MVP
 
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
-- [x] Interactive dashboard widget with live summary, next appointment, and onboarding checklist.
+- [x] Interactive dashboard widget with live summary, expandable condition/medication/allergy/record details, next appointment, and onboarding checklist.
 - [x] Read-only detail tools for conditions, medications, allergies, and recent records.
 - [x] Two-step conversational appointment creation with preview, explicit confirmation, authenticated RLS insert, and future-date validation.
-- [~] Updated `health-vault-mcp` deployed as version 7; dashboard verified, appointment preview/create flow still needs an authenticated ChatGPT test.
+- [x] `health-vault-mcp` version 8 deployed; authenticated dashboard and appointment preview/create flow verified in ChatGPT.
+- [x] Appointment creation returns a refreshed dashboard widget automatically after confirmation.
+- [x] GPT-originated new-user signup preserves the pending OAuth request, runs full onboarding, and returns to consent.
+- [~] Authenticated dashboard deep link and marketing profile navigation are implemented locally; publish the web build through Bolt and test signed-in/signed-out routes.
 - [ ] Add confirmed conversational writes for conditions, medications, and allergies.
 - [ ] Add secure health-record file upload; metadata-only record creation is not sufficient for the MVP.
 - [ ] Test RLS isolation with a second Health Vault account before broader distribution.
-- [ ] Add first-run empty states and guided deep links for users who have not completed Health Vault onboarding.
+- [~] Add first-run empty states and guided deep links for users who have not completed Health Vault onboarding. The GPT onboarding deep link is implemented; empty health-data presentation still needs a first-account test.
 - [ ] Audit Edge Functions for asymmetric JWT verification, rotate the Supabase signing key, then re-enable OIDC in the ChatGPT app.
 
 ---

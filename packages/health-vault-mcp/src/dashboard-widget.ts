@@ -24,6 +24,15 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .status { flex: 0 0 auto; font-weight: 700; color: #008a68; }
     .status.todo { color: #9a5b00; }
     .appointment { padding: 13px 14px; border-radius: 14px; background: #edf9f5; color: #075e49; font-size: 13px; line-height: 1.45; }
+    details { border-top: 1px solid #eceae8; }
+    summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 13px 0; font-size: 14px; font-weight: 750; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; color: #78716c; font-size: 18px; }
+    details[open] summary::after { content: '−'; }
+    .detail-list { display: grid; gap: 8px; padding: 0 0 13px; }
+    .detail-item { padding: 11px 12px; border-radius: 12px; background: #f7f7f6; font-size: 13px; line-height: 1.4; }
+    .detail-item strong { display: block; }
+    .meta { color: #68635f; font-size: 12px; }
     .actions { display: flex; gap: 10px; padding: 0 16px 16px; }
     button { width: 100%; border: 0; border-radius: 999px; padding: 11px 14px; cursor: pointer; font: inherit; font-weight: 750; color: white; background: #171717; }
     .empty { padding: 28px 20px; text-align: center; color: #68635f; }
@@ -34,6 +43,9 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .value { color: #c4b5fd; }
       .label { color: #a8a29e; }
       .row { border-color: #44403c; }
+      details { border-color: #44403c; }
+      .detail-item { background: #292524; }
+      .meta { color: #a8a29e; }
       .appointment { background: #063f33; color: #d1fae5; }
       button { color: #171717; background: #f5f5f4; }
     }
@@ -44,7 +56,10 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
   <script>
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const openVault = () => {
-      const href = 'https://healthvault27.com';
+      const incomplete = window.openai?.toolOutput?.summary?.onboarding?.complete === false;
+      const href = incomplete
+        ? 'https://healthvault27.com/?app=onboarding&source=chatgpt'
+        : 'https://healthvault27.com/?app=dashboard&source=chatgpt';
       if (window.openai?.openExternal) window.openai.openExternal({ href });
       else window.open(href, '_blank', 'noopener,noreferrer');
     };
@@ -53,6 +68,16 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       if (!summary) return;
       const appointment = summary.nextAppointment;
       const checklist = summary.onboarding?.checklist ?? [];
+      const details = summary.details ?? {};
+      const formatDate = (value) => value ? new Date(value + (String(value).length === 10 ? 'T00:00:00' : '')).toLocaleDateString() : '';
+      const list = (rows, primary, secondary) => rows.length
+        ? rows.map((row) => '<div class="detail-item"><strong>' + esc(primary(row)) + '</strong>'
+          + (secondary(row) ? '<span class="meta">' + esc(secondary(row)) + '</span>' : '') + '</div>').join('')
+        : '<div class="detail-item meta">Nothing recorded yet.</div>';
+      const conditionHtml = list(details.conditions ?? [], (r) => r.name || 'Condition', (r) => [r.notes, r.managing_physician ? 'Managed by ' + r.managing_physician : '', formatDate(r.diagnosed_on)].filter(Boolean).join(' · '));
+      const medicationHtml = list(details.medications ?? [], (r) => r.name || 'Medication', (r) => [r.dosage, r.frequency, r.prescribed_by ? 'Prescribed by ' + r.prescribed_by : ''].filter(Boolean).join(' · '));
+      const allergyHtml = list(details.allergies ?? [], (r) => r.allergen || 'Allergy', (r) => [r.reaction, r.severity].filter(Boolean).join(' · '));
+      const recordHtml = list(details.recentRecords ?? [], (r) => r.title || r.kind || 'Health record', (r) => [r.provider_name, formatDate(r.service_date || r.received_at)].filter(Boolean).join(' · '));
       const appointmentHtml = appointment
         ? '<strong>' + esc(appointment.appointmentType || 'Appointment') + '</strong><br>'
           + esc(appointment.providerName || 'Provider') + ' · '
@@ -74,6 +99,11 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<div class="stat"><span class="value">' + esc(summary.allergies) + '</span><span class="label">Allergies</span></div>'
         + '<div class="stat"><span class="value">' + esc(summary.healthRecords) + '</span><span class="label">Health records</span></div></section>'
         + '<section class="section"><h2>Next appointment</h2><div class="appointment">' + appointmentHtml + '</div></section>'
+        + '<section class="section"><h2>Your health details</h2>'
+        + '<details><summary>Active conditions</summary><div class="detail-list">' + conditionHtml + '</div></details>'
+        + '<details><summary>Medications</summary><div class="detail-list">' + medicationHtml + '</div></details>'
+        + '<details><summary>Allergies</summary><div class="detail-list">' + allergyHtml + '</div></details>'
+        + '<details><summary>Recent records</summary><div class="detail-list">' + recordHtml + '</div></details></section>'
         + '<section class="section"><h2>Vault setup</h2>' + checklistHtml + '</section>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', openVault);
