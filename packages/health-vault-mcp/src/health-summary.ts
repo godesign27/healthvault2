@@ -86,8 +86,8 @@ export async function getHealthSummary(supabase: SupabaseClient) {
     onboarding: {
       complete: Boolean(profileRow?.onboarding_complete),
       checklist: [
-        { key: "email", label: "Verify email", complete: Boolean(profileRow?.email_verified), optional: false },
-        { key: "identity", label: "Complete identity profile", complete: Boolean(profileRow?.identity_verified), optional: false },
+        { key: "email", label: "Verify email", complete: Boolean(profileRow?.email_verified || profileRow?.onboarding_complete), optional: false },
+        { key: "identity", label: "Complete identity profile", complete: Boolean(profileRow?.identity_verified || profileRow?.onboarding_complete), optional: false },
         { key: "insurance", label: "Add insurance", complete: (coverages.count ?? 0) > 0, optional: true },
         { key: "preferences", label: "Choose assistant preferences", complete: Boolean(preferences.data), optional: true },
       ],

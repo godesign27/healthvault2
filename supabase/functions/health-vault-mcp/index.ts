@@ -13,6 +13,10 @@ import {
   getHealthRecords,
   getMedications,
 } from "../../../packages/health-vault-mcp/src/health-details.ts";
+import {
+  createAppointment,
+  previewAppointment,
+} from "../../../packages/health-vault-mcp/src/appointments.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -118,8 +122,8 @@ async function getHealthSummary(supabase: SupabaseClient) {
     onboarding: {
       complete: Boolean(profileRow?.onboarding_complete),
       checklist: [
-        { key: "email", label: "Verify email", complete: Boolean(profileRow?.email_verified), optional: false },
-        { key: "identity", label: "Complete identity profile", complete: Boolean(profileRow?.identity_verified), optional: false },
+        { key: "email", label: "Verify email", complete: Boolean(profileRow?.email_verified || profileRow?.onboarding_complete), optional: false },
+        { key: "identity", label: "Complete identity profile", complete: Boolean(profileRow?.identity_verified || profileRow?.onboarding_complete), optional: false },
         { key: "insurance", label: "Add insurance", complete: (coverages.count ?? 0) > 0, optional: true },
         { key: "preferences", label: "Choose assistant preferences", complete: Boolean(preferences.data), optional: true },
       ],
@@ -127,7 +131,7 @@ async function getHealthSummary(supabase: SupabaseClient) {
   };
 }
 
-function createHealthVaultMcpServer(supabase: SupabaseClient): McpServer {
+function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
   const server = new McpServer(
     { name: "health-vault", version: "0.1.0" },
     {
@@ -241,6 +245,52 @@ function createHealthVaultMcpServer(supabase: SupabaseClient): McpServer {
     ({ limit }) => getHealthRecords(supabase, limit),
   );
 
+  const appointmentSchema = {
+    providerName: z.string().trim().min(1).max(160),
+    appointmentType: z.string().trim().min(1).max(120),
+    scheduledAt: z.string().datetime({ offset: true }),
+    location: z.string().trim().max(240).optional(),
+    notes: z.string().trim().max(2000).optional(),
+  };
+
+  server.registerTool(
+    "preview_appointment",
+    {
+      title: "Preview appointment",
+      description: "Prepare an appointment for review. This never saves data. Show the complete preview and ask the user to explicitly confirm before calling create_appointment.",
+      inputSchema: z.object(appointmentSchema),
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async (input) => {
+      try {
+        const preview = previewAppointment(input);
+        return { structuredContent: { preview }, content: [{ type: "text", text: JSON.stringify(preview) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to preview appointment";
+        return { isError: true, content: [{ type: "text", text: message }] };
+      }
+    },
+  );
+
+  server.registerTool(
+    "create_appointment",
+    {
+      title: "Add confirmed appointment",
+      description: "Save an appointment only after preview_appointment has been shown and the user explicitly confirms the exact details. Never call this from an initial request or implied consent.",
+      inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    },
+    async ({ confirmed: _confirmed, ...input }) => {
+      try {
+        const appointment = await createAppointment(supabase, userId, input);
+        return { structuredContent: { appointment }, content: [{ type: "text", text: JSON.stringify(appointment) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to add appointment";
+        return { isError: true, content: [{ type: "text", text: message }] };
+      }
+    },
+  );
+
   return server;
 }
 
@@ -274,7 +324,7 @@ Deno.serve(async (request: Request) => {
   const { data, error } = await supabase.auth.getUser(accessToken);
   if (error || !data.user) return unauthorizedResponse();
 
-  const server = createHealthVaultMcpServer(supabase);
+  const server = createHealthVaultMcpServer(supabase, data.user.id);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
