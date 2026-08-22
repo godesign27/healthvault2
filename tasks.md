@@ -8,21 +8,6 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ---
 
-# ChatGPT App MVP
-
-- [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
-- [x] Interactive dashboard widget with live summary, next appointment, and onboarding checklist.
-- [x] Read-only detail tools for conditions, medications, allergies, and recent records.
-- [x] Two-step conversational appointment creation with preview, explicit confirmation, authenticated RLS insert, and future-date validation.
-- [~] Updated `health-vault-mcp` deployed as version 7; dashboard verified, appointment preview/create flow still needs an authenticated ChatGPT test.
-- [ ] Add confirmed conversational writes for conditions, medications, and allergies.
-- [ ] Add secure health-record file upload; metadata-only record creation is not sufficient for the MVP.
-- [ ] Test RLS isolation with a second Health Vault account before broader distribution.
-- [ ] Add first-run empty states and guided deep links for users who have not completed Health Vault onboarding.
-- [ ] Audit Edge Functions for asymmetric JWT verification, rotate the Supabase signing key, then re-enable OIDC in the ChatGPT app.
-
----
-
 # Mobile App
 
 ## 0. Current state (read first)

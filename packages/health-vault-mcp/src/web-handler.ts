@@ -67,7 +67,7 @@ export async function handleMcpRequest(request: Request): Promise<Response> {
     );
   }
 
-  const server = createHealthVaultMcpServer(supabase, data.user.id);
+  const server = createHealthVaultMcpServer(supabase);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,

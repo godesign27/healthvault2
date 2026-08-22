@@ -3,20 +3,6 @@ import { McpServer } from "npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "npm:@modelcontextprotocol/sdk@1.25.3/server/webStandardStreamableHttp.js";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.112.3";
 import { z } from "npm:zod@4.1.13";
-import {
-  DASHBOARD_WIDGET_HTML,
-  DASHBOARD_WIDGET_URI,
-} from "../../../packages/health-vault-mcp/src/dashboard-widget.ts";
-import {
-  getAllergies,
-  getConditions,
-  getHealthRecords,
-  getMedications,
-} from "../../../packages/health-vault-mcp/src/health-details.ts";
-import {
-  createAppointment,
-  previewAppointment,
-} from "../../../packages/health-vault-mcp/src/appointments.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -59,12 +45,9 @@ function assertSuccessful(label: string, result: QueryResult): void {
 async function getHealthSummary(supabase: SupabaseClient) {
   const today = new Date().toISOString().slice(0, 10);
   const now = new Date().toISOString();
-  const [profile, conditions, medications, allergies, records, appointments, coverages, preferences] =
+  const [profile, conditions, medications, allergies, records, appointments] =
     await Promise.all([
-      supabase
-        .from("user_profiles")
-        .select("first_name, last_name, email_verified, identity_verified, onboarding_complete")
-        .maybeSingle(),
+      supabase.from("user_profiles").select("first_name, last_name").maybeSingle(),
       supabase.from("conditions").select("id", { count: "exact", head: true }).eq("status", "Active"),
       supabase.from("medications").select("id, end_date"),
       supabase.from("allergies").select("id", { count: "exact", head: true }),
@@ -76,8 +59,6 @@ async function getHealthSummary(supabase: SupabaseClient) {
         .gte("scheduled_at", now)
         .order("scheduled_at", { ascending: true })
         .limit(1),
-      supabase.from("insurance_coverages").select("id", { count: "exact", head: true }),
-      supabase.from("user_preferences").select("id").maybeSingle(),
     ]);
 
   assertSuccessful("profile", profile);
@@ -86,17 +67,9 @@ async function getHealthSummary(supabase: SupabaseClient) {
   assertSuccessful("allergies", allergies);
   assertSuccessful("health records", records);
   assertSuccessful("appointments", appointments);
-  assertSuccessful("insurance coverages", coverages);
-  assertSuccessful("preferences", preferences);
 
   const medicationRows = (medications.data ?? []) as Array<{ end_date: string | null }>;
-  const profileRow = profile.data as {
-    first_name?: string;
-    last_name?: string;
-    email_verified?: boolean;
-    identity_verified?: boolean;
-    onboarding_complete?: boolean;
-  } | null;
+  const profileRow = profile.data as { first_name?: string; last_name?: string } | null;
   const appointmentRows = (appointments.data ?? []) as Array<{
     provider_name: string | null;
     appointment_type: string | null;
@@ -119,43 +92,16 @@ async function getHealthSummary(supabase: SupabaseClient) {
           location: nextAppointment.location,
         }
       : null,
-    onboarding: {
-      complete: Boolean(profileRow?.onboarding_complete),
-      checklist: [
-        { key: "email", label: "Verify email", complete: Boolean(profileRow?.email_verified || profileRow?.onboarding_complete), optional: false },
-        { key: "identity", label: "Complete identity profile", complete: Boolean(profileRow?.identity_verified || profileRow?.onboarding_complete), optional: false },
-        { key: "insurance", label: "Add insurance", complete: (coverages.count ?? 0) > 0, optional: true },
-        { key: "preferences", label: "Choose assistant preferences", complete: Boolean(preferences.data), optional: true },
-      ],
-    },
   };
 }
 
-function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
+function createHealthVaultMcpServer(supabase: SupabaseClient): McpServer {
   const server = new McpServer(
     { name: "health-vault", version: "0.1.0" },
     {
       instructions:
         "Use Health Vault tools only for the authenticated user's records. Treat results as informational health data, not diagnosis or emergency medical advice.",
     },
-  );
-
-  server.registerResource(
-    "health-vault-dashboard",
-    DASHBOARD_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Interactive Health Vault dashboard" },
-    async () => ({
-      contents: [{
-        uri: DASHBOARD_WIDGET_URI,
-        mimeType: "text/html+skybridge",
-        text: DASHBOARD_WIDGET_HTML,
-        _meta: {
-          "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
-          "openai/widgetPrefersBorder": true,
-          "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
-        },
-      }],
-    }),
   );
 
   server.registerTool(
@@ -171,11 +117,6 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         idempotentHint: true,
         openWorldHint: false,
       },
-      _meta: {
-        "openai/outputTemplate": DASHBOARD_WIDGET_URI,
-        "openai/toolInvocation/invoking": "Loading your Health Vault",
-        "openai/toolInvocation/invoked": "Health Vault dashboard ready",
-      },
     },
     async () => {
       try {
@@ -186,106 +127,6 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to read health summary";
-        return { isError: true, content: [{ type: "text", text: message }] };
-      }
-    },
-  );
-
-  const registerReadTool = <T>(
-    name: string,
-    title: string,
-    description: string,
-    inputSchema: z.ZodType<T>,
-    read: (input: T) => Promise<unknown>,
-  ) => server.registerTool(
-    name,
-    {
-      title,
-      description,
-      inputSchema,
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-    },
-    async (input) => {
-      try {
-        const result = await read(input as T);
-        return { structuredContent: { result }, content: [{ type: "text", text: JSON.stringify(result) }] };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : `Unable to run ${title}`;
-        return { isError: true, content: [{ type: "text", text: message }] };
-      }
-    },
-  );
-
-  registerReadTool(
-    "list_conditions",
-    "List conditions",
-    "List the authenticated user's recorded health conditions. Use activeOnly unless the user asks for history.",
-    z.object({ activeOnly: z.boolean().default(true) }),
-    ({ activeOnly }) => getConditions(supabase, activeOnly),
-  );
-  registerReadTool(
-    "list_medications",
-    "List medications",
-    "List the authenticated user's medications, including dosage and frequency when recorded.",
-    z.object({ activeOnly: z.boolean().default(true) }),
-    ({ activeOnly }) => getMedications(supabase, activeOnly),
-  );
-  registerReadTool(
-    "list_allergies",
-    "List allergies",
-    "List the authenticated user's recorded allergies and reactions.",
-    z.object({}),
-    () => getAllergies(supabase),
-  );
-  registerReadTool(
-    "list_health_records",
-    "List health records",
-    "List the authenticated user's most recent Health Vault records with dates, type, and provider.",
-    z.object({ limit: z.number().int().min(1).max(25).default(10) }),
-    ({ limit }) => getHealthRecords(supabase, limit),
-  );
-
-  const appointmentSchema = {
-    providerName: z.string().trim().min(1).max(160),
-    appointmentType: z.string().trim().min(1).max(120),
-    scheduledAt: z.string().datetime({ offset: true }),
-    location: z.string().trim().max(240).optional(),
-    notes: z.string().trim().max(2000).optional(),
-  };
-
-  server.registerTool(
-    "preview_appointment",
-    {
-      title: "Preview appointment",
-      description: "Prepare an appointment for review. This never saves data. Show the complete preview and ask the user to explicitly confirm before calling create_appointment.",
-      inputSchema: z.object(appointmentSchema),
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-    },
-    async (input) => {
-      try {
-        const preview = previewAppointment(input);
-        return { structuredContent: { preview }, content: [{ type: "text", text: JSON.stringify(preview) }] };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Unable to preview appointment";
-        return { isError: true, content: [{ type: "text", text: message }] };
-      }
-    },
-  );
-
-  server.registerTool(
-    "create_appointment",
-    {
-      title: "Add confirmed appointment",
-      description: "Save an appointment only after preview_appointment has been shown and the user explicitly confirms the exact details. Never call this from an initial request or implied consent.",
-      inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
-    },
-    async ({ confirmed: _confirmed, ...input }) => {
-      try {
-        const appointment = await createAppointment(supabase, userId, input);
-        return { structuredContent: { appointment }, content: [{ type: "text", text: JSON.stringify(appointment) }] };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Unable to add appointment";
         return { isError: true, content: [{ type: "text", text: message }] };
       }
     },
@@ -324,7 +165,7 @@ Deno.serve(async (request: Request) => {
   const { data, error } = await supabase.auth.getUser(accessToken);
   if (error || !data.user) return unauthorizedResponse();
 
-  const server = createHealthVaultMcpServer(supabase, data.user.id);
+  const server = createHealthVaultMcpServer(supabase);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,

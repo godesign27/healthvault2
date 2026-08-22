@@ -34,7 +34,7 @@ app.post("/mcp", async (request, response) => {
     return;
   }
 
-  const server = createHealthVaultMcpServer(authenticated.supabase, authenticated.user.id);
+  const server = createHealthVaultMcpServer(authenticated.supabase);
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
   });
