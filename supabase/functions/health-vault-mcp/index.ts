@@ -499,7 +499,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async () => {
       try {
-        const catalog = await listMedicalForms(supabase);
+        const catalog = await listMedicalForms(supabase, userId);
         return {
           structuredContent: catalog,
           content: [{ type: "text", text: catalog.forms.length ? "Your common Health Vault forms are displayed above. Ask which one the user wants to complete, or offer the secure upload option for a provider PDF or photos." : "No common medical forms are available. Offer the secure upload option." }],
@@ -521,7 +521,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async ({ templateId }) => {
       try {
-        const form = await getMedicalForm(supabase, templateId);
+        const form = await getMedicalForm(supabase, userId, templateId);
         return {
           structuredContent: { form },
           content: [{ type: "text", text: "The selected reusable form is loaded. Ask only for the missing information needed for this task, and distinguish saved answers from unconfirmed Health Vault suggestions." }],

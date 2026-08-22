@@ -144,8 +144,12 @@ type FormResponse = {
   updated_at: string | null;
 };
 
-async function getPatientProfileId(supabase: SupabaseClient): Promise<string> {
-  const { data, error } = await supabase.from("patient_profiles").select("id").maybeSingle();
+async function getPatientProfileId(supabase: SupabaseClient, userId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("patient_profiles")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
   if (error) throw new Error(`Unable to find the Health Vault profile: ${error.message}`);
   if (!data?.id) throw new Error("Complete your Health Vault profile before working on medical forms.");
   return data.id;
@@ -204,8 +208,8 @@ async function suggestedMedicalHistory(supabase: SupabaseClient) {
   };
 }
 
-export async function listMedicalForms(supabase: SupabaseClient) {
-  const patientId = await getPatientProfileId(supabase);
+export async function listMedicalForms(supabase: SupabaseClient, userId: string) {
+  const patientId = await getPatientProfileId(supabase, userId);
   const [{ data: templates, error: templateError }, { data, error }] = await Promise.all([
     supabase.from("form_templates")
       .select("id, title, description, category, version")
@@ -242,9 +246,9 @@ export async function listMedicalForms(supabase: SupabaseClient) {
   };
 }
 
-export async function getMedicalForm(supabase: SupabaseClient, templateId: string) {
+export async function getMedicalForm(supabase: SupabaseClient, userId: string, templateId: string) {
   const definition = definitionFor(templateId);
-  const patientId = await getPatientProfileId(supabase);
+  const patientId = await getPatientProfileId(supabase, userId);
   const response = await getResponse(supabase, patientId, templateId);
   const savedAnswers = response?.answers_json ?? {};
   const suggestions = templateId === "medical-history" ? await suggestedMedicalHistory(supabase) : {};
@@ -270,7 +274,7 @@ export async function proposeFormAnswers(
 ) {
   const definition = definitionFor(templateId);
   const cleanAnswers = validateAnswers(definition, answers);
-  const patientId = await getPatientProfileId(supabase);
+  const patientId = await getPatientProfileId(supabase, userId);
   const response = await getResponse(supabase, patientId, templateId);
   const actualUpdatedAt = response?.updated_at ?? null;
   if ((expectedUpdatedAt ?? null) !== actualUpdatedAt) {
