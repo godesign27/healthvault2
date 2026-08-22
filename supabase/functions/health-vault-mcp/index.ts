@@ -199,10 +199,10 @@ async function getHealthSummary(supabase: SupabaseClient) {
 
 function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
   const server = new McpServer(
-    { name: "health-vault", version: "0.1.0" },
+    { name: "health-vault", version: "0.3.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. Treat results as informational health data, not diagnosis or emergency medical advice.",
+        "Use Health Vault tools only for the authenticated user's records. The server supports reading the dashboard, previewing and confirming health-data writes, and previewing, creating, and revoking secure shares. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis or emergency medical advice.",
     },
   );
 

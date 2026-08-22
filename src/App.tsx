@@ -89,6 +89,11 @@ const IS_DEMO_MODE = (() => {
       window.history.replaceState({}, '', '/dashboard');
       return false;
     }
+    if (requestedApp === 'marketing') {
+      sessionStorage.removeItem(SESSION_DEMO_KEY);
+      sessionStorage.setItem(SESSION_VIEW_KEY, 'marketing');
+      return false;
+    }
     if (requestedApp === 'onboarding') {
       sessionStorage.removeItem(SESSION_DEMO_KEY);
       sessionStorage.setItem(SESSION_VIEW_KEY, 'onboarding');
@@ -156,6 +161,21 @@ function App() {
       setCurrentView(currentView === 'health-vault' ? 'login' : 'marketing');
     }
   }, [authState.isAuthenticated, authState.authChecked, currentView]);
+
+  useEffect(() => {
+    if (
+      authState.authChecked &&
+      authState.onboardingChecked &&
+      authState.isAuthenticated &&
+      authState.onboardingComplete &&
+      currentView === 'marketing' &&
+      window.location.pathname === '/' &&
+      new URLSearchParams(window.location.search).get('app') !== 'marketing'
+    ) {
+      setCurrentView('health-vault');
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [authState, currentView]);
 
   useEffect(() => {
     if (initializingRef.current) return;
@@ -267,8 +287,8 @@ function App() {
     setCurrentView(view);
     if (view === 'health-vault' && window.location.pathname !== '/dashboard') {
       window.history.pushState({}, '', '/dashboard');
-    } else if (view === 'marketing' && window.location.pathname === '/dashboard') {
-      window.history.pushState({}, '', '/');
+    } else if (view === 'marketing') {
+      window.history.pushState({}, '', '/?app=marketing');
     }
     if (view === 'projects') {
       setCurrentProjectId(null);
@@ -311,6 +331,7 @@ function App() {
 
         if (onboardingComplete) {
           setCurrentView('health-vault');
+          window.history.replaceState({}, '', '/dashboard');
         } else {
           setCurrentView('onboarding');
           setOnboardingStep('start');
