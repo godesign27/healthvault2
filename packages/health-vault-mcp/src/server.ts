@@ -176,7 +176,14 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
         const appointment = await createAppointment(supabase, userId, input);
         const summary = await getHealthSummary(supabase);
         return {
-          structuredContent: { appointment, summary },
+          structuredContent: {
+            appointment,
+            summary,
+            recentChange: {
+              title: "Appointment added",
+              message: `${appointment.appointment_type} with ${appointment.provider_name} is now in Health Vault.`,
+            },
+          },
           content: [{ type: "text", text: "The appointment was saved and the refreshed Health Vault dashboard is displayed in the widget." }],
         };
       } catch (error) {

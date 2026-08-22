@@ -18,6 +18,24 @@ import {
   previewAppointment,
 } from "../../../packages/health-vault-mcp/src/appointments.ts";
 import { getHealthSummary as getSharedHealthSummary } from "../../../packages/health-vault-mcp/src/health-summary.ts";
+import {
+  cancelAppointment,
+  createAllergy,
+  createCondition,
+  createHealthRecord,
+  createMedication,
+  previewAllergy,
+  previewAppointmentCancellation,
+  previewCondition,
+  previewHealthRecord,
+  previewMedication,
+} from "../../../packages/health-vault-mcp/src/health-writes.ts";
+import {
+  createHealthShare,
+  HEALTH_SHARE_CATEGORIES,
+  previewHealthShare,
+  revokeHealthShare,
+} from "../../../packages/health-vault-mcp/src/health-sharing.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -193,6 +211,16 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
   );
 
+  const dashboardResult = async (
+    summary: Awaited<ReturnType<typeof getSharedHealthSummary>>,
+    recentChange: { title: string; message: string },
+    extra: Record<string, unknown> = {},
+  ) => ({
+    structuredContent: { ...extra, summary, recentChange },
+    content: [{ type: "text" as const, text: `${recentChange.title}. The refreshed Health Vault dashboard is displayed in the widget.` }],
+    _meta: await dashboardMetadata(summary),
+  });
+
   server.registerResource(
     "health-vault-dashboard",
     DASHBOARD_WIDGET_URI,
@@ -346,17 +374,146 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       try {
         const appointment = await createAppointment(supabase, userId, input);
         const summary = await getSharedHealthSummary(supabase);
-        return {
-          structuredContent: { appointment, summary },
-          content: [{ type: "text", text: "The appointment was saved and the refreshed Health Vault dashboard is displayed in the widget." }],
-          _meta: await dashboardMetadata(summary),
-        };
+        return dashboardResult(summary, {
+          title: "Appointment added",
+          message: `${appointment.appointment_type} with ${appointment.provider_name} is now in Health Vault.`,
+        }, { appointment });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to add appointment";
         return { isError: true, content: [{ type: "text", text: message }] };
       }
     },
   );
+
+  const dateValue = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD").optional();
+  const conditionSchema = z.object({
+    name: z.string().trim().min(1).max(160),
+    status: z.enum(["Active", "In remission", "Resolved"]).default("Active"),
+    diagnosedOn: dateValue,
+    managingPhysician: z.string().trim().max(160).optional(),
+    notes: z.string().trim().max(2000).optional(),
+  });
+  const medicationSchema = z.object({
+    name: z.string().trim().min(1).max(160),
+    dosage: z.string().trim().max(120).optional(),
+    frequency: z.string().trim().max(160).optional(),
+    prescribedBy: z.string().trim().max(160).optional(),
+    startDate: dateValue,
+    endDate: dateValue,
+    notes: z.string().trim().max(2000).optional(),
+  });
+  const allergySchema = z.object({
+    allergen: z.string().trim().min(1).max(160),
+    reaction: z.string().trim().max(500).optional(),
+    severity: z.enum(["Mild", "Moderate", "Severe"]).optional(),
+    diagnosedOn: dateValue,
+    notes: z.string().trim().max(2000).optional(),
+  });
+  const recordSchema = z.object({
+    title: z.string().trim().min(1).max(200),
+    kind: z.enum(["lab", "imaging", "pathology", "specialist_report", "other"]),
+    providerName: z.string().trim().max(160).optional(),
+    serviceDate: dateValue,
+    summary: z.string().trim().max(4000).optional(),
+    tags: z.array(z.string().trim().min(1).max(50)).max(12).optional(),
+  });
+
+  const previewTool = <T>(name: string, title: string, description: string, schema: z.ZodType<T>, preview: (input: T) => unknown) =>
+    server.registerTool(name, {
+      title,
+      description,
+      inputSchema: schema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    }, async (input) => {
+      try {
+        const result = preview(input as T);
+        return { structuredContent: { preview: result }, content: [{ type: "text", text: JSON.stringify(result) }] };
+      } catch (error) {
+        return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : `Unable to ${title}` }] };
+      }
+    });
+
+  const confirmedTool = <T>(
+    name: string,
+    title: string,
+    description: string,
+    schema: z.ZodType<T>,
+    save: (input: T) => Promise<unknown>,
+    change: (saved: any) => { title: string; message: string },
+  ) => server.registerTool(name, {
+    title,
+    description,
+    inputSchema: schema,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    _meta: { "openai/outputTemplate": DASHBOARD_WIDGET_URI },
+  }, async (input) => {
+    try {
+      const saved = await save(input as T);
+      const summary = await getSharedHealthSummary(supabase);
+      return dashboardResult(summary, change(saved), { saved });
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : `Unable to ${title}` }] };
+    }
+  });
+
+  previewTool("preview_condition", "Preview condition", "Prepare a condition for review without saving it. Show the exact details and request explicit confirmation before add_condition.", conditionSchema, previewCondition);
+  confirmedTool("add_condition", "Add confirmed condition", "Save only after preview_condition and explicit user confirmation.", conditionSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => createCondition(supabase, userId, input), (saved) => ({ title: "Condition added", message: `${saved.name} is now in Health Vault.` }));
+  previewTool("preview_medication", "Preview medication", "Prepare a medication for review without saving it. Show the exact details and request explicit confirmation before add_medication.", medicationSchema, previewMedication);
+  confirmedTool("add_medication", "Add confirmed medication", "Save only after preview_medication and explicit user confirmation.", medicationSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => createMedication(supabase, userId, input), (saved) => ({ title: "Medication added", message: `${saved.name} is now in Health Vault.` }));
+  previewTool("preview_allergy", "Preview allergy", "Prepare an allergy for review without saving it. Show the exact details and request explicit confirmation before add_allergy.", allergySchema, previewAllergy);
+  confirmedTool("add_allergy", "Add confirmed allergy", "Save only after preview_allergy and explicit user confirmation.", allergySchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => createAllergy(supabase, userId, input), (saved) => ({ title: "Allergy added", message: `${saved.allergen} is now in Health Vault.` }));
+  previewTool("preview_health_record", "Preview health record", "Prepare a record summary for review without saving it. Show the exact details and request explicit confirmation before add_health_record.", recordSchema, previewHealthRecord);
+  confirmedTool("add_health_record", "Add confirmed health record", "Save only after preview_health_record and explicit user confirmation. This stores structured record information, not an uploaded file.", recordSchema.extend({ confirmed: z.literal(true) }), ({ confirmed: _confirmed, ...input }) => createHealthRecord(supabase, userId, input), (saved) => ({ title: "Health record added", message: `${saved.title} is now in Health Vault.` }));
+
+  server.registerTool("preview_appointment_cancellation", {
+    title: "Preview appointment cancellation",
+    description: "Load the exact scheduled appointment and ask the user to explicitly confirm before cancel_appointment.",
+    inputSchema: z.object({ appointmentId: z.string().uuid() }),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ appointmentId }) => {
+    try {
+      const preview = await previewAppointmentCancellation(supabase, appointmentId);
+      return { structuredContent: { preview }, content: [{ type: "text", text: JSON.stringify(preview) }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to preview cancellation" }] };
+    }
+  });
+  confirmedTool("cancel_appointment", "Cancel confirmed appointment", "Cancel only after preview_appointment_cancellation and explicit user confirmation.", z.object({ appointmentId: z.string().uuid(), confirmed: z.literal(true) }), ({ appointmentId }) => cancelAppointment(supabase, appointmentId), (saved) => ({ title: "Appointment cancelled", message: `${saved.appointment_type} with ${saved.provider_name} was cancelled.` }));
+
+  const shareSchema = z.object({
+    recipientName: z.string().trim().min(1).max(160),
+    recipientOrganization: z.string().trim().max(200).optional(),
+    categories: z.array(z.enum(HEALTH_SHARE_CATEGORIES)).min(1),
+    expiresInDays: z.number().int().min(1).max(30).default(7),
+    note: z.string().trim().max(1000).optional(),
+  });
+  previewTool("preview_health_share", "Preview secure health share", "Preview the recipient, selected categories, and expiration without creating a link. Require explicit confirmation before create_health_share.", shareSchema, previewHealthShare);
+  server.registerTool("create_health_share", {
+    title: "Create confirmed secure health share",
+    description: "Create a revocable, expiring link only after preview_health_share and explicit user confirmation. Return the link to the user; do not send it automatically.",
+    inputSchema: shareSchema.extend({ confirmed: z.literal(true) }),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ confirmed: _confirmed, ...input }) => {
+    try {
+      const share = await createHealthShare(supabase, userId, "https://healthvault27.com", input);
+      return { structuredContent: { share }, content: [{ type: "text", text: `Secure share created for ${share.recipientName}. It expires at ${share.expiresAt}.` }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to create secure share" }] };
+    }
+  });
+  server.registerTool("revoke_health_share", {
+    title: "Revoke secure health share",
+    description: "Revoke an existing secure share only after the user explicitly asks to revoke that exact share ID.",
+    inputSchema: z.object({ shareId: z.string().uuid(), confirmed: z.literal(true) }),
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+  }, async ({ shareId }) => {
+    try {
+      const revoked = await revokeHealthShare(supabase, shareId);
+      return { structuredContent: { revoked }, content: [{ type: "text", text: "The secure share was revoked." }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to revoke secure share" }] };
+    }
+  });
 
   return server;
 }

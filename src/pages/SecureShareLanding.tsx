@@ -32,6 +32,11 @@ type LandingSharePayload = {
   expiresAt?: string;
   openedAt?: string;
   revokedAt?: string;
+  healthData?: {
+    categories: string[];
+    snapshot: Record<string, unknown>;
+    capturedAt: string;
+  } | null;
 };
 
 function StatusBadge({ status }: { status: ShareStatus }) {
@@ -109,8 +114,11 @@ export default function SecureShareLanding() {
 
         fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/share/${payload.id}/opened`, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
         })
-          .then(() => {
+          .then((response) => {
+            if (!response.ok) throw new Error('Unable to record share access');
             setAccessLoggedAt(new Date().toLocaleString());
           })
           .catch(() => {});
@@ -126,6 +134,9 @@ export default function SecureShareLanding() {
 
   const isDisabled = data ? (data.status === 'revoked' || data.status === 'expired') : true;
   const hasMultipleForms = data && data.forms.length > 1;
+  const healthSections = data?.healthData
+    ? Object.entries(data.healthData.snapshot).filter(([, value]) => value != null)
+    : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -193,8 +204,30 @@ export default function SecureShareLanding() {
               <>
                 {/* Instructional Text */}
                 <p className="text-slate-600 mb-6">
-                  Access the patient-authorized forms below. Download as a PDF packet or as a FHIR JSON bundle for EHR import.
+                  Access only the health information the patient explicitly authorized below.
                 </p>
+
+                {healthSections.length > 0 && (
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <h2 className="text-slate-900 text-lg font-semibold">Patient-authorized health information</h2>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        Snapshot
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Captured {new Date(data.healthData!.capturedAt).toLocaleString()}. Later Health Vault changes are not included.
+                    </p>
+                    {healthSections.map(([category, value]) => (
+                      <section key={category} className="hv-surface-card hv-surface-card--flat p-6">
+                        <h3 className="text-slate-900 font-semibold capitalize mb-3">{category.replace(/_/g, ' ')}</h3>
+                        <pre className="whitespace-pre-wrap break-words text-xs leading-5 text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-4 overflow-auto">
+                          {JSON.stringify(value, null, 2)}
+                        </pre>
+                      </section>
+                    ))}
+                  </div>
+                )}
 
                 {/* Intended Recipient */}
                 <div className="hv-surface-card hv-surface-card--flat p-6 mb-4">
@@ -247,7 +280,7 @@ export default function SecureShareLanding() {
                 )}
 
                 {/* Included Forms */}
-                <div className="space-y-4 mb-6">
+                {data.forms.length > 0 && <div className="space-y-4 mb-6">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <h2 className="text-slate-900 text-lg font-semibold">Included Forms</h2>
@@ -314,7 +347,7 @@ export default function SecureShareLanding() {
                       </div>
                     </div>
                   ))}
-                </div>
+                </div>}
 
                 {/* Provider Guidance Note */}
                 <p className="text-xs text-slate-500 mb-6">

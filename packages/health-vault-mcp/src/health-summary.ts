@@ -12,6 +12,20 @@ function assertSuccessful(label: string, result: QueryResult): void {
   }
 }
 
+function normalized(value: unknown): string {
+  return String(value ?? "").trim().toLocaleLowerCase();
+}
+
+function uniqueBy<T>(rows: T[], key: (row: T) => string): T[] {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const value = key(row);
+    if (seen.has(value)) return false;
+    seen.add(value);
+    return true;
+  });
+}
+
 export async function getHealthSummary(supabase: SupabaseClient) {
   const today = new Date().toISOString().slice(0, 10);
   const now = new Date().toISOString();
@@ -53,10 +67,6 @@ export async function getHealthSummary(supabase: SupabaseClient) {
   assertSuccessful("insurance coverages", coverages);
   assertSuccessful("preferences", preferences);
 
-  const medicationRows = (medications.data ?? []) as Array<{ end_date: string | null }>;
-  const activeMedications = medicationRows.filter(
-    ({ end_date }) => !end_date || end_date >= today,
-  ).length;
   const profileRow = profile.data as {
     first_name?: string;
     last_name?: string;
@@ -93,30 +103,45 @@ export async function getHealthSummary(supabase: SupabaseClient) {
       .select("id, name, status, diagnosed_on, managing_physician, notes")
       .eq("status", "Active")
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(50),
     supabase
       .from("medications")
       .select("id, name, dosage, frequency, prescribed_by, start_date, end_date")
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(50),
     supabase
       .from("allergies")
       .select("id, allergen, reaction, severity")
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(50),
     supabase
       .from("health_records")
       .select("id, title, kind, provider_name, service_date, received_at")
       .order("service_date", { ascending: false, nullsFirst: false })
-      .limit(6),
+      .limit(50),
   ]);
   const detailRows = detailResults.map((result) =>
     result.status === "fulfilled" && !result.value.error
       ? result.value.data ?? []
       : [],
   );
-  const activeMedicationRows = (detailRows[1] as Array<{ end_date?: string | null }>).filter(
-    ({ end_date }) => !end_date || end_date >= today,
+  const conditionRows = uniqueBy(
+    detailRows[0] as Array<{ name?: string; status?: string }>,
+    (row) => `${normalized(row.name)}|${normalized(row.status)}`,
+  );
+  const activeMedicationRows = uniqueBy(
+    (detailRows[1] as Array<{ name?: string; dosage?: string; frequency?: string; end_date?: string | null }>).filter(
+      ({ end_date }) => !end_date || end_date >= today,
+    ),
+    (row) => `${normalized(row.name)}|${normalized(row.dosage)}|${normalized(row.frequency)}`,
+  );
+  const allergyRows = uniqueBy(
+    detailRows[2] as Array<{ allergen?: string; reaction?: string }>,
+    (row) => `${normalized(row.allergen)}|${normalized(row.reaction)}`,
+  );
+  const recordRows = uniqueBy(
+    detailRows[3] as Array<{ title?: string; provider_name?: string; service_date?: string }>,
+    (row) => `${normalized(row.title)}|${normalized(row.provider_name)}|${normalized(row.service_date)}`,
   );
 
   return {
@@ -146,15 +171,15 @@ export async function getHealthSummary(supabase: SupabaseClient) {
           : null,
       },
     },
-    activeConditions: conditions.count ?? 0,
-    activeMedications,
-    allergies: allergies.count ?? 0,
-    healthRecords: records.count ?? 0,
+    activeConditions: conditionRows.length,
+    activeMedications: activeMedicationRows.length,
+    allergies: allergyRows.length,
+    healthRecords: recordRows.length,
     details: {
-      conditions: detailRows[0],
+      conditions: conditionRows,
       medications: activeMedicationRows,
-      allergies: detailRows[2],
-      recentRecords: detailRows[3],
+      allergies: allergyRows,
+      recentRecords: recordRows,
     },
     nextAppointment: nextAppointment
       ? {

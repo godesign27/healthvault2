@@ -31,6 +31,8 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     .status { flex: 0 0 auto; font-weight: 700; color: #008a68; }
     .status.todo { color: #9a5b00; }
     .appointment { padding: 13px 14px; border-left: 3px solid #0b8063; border-radius: 8px; background: #edf6f2; color: #145846; font-size: 13px; line-height: 1.5; }
+    .change-banner { margin: 16px 18px 0; padding: 12px 14px; border: 1px solid #a7e1cf; border-radius: 8px; background: #edf9f5; color: #145846; font-size: 12px; line-height: 1.45; }
+    .change-banner strong { display: block; margin-bottom: 2px; }
     .detail-section { padding: 14px 0 4px; border-top: 1px solid #eceae8; }
     .detail-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
     .detail-heading h3 { margin: 0; font-size: 14px; font-weight: 750; }
@@ -72,6 +74,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       .medical-id-note, .private-detail span { color: #9ea6aa; }
       .private-detail { border-color: #343a3e; }
       .appointment { background: #163b32; color: #c7f2e4; border-left-color: #30b792; }
+      .change-banner { background: #163b32; border-color: #286c5a; color: #c7f2e4; }
       button { color: #17213a; background: #f2f4f5; }
       button:hover { background: #dfe4e7; }
     }
@@ -91,7 +94,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const incomplete = window.openai?.toolOutput?.summary?.onboarding?.complete === false;
       const href = incomplete
         ? 'https://healthvault27.com/?app=onboarding&source=chatgpt'
-        : 'https://healthvault27.com/?app=dashboard&source=chatgpt';
+        : 'https://healthvault27.com/dashboard?source=chatgpt';
       if (window.openai?.openExternal) window.openai.openExternal({ href });
       else window.open(href, '_blank', 'noopener,noreferrer');
     };
@@ -103,6 +106,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       const details = summary.details ?? {};
       const profile = summary.profile ?? {};
       const privateProfile = profile.private ?? {};
+      const recentChange = window.openai?.toolOutput?.recentChange;
       const responseMetadata = window.openai?.toolResponseMetadata ?? {};
       const hiddenMetadata = responseMetadata?.mcp_tool_result?._meta
         ?? responseMetadata?.call_tool_result?._meta
@@ -171,6 +175,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         + '<div class="stat"><span class="value">' + esc(summary.activeMedications) + '</span><span class="label">Active medications</span></div>'
         + '<div class="stat"><span class="value">' + esc(summary.allergies) + '</span><span class="label">Allergies</span></div>'
         + '<div class="stat"><span class="value">' + esc(summary.healthRecords) + '</span><span class="label">Health records</span></div></section>'
+        + (recentChange ? '<div class="change-banner" role="status"><strong>' + esc(recentChange.title || 'Health Vault updated') + '</strong>' + esc(recentChange.message || 'Your dashboard now reflects the confirmed change.') + '</div>' : '')
         + '<section class="section"><h2>Next appointment</h2><div class="appointment">' + appointmentHtml + '</div></section>'
         + '<section class="section"><h2>Your health details</h2>'
         + conditionHtml + medicationHtml + allergyHtml + recordHtml + '</section>'

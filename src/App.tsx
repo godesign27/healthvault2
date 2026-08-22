@@ -78,14 +78,15 @@ const IS_DEMO_MODE = (() => {
   try {
     const params = new URLSearchParams(window.location.search);
     const requestedApp = params.get('app');
+    const requestedDashboard = window.location.pathname === '/dashboard';
     const returnTo = params.get('return_to');
     if (returnTo?.startsWith('/oauth/consent?authorization_id=')) {
       sessionStorage.setItem(SESSION_RETURN_TO_KEY, returnTo);
     }
-    if (requestedApp === 'dashboard') {
+    if (requestedApp === 'dashboard' || requestedDashboard) {
       sessionStorage.removeItem(SESSION_DEMO_KEY);
       sessionStorage.setItem(SESSION_VIEW_KEY, 'health-vault');
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', '/dashboard');
       return false;
     }
     if (requestedApp === 'onboarding') {
@@ -264,6 +265,11 @@ function App() {
       }
     }
     setCurrentView(view);
+    if (view === 'health-vault' && window.location.pathname !== '/dashboard') {
+      window.history.pushState({}, '', '/dashboard');
+    } else if (view === 'marketing' && window.location.pathname === '/dashboard') {
+      window.history.pushState({}, '', '/');
+    }
     if (view === 'projects') {
       setCurrentProjectId(null);
     }
@@ -325,6 +331,9 @@ function App() {
 
   const handleLoginCancel = () => {
     setCurrentView('marketing');
+    if (window.location.pathname === '/dashboard') {
+      window.history.replaceState({}, '', '/');
+    }
   };
 
   const handleProjectOpen = (projectId: string) => {
