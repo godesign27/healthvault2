@@ -16,6 +16,25 @@ export type MedicalFormDefinition = {
   fields: MedicalFormField[];
 };
 
+// Chat intentionally omits SSN, signatures, legal consent, and payment fields.
+// Those fields must never be requested or returned by the MCP server.
+const PATIENT_REGISTRATION_FIELDS: MedicalFormField[] = [
+  { key: "first_name", label: "First Name", type: "text" },
+  { key: "middle_name", label: "Middle Name", type: "text" },
+  { key: "last_name", label: "Last Name", type: "text" },
+  { key: "date_of_birth", label: "Date of Birth", type: "text" },
+  { key: "gender", label: "Gender", type: "select", options: ["Male", "Female", "Other", "Prefer not to say"] },
+  { key: "phone_number", label: "Phone Number", type: "text" },
+  { key: "email_address", label: "Email Address", type: "text" },
+  { key: "street_address", label: "Street Address", type: "text" },
+  { key: "city", label: "City", type: "text" },
+  { key: "state", label: "State", type: "text" },
+  { key: "zip_code", label: "ZIP Code", type: "text" },
+  { key: "emergency_contact_name", label: "Emergency Contact Name", type: "text" },
+  { key: "emergency_contact_relationship", label: "Emergency Contact Relationship", type: "text" },
+  { key: "emergency_contact_phone", label: "Emergency Contact Phone", type: "text" },
+];
+
 const MEDICAL_HISTORY_FIELDS: MedicalFormField[] = [
   { key: "reason_for_visit", label: "Reason for Visit", type: "textarea" },
   { key: "current_medical_conditions", label: "Current Medical Conditions", type: "textarea" },
@@ -84,6 +103,14 @@ const ALLERGY_FIELDS: MedicalFormField[] = [
 ];
 
 export const GPT_MEDICAL_FORMS: MedicalFormDefinition[] = [
+  {
+    id: "patient-reg",
+    title: "Patient Registration",
+    description: "Basic demographics, contact details, and emergency contact information. Restricted identity fields stay outside chat.",
+    category: "Identification",
+    version: "2025.01",
+    fields: PATIENT_REGISTRATION_FIELDS,
+  },
   {
     id: "medical-history",
     title: "Medical History",
@@ -208,6 +235,73 @@ async function suggestedMedicalHistory(supabase: SupabaseClient) {
   };
 }
 
+function value(row: Record<string, unknown> | null | undefined, ...keys: string[]) {
+  for (const key of keys) {
+    const candidate = row?.[key];
+    if (typeof candidate === "string" && candidate.trim()) return candidate.trim();
+  }
+  return "";
+}
+
+function compactAnswers(entries: Array<[string, string | undefined]>) {
+  return Object.fromEntries(entries.filter((entry): entry is [string, string] => Boolean(entry[1]?.trim())));
+}
+
+async function suggestedProfileAnswers(supabase: SupabaseClient, userId: string, templateId: string) {
+  if (templateId === "medical-history") return suggestedMedicalHistory(supabase);
+  const [{ data: userProfile, error: userError }, { data: patientProfile, error: patientError }] = await Promise.all([
+    supabase.from("user_profiles").select("*").eq("user_id", userId).maybeSingle(),
+    supabase.from("patient_profiles").select("*").eq("user_id", userId).maybeSingle(),
+  ]);
+  if (userError) throw new Error(`Unable to read profile details: ${userError.message}`);
+  if (patientError) throw new Error(`Unable to read medical profile details: ${patientError.message}`);
+  const user = (userProfile ?? {}) as Record<string, unknown>;
+  const patient = (patientProfile ?? {}) as Record<string, unknown>;
+  const emergency = (user.emergency_contact && typeof user.emergency_contact === "object" ? user.emergency_contact : {}) as Record<string, unknown>;
+
+  if (templateId === "patient-reg") {
+    const fullName = value(patient, "name").split(/\s+/);
+    return compactAnswers([
+      ["first_name", value(user, "first_name") || fullName[0]],
+      ["middle_name", value(user, "middle_name")],
+      ["last_name", value(user, "last_name") || (fullName.length > 1 ? fullName.at(-1) : "")],
+      ["date_of_birth", value(user, "date_of_birth") || value(patient, "birth_date")],
+      ["gender", value(user, "gender")],
+      ["phone_number", value(user, "phone") || value(patient, "contact_phone")],
+      ["email_address", value(user, "email") || value(patient, "contact_email")],
+      ["street_address", value(user, "address_line1", "street_address")],
+      ["city", value(user, "city")],
+      ["state", value(user, "state")],
+      ["zip_code", value(user, "postal_code", "zip_code")],
+      ["emergency_contact_name", value(emergency, "name") || value(patient, "emergency_contact_name")],
+      ["emergency_contact_relationship", value(emergency, "relationship") || value(patient, "emergency_contact_relationship")],
+      ["emergency_contact_phone", value(emergency, "phone") || value(patient, "emergency_contact_phone")],
+    ]);
+  }
+  if (templateId === "emergency-contact") {
+    return compactAnswers([
+      ["primary_contact_name", value(emergency, "name") || value(patient, "emergency_contact_name")],
+      ["relationship", value(emergency, "relationship") || value(patient, "emergency_contact_relationship")],
+      ["phone_number", value(emergency, "phone") || value(patient, "emergency_contact_phone")],
+      ["email", value(emergency, "email") || value(patient, "emergency_contact_email")],
+    ]);
+  }
+  if (templateId === "medical-id") {
+    const clinical = await suggestedMedicalHistory(supabase);
+    return compactAnswers([
+      ["blood_type", value(patient, "blood_type")],
+      ["primary_language", value(user, "preferred_language", "language")],
+      ["preferred_pharmacy", value(patient, "preferred_pharmacy")],
+      ["pharmacy_phone", value(patient, "pharmacy_phone")],
+      ["primary_care_physician", value(patient, "primary_care_physician")],
+      ["physician_phone", value(patient, "physician_phone")],
+      ["known_allergies", clinical.known_allergies],
+      ["current_medications", clinical.current_medications],
+    ]);
+  }
+  return {};
+}
+
 export async function listMedicalForms(supabase: SupabaseClient, userId: string) {
   const patientId = await getPatientProfileId(supabase, userId);
   const [{ data: templates, error: templateError }, { data, error }] = await Promise.all([
@@ -251,15 +345,30 @@ export async function getMedicalForm(supabase: SupabaseClient, userId: string, t
   const patientId = await getPatientProfileId(supabase, userId);
   const response = await getResponse(supabase, patientId, templateId);
   const savedAnswers = response?.answers_json ?? {};
-  const suggestions = templateId === "medical-history" ? await suggestedMedicalHistory(supabase) : {};
+  const suggestions = await suggestedProfileAnswers(supabase, userId, templateId);
   const suggestedAnswers = Object.fromEntries(Object.entries(suggestions).filter(([key]) => !savedAnswers[key]));
+  const savedKeys = definition.fields.filter(({ key }) => Boolean(savedAnswers[key])).map(({ key }) => key);
+  const suggestedKeys = definition.fields.filter(({ key }) => Boolean(suggestedAnswers[key])).map(({ key }) => key);
+  const readyKeys = new Set([...savedKeys, ...suggestedKeys]);
+  const missingFields = definition.fields.filter(({ key }) => !readyKeys.has(key)).map(({ key, label, type, options }) => ({ key, label, type, options }));
+  const suggestionsToReview = definition.fields.filter(({ key }) => suggestedKeys.includes(key)).map(({ key, label }) => ({ key, label, value: suggestedAnswers[key] }));
   return {
     definition,
     responseId: response?.id ?? null,
     status: response?.status ?? "not_started",
     savedAnswers,
     suggestedAnswers,
-    missingFields: definition.fields.filter(({ key }) => !savedAnswers[key]).map(({ key, label }) => ({ key, label })),
+    missingFields,
+    suggestionsToReview,
+    nextQuestion: missingFields[0] ?? null,
+    progress: {
+      totalFields: definition.fields.length,
+      savedFields: savedKeys.length,
+      suggestedFields: suggestedKeys.length,
+      readyFields: readyKeys.size,
+      remainingFields: missingFields.length,
+      percentReady: Math.round((readyKeys.size / definition.fields.length) * 100),
+    },
     expectedUpdatedAt: response?.updated_at ?? null,
     resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(templateId)}&source=chatgpt`,
   };

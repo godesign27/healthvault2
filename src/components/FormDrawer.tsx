@@ -93,7 +93,16 @@ export function FormDrawer({
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-full max-w-2xl z-50 shadow-2xl transform transition-transform bg-surface-raised">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={template.title}
+        className="fixed top-0 right-0 h-full w-full max-w-2xl z-50 shadow-2xl transform transition-transform"
+        style={{
+          backgroundColor: darkMode ? '#15191c' : '#f8fafc',
+          isolation: 'isolate',
+        }}
+      >
         <div className="flex flex-col h-full">
           <div className="px-6 py-4 border-b flex items-start justify-between border-stroke-subtle">
             <div className="flex-1 pr-4">
