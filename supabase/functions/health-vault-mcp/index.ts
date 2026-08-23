@@ -244,7 +244,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.6.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated draft updates, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, call get_medical_form, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation; saving a draft never completes, signs, or shares it. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated draft updates, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep the user in ChatGPT: call get_medical_form, explain how many safe fields are ready, review profile-derived suggestions as unconfirmed, and ask one logical missing question at a time while reporting progress. Never redirect a ChatGPT-supported reusable form to the web app. When the safe answer set is ready, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation; saving a draft never completes, signs, or shares it. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -493,13 +493,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       _meta: {
         "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
+        "openai/widgetAccessible": true,
         "openai/toolInvocation/invoking": "Loading your medical forms",
         "openai/toolInvocation/invoked": "Medical forms ready",
       },
     },
     async () => {
       try {
-        const catalog = await listMedicalForms(supabase);
+        const catalog = await listMedicalForms(supabase, userId);
         return {
           structuredContent: catalog,
           content: [{ type: "text", text: catalog.forms.length ? "Your common Health Vault forms are displayed above. Ask which one the user wants to complete, or offer the secure upload option for a provider PDF or photos." : "No common medical forms are available. Offer the secure upload option." }],
@@ -518,13 +519,19 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       inputSchema: z.object({ templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]) }),
       outputSchema: z.object({ form: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: {
+        "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
+        "openai/widgetAccessible": true,
+        "openai/toolInvocation/invoking": "Preparing your form interview",
+        "openai/toolInvocation/invoked": "Form interview ready",
+      },
     },
     async ({ templateId }) => {
       try {
-        const form = await getMedicalForm(supabase, templateId);
+        const form = await getMedicalForm(supabase, userId, templateId);
         return {
           structuredContent: { form },
-          content: [{ type: "text", text: "The selected reusable form is loaded. Ask only for the missing information needed for this task, and distinguish saved answers from unconfirmed Health Vault suggestions." }],
+          content: [{ type: "text", text: `The selected reusable form is loaded. ${form.progress.readyFields} of ${form.progress.totalFields} safe fields are ready (${form.progress.percentReady}%). Review profile suggestions as unconfirmed, then ask one logical missing question at a time. Do not request restricted fields or send the user to the web app for this reusable form.` }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to load the medical form" }] };
