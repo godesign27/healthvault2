@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getPatientProfileId, GPT_MEDICAL_FORMS } from "./medical-forms.js";
+import { getPatientProfileId, GPT_MEDICAL_FORMS } from "./medical-forms.ts";
 
 export type MedicalFormShareInput = {
   templateId: string;
