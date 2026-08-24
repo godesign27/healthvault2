@@ -17,6 +17,17 @@ export type MedicalFormDefinition = {
   fields: MedicalFormField[];
 };
 
+export type InterviewGroup = {
+  id: string;
+  title: string;
+  prompt: string;
+  keys: string[];
+};
+
+export type InterviewGroupView = InterviewGroup & {
+  fields: MedicalFormField[];
+};
+
 // Chat intentionally omits SSN, signatures, legal consent, and payment fields.
 // Those fields must never be requested or returned by the MCP server.
 const PATIENT_REGISTRATION_FIELDS: MedicalFormField[] = [
@@ -165,6 +176,26 @@ const COMMON_FORM_IDS = [
 
 export const GPT_MEDICAL_FORM_IDS = GPT_MEDICAL_FORMS.map(({ id }) => id);
 
+const INTERVIEW_GROUPS: Record<string, InterviewGroup[]> = {
+  "patient-reg": [
+    { id: "name", title: "Your name", prompt: "What is your first, middle, and last name?", keys: ["first_name", "middle_name", "last_name"] },
+    { id: "birth", title: "Date of birth", prompt: "What is your date of birth?", keys: ["date_of_birth"] },
+    { id: "gender", title: "Gender", prompt: "What is your gender?", keys: ["gender"] },
+    { id: "contact", title: "Contact details", prompt: "What phone number and email should we use?", keys: ["phone_number", "email_address"] },
+    { id: "address", title: "Home address", prompt: "What is your street address, city, state, and ZIP code?", keys: ["street_address", "city", "state", "zip_code"] },
+    { id: "emergency", title: "Emergency contact", prompt: "Who is your emergency contact, their relationship to you, and their phone number?", keys: ["emergency_contact_name", "emergency_contact_relationship", "emergency_contact_phone"] },
+  ],
+  "emergency-contact": [
+    { id: "primary", title: "Primary emergency contact", prompt: "Who is your primary emergency contact, including relationship, phone, and email?", keys: ["primary_contact_name", "relationship", "phone_number", "email"] },
+    { id: "secondary", title: "Secondary emergency contact", prompt: "If you have a secondary emergency contact, what is their name, relationship, phone, and email?", keys: ["secondary_contact_name", "secondary_relationship", "secondary_phone", "secondary_email"] },
+  ],
+  "medical-id": [
+    { id: "identity", title: "Medical ID basics", prompt: "What is your blood type and primary language?", keys: ["blood_type", "primary_language"] },
+    { id: "care-team", title: "Pharmacy and physician", prompt: "What is your preferred pharmacy and primary care physician, including phone numbers if you have them?", keys: ["preferred_pharmacy", "pharmacy_phone", "primary_care_physician", "physician_phone"] },
+    { id: "clinical", title: "Allergies and medications", prompt: "What allergies and current medications should appear on your Medical ID?", keys: ["known_allergies", "current_medications"] },
+  ],
+};
+
 type FormResponse = {
   id: string;
   answers_json: Record<string, string> | null;
@@ -189,29 +220,26 @@ function definitionFor(templateId: string): MedicalFormDefinition {
   return definition;
 }
 
-function validateAnswers(definition: MedicalFormDefinition, answers: Record<string, string>) {
-  if (!Object.keys(answers).length) throw new Error("Add at least one answer before preparing a form update.");
-  const fields = new Map(definition.fields.map((field) => [field.key, field]));
-  const clean: Record<string, string> = {};
-  for (const [key, rawValue] of Object.entries(answers)) {
-    const field = fields.get(key);
-    if (!field) throw new Error(`Unknown field: ${key}`);
-    const value = rawValue.trim();
-    if (!value) throw new Error(`${field.label} cannot be blank.`);
-    if (value.length > 4_000) throw new Error(`${field.label} is too long.`);
-    if (field.options && !field.options.includes(value)) {
-      throw new Error(`${field.label} must be one of: ${field.options.join(", ")}.`);
-    }
-    clean[key] = value;
-  }
-  return clean;
+const INTERVIEW_TTL_MS = 30 * 60 * 1_000;
+
+type FormProposal = {
+  id: string;
+  user_id: string;
+  patient_id: string;
+  response_id: string | null;
+  template_id: string;
+  template_version: string;
+  proposed_answers: Record<string, string> | null;
+  expected_response_updated_at: string | null;
+  expires_at: string;
+  confirmed_at: string | null;
+};
+
+export function hasAnswer(value: unknown) {
+  return typeof value === "string" ? Boolean(value.trim()) : value !== null && value !== undefined && String(value).trim() !== "";
 }
 
-function hasAnswer(value: unknown) {
-  return typeof value === "string" ? Boolean(value.trim()) : value !== null && value !== undefined;
-}
-
-function formProgress(definition: MedicalFormDefinition, answers: Record<string, string>) {
+export function computeFormProgress(definition: MedicalFormDefinition, answers: Record<string, string>) {
   const requiredFields = definition.fields.filter(({ required }) => required !== false);
   const missingFields = requiredFields
     .filter(({ key }) => !hasAnswer(answers[key]))
@@ -226,14 +254,170 @@ function formProgress(definition: MedicalFormDefinition, answers: Record<string,
   };
 }
 
+function formProgress(definition: MedicalFormDefinition, answers: Record<string, string>) {
+  return computeFormProgress(definition, answers);
+}
+
+function groupsFor(definition: MedicalFormDefinition): InterviewGroup[] {
+  return INTERVIEW_GROUPS[definition.id] ?? definition.fields.map((field) => ({
+    id: field.key,
+    title: field.label,
+    prompt: `What is your ${field.label.toLowerCase()}?`,
+    keys: [field.key],
+  }));
+}
+
+function groupIsComplete(group: InterviewGroup, definition: MedicalFormDefinition, answers: Record<string, string>) {
+  return group.keys.every((key) => {
+    const field = definition.fields.find((candidate) => candidate.key === key);
+    if (!field || field.required === false) return true;
+    return hasAnswer(answers[key]);
+  });
+}
+
+export function computeNextGroup(
+  definition: MedicalFormDefinition,
+  answers: Record<string, string>,
+): InterviewGroupView | null {
+  const current = groupsFor(definition).find((group) => !groupIsComplete(group, definition, answers));
+  if (!current) return null;
+  const fields = current.keys.flatMap((key) => {
+    const field = definition.fields.find((candidate) => candidate.key === key);
+    if (!field || hasAnswer(answers[key])) return [];
+    return [field];
+  });
+  return { ...current, fields };
+}
+
+function sameTimestamp(left: string | null | undefined, right: string | null | undefined) {
+  if (!left && !right) return true;
+  if (!left || !right) return false;
+  const leftTime = new Date(left).getTime();
+  const rightTime = new Date(right).getTime();
+  if (Number.isNaN(leftTime) || Number.isNaN(rightTime)) return left === right;
+  return leftTime === rightTime;
+}
+
+function interviewExpiry() {
+  return new Date(Date.now() + INTERVIEW_TTL_MS).toISOString();
+}
+
+export function normalizeFormAnswers(definition: MedicalFormDefinition, answers: Record<string, unknown>) {
+  const fields = new Map(definition.fields.map((field) => [field.key, field]));
+  const byLabel = new Map(definition.fields.map((field) => [field.label.toLowerCase(), field]));
+  const clean: Record<string, string> = {};
+  for (const [rawKey, rawValue] of Object.entries(answers)) {
+    const field = fields.get(rawKey) ?? byLabel.get(rawKey.trim().toLowerCase());
+    if (!field) throw new Error(`Unknown field: ${rawKey}`);
+    if (rawValue == null) continue;
+    const value = String(rawValue).trim();
+    if (!value) throw new Error(`${field.label} cannot be blank.`);
+    if (value.length > 4_000) throw new Error(`${field.label} is too long.`);
+    if (field.options) {
+      const match = field.options.find((option) => option.toLowerCase() === value.toLowerCase());
+      if (!match) throw new Error(`${field.label} must be one of: ${field.options.join(", ")}.`);
+      clean[field.key] = match;
+    } else {
+      clean[field.key] = value;
+    }
+  }
+  return clean;
+}
+
+function validateAnswers(definition: MedicalFormDefinition, answers: Record<string, string>) {
+  const clean = normalizeFormAnswers(definition, answers);
+  if (!Object.keys(clean).length) throw new Error("Add at least one answer before preparing a form update.");
+  return clean;
+}
+
+function canonicalizeSuggestion(definition: MedicalFormDefinition, key: string, value: string) {
+  const field = definition.fields.find((candidate) => candidate.key === key);
+  if (!field) return "";
+  if (!field.options) return value.trim();
+  return field.options.find((option) => option.toLowerCase() === value.trim().toLowerCase()) ?? "";
+}
+
 async function getResponse(supabase: SupabaseClient, patientId: string, templateId: string) {
   const { data, error } = await supabase.from("form_responses")
     .select("id, answers_json, status, updated_at")
     .eq("patient_id", patientId)
     .eq("template_id", templateId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (error) throw new Error(`Unable to load the medical form: ${error.message}`);
   return data as FormResponse | null;
+}
+
+async function getActiveInterviews(supabase: SupabaseClient, userId: string, templateId: string) {
+  const { data, error } = await supabase.from("form_answer_proposals")
+    .select("id, user_id, patient_id, response_id, template_id, template_version, proposed_answers, expected_response_updated_at, expires_at, confirmed_at, created_at")
+    .eq("user_id", userId)
+    .eq("template_id", templateId)
+    .is("confirmed_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Unable to load the form interview: ${error.message}`);
+  return (data ?? []) as FormProposal[];
+}
+
+async function expireDuplicateInterviews(supabase: SupabaseClient, keepId: string, duplicates: FormProposal[]) {
+  const extraIds = duplicates.filter((row) => row.id !== keepId).map((row) => row.id);
+  if (!extraIds.length) return;
+  const expiredAt = new Date().toISOString();
+  const { error } = await supabase.from("form_answer_proposals")
+    .update({ expires_at: expiredAt })
+    .in("id", extraIds)
+    .is("confirmed_at", null);
+  if (error) throw new Error(`Unable to collapse duplicate form interviews: ${error.message}`);
+}
+
+async function persistInterviewAnswers(
+  supabase: SupabaseClient,
+  userId: string,
+  patientId: string,
+  definition: MedicalFormDefinition,
+  response: FormResponse | null,
+  answers: Record<string, string>,
+) {
+  const active = await getActiveInterviews(supabase, userId, definition.id);
+  const current = active[0] ?? null;
+  const merged = { ...(current?.proposed_answers ?? {}), ...answers };
+  if (!Object.keys(merged).length) {
+    return current;
+  }
+  const expiresAt = interviewExpiry();
+  const expectedUpdatedAt = response?.updated_at ?? null;
+  if (current) {
+    await expireDuplicateInterviews(supabase, current.id, active);
+    const { data, error } = await supabase.from("form_answer_proposals")
+      .update({
+        proposed_answers: merged,
+        expected_response_updated_at: expectedUpdatedAt,
+        expires_at: expiresAt,
+        response_id: response?.id ?? current.response_id,
+        template_version: definition.version,
+      })
+      .eq("id", current.id)
+      .eq("user_id", userId)
+      .is("confirmed_at", null)
+      .select("id, user_id, patient_id, response_id, template_id, template_version, proposed_answers, expected_response_updated_at, expires_at, confirmed_at")
+      .single();
+    if (error) throw new Error(`Unable to update the form interview: ${error.message}`);
+    return data as FormProposal;
+  }
+  const { data, error } = await supabase.from("form_answer_proposals").insert({
+    user_id: userId,
+    patient_id: patientId,
+    response_id: response?.id ?? null,
+    template_id: definition.id,
+    template_version: definition.version,
+    proposed_answers: merged,
+    expected_response_updated_at: expectedUpdatedAt,
+    expires_at: expiresAt,
+  }).select("id, user_id, patient_id, response_id, template_id, template_version, proposed_answers, expected_response_updated_at, expires_at, confirmed_at").single();
+  if (error) throw new Error(`Unable to start the form interview: ${error.message}`);
+  return data as FormProposal;
 }
 
 async function suggestedMedicalHistory(supabase: SupabaseClient) {
@@ -280,18 +464,19 @@ async function suggestedProfileAnswers(supabase: SupabaseClient, userId: string,
   const emergency = (user.emergency_contact && typeof user.emergency_contact === "object" ? user.emergency_contact : {}) as Record<string, unknown>;
 
   if (templateId === "patient-reg") {
+    const definition = definitionFor(templateId);
     const fullName = value(patient, "name").split(/\s+/);
     return compactAnswers([
       ["first_name", value(user, "first_name") || fullName[0]],
       ["middle_name", value(user, "middle_name")],
       ["last_name", value(user, "last_name") || (fullName.length > 1 ? fullName.at(-1) : "")],
       ["date_of_birth", value(user, "date_of_birth") || value(patient, "birth_date")],
-      ["gender", value(user, "gender")],
+      ["gender", canonicalizeSuggestion(definition, "gender", value(user, "gender"))],
       ["phone_number", value(user, "phone") || value(patient, "contact_phone")],
       ["email_address", value(user, "email") || value(patient, "contact_email")],
       ["street_address", value(user, "address_line1", "street_address")],
       ["city", value(user, "city")],
-      ["state", value(user, "state")],
+      ["state", canonicalizeSuggestion(definition, "state", value(user, "state")) || value(user, "state")],
       ["zip_code", value(user, "postal_code", "zip_code")],
       ["emergency_contact_name", value(emergency, "name") || value(patient, "emergency_contact_name")],
       ["emergency_contact_relationship", value(emergency, "relationship") || value(patient, "emergency_contact_relationship")],
@@ -360,32 +545,89 @@ export async function listMedicalForms(supabase: SupabaseClient, userId: string)
   };
 }
 
-export async function getMedicalForm(supabase: SupabaseClient, userId: string, templateId: string) {
+function buildReview(
+  definition: MedicalFormDefinition,
+  proposalId: string,
+  proposedAnswers: Record<string, string>,
+  resultingAnswers: Record<string, string>,
+  expiresAt: string,
+) {
+  const progress = formProgress(definition, resultingAnswers);
+  const reviewFields = definition.fields
+    .filter(({ key }) => hasAnswer(resultingAnswers[key]))
+    .map(({ key, label }) => ({ key, label, value: resultingAnswers[key] }));
+  return {
+    proposalId,
+    templateId: definition.id,
+    templateTitle: definition.title,
+    templateVersion: definition.version,
+    proposedAnswers,
+    reviewFields,
+    resultingAnswers,
+    progress,
+    willComplete: progress.remainingFields === 0,
+    expiresAt,
+    confirmationState: "pending" as const,
+    confirmLabel: "Confirm & Save",
+    safeSummary: progress.remainingFields === 0
+      ? `Review these ${definition.title} answers before completing your private form. Nothing has been saved.`
+      : `Review these ${definition.title} answers before saving your private draft. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}. Nothing has been saved.`,
+  };
+}
+
+function shareOffer(templateId: string, templateTitle: string, available: boolean) {
+  return {
+    available,
+    templateId,
+    templateTitle,
+    prompt: `Create a secure share of my completed ${templateTitle} form.`,
+    safeSummary: available
+      ? `${templateTitle} is complete and private. You can now create a secure share.`
+      : `${templateTitle} is still a private draft and cannot be shared until it is complete.`,
+  };
+}
+
+async function loadFormSnapshot(supabase: SupabaseClient, userId: string, templateId: string) {
   const definition = definitionFor(templateId);
   const patientId = await getPatientProfileId(supabase, userId);
   const response = await getResponse(supabase, patientId, templateId);
+  const interviews = await getActiveInterviews(supabase, userId, templateId);
+  if (interviews[0]) await expireDuplicateInterviews(supabase, interviews[0].id, interviews);
+  const interview = interviews[0] ?? null;
   const savedAnswers = response?.answers_json ?? {};
   const suggestions = await suggestedProfileAnswers(supabase, userId, templateId);
-  const suggestedAnswers = Object.fromEntries(Object.entries(suggestions).filter(([key]) => !savedAnswers[key]));
+  const interviewAnswers = interview?.proposed_answers ?? {};
+  const suggestedAnswers = Object.fromEntries(
+    Object.entries(suggestions).filter(([key]) => !savedAnswers[key] && !interviewAnswers[key]),
+  );
   const savedKeys = definition.fields.filter(({ key }) => Boolean(savedAnswers[key])).map(({ key }) => key);
   const suggestedKeys = definition.fields.filter(({ key }) => Boolean(suggestedAnswers[key])).map(({ key }) => key);
-  const combinedAnswers = { ...suggestedAnswers, ...savedAnswers };
+  const combinedAnswers = { ...suggestedAnswers, ...savedAnswers, ...interviewAnswers };
   const progress = formProgress(definition, combinedAnswers);
   const missingFields = progress.missingFields;
-  const suggestionsToReview = definition.fields.filter(({ key }) => suggestedKeys.includes(key)).map(({ key, label }) => ({ key, label, value: suggestedAnswers[key] }));
+  const nextGroup = computeNextGroup(definition, combinedAnswers);
+  const suggestionsToReview = definition.fields
+    .filter(({ key }) => suggestedKeys.includes(key))
+    .map(({ key, label }) => ({ key, label, value: suggestedAnswers[key] }));
   return {
     definition,
-    responseId: response?.id ?? null,
-    status: response?.status ?? "not_started",
+    patientId,
+    response,
+    interview,
+    interviewId: interview?.id ?? null,
     savedAnswers,
     suggestedAnswers,
+    interviewAnswers,
+    combinedAnswers,
     missingFields,
     suggestionsToReview,
     nextQuestion: missingFields[0] ?? null,
+    nextGroup,
     progress: {
       ...progress,
       savedFields: savedKeys.length,
       suggestedFields: suggestedKeys.length,
+      interviewFields: Object.keys(interviewAnswers).length,
       readyFields: progress.completedFields,
     },
     expectedUpdatedAt: response?.updated_at ?? null,
@@ -393,21 +635,71 @@ export async function getMedicalForm(supabase: SupabaseClient, userId: string, t
   };
 }
 
+function formPayload(snapshot: Awaited<ReturnType<typeof loadFormSnapshot>>) {
+  return {
+    definition: snapshot.definition,
+    responseId: snapshot.response?.id ?? null,
+    interviewId: snapshot.interviewId,
+    status: snapshot.progress.remainingFields === 0 ? "ready_to_save" : (snapshot.response?.status ?? "not_started"),
+    savedAnswers: snapshot.savedAnswers,
+    suggestedAnswers: snapshot.suggestedAnswers,
+    interviewAnswers: snapshot.interviewAnswers,
+    missingFields: snapshot.missingFields,
+    suggestionsToReview: snapshot.suggestionsToReview,
+    nextQuestion: snapshot.nextQuestion,
+    nextGroup: snapshot.nextGroup,
+    progress: snapshot.progress,
+    expectedUpdatedAt: snapshot.expectedUpdatedAt,
+    resumeUrl: snapshot.resumeUrl,
+  };
+}
+
+export async function getMedicalForm(supabase: SupabaseClient, userId: string, templateId: string) {
+  const snapshot = await loadFormSnapshot(supabase, userId, templateId);
+  return formPayload(snapshot);
+}
+
 export async function getMedicalFormProgress(
   supabase: SupabaseClient,
   userId: string,
   templateId: string,
-  answers: Record<string, string> = {},
+  answers: Record<string, unknown> = {},
+  options: { acceptSuggestions?: boolean } = {},
 ) {
-  const form = await getMedicalForm(supabase, userId, templateId);
-  const combinedAnswers = { ...form.suggestedAnswers, ...form.savedAnswers, ...answers };
-  const progress = formProgress(form.definition, combinedAnswers);
+  const definition = definitionFor(templateId);
+  const incoming = Object.keys(answers).length ? normalizeFormAnswers(definition, answers) : {};
+  const before = await loadFormSnapshot(supabase, userId, templateId);
+  if (Object.keys(incoming).length || options.acceptSuggestions) {
+    const accepted = { ...before.suggestedAnswers, ...incoming };
+    await persistInterviewAnswers(supabase, userId, before.patientId, definition, before.response, accepted);
+  }
+  let snapshot = await loadFormSnapshot(supabase, userId, templateId);
+  if (snapshot.progress.remainingFields === 0 && !snapshot.interview && Object.keys(snapshot.combinedAnswers).length) {
+    await persistInterviewAnswers(supabase, userId, snapshot.patientId, definition, snapshot.response, snapshot.combinedAnswers);
+    snapshot = await loadFormSnapshot(supabase, userId, templateId);
+  }
+  const form = formPayload(snapshot);
+  const readyForReview = snapshot.progress.remainingFields === 0;
+  const preview = readyForReview && snapshot.interview
+    ? buildReview(
+      definition,
+      snapshot.interview.id,
+      snapshot.interviewAnswers,
+      snapshot.combinedAnswers,
+      snapshot.interview.expires_at,
+    )
+    : null;
   return {
+    view: options.acceptSuggestions && !readyForReview ? "prefill" : (readyForReview ? "review" : "interview"),
     templateId,
-    templateTitle: form.definition.title,
-    status: progress.remainingFields === 0 ? "ready_to_save" : "in_progress",
-    progress,
-    nextQuestion: progress.missingFields[0] ?? null,
+    templateTitle: definition.title,
+    status: readyForReview ? "ready_to_save" : "in_progress",
+    formProgress: snapshot.progress,
+    progress: snapshot.progress,
+    nextQuestion: snapshot.nextQuestion,
+    nextGroup: snapshot.nextGroup,
+    form,
+    preview,
   };
 }
 
@@ -415,47 +707,27 @@ export async function proposeFormAnswers(
   supabase: SupabaseClient,
   userId: string,
   templateId: string,
-  answers: Record<string, string>,
+  answers: Record<string, unknown> = {},
   expectedUpdatedAt?: string | null,
 ) {
   const definition = definitionFor(templateId);
-  const cleanAnswers = validateAnswers(definition, answers);
   const patientId = await getPatientProfileId(supabase, userId);
   const response = await getResponse(supabase, patientId, templateId);
   const actualUpdatedAt = response?.updated_at ?? null;
-  if ((expectedUpdatedAt ?? null) !== actualUpdatedAt) {
+  if (expectedUpdatedAt != null && expectedUpdatedAt !== "" && !sameTimestamp(expectedUpdatedAt, actualUpdatedAt)) {
     throw new Error("This form changed after it was loaded. Reopen the form before preparing new answers.");
   }
-  const expiresAt = new Date(Date.now() + 30 * 60 * 1_000).toISOString();
-  const { data, error } = await supabase.from("form_answer_proposals").insert({
-    user_id: userId,
-    patient_id: patientId,
-    response_id: response?.id ?? null,
-    template_id: templateId,
-    template_version: definition.version,
-    proposed_answers: cleanAnswers,
-    expected_response_updated_at: actualUpdatedAt,
-    expires_at: expiresAt,
-  }).select("id").single();
-  if (error) throw new Error(`Unable to prepare the form review: ${error.message}`);
-  const resultingAnswers = { ...(response?.answers_json ?? {}), ...cleanAnswers };
-  const progress = formProgress(definition, resultingAnswers);
-  return {
-    proposalId: data.id,
-    templateId,
-    templateTitle: definition.title,
-    templateVersion: definition.version,
-    proposedAnswers: cleanAnswers,
-    reviewFields: Object.entries(cleanAnswers).map(([key, value]) => ({ key, label: definition.fields.find((field) => field.key === key)?.label ?? key, value })),
-    resultingAnswers,
-    progress,
-    willComplete: progress.remainingFields === 0,
-    expiresAt,
-    confirmationState: "pending",
-    safeSummary: progress.remainingFields === 0
-      ? `Review these ${definition.title} answers before completing your private form. Nothing has been saved.`
-      : `Review these ${definition.title} answers before saving your private draft. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}. Nothing has been saved.`,
-  };
+  const incoming = Object.keys(answers).length ? normalizeFormAnswers(definition, answers) : {};
+  const proposal = await persistInterviewAnswers(supabase, userId, patientId, definition, response, incoming);
+  if (!proposal) throw new Error("Add at least one answer before preparing a form review.");
+  const snapshot = await loadFormSnapshot(supabase, userId, templateId);
+  return buildReview(
+    definition,
+    proposal.id,
+    snapshot.interviewAnswers,
+    snapshot.combinedAnswers,
+    proposal.expires_at,
+  );
 }
 
 export async function confirmFormAnswers(supabase: SupabaseClient, userId: string, proposalId: string) {
@@ -466,25 +738,27 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
     .maybeSingle();
   if (error) throw new Error(`Unable to load the form proposal: ${error.message}`);
   if (!proposal) throw new Error("This form proposal was not found or does not belong to you.");
+  const definition = definitionFor(proposal.template_id);
   if (proposal.confirmed_at) {
     const existing = await getResponse(supabase, proposal.patient_id, proposal.template_id);
     if (!existing) throw new Error("This proposal was confirmed, but its saved draft could not be found.");
-    const progress = formProgress(definitionFor(proposal.template_id), existing.answers_json ?? {});
+    const progress = formProgress(definition, existing.answers_json ?? {});
+    const completed = progress.remainingFields === 0;
     return {
       response: existing,
       confirmationState: "confirmed",
-      savedAs: progress.remainingFields === 0 ? "completed_form" : "draft",
+      savedAs: completed ? "completed_form" : "draft",
       progress,
       resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
-      safeSummary: `This ${definitionFor(proposal.template_id).title} proposal was already saved. Nothing was added twice.`,
+      shareOffer: shareOffer(definition.id, definition.title, completed),
+      safeSummary: `This ${definition.title} proposal was already saved. Nothing was added twice.`,
     };
   }
   if (new Date(proposal.expires_at).getTime() <= Date.now()) throw new Error("This form proposal expired. Prepare the answers again.");
-  const definition = definitionFor(proposal.template_id);
   if (definition.version !== proposal.template_version) throw new Error("This form version changed. Reopen it before saving.");
-  const cleanAnswers = validateAnswers(definition, proposal.proposed_answers as Record<string, string>);
+  const cleanAnswers = validateAnswers(definition, (proposal.proposed_answers ?? {}) as Record<string, string>);
   const current = await getResponse(supabase, proposal.patient_id, proposal.template_id);
-  if ((current?.updated_at ?? null) !== (proposal.expected_response_updated_at ?? null)) {
+  if (!sameTimestamp(current?.updated_at, proposal.expected_response_updated_at)) {
     throw new Error("This form changed after the review was prepared. Reopen it to avoid overwriting newer answers.");
   }
   const updatedAt = new Date().toISOString();
@@ -508,6 +782,7 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
     savedAs: completed ? "completed_form" : "draft",
     progress,
     resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
+    shareOffer: shareOffer(definition.id, definition.title, completed),
     safeSummary: completed
       ? `${definition.title} completed with your confirmed answers.`
       : `${definition.title} draft updated. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}.`,

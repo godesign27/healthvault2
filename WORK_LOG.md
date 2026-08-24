@@ -7,6 +7,11 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-08-24 (ChatGPT Patient Registration interview)
+
+- **supabase / mcp** — Patient Registration in ChatGPT now keeps one authoritative interview per user and form. Accepted answers persist before progress is calculated, related questions are asked in groups, the same interview widget is reused for progress/review/save, and Confirm & Save still requires an explicit second step. After a completed save the card offers a secure share. Review prefilled answers calls the interview tool instead of a no-op follow-up.
+- **infra** — MCP package tests and typecheck pass. Deploy `health-vault-mcp` to ChatGPT; no new database migration.
+
 ## 2026-08-22 (compact completed Vault setup)
 
 - **web** — Converted the dashboard's Vault setup checklist into an accessible accordion. Incomplete setup stays expanded with per-step status; completed setup defaults closed and shows `100%` in its summary, while remaining available for review.
