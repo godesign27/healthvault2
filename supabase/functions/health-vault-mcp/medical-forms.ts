@@ -5,6 +5,7 @@ export type MedicalFormField = {
   label: string;
   type: "text" | "textarea" | "select";
   options?: string[];
+  required?: boolean;
 };
 
 export type MedicalFormDefinition = {
@@ -20,7 +21,7 @@ export type MedicalFormDefinition = {
 // Those fields must never be requested or returned by the MCP server.
 const PATIENT_REGISTRATION_FIELDS: MedicalFormField[] = [
   { key: "first_name", label: "First Name", type: "text" },
-  { key: "middle_name", label: "Middle Name", type: "text" },
+  { key: "middle_name", label: "Middle Name", type: "text", required: false },
   { key: "last_name", label: "Last Name", type: "text" },
   { key: "date_of_birth", label: "Date of Birth", type: "text" },
   { key: "gender", label: "Gender", type: "select", options: ["Male", "Female", "Other", "Prefer not to say"] },
@@ -42,27 +43,27 @@ const MEDICAL_HISTORY_FIELDS: MedicalFormField[] = [
   { key: "high_blood_pressure", label: "High Blood Pressure", type: "select", options: ["No", "Yes", "Borderline"] },
   { key: "heart_disease", label: "Heart Disease", type: "select", options: ["No", "Yes"] },
   { key: "cancer_history", label: "Cancer History", type: "select", options: ["No", "Yes"] },
-  { key: "cancer_details", label: "Cancer Details", type: "textarea" },
-  { key: "family_history_heart_disease", label: "Family History - Heart Disease", type: "textarea" },
-  { key: "family_history_diabetes", label: "Family History - Diabetes", type: "textarea" },
-  { key: "family_history_cancer", label: "Family History - Cancer", type: "textarea" },
+  { key: "cancer_details", label: "Cancer Details", type: "textarea", required: false },
+  { key: "family_history_heart_disease", label: "Family History - Heart Disease", type: "textarea", required: false },
+  { key: "family_history_diabetes", label: "Family History - Diabetes", type: "textarea", required: false },
+  { key: "family_history_cancer", label: "Family History - Cancer", type: "textarea", required: false },
   { key: "known_allergies", label: "Known Allergies", type: "textarea" },
   { key: "current_medications", label: "Current Medications", type: "textarea" },
-  { key: "previous_surgeries", label: "Previous Surgeries", type: "textarea" },
-  { key: "past_hospitalizations", label: "Past Hospitalizations", type: "textarea" },
-  { key: "occupation", label: "Occupation", type: "text" },
+  { key: "previous_surgeries", label: "Previous Surgeries", type: "textarea", required: false },
+  { key: "past_hospitalizations", label: "Past Hospitalizations", type: "textarea", required: false },
+  { key: "occupation", label: "Occupation", type: "text", required: false },
   { key: "smoking_status", label: "Smoking Status", type: "select", options: ["Never smoker", "Current daily smoker", "Current some-day smoker", "Former smoker", "Former smoker - status unknown"] },
-  { key: "alcohol_use", label: "Alcohol Use", type: "textarea" },
-  { key: "other_relevant_information", label: "Other Relevant Information", type: "textarea" },
+  { key: "alcohol_use", label: "Alcohol Use", type: "textarea", required: false },
+  { key: "other_relevant_information", label: "Other Relevant Information", type: "textarea", required: false },
 ];
 
 const MEDICAL_ID_FIELDS: MedicalFormField[] = [
   { key: "blood_type", label: "Blood Type", type: "select", options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] },
   { key: "primary_language", label: "Primary Language", type: "text" },
   { key: "preferred_pharmacy", label: "Preferred Pharmacy", type: "text" },
-  { key: "pharmacy_phone", label: "Pharmacy Phone", type: "text" },
+  { key: "pharmacy_phone", label: "Pharmacy Phone", type: "text", required: false },
   { key: "primary_care_physician", label: "Primary Care Physician", type: "text" },
-  { key: "physician_phone", label: "Physician Phone", type: "text" },
+  { key: "physician_phone", label: "Physician Phone", type: "text", required: false },
   { key: "known_allergies", label: "Known Allergies", type: "textarea" },
   { key: "current_medications", label: "Current Medications", type: "textarea" },
 ];
@@ -71,25 +72,25 @@ const EMERGENCY_CONTACT_FIELDS: MedicalFormField[] = [
   { key: "primary_contact_name", label: "Primary Contact Name", type: "text" },
   { key: "relationship", label: "Relationship", type: "text" },
   { key: "phone_number", label: "Phone Number", type: "text" },
-  { key: "email", label: "Email", type: "text" },
-  { key: "secondary_contact_name", label: "Secondary Contact Name", type: "text" },
-  { key: "secondary_relationship", label: "Secondary Relationship", type: "text" },
-  { key: "secondary_phone", label: "Secondary Phone", type: "text" },
-  { key: "secondary_email", label: "Secondary Email", type: "text" },
+  { key: "email", label: "Email", type: "text", required: false },
+  { key: "secondary_contact_name", label: "Secondary Contact Name", type: "text", required: false },
+  { key: "secondary_relationship", label: "Secondary Relationship", type: "text", required: false },
+  { key: "secondary_phone", label: "Secondary Phone", type: "text", required: false },
+  { key: "secondary_email", label: "Secondary Email", type: "text", required: false },
 ];
 
 const CURRENT_MEDICATION_FIELDS: MedicalFormField[] = [
   { key: "medication_1_name", label: "Medication 1 Name", type: "text" },
   { key: "medication_1_dosage", label: "Medication 1 Dosage", type: "text" },
-  { key: "medication_1_prescriber", label: "Medication 1 Prescriber", type: "text" },
-  { key: "medication_2_name", label: "Medication 2 Name", type: "text" },
-  { key: "medication_2_dosage", label: "Medication 2 Dosage", type: "text" },
-  { key: "medication_2_prescriber", label: "Medication 2 Prescriber", type: "text" },
-  { key: "medication_3_name", label: "Medication 3 Name", type: "text" },
-  { key: "medication_3_dosage", label: "Medication 3 Dosage", type: "text" },
-  { key: "medication_3_prescriber", label: "Medication 3 Prescriber", type: "text" },
-  { key: "over_the_counter_medications", label: "Over-the-Counter Medications", type: "textarea" },
-  { key: "supplements", label: "Supplements", type: "textarea" },
+  { key: "medication_1_prescriber", label: "Medication 1 Prescriber", type: "text", required: false },
+  { key: "medication_2_name", label: "Medication 2 Name", type: "text", required: false },
+  { key: "medication_2_dosage", label: "Medication 2 Dosage", type: "text", required: false },
+  { key: "medication_2_prescriber", label: "Medication 2 Prescriber", type: "text", required: false },
+  { key: "medication_3_name", label: "Medication 3 Name", type: "text", required: false },
+  { key: "medication_3_dosage", label: "Medication 3 Dosage", type: "text", required: false },
+  { key: "medication_3_prescriber", label: "Medication 3 Prescriber", type: "text", required: false },
+  { key: "over_the_counter_medications", label: "Over-the-Counter Medications", type: "textarea", required: false },
+  { key: "supplements", label: "Supplements", type: "textarea", required: false },
 ];
 
 const ALLERGY_FIELDS: MedicalFormField[] = [
@@ -97,7 +98,7 @@ const ALLERGY_FIELDS: MedicalFormField[] = [
   { key: "food_allergies", label: "Food Allergies", type: "textarea" },
   { key: "environmental_allergies", label: "Environmental Allergies", type: "textarea" },
   { key: "latex_allergy", label: "Latex Allergy", type: "select", options: ["Yes", "No", "Unknown"] },
-  { key: "other_allergies", label: "Other Allergies", type: "textarea" },
+  { key: "other_allergies", label: "Other Allergies", type: "textarea", required: false },
   { key: "allergy_reactions", label: "Allergy Reactions", type: "textarea" },
   { key: "carries_epipen", label: "Carries EpiPen", type: "select", options: ["Yes", "No"] },
 ];
@@ -171,7 +172,7 @@ type FormResponse = {
   updated_at: string | null;
 };
 
-async function getPatientProfileId(supabase: SupabaseClient, userId: string): Promise<string> {
+export async function getPatientProfileId(supabase: SupabaseClient, userId: string): Promise<string> {
   const { data, error } = await supabase
     .from("patient_profiles")
     .select("id")
@@ -204,6 +205,25 @@ function validateAnswers(definition: MedicalFormDefinition, answers: Record<stri
     clean[key] = value;
   }
   return clean;
+}
+
+function hasAnswer(value: unknown) {
+  return typeof value === "string" ? Boolean(value.trim()) : value !== null && value !== undefined;
+}
+
+function formProgress(definition: MedicalFormDefinition, answers: Record<string, string>) {
+  const requiredFields = definition.fields.filter(({ required }) => required !== false);
+  const missingFields = requiredFields
+    .filter(({ key }) => !hasAnswer(answers[key]))
+    .map(({ key, label, type, options }) => ({ key, label, type, options }));
+  const completedFields = requiredFields.length - missingFields.length;
+  return {
+    totalFields: requiredFields.length,
+    completedFields,
+    remainingFields: missingFields.length,
+    percentReady: requiredFields.length ? Math.round((completedFields / requiredFields.length) * 100) : 100,
+    missingFields,
+  };
 }
 
 async function getResponse(supabase: SupabaseClient, patientId: string, templateId: string) {
@@ -349,8 +369,9 @@ export async function getMedicalForm(supabase: SupabaseClient, userId: string, t
   const suggestedAnswers = Object.fromEntries(Object.entries(suggestions).filter(([key]) => !savedAnswers[key]));
   const savedKeys = definition.fields.filter(({ key }) => Boolean(savedAnswers[key])).map(({ key }) => key);
   const suggestedKeys = definition.fields.filter(({ key }) => Boolean(suggestedAnswers[key])).map(({ key }) => key);
-  const readyKeys = new Set([...savedKeys, ...suggestedKeys]);
-  const missingFields = definition.fields.filter(({ key }) => !readyKeys.has(key)).map(({ key, label, type, options }) => ({ key, label, type, options }));
+  const combinedAnswers = { ...suggestedAnswers, ...savedAnswers };
+  const progress = formProgress(definition, combinedAnswers);
+  const missingFields = progress.missingFields;
   const suggestionsToReview = definition.fields.filter(({ key }) => suggestedKeys.includes(key)).map(({ key, label }) => ({ key, label, value: suggestedAnswers[key] }));
   return {
     definition,
@@ -362,15 +383,31 @@ export async function getMedicalForm(supabase: SupabaseClient, userId: string, t
     suggestionsToReview,
     nextQuestion: missingFields[0] ?? null,
     progress: {
-      totalFields: definition.fields.length,
+      ...progress,
       savedFields: savedKeys.length,
       suggestedFields: suggestedKeys.length,
-      readyFields: readyKeys.size,
-      remainingFields: missingFields.length,
-      percentReady: Math.round((readyKeys.size / definition.fields.length) * 100),
+      readyFields: progress.completedFields,
     },
     expectedUpdatedAt: response?.updated_at ?? null,
     resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(templateId)}&source=chatgpt`,
+  };
+}
+
+export async function getMedicalFormProgress(
+  supabase: SupabaseClient,
+  userId: string,
+  templateId: string,
+  answers: Record<string, string> = {},
+) {
+  const form = await getMedicalForm(supabase, userId, templateId);
+  const combinedAnswers = { ...form.suggestedAnswers, ...form.savedAnswers, ...answers };
+  const progress = formProgress(form.definition, combinedAnswers);
+  return {
+    templateId,
+    templateTitle: form.definition.title,
+    status: progress.remainingFields === 0 ? "ready_to_save" : "in_progress",
+    progress,
+    nextQuestion: progress.missingFields[0] ?? null,
   };
 }
 
@@ -401,6 +438,8 @@ export async function proposeFormAnswers(
     expires_at: expiresAt,
   }).select("id").single();
   if (error) throw new Error(`Unable to prepare the form review: ${error.message}`);
+  const resultingAnswers = { ...(response?.answers_json ?? {}), ...cleanAnswers };
+  const progress = formProgress(definition, resultingAnswers);
   return {
     proposalId: data.id,
     templateId,
@@ -408,10 +447,14 @@ export async function proposeFormAnswers(
     templateVersion: definition.version,
     proposedAnswers: cleanAnswers,
     reviewFields: Object.entries(cleanAnswers).map(([key, value]) => ({ key, label: definition.fields.find((field) => field.key === key)?.label ?? key, value })),
-    resultingAnswers: { ...(response?.answers_json ?? {}), ...cleanAnswers },
+    resultingAnswers,
+    progress,
+    willComplete: progress.remainingFields === 0,
     expiresAt,
     confirmationState: "pending",
-    safeSummary: `${Object.keys(cleanAnswers).length} ${definition.title} answer${Object.keys(cleanAnswers).length === 1 ? "" : "s"} ready for review. Nothing has been saved.`,
+    safeSummary: progress.remainingFields === 0
+      ? `Review these ${definition.title} answers before completing your private form. Nothing has been saved.`
+      : `Review these ${definition.title} answers before saving your private draft. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}. Nothing has been saved.`,
   };
 }
 
@@ -426,10 +469,12 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
   if (proposal.confirmed_at) {
     const existing = await getResponse(supabase, proposal.patient_id, proposal.template_id);
     if (!existing) throw new Error("This proposal was confirmed, but its saved draft could not be found.");
+    const progress = formProgress(definitionFor(proposal.template_id), existing.answers_json ?? {});
     return {
       response: existing,
       confirmationState: "confirmed",
-      savedAs: "draft",
+      savedAs: progress.remainingFields === 0 ? "completed_form" : "draft",
+      progress,
       resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
       safeSummary: `This ${definitionFor(proposal.template_id).title} proposal was already saved. Nothing was added twice.`,
     };
@@ -443,22 +488,28 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
     throw new Error("This form changed after the review was prepared. Reopen it to avoid overwriting newer answers.");
   }
   const updatedAt = new Date().toISOString();
+  const resultingAnswers = { ...(current?.answers_json ?? {}), ...cleanAnswers };
+  const progress = formProgress(definition, resultingAnswers);
+  const completed = progress.remainingFields === 0;
   const { data: response, error: saveError } = await supabase.from("form_responses").upsert({
     patient_id: proposal.patient_id,
     template_id: proposal.template_id,
-    answers_json: { ...(current?.answers_json ?? {}), ...cleanAnswers },
-    status: "incomplete",
+    answers_json: resultingAnswers,
+    status: completed ? "complete" : "incomplete",
     signed_at: null,
     updated_at: updatedAt,
   }, { onConflict: "patient_id,template_id" }).select("id, template_id, answers_json, status, updated_at").single();
-  if (saveError) throw new Error(`Unable to save the form draft: ${saveError.message}`);
+  if (saveError) throw new Error(`Unable to save the form: ${saveError.message}`);
   const { error: confirmError } = await supabase.from("form_answer_proposals").update({ confirmed_at: updatedAt }).eq("id", proposalId).is("confirmed_at", null);
-  if (confirmError) throw new Error(`The draft was saved, but its confirmation receipt could not be updated: ${confirmError.message}`);
+  if (confirmError) throw new Error(`The form was saved, but its confirmation receipt could not be updated: ${confirmError.message}`);
   return {
     response,
     confirmationState: "confirmed",
-    savedAs: "draft",
+    savedAs: completed ? "completed_form" : "draft",
+    progress,
     resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
-    safeSummary: `${definition.title} draft updated with ${Object.keys(cleanAnswers).length} confirmed answer${Object.keys(cleanAnswers).length === 1 ? "" : "s"}.`,
+    safeSummary: completed
+      ? `${definition.title} completed with your confirmed answers.`
+      : `${definition.title} draft updated. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}.`,
   };
 }
