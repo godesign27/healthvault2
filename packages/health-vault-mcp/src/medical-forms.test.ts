@@ -76,9 +76,30 @@ test("a newly saved complete answer set is immediately shareable", async () => {
   const preview = await previewMedicalFormShare(supabase as never, "user-1", {
     templateId: "patient-reg",
     recipientName: "Dr. Rivera",
+    recipientEmail: "rivera@clinic.example",
     expiresInHours: 24,
   });
 
   assert.equal(preview.responseId, "response-1");
   assert.equal(preview.confirmationState, "pending");
+  assert.equal(preview.recipientEmail, "rivera@clinic.example");
+  assert.equal(preview.sendPatientCopy, false);
+});
+
+test("secure-share widget confirms the exact email and optional patient receipt", () => {
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /recipientEmail:o\.recipientEmail/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /sendPatientCopy:Boolean\(o\.sendPatientCopy\)/);
+});
+
+test("secure-share preview rejects an invalid recipient email before reading health data", async () => {
+  await assert.rejects(
+    previewMedicalFormShare({ from: () => { throw new Error("should not query"); } } as never, "user-1", {
+      templateId: "patient-reg",
+      recipientName: "Dr. Rivera",
+      recipientEmail: "not-an-email",
+      expiresInHours: 24,
+    }),
+    /valid recipient email/,
+  );
 });
