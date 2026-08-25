@@ -11,6 +11,14 @@ export type MedicalFormShareInput = {
 
 const clean = (value?: string | null) => value?.trim() || null;
 
+function hasAllRequiredAnswers(definition: (typeof GPT_MEDICAL_FORMS)[number], answers: unknown) {
+  if (!answers || typeof answers !== "object" || Array.isArray(answers)) return false;
+  const values = answers as Record<string, unknown>;
+  return definition.fields
+    .filter(({ required }) => required !== false)
+    .every(({ key }) => typeof values[key] === "string" && Boolean(values[key].trim()));
+}
+
 async function completedForm(supabase: SupabaseClient, userId: string, templateId: string) {
   const definition = GPT_MEDICAL_FORMS.find(({ id }) => id === templateId);
   if (!definition) throw new Error("This medical form is not available for secure sharing.");
@@ -21,7 +29,10 @@ async function completedForm(supabase: SupabaseClient, userId: string, templateI
     .eq("template_id", templateId)
     .maybeSingle();
   if (error) throw new Error(`Unable to load the completed medical form: ${error.message}`);
-  if (!data || !["complete", "completed"].includes(data.status)) {
+  // The answer set is the durable source of truth. In particular, a response
+  // written by the confirmation card can be read before status-based clients
+  // have refreshed their saved-state cache.
+  if (!data || (!['complete', 'completed'].includes(data.status) && !hasAllRequiredAnswers(definition, data.answers_json))) {
     throw new Error(`${definition.title} must be completed before it can be shared.`);
   }
   return { definition, patientId, response: data };

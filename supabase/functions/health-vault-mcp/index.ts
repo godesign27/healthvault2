@@ -633,7 +633,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       inputSchema: z.object({
         templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
         answers: z.record(z.string(), z.string()),
-        expectedUpdatedAt: z.string().datetime({ offset: true }).nullable(),
+        // Brand-new forms have no response timestamp. Models commonly omit null
+        // optional values, so normalize an omitted key to null while preserving
+        // the stale-write check for existing drafts in proposeFormAnswers.
+        expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional().default(null),
       }),
       outputSchema: z.object({ preview: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
