@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Clock, Shield, FileText, User, Building2, Calendar, AlertCircle, Lock, Download } from 'lucide-react';
+import { Clock, Shield, FileText, User, Building2, Calendar, AlertCircle, Lock, Download, ArrowLeft } from 'lucide-react';
 
 type ShareStatus = 'pending' | 'delivered' | 'opened' | 'revoked' | 'expired';
 
@@ -152,11 +152,20 @@ export default function SecureShareLanding() {
               />
               <h1 className="text-slate-900 text-2xl sm:text-3xl font-bold">Health Vault</h1>
             </div>
-            {loading ? (
-              <div className="h-8 w-24 rounded animate-pulse bg-slate-200"></div>
-            ) : data ? (
-              <StatusBadge status={data.status} />
-            ) : null}
+            <div className="flex items-center gap-3">
+              <a
+                href="/"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-slate-950 hover:underline"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to my Health Vault
+              </a>
+              {loading ? (
+                <div className="h-8 w-24 rounded animate-pulse bg-slate-200"></div>
+              ) : data ? (
+                <StatusBadge status={data.status} />
+              ) : null}
+            </div>
           </div>
 
           <h2 className="text-slate-900 flex items-center gap-2 text-lg">

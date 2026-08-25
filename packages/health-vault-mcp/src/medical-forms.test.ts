@@ -4,7 +4,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { MEDICAL_FORM_REVIEW_WIDGET_HTML } from "./medical-form-review-widget.ts";
-import { MEDICAL_FORM_SHARE_WIDGET_HTML } from "./medical-form-share-widget.ts";
+import { MEDICAL_FORM_SHARE_WIDGET_HTML, MEDICAL_FORM_SHARE_WIDGET_URI } from "./medical-form-share-widget.ts";
 import { previewMedicalFormShare } from "./medical-form-sharing.ts";
 import { GPT_MEDICAL_FORMS } from "./medical-forms.ts";
 
@@ -141,4 +141,30 @@ test("typed share confirmation reuses the preview without extra reads or verbose
   assert.match(edgeIndex, /Do not call any read or preview tool again/);
   assert.match(edgeIndex, /Never repeat patient details, recipient details, share IDs, or expiration details in prose/);
   assert.match(edgeIndex, /Secure share result is shown in the card\./);
+});
+
+test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v2\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
+  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
+
+  const legacyEdgeWidget = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/medical-form-share-widget.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.doesNotMatch(legacyEdgeWidget, /Nothing is sent automatically|>Confirm Secure Share</);
+});
+
+test("medical-form result card reports patient receipt acceptance or failure", () => {
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Patient receipt accepted for delivery/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Patient receipt email failed/);
+});
+
+test("public secure-share page links back to the authenticated Health Vault profile", async () => {
+  const landingPage = await readFile(
+    fileURLToPath(new URL("../../../src/pages/SecureShareLanding.tsx", import.meta.url)),
+    "utf8",
+  );
+  assert.match(landingPage, /href="\/"/);
+  assert.match(landingPage, /Back to my Health Vault/);
 });
