@@ -119,3 +119,26 @@ test("MCP instructions require one compact share preview without unrelated cards
   assert.match(edgeIndex, /Do not repeat the card as a prose checklist/);
   assert.match(edgeIndex, /Do not ask for a typed confirmation when the card has a confirmation button/);
 });
+
+test("medical form share preview permits its widget to call the confirmed save tool", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  const previewRegistration = edgeIndex.slice(
+    edgeIndex.indexOf('"preview_medical_form_share"'),
+    edgeIndex.indexOf('"create_medical_form_share"'),
+  );
+  assert.match(previewRegistration, /"openai\/widgetAccessible": true/);
+});
+
+test("typed share confirmation reuses the preview without extra reads or verbose PII", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.match(edgeIndex, /When the user types confirmation after a medical-form share preview, call create_medical_form_share exactly once/);
+  assert.match(edgeIndex, /Do not call any read or preview tool again/);
+  assert.match(edgeIndex, /Never repeat patient details, recipient details, share IDs, or expiration details in prose/);
+  assert.match(edgeIndex, /Secure share result is shown in the card\./);
+});
