@@ -74,6 +74,8 @@ export async function previewMedicalFormShare(supabase: SupabaseClient, userId: 
   return {
     templateId: definition.id,
     templateTitle: definition.title,
+    completedFieldCount: definition.fields.filter(({ required }) => required !== false).length,
+    totalFieldCount: definition.fields.filter(({ required }) => required !== false).length,
     responseId: response.id,
     recipientName: input.recipientName.trim(),
     recipientOrganization: clean(input.recipientOrganization),

@@ -114,7 +114,7 @@ test("MCP instructions require one compact share preview without unrelated cards
     fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
     "utf8",
   );
-  assert.match(edgeIndex, /call preview_medical_form_share exactly once/);
+  assert.match(edgeIndex, /call preview_medical_form_email_share exactly once/);
   assert.match(edgeIndex, /Do not call onboarding, dashboard, form-progress, or recipient-resolution tools/);
   assert.match(edgeIndex, /Do not repeat the card as a prose checklist/);
   assert.match(edgeIndex, /Do not ask for a typed confirmation when the card has a confirmation button/);
@@ -126,8 +126,8 @@ test("medical form share preview permits its widget to call the confirmed save t
     "utf8",
   );
   const previewRegistration = edgeIndex.slice(
-    edgeIndex.indexOf('"preview_medical_form_share"'),
-    edgeIndex.indexOf('"create_medical_form_share"'),
+    edgeIndex.indexOf('"preview_medical_form_email_share"'),
+    edgeIndex.indexOf('"create_medical_form_email_share"'),
   );
   assert.match(previewRegistration, /"openai\/widgetAccessible": true/);
 });
@@ -137,14 +137,14 @@ test("typed share confirmation reuses the preview without extra reads or verbose
     fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
     "utf8",
   );
-  assert.match(edgeIndex, /When the user types confirmation after a medical-form share preview, call create_medical_form_share exactly once/);
+  assert.match(edgeIndex, /When the user types confirmation after a medical-form share preview, call create_medical_form_email_share exactly once/);
   assert.match(edgeIndex, /Do not call any read or preview tool again/);
   assert.match(edgeIndex, /Never repeat patient details, recipient details, share IDs, or expiration details in prose/);
   assert.match(edgeIndex, /Secure share result is shown in the card\./);
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v2\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v3\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -167,4 +167,31 @@ test("public secure-share page links back to the authenticated Health Vault prof
   );
   assert.match(landingPage, /href="\/"/);
   assert.match(landingPage, /Back to my Health Vault/);
+});
+
+test("medical-form share card is the complete minimal final review", () => {
+  for (const text of [
+    "FINAL REVIEW",
+    "Completed fields",
+    "Recipient email",
+    "Secure, read-only link",
+    "Expiration",
+    "Note",
+    "Patient receipt",
+  ]) {
+    assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, new RegExp(text));
+  }
+  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Date of birth|Address:|Phone:|Emergency contact/);
+});
+
+test("versioned medical-form email tools replace the stale legacy tool names", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.match(edgeIndex, /"preview_medical_form_email_share"/);
+  assert.match(edgeIndex, /"create_medical_form_email_share"/);
+  assert.doesNotMatch(edgeIndex, /registerTool\(\s*"preview_medical_form_share"/);
+  assert.doesNotMatch(edgeIndex, /registerTool\(\s*"create_medical_form_share"/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /callTool\('create_medical_form_email_share'/);
 });
