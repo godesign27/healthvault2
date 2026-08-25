@@ -134,13 +134,46 @@ Deno.serve(async (req: Request) => {
         };
       });
 
+      // New MCP shares persist the patient name in recipient metadata. Resolve
+      // older shares through their owner profile so valid links do not display
+      // "Unknown" while keeping contact details out of the recipient payload.
+      let patientName = shareEvent.recipient?.patientName || '';
+      let patientBirthDate = shareEvent.patient_dob || null;
+      if (!patientName) {
+        let { data: patientProfile } = await supabase
+          .from('patient_profiles')
+          .select('user_id, name, birth_date')
+          .eq('id', shareEvent.patient_id)
+          .maybeSingle();
+        if (!patientProfile) {
+          const byUser = await supabase
+            .from('patient_profiles')
+            .select('user_id, name, birth_date')
+            .eq('user_id', shareEvent.patient_id)
+            .maybeSingle();
+          patientProfile = byUser.data;
+        }
+        patientName = patientProfile?.name || '';
+        patientBirthDate = patientBirthDate || patientProfile?.birth_date || null;
+        const profileUserId = patientProfile?.user_id || shareEvent.patient_id;
+        if (!patientName && profileUserId) {
+          const { data: userProfile } = await supabase
+            .from('user_profiles')
+            .select('first_name, last_name, date_of_birth')
+            .eq('user_id', profileUserId)
+            .maybeSingle();
+          patientName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ').trim();
+          patientBirthDate = patientBirthDate || userProfile?.date_of_birth || null;
+        }
+      }
+
       const payload = {
         id: shareEvent.id,
         status: shareEvent.status,
         patient: {
           id: shareEvent.patient_id,
-          name: shareEvent.recipient?.patientName || 'Unknown',
-          birthDate: shareEvent.patient_dob || null,
+          name: patientName || 'Health Vault patient',
+          birthDate: patientBirthDate,
         },
         recipient: {
           displayName: shareEvent.recipient?.providerName || shareEvent.recipient?.displayName || 'Unknown',

@@ -95,6 +95,7 @@ import {
   createMedicalFormShare,
   previewMedicalFormShare,
 } from "./medical-form-sharing.ts";
+import { sendMedicalFormShareEmail } from "./medical-form-share-email.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
@@ -257,7 +258,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.7.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep the user in ChatGPT: call get_medical_form, review profile-derived suggestions as unconfirmed, ask one logical missing question at a time, and call get_medical_form_progress after each answer batch so the user sees a progress card. Never redirect a ChatGPT-supported reusable form to the web app. When the required safe answer set is ready, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation. A confirmed form becomes complete when all required safe fields are present; completion never signs or shares it. Only completed forms may be shared: call preview_medical_form_share first and create_medical_form_share only after explicit confirmation. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep the user in ChatGPT: call get_medical_form, review profile-derived suggestions as unconfirmed, ask one logical missing question at a time, and call get_medical_form_progress after each answer batch so the user sees a progress card. Never redirect a ChatGPT-supported reusable form to the web app. When the required safe answer set is ready, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation. A confirmed form becomes complete when all required safe fields are present; completion never signs or shares it. Only completed forms may be shared: collect the provider's email, ask whether the patient wants a receipt at their verified Health Vault email, call preview_medical_form_share first, and create and email the share only after explicit confirmation of the exact recipient email, expiration, and receipt choice. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -633,7 +634,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       inputSchema: z.object({
         templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
         answers: z.record(z.string(), z.string()),
-        expectedUpdatedAt: z.string().datetime({ offset: true }).nullable(),
+        // Brand-new forms have no response timestamp. Models commonly omit null
+        // optional values, so normalize an omitted key to null while preserving
+        // the stale-write check for existing drafts in proposeFormAnswers.
+        expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional().default(null),
       }),
       outputSchema: z.object({ preview: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
@@ -683,15 +687,17 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
     recipientName: z.string().min(1).max(160),
     recipientOrganization: z.string().max(200).optional(),
+    recipientEmail: z.string().email().max(320),
     expiresInHours: z.number().int().min(1).max(168).default(24),
     note: z.string().max(500).optional(),
+    sendPatientCopy: z.boolean().default(false),
   });
 
   server.registerTool(
     "preview_medical_form_share",
     {
       title: "Preview completed medical form share",
-      description: "Preview a scoped, expiring secure share of exactly one completed medical form. This read-only step creates no link and requires explicit confirmation before creation.",
+      description: "Preview a scoped, expiring secure share of exactly one completed medical form, including the exact recipient email. This read-only step creates no link or email and requires explicit confirmation before creation and delivery.",
       inputSchema: medicalFormShareInput,
       outputSchema: z.object({ share: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -704,7 +710,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     async (input) => {
       try {
         const share = await previewMedicalFormShare(supabase, userId, input);
-        return { structuredContent: { share }, content: [{ type: "text", text: `${share.safeSummary} Confirm the exact recipient and expiration before creating it.` }] };
+        return { structuredContent: { share }, content: [{ type: "text", text: `${share.safeSummary} Confirm the exact recipient email, expiration, and whether the patient should receive a receipt before creating and emailing it.` }] };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to preview the secure form share" }] };
       }
@@ -715,7 +721,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     "create_medical_form_share",
     {
       title: "Create completed medical form share",
-      description: "Create a scoped, expiring read-only link for one completed medical form only after the user explicitly confirms the previewed recipient and expiration.",
+      description: "Create and email a scoped, expiring read-only link for one completed medical form only after the user explicitly confirms the previewed recipient email, expiration, and optional patient receipt.",
       inputSchema: medicalFormShareInput.extend({ confirmed: z.literal(true) }),
       outputSchema: z.object({ share: z.unknown() }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
@@ -728,7 +734,12 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
     async ({ confirmed: _confirmed, ...input }) => {
       try {
-        const share = await createMedicalFormShare(supabase, userId, "https://healthvault27.com", input);
+        const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
+        const from = Deno.env.get("RESEND_FROM_EMAIL") || "Health Vault <team@healthvault27.com>";
+        const share = await createMedicalFormShare(supabase, userId, "https://healthvault27.com", input, async (email) => {
+          if (!resendApiKey) return { recipient: { sent: false, error: "Email delivery is not configured." } };
+          return sendMedicalFormShareEmail({ ...email, apiKey: resendApiKey, from });
+        });
         return { structuredContent: { share }, content: [{ type: "text", text: `${share.safeSummary} The link expires automatically and can be revoked from Health Vault. Anything else I can help you do today?` }] };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to create the secure form share" }] };
