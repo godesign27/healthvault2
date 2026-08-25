@@ -103,3 +103,19 @@ test("secure-share preview rejects an invalid recipient email before reading hea
     /valid recipient email/,
   );
 });
+
+test("secure-share widget suppresses empty cards when a preview call fails", () => {
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /if\(!o\.templateId\|\|!o\.recipientEmail\)/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
+});
+
+test("MCP instructions require one compact share preview without unrelated cards", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.match(edgeIndex, /call preview_medical_form_share exactly once/);
+  assert.match(edgeIndex, /Do not call onboarding, dashboard, form-progress, or recipient-resolution tools/);
+  assert.match(edgeIndex, /Do not repeat the card as a prose checklist/);
+  assert.match(edgeIndex, /Do not ask for a typed confirmation when the card has a confirmation button/);
+});
