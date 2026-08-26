@@ -144,7 +144,7 @@ test("typed share confirmation reuses the preview without extra reads or verbose
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v6\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v7\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -160,6 +160,8 @@ test("medical-form share widget waits for late ChatGPT tool output without becom
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/notifications\/tool-result/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /request\('tools\/call'/);
 });
 
 test("medical-form share uses the current MCP Apps resource contract", async () => {
