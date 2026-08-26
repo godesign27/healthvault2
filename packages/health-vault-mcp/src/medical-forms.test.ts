@@ -144,7 +144,7 @@ test("typed share confirmation reuses the preview without extra reads or verbose
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v3\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v4\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -153,6 +153,15 @@ test("medical-form email widget uses a versioned resource and contains no legacy
     "utf8",
   );
   assert.doesNotMatch(legacyEdgeWidget, /Nothing is sent automatically|>Confirm Secure Share</);
+});
+
+test("medical-form sharing uses Health Vault delivery without Gmail or another email plugin", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.match(edgeIndex, /Never invoke, suggest, or install Gmail or another email plugin/);
+  assert.match(edgeIndex, /Health Vault sends both emails server-side through its configured delivery service/);
 });
 
 test("medical-form result card reports patient receipt acceptance or failure", () => {
