@@ -48,3 +48,32 @@ test("cloud share records delivery truthfully instead of marking failed email as
   assert.match(shareFunction, /status: emailSent \? 'delivered' : 'sent'/);
   assert.match(shareFunction, /patientReceipt: patientReceiptSent \? 'accepted' : 'failed'/);
 });
+
+test("public cloud share renders authorized answers and serves a real token-protected PDF", async () => {
+  const shareFunction = await readWorkspaceFile("supabase/functions/share/index.ts");
+  const landing = await readWorkspaceFile("src/pages/SecureShareLanding.tsx");
+  const storageMigration = await readWorkspaceFile("supabase/migrations/20260826000000_secure_share_downloads.sql");
+
+  assert.match(shareFunction, /from "npm:pdf-lib@1\.17\.1"/);
+  assert.match(shareFunction, /PDFDocument\.create\(\)/);
+  assert.doesNotMatch(shareFunction, /new Blob\(\[pdfHtml\]/);
+  assert.match(shareFunction, /answers_json/);
+  assert.match(shareFunction, /\/pdf\?token=/);
+  assert.match(shareFunction, /Content-Disposition.*attachment/);
+  assert.match(landing, /form\.answers/);
+  assert.match(landing, /Read-only form/);
+  assert.match(storageMigration, /UPDATE storage\.buckets[\s\S]*public = false/);
+  assert.match(storageMigration, /DROP POLICY IF EXISTS "Public read access for shares"/);
+  assert.match(storageMigration, /UPDATE share_events AS share_event[\s\S]*patient_profiles AS patient_profile/);
+  assert.match(storageMigration, /patient_profile\.user_id::text/);
+  assert.match(storageMigration, /patient_profile\.id::text/);
+});
+
+test("GPT medical-form shares use the authenticated owner and the shared secure viewer", async () => {
+  const sharing = await readWorkspaceFile("packages/health-vault-mcp/src/medical-form-sharing.ts");
+
+  assert.match(sharing, /patient_id: userId/);
+  assert.match(sharing, /form_response_ids: \[response\.id\]/);
+  assert.match(sharing, /\/share\/\$\{shareId\}\?token=\$\{shareToken\}/);
+  assert.match(sharing, /\.eq\("patient_id", userId\)/);
+});

@@ -27,7 +27,7 @@ type LandingSharePayload = {
   status: ShareStatus;
   patient: { id: string; name: string; birthDate?: string };
   recipient: { displayName: string; orgName?: string };
-  forms: { id: string; title: string; version: string; signedAt?: string }[];
+  forms: { id: string; title: string; version: string; signedAt?: string; answers: Record<string, unknown> }[];
   files: { pdfUrl: string; bundleUrl?: string };
   expiresAt?: string;
   openedAt?: string;
@@ -322,11 +322,30 @@ export default function SecureShareLanding() {
                           </p>
                         </div>
                         <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 border border-slate-300 whitespace-nowrap">
-                          PDF + FHIR
+                          Read-only form
                         </span>
                       </div>
 
                       <div className="h-px bg-slate-200 mb-6"></div>
+
+                      <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-4 mb-6">
+                        {Object.entries(form.answers || {})
+                          .filter(([, value]) => value !== null && value !== undefined && value !== '')
+                          .map(([key, value]) => (
+                            <div key={key} className="min-w-0">
+                              <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase())}
+                              </dt>
+                              <dd className="mt-1 text-sm text-slate-900 break-words">
+                                {Array.isArray(value)
+                                  ? value.join(', ')
+                                  : typeof value === 'object' && value !== null
+                                    ? JSON.stringify(value)
+                                    : String(value)}
+                              </dd>
+                            </div>
+                          ))}
+                      </dl>
 
                       {/* Download Buttons */}
                       <div className="grid sm:grid-cols-2 gap-4">

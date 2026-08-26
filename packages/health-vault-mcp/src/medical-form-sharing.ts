@@ -121,7 +121,7 @@ export async function createMedicalFormShare(
   const createdAudit = [{ event: "created", at: createdAt, actor: "patient" }];
   const { error } = await supabase.from("share_events").insert({
     id: shareId,
-    patient_id: patientId,
+    patient_id: userId,
     form_response_ids: [response.id],
     method: "SecureLink",
     recipient,
@@ -165,7 +165,7 @@ export async function createMedicalFormShare(
       ...(emailDelivery.patientCopy ? { patientReceipt: emailDelivery.patientCopy.sent ? "accepted" : "failed" } : {}),
     },
     audit,
-  }).eq("id", shareId).eq("patient_id", patientId);
+  }).eq("id", shareId).eq("patient_id", userId);
 
   return {
     ...preview,

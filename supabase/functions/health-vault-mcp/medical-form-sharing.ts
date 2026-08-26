@@ -64,7 +64,7 @@ export async function createMedicalFormShare(supabase: SupabaseClient, userId: s
   const expiresAt = new Date(Date.now() + preview.expiresInHours * 3_600_000).toISOString();
   const { error } = await supabase.from("share_events").insert({
     id: shareId,
-    patient_id: patientId,
+    patient_id: userId,
     form_response_ids: [response.id],
     method: "SecureLink",
     recipient: { displayName: preview.recipientName, orgName: preview.recipientOrganization },
