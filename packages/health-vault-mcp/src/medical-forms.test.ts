@@ -88,8 +88,8 @@ test("a newly saved complete answer set is immediately shareable", async () => {
 
 test("secure-share widget confirms the exact email and optional patient receipt", () => {
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /recipientEmail:o\.recipientEmail/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /sendPatientCopy:Boolean\(o\.sendPatientCopy\)/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /recipientEmail:output\.recipientEmail/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /sendPatientCopy:Boolean\(output\.sendPatientCopy\)/);
 });
 
 test("secure-share preview rejects an invalid recipient email before reading health data", async () => {
@@ -105,7 +105,7 @@ test("secure-share preview rejects an invalid recipient email before reading hea
 });
 
 test("secure-share widget avoids rendering an empty confirmation card", () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /if\(!o\.templateId\|\|!o\.recipientEmail\)/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /if\(!output\.templateId\|\|!output\.recipientEmail\)/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
 });
 
@@ -144,7 +144,7 @@ test("typed share confirmation reuses the preview without extra reads or verbose
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v7\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v8\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -156,12 +156,13 @@ test("medical-form email widget uses a versioned resource and contains no legacy
 });
 
 test("medical-form share widget waits for late ChatGPT tool output without becoming blank", () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /event\.detail\?\.globals\?\.toolOutput/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /globals\.toolOutput\|\|detail\.toolOutput/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/notifications\/tool-result/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /request\('tools\/call'/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /\(function\(\)\{/);
 });
 
 test("medical-form share uses the current MCP Apps resource contract", async () => {
