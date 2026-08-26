@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,6 +31,109 @@ function getFormTitle(formId: string): string {
   };
 
   return formTitles[formId] || 'Unknown Form';
+}
+
+function answerLabel(key: string): string {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function printable(value: unknown): string {
+  const text = Array.isArray(value)
+    ? value.join(', ')
+    : typeof value === 'object' && value !== null
+      ? JSON.stringify(value)
+      : String(value);
+  return text.replace(/[^\x20-\x7E]/g, ' ');
+}
+
+function wrapText(text: string, maxCharacters = 88): string[] {
+  const words = printable(text).split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let line = '';
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length > maxCharacters && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.length ? lines : [''];
+}
+
+async function createPdfPacket(input: {
+  patientName: string;
+  patientDob?: string | null;
+  recipientName: string;
+  forms: any[];
+}): Promise<Uint8Array> {
+  const document = await PDFDocument.create();
+  const regular = await document.embedFont(StandardFonts.Helvetica);
+  const bold = await document.embedFont(StandardFonts.HelveticaBold);
+  const pageSize: [number, number] = [612, 792];
+  const margin = 48;
+  let page = document.addPage(pageSize);
+  let y = 742;
+
+  const addPage = () => {
+    page = document.addPage(pageSize);
+    y = 742;
+  };
+  const ensureSpace = (height: number) => {
+    if (y - height < 48) addPage();
+  };
+  const drawLine = (text: string, options: { bold?: boolean; size?: number; color?: ReturnType<typeof rgb> } = {}) => {
+    const size = options.size ?? 10;
+    ensureSpace(size + 7);
+    page.drawText(printable(text), {
+      x: margin,
+      y,
+      size,
+      font: options.bold ? bold : regular,
+      color: options.color ?? rgb(0.12, 0.16, 0.22),
+    });
+    y -= size + 7;
+  };
+
+  drawLine('HEALTH VAULT', { bold: true, size: 11, color: rgb(0.04, 0.53, 0.39) });
+  drawLine('Medical Forms Packet', { bold: true, size: 22 });
+  y -= 8;
+  drawLine(`Patient: ${input.patientName}`, { bold: true });
+  if (input.patientDob) drawLine(`Date of Birth: ${input.patientDob}`);
+  drawLine(`Shared With: ${input.recipientName}`);
+  drawLine(`Generated: ${new Date().toISOString()}`);
+  y -= 12;
+
+  for (const form of input.forms) {
+    ensureSpace(52);
+    drawLine(getFormTitle(form.template_id), { bold: true, size: 15 });
+    const answers = Object.entries(form.answers_json || {})
+      .filter(([, value]) => value !== null && value !== undefined && value !== '');
+    if (!answers.length) {
+      drawLine('No answers recorded.', { color: rgb(0.45, 0.49, 0.55) });
+    }
+    for (const [key, value] of answers) {
+      const lines = wrapText(`${answerLabel(key)}: ${printable(value)}`);
+      for (const [index, line] of lines.entries()) {
+        drawLine(index === 0 ? line : `  ${line}`);
+      }
+      y -= 2;
+    }
+    y -= 12;
+  }
+
+  for (const currentPage of document.getPages()) {
+    currentPage.drawText('Shared securely via Health Vault. Contains protected health information.', {
+      x: margin,
+      y: 24,
+      size: 8,
+      font: regular,
+      color: rgb(0.55, 0.59, 0.64),
+    });
+  }
+  return document.save();
 }
 
 Deno.serve(async (req: Request) => {
@@ -112,13 +216,71 @@ Deno.serve(async (req: Request) => {
         );
       }
 
+      if (pathParts[1] === 'pdf' || pathParts[1] === 'bundle') {
+        const isPdf = pathParts[1] === 'pdf';
+        if (isPdf) {
+          const { data: sharedForms, error: sharedFormsError } = await supabase
+            .from('form_responses')
+            .select('id, template_id, answers_json')
+            .in('id', shareEvent.form_response_ids || []);
+          if (sharedFormsError || !sharedForms?.length) {
+            return new Response(JSON.stringify({ error: 'Shared forms are unavailable' }), {
+              status: 404,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+          const { data: ownerProfile } = await supabase
+            .from('user_profiles')
+            .select('first_name, last_name, date_of_birth')
+            .eq('user_id', shareEvent.patient_id)
+            .maybeSingle();
+          const patientName = shareEvent.recipient?.patientName
+            || [ownerProfile?.first_name, ownerProfile?.last_name].filter(Boolean).join(' ')
+            || 'Health Vault patient';
+          const pdfBytes = await createPdfPacket({
+            patientName,
+            patientDob: ownerProfile?.date_of_birth,
+            recipientName: shareEvent.recipient?.providerName || shareEvent.recipient?.displayName || 'Provider',
+            forms: sharedForms,
+          });
+          return new Response(pdfBytes, {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': 'attachment; filename="health-vault-forms.pdf"',
+              'Cache-Control': 'private, no-store, max-age=0',
+            },
+          });
+        }
+        const objectPath = `${shareId}/${isPdf ? 'packet.pdf' : 'bundle.json'}`;
+        const { data: file, error: downloadError } = await supabase.storage
+          .from('shares')
+          .download(objectPath);
+        if (downloadError || !file) {
+          return new Response(JSON.stringify({ error: 'Shared file is unavailable' }), {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        return new Response(file, {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': isPdf ? 'application/pdf' : 'application/fhir+json',
+            'Content-Disposition': `attachment; filename="health-vault-${isPdf ? 'forms.pdf' : 'bundle.json'}"`,
+            'Cache-Control': 'private, no-store, max-age=0',
+          },
+        });
+      }
+
       const formResponseIds = shareEvent.form_response_ids || [];
       // form_response_ids are form_responses UUIDs; resolve titles via their template_id.
       let formRows: any[] = [];
       if (formResponseIds.length > 0) {
         const { data: frs } = await supabase
           .from('form_responses')
-          .select('id, template_id, signed_at')
+          .select('id, template_id, signed_at, answers_json')
           .in('id', formResponseIds);
         formRows = frs || [];
       }
@@ -131,6 +293,7 @@ Deno.serve(async (req: Request) => {
           title: getFormTitle(templateId),
           version: '2025.01',
           signedAt: fr?.signed_at || shareEvent.sent_at || new Date().toISOString(),
+          answers: fr?.answers_json || {},
         };
       });
 
@@ -181,8 +344,10 @@ Deno.serve(async (req: Request) => {
         },
         forms: forms,
         files: {
-          pdfUrl: shareEvent.pdf_url,
-          bundleUrl: shareEvent.bundle_url,
+          pdfUrl: `${supabaseUrl}/functions/v1/share/${shareId}/pdf?token=${encodeURIComponent(token || '')}`,
+          bundleUrl: shareEvent.bundle_url
+            ? `${supabaseUrl}/functions/v1/share/${shareId}/bundle?token=${encodeURIComponent(token || '')}`
+            : undefined,
         },
         expiresAt: shareEvent.expires_at,
         openedAt: shareEvent.opened_at,
@@ -368,8 +533,8 @@ Deno.serve(async (req: Request) => {
       const shareToken = crypto.randomUUID();
       const appUrl = Deno.env.get('APP_URL') || req.headers.get('origin') || supabaseUrl;
       const shareUrl = `${appUrl}/share/${shareEventId}?token=${shareToken}`;
-      const bundleUrl = `${supabaseUrl}/storage/v1/object/public/shares/${shareEventId}/bundle.json`;
-      const pdfUrl = `${supabaseUrl}/storage/v1/object/public/shares/${shareEventId}/packet.pdf`;
+      const bundleUrl = `${supabaseUrl}/functions/v1/share/${shareEventId}/bundle?token=${shareToken}`;
+      const pdfUrl = `${supabaseUrl}/functions/v1/share/${shareEventId}/pdf?token=${shareToken}`;
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
@@ -421,53 +586,14 @@ Deno.serve(async (req: Request) => {
         console.error('Error uploading bundle:', bundleUploadError);
       }
 
-      // Generate PDF packet from real form_responses data
-      const formSections = (formResponses || []).map((fr: any) => {
-        const formTitle = getFormTitle(fr.template_id) || fr.template_id || 'Medical Form';
-        const answers = fr.answers_json || {};
-        const answerLines = Object.entries(answers)
-          .filter(([, v]) => v !== null && v !== undefined && v !== '')
-          .map(([k, v]) => {
-            const label = k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-            return `<tr><td style="padding:6px 12px;font-weight:600;color:#374151;width:35%;vertical-align:top">${label}</td><td style="padding:6px 12px;color:#1f2937">${String(v)}</td></tr>`;
-          })
-          .join('');
-        return `
-          <div style="margin-bottom:32px;page-break-inside:avoid">
-            <h2 style="font-size:16px;font-weight:700;color:#111827;border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px">${formTitle}</h2>
-            <table style="width:100%;border-collapse:collapse;font-size:14px">
-              ${answerLines || '<tr><td style="padding:6px 12px;color:#9ca3af" colspan="2">No answers recorded.</td></tr>'}
-            </table>
-          </div>`;
-      }).join('');
-
-      const pdfHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Medical Forms Packet — Health Vault</title>
-<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1f2937}</style>
-</head>
-<body>
-<div style="text-align:center;margin-bottom:32px;border-bottom:3px solid #10b981;padding-bottom:24px">
-  <h1 style="font-size:24px;font-weight:700;color:#111827;margin:0 0 8px">Medical Forms Packet</h1>
-  <p style="color:#6b7280;margin:4px 0">Health Vault — Secure Health Records Platform</p>
-</div>
-<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:32px">
-  <p style="margin:4px 0"><strong>Patient:</strong> ${patientFullName}</p>
-  ${patientDob ? `<p style="margin:4px 0"><strong>Date of Birth:</strong> ${patientDob}</p>` : ''}
-  <p style="margin:4px 0"><strong>Shared With:</strong> ${recipient?.providerName || recipient?.displayName || 'Unknown'}</p>
-  <p style="margin:4px 0"><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-  <p style="margin:4px 0"><strong>Forms Included:</strong> ${forms.length}</p>
-</div>
-${formSections}
-<div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#9ca3af;text-align:center">
-  Shared securely via Health Vault. This document contains protected health information.
-</div>
-</body>
-</html>`;
-
-      const pdfBlob = new Blob([pdfHtml], { type: 'text/html' });
+      // Generate a real PDF packet from the authorized form responses.
+      const pdfBytes = await createPdfPacket({
+        patientName: patientFullName,
+        patientDob,
+        recipientName: recipient?.providerName || recipient?.displayName || 'Unknown',
+        forms: formResponses,
+      });
+      const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
       const { error: pdfUploadError } = await supabase.storage
         .from('shares')
         .upload(`${shareEventId}/packet.pdf`, pdfBlob, {
