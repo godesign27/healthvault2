@@ -4,6 +4,7 @@ import { Button } from './ui/Button';
 import { Checkbox } from './ui/Checkbox';
 import { FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { HorizontalMedicalIDCard } from './HorizontalMedicalIDCard';
+import { supabase } from '../lib/supabase';
 
 export type FormSummary = {
   id: string;

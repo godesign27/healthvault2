@@ -10,6 +10,7 @@ const readWorkspaceFile = (path: string) => readFile(
 
 test("cloud share uses the authenticated session instead of the public anon key", async () => {
   const drawer = await readWorkspaceFile("src/components/ShareFormsDrawer.tsx");
+  assert.match(drawer, /import \{ supabase \} from '\.\.\/lib\/supabase'/);
   assert.match(drawer, /supabase\.auth\.getSession\(\)/);
   assert.match(drawer, /Bearer \$\{session\.access_token\}/);
   assert.doesNotMatch(drawer, /Bearer \$\{import\.meta\.env\.VITE_SUPABASE_ANON_KEY\}/);
