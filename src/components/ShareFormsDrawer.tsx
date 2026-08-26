@@ -70,12 +70,15 @@ export function ShareFormsDrawer({
     setError(null);
     setAck(null);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Please sign in again before sharing forms.');
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/share`;
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           patientId: patient.id,
@@ -93,9 +96,11 @@ export function ShareFormsDrawer({
           },
         }),
       });
-      if (!res.ok) throw new Error(`Share failed: ${res.status}`);
-      const data = await res.json();
-      setAck(`Forms shared successfully. Share link: ${data.shareUrl}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Share failed: ${res.status}`);
+      const providerStatus = data.emailSent ? 'sent' : `failed${data.emailError ? ` (${data.emailError})` : ''}`;
+      const receiptStatus = data.patientReceiptSent ? 'sent' : `failed${data.patientReceiptError ? ` (${data.patientReceiptError})` : ''}`;
+      setAck(`Secure share created. Provider email: ${providerStatus}. Patient receipt: ${receiptStatus}. Share link: ${data.shareUrl}`);
       onShared?.(data?.id ?? '');
     } catch (e: any) {
       setError(e.message || 'Something went wrong.');
