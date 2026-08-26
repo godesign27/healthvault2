@@ -297,6 +297,31 @@ Deno.serve(async (req: Request) => {
       if (!patientId || !forms || !Array.isArray(forms) || forms.length === 0) {
         throw new Error('Missing required fields');
       }
+      if (!recipient?.email || typeof recipient.email !== 'string') {
+        return new Response(JSON.stringify({ error: 'A recipient email is required' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const authHeader = req.headers.get('Authorization');
+      const authenticatedSupabase = createClient(
+        supabaseUrl,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader || '' } } },
+      );
+      const { data: { user } } = await authenticatedSupabase.auth.getUser(
+        authHeader?.split(' ')[1] || '',
+      );
+      if (!user) {
+        return new Response(JSON.stringify({ error: 'Authentication required' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (patientId !== user.id) {
+        return new Response(JSON.stringify({ error: 'You can only share your own forms' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       const formIds = forms.map((f: any) => f.id);
 
@@ -311,8 +336,8 @@ Deno.serve(async (req: Request) => {
       // Fetch patient DOB to store with the share event
       const { data: patientProfile } = await supabase
         .from('user_profiles')
-        .select('date_of_birth, first_name, last_name')
-        .eq('user_id', patientId)
+        .select('date_of_birth, first_name, last_name, email, email_verified')
+        .eq('user_id', user.id)
         .maybeSingle();
       const patientDob = patientProfile?.date_of_birth || null;
       const patientFullName = patientProfile
@@ -320,10 +345,24 @@ Deno.serve(async (req: Request) => {
         : (recipient?.patientName || 'Unknown');
 
       // Fetch real form_responses data for the forms being shared
-      const { data: formResponses } = await supabase
+      const { data: ownerPatientProfile } = await supabase
+        .from('patient_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!ownerPatientProfile?.id) throw new Error('Complete your patient profile before sharing forms');
+
+      const { data: formResponses, error: formResponsesError } = await supabase
         .from('form_responses')
         .select('id, template_id, answers_json, status, signed_at')
-        .in('id', formIds);
+        .in('id', formIds)
+        .eq('patient_id', ownerPatientProfile.id);
+      if (formResponsesError) throw formResponsesError;
+      if (!formResponses || formResponses.length !== formIds.length) {
+        return new Response(JSON.stringify({ error: 'One or more selected forms are unavailable' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       const shareEventId = crypto.randomUUID();
       const shareToken = crypto.randomUUID();
@@ -444,14 +483,13 @@ ${formSections}
         .from('share_events')
         .insert({
           id: shareEventId,
-          patient_id: patientId,
-          patient_dob: patientDob,
+          patient_id: user.id,
           form_response_ids: formIds,
           method: recipient.method,
           recipient: { ...recipient, patientName: patientFullName },
           bundle_url: bundleUrl,
           pdf_url: pdfUrl,
-          status: 'delivered',
+          status: 'sent',
           sent_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
           note: note || null,
@@ -475,6 +513,8 @@ ${formSections}
 
       let emailSent = false;
       let emailError = null;
+      let patientReceiptSent = false;
+      let patientReceiptError = null;
 
       try {
         const resendApiKey = Deno.env.get('RESEND_API_KEY');
@@ -508,21 +548,83 @@ ${formSections}
             emailSent = true;
             console.log('Email sent successfully:', responseText);
           }
+
+          const wantsPatientReceipt = Boolean(options?.cc?.me || options?.cc?.patient);
+          if (wantsPatientReceipt) {
+            if (!patientProfile?.email_verified || !patientProfile?.email) {
+              patientReceiptError = 'The patient email is not verified';
+            } else {
+              const receiptResponse = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${resendApiKey}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  from: 'Health Vault <team@healthvault27.com>',
+                  to: [patientProfile.email],
+                  subject: 'Your Health Vault secure-share receipt',
+                  html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#17223b"><h1 style="font-size:24px">Health Vault</h1><p>Your secure form link for ${recipient.providerName || recipient.displayName || 'your recipient'} was created and sent.</p><p>You can revoke it from Health Vault.</p></div>`,
+                }),
+              });
+              const receiptText = await receiptResponse.text();
+              if (receiptResponse.ok) {
+                patientReceiptSent = true;
+                console.log('Patient receipt sent successfully:', receiptText);
+              } else {
+                patientReceiptError = `Failed to send patient receipt: ${receiptResponse.status} ${receiptText}`;
+                console.error(patientReceiptError);
+              }
+            }
+          }
         }
       } catch (err: any) {
         emailError = err.message || 'Unknown error sending email';
         console.error('Exception sending email:', err);
       }
 
+      const deliveredAt = new Date().toISOString();
+      const { error: deliveryUpdateError } = await supabase
+        .from('share_events')
+        .update({
+          status: emailSent ? 'delivered' : 'sent',
+          recipient: {
+            ...recipient,
+            patientName: patientFullName,
+            emailDelivery: emailSent ? 'accepted' : 'failed',
+            patientReceipt: patientReceiptSent ? 'accepted' : 'failed',
+          },
+          audit: [
+            { event: 'created', at: deliveredAt, actor: 'patient' },
+            {
+              event: emailSent ? 'email_accepted' : 'email_delivery_failed',
+              at: deliveredAt,
+              actor: 'system',
+              ...(emailError ? { error: emailError } : {}),
+            },
+            {
+              event: patientReceiptSent ? 'patient_receipt_accepted' : 'patient_receipt_failed',
+              at: deliveredAt,
+              actor: 'system',
+              ...(patientReceiptError ? { error: patientReceiptError } : {}),
+            },
+          ],
+        })
+        .eq('id', shareEventId)
+        .eq('patient_id', user.id);
+
       const response = {
         id: shareEventId,
-        status: 'delivered',
+        status: emailSent ? 'delivered' : 'sent',
         bundleUrl: bundleUrl,
         pdfUrl: pdfUrl,
         shareUrl,
         message: 'Forms shared successfully',
         emailSent,
         emailError,
+        patientReceiptSent,
+        patientReceiptError,
+        deliveryReceiptSaved: !deliveryUpdateError,
       };
 
       return new Response(
