@@ -65,6 +65,8 @@ test("public cloud share renders authorized answers and serves a real token-prot
   assert.match(storageMigration, /UPDATE storage\.buckets[\s\S]*public = false/);
   assert.match(storageMigration, /DROP POLICY IF EXISTS "Public read access for shares"/);
   assert.match(storageMigration, /UPDATE share_events AS share_event[\s\S]*patient_profiles AS patient_profile/);
+  assert.match(storageMigration, /patient_profile\.user_id::text/);
+  assert.match(storageMigration, /patient_profile\.id::text/);
 });
 
 test("GPT medical-form shares use the authenticated owner and the shared secure viewer", async () => {

@@ -14,7 +14,7 @@ DROP POLICY IF EXISTS "Public read access for shares" ON storage.objects;
 -- Older GPT medical-form shares used patient_profiles.id here. Normalize them
 -- to auth.users.id so ownership checks and revocation work for existing links.
 UPDATE share_events AS share_event
-SET patient_id = patient_profile.user_id
+SET patient_id = patient_profile.user_id::text
 FROM patient_profiles AS patient_profile
-WHERE share_event.patient_id = patient_profile.id
+WHERE share_event.patient_id = patient_profile.id::text
   AND share_event.options ? 'medicalFormShare';
