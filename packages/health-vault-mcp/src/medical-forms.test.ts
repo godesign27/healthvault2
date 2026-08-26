@@ -144,7 +144,7 @@ test("typed share confirmation reuses the preview without extra reads or verbose
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v5\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v6\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -160,6 +160,25 @@ test("medical-form share widget waits for late ChatGPT tool output without becom
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
+});
+
+test("medical-form share uses the current MCP Apps resource contract", async () => {
+  const edgeIndex = await readFile(
+    fileURLToPath(new URL("../../../supabase/functions/health-vault-mcp/index.ts", import.meta.url)),
+    "utf8",
+  );
+  const resourceRegistration = edgeIndex.slice(
+    edgeIndex.indexOf('"health-vault-medical-form-share"'),
+    edgeIndex.indexOf('server.registerTool(', edgeIndex.indexOf('"health-vault-medical-form-share"')),
+  );
+  assert.match(resourceRegistration, /text\/html;profile=mcp-app/);
+  assert.match(resourceRegistration, /ui:\s*\{\s*prefersBorder:\s*true/);
+
+  const previewTool = edgeIndex.slice(
+    edgeIndex.indexOf('"preview_medical_form_email_share"'),
+    edgeIndex.indexOf('"create_medical_form_email_share"'),
+  );
+  assert.match(previewTool, /ui:\s*\{\s*resourceUri:\s*MEDICAL_FORM_SHARE_WIDGET_URI/);
 });
 
 test("medical-form sharing uses Health Vault delivery without Gmail or another email plugin", async () => {

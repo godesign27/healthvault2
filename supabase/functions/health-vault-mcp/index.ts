@@ -452,16 +452,16 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-medical-form-share",
     MEDICAL_FORM_SHARE_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault completed medical form share" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault completed medical form share" },
     async () => ({
       contents: [{
         uri: MEDICAL_FORM_SHARE_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: MEDICAL_FORM_SHARE_WIDGET_HTML,
         _meta: {
+          ui: { prefersBorder: true },
           "openai/widgetDescription": "The complete final review for one scoped, expiring medical-form email share. Do not duplicate its details in prose or request typed confirmation; the card's button is the explicit confirmation.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -702,6 +702,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       outputSchema: z.object({ share: z.unknown() }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       _meta: {
+        ui: { resourceUri: MEDICAL_FORM_SHARE_WIDGET_URI },
         "openai/outputTemplate": MEDICAL_FORM_SHARE_WIDGET_URI,
         "openai/widgetAccessible": true,
         "openai/toolInvocation/invoking": "Preparing your secure form share",
@@ -727,6 +728,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       outputSchema: z.object({ share: z.unknown() }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       _meta: {
+        ui: { resourceUri: MEDICAL_FORM_SHARE_WIDGET_URI },
         "openai/outputTemplate": MEDICAL_FORM_SHARE_WIDGET_URI,
         "openai/widgetAccessible": true,
         "openai/toolInvocation/invoking": "Creating your secure form share",
