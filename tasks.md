@@ -310,3 +310,14 @@ this audit (demo UUIDs, dual backends, tool/schema mismatches, missing tools).
 ---
 
 _Last updated: 2026-06-07_
+## 9. Admin Intelligence Platform
+
+- [x] Scaffold dedicated `apps/admin` workspace and protected application shell.
+- [x] Establish stable `gpt_app` / `saas_cloud` product keys and shared typed contracts.
+- [x] Add fail-closed, product-scoped admin role schema; no default role grants.
+- [x] Reserve Provider Operations as a domain separate from product analytics.
+- [ ] Add the server-side admin API and immutable admin audit event stream.
+- [x] Add versioned GPT App event storage, deterministic fixtures, and the first meaningful-task metric snapshot dashboard.
+- [ ] Instrument live GPT App events and replace the synthetic snapshot with reproducible live aggregation.
+- [x] Build synthetic narrative dashboards for all six GPT App admin tabs.
+- [ ] Build the canonical provider-account migration and separate provider integration portal.
