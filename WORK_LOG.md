@@ -137,3 +137,8 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 ---
 
 _Older history predates this log. See git history and the chat transcript for details._
+## 2026-08-27
+
+- **admin foundation** — Added a separately buildable `apps/admin` workspace with fail-closed Supabase authentication, product-scoped role checks, GPT App navigation, a reserved SaaS Cloud boundary, and an isolated Provider Operations area. Added shared `admin-contracts`, `analytics-contracts`, and `provider-contracts` packages plus the initial product registry/admin-role migration. No administrator is granted automatically.
+- **GPT analytics slice** — Added service-only versioned analytics event storage, role-aware metric snapshot access, and a deterministic GPT App Insights fixture. Built accessible metric cards, usage trend, task outcome, intent ranking, and quality-attention visualizations with explicit synthetic-data labeling and table alternatives.
+- **GPT admin narratives** — Built synthetic, evidence-oriented narratives for Users, Interactions, Capabilities, Unmet Needs, and Weekly Briefs. Added activation funnel/cohorts, failure ranking, capability health table, opportunity clusters, and fact/interpretation/recommendation separation.

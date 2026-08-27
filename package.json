@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "apps/mobile"
+    "apps/*"
   ],
   "overrides": {
     "react": "18.2.0",
@@ -27,7 +27,10 @@
     "postinstall": "node scripts/patch-react-native-css-interop.cjs",
     "mobile": "npm run start -w @health-vault/mobile",
     "mobile:ios": "npm run ios -w @health-vault/mobile",
-    "mobile:8083": "npm run start -w @health-vault/mobile -- --port 8083"
+    "mobile:8083": "npm run start -w @health-vault/mobile -- --port 8083",
+    "admin:dev": "npm run dev -w @health-vault/admin",
+    "admin:build": "npm run build -w @health-vault/admin",
+    "admin:typecheck": "npm run typecheck -w @health-vault/admin"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
