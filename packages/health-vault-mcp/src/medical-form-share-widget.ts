@@ -22,14 +22,13 @@ export const MEDICAL_FORM_SHARE_WIDGET_HTML = `<!doctype html>
   function render(){
     if(!app)return;
     var output=currentOutput();
-    if(!output.templateId||!output.recipientEmail){return}
+    if(!output.templateId||!output.recipientEmail){app.innerHTML='<section class="card loading">Loading secure share review…</section>';return}
     var done=output.confirmationState==='confirmed';
     var delivery=output.emailDelivery&&output.emailDelivery.recipient;
     var patientDelivery=output.emailDelivery&&output.emailDelivery.patientCopy;
     var deliveryText=delivery?(delivery.sent?'Email accepted for delivery to '+output.recipientEmail:'Email delivery failed; copy the secure link instead.'):'Confirming will create the link and email it to '+output.recipientEmail+'.';
     var receiptStatus=!output.sendPatientCopy?'No patient receipt requested':patientDelivery?(patientDelivery.sent?'Patient receipt accepted for delivery':'Patient receipt email failed; check the verified profile email'):'Send to the verified Health Vault email';
     var review=row('Completed fields',(output.completedFieldCount||13)+' of '+(output.totalFieldCount||13))+row('Recipient',output.recipientName+(output.recipientOrganization?' · '+output.recipientOrganization:''))+row('Recipient email',output.recipientEmail)+row('Access','Secure, read-only link')+row('Expiration',output.expiresInHours+' hours after creation')+(output.note?row('Note',output.note):'')+row('Patient receipt',receiptStatus);
-    app.dataset.state=done?'confirmed':'review';
     app.innerHTML='<section class="card"><div class="eyebrow">FINAL REVIEW · SECURE MEDICAL FORM</div><div class="title">'+esc(output.templateTitle)+'</div><div class="review">'+review+'</div><div class="well">'+esc(deliveryText)+'</div>'+(done?'<div class="success"><strong>Secure share created</strong><br><a id="open" class="link" href="#">Open secure share</a><br><span class="muted">Expires '+esc(output.expiresAt)+'</span></div>':'<button id="confirm" class="button" type="button">Confirm & Email Secure Share</button><div id="error"></div>')+'</section>';
     var confirmButton=document.getElementById('confirm');if(confirmButton)confirmButton.addEventListener('click',confirmShare);
     var openLink=document.getElementById('open');if(openLink)openLink.addEventListener('click',function(event){event.preventDefault();var bridge=window.openai||{};if(output.shareUrl&&typeof bridge.openExternal==='function')bridge.openExternal({href:output.shareUrl})});

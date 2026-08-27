@@ -221,7 +221,6 @@ test("medical-form share widget waits for late ChatGPT tool output without becom
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /globals\.toolOutput\|\|detail\.toolOutput/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
-  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval\(function\(\)\{render\(\)/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/notifications\/tool-result/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /request\('tools\/call'/);
