@@ -21,6 +21,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] Added task-specific ChatGPT widgets for appointment-prep briefs, slider-based Life Signal check-ins, and a single batch diet confirmation that becomes a seven-day Wellness summary after saving.
 - [x] Added authenticated Medical Profile editing for address, blood type, current height, and current weight; sensitive address data remains off the Medical ID summary card.
 - [x] Reduced dashboard cognitive load with a Vault setup accordion: incomplete setup is expanded by default, while complete setup is collapsed with a visible `100%` summary.
+- [x] Patient Registration ChatGPT interview now persists each accepted answer in one authoritative session, updates a single interview widget, groups related questions, and shows Confirm & Save plus a secure-share offer without auto-saving. Deploy `health-vault-mcp` to verify in ChatGPT.
 - [~] Apply `20260822160000_add_height_weight_to_patient_profiles.sql`, publish the web build, and verify Medical ID editing against the hosted profile.
 - [~] Validate the task-specific widgets after deploying `health-vault-mcp`: confirm one diet card for multi-meal input, one batch save, a rendered appointment brief, and a five-slider Life Signal save.
 - [~] Authenticated dashboard deep link and marketing profile navigation are implemented locally; publish the web build through Bolt and test signed-in/signed-out routes.
