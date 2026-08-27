@@ -41,9 +41,9 @@ Deno.serve(async (req: Request) => {
 
     const [recordsRes, connectionsRes, requestsRes, syncRes] = await Promise.all([
       sb.from("health_records").select("id", { count: "exact", head: true }).eq("user_id", user.id),
-      sb.from("provider_connections").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("connection_method", "keragon").eq("status", "active"),
+      sb.from("provider_connections").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "active"),
       sb.from("health_record_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", ["pending", "sent"]),
-      sb.from("provider_connections").select("last_synced_at").eq("user_id", user.id).eq("connection_method", "keragon").order("last_synced_at", { ascending: false }).limit(1),
+      sb.from("provider_connections").select("last_synced_at").eq("user_id", user.id).eq("status", "active").order("last_synced_at", { ascending: false }).limit(1),
     ]);
 
     const lastSyncedAt = syncRes.data?.[0]?.last_synced_at ?? null;

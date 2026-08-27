@@ -83,6 +83,7 @@ export interface PharmacySearchResult {
 export async function fetchInsuranceContext(
   userId?: string
 ): Promise<InsuranceContextResult> {
+  const effectiveUserId = await resolveUserId(userId);
   const { data, error } = await supabase
     .from('insurance_coverages')
     .select(`
@@ -90,7 +91,7 @@ export async function fetchInsuranceContext(
       is_primary, coverage_status, verification_status,
       insurance_providers!inner (id, name, logo_url)
     `)
-    .eq('user_id', userId)
+    .eq('user_id', effectiveUserId)
     .order('is_primary', { ascending: false })
     .order('effective_start', { ascending: false });
 
@@ -123,11 +124,12 @@ export async function fetchInsuranceContext(
 export async function fetchCareNetwork(
   userId?: string
 ): Promise<CareNetworkResult> {
+  const effectiveUserId = await resolveUserId(userId);
   let insuranceName: string | null = null;
   const { data: primaryCoverage } = await supabase
     .from('insurance_coverages')
     .select('id, plan_name, coverage_status, insurance_providers!inner(name)')
-    .eq('user_id', userId)
+    .eq('user_id', effectiveUserId)
     .eq('coverage_status', 'active')
     .eq('is_primary', true)
     .maybeSingle();
@@ -140,13 +142,13 @@ export async function fetchCareNetwork(
     supabase
       .from('providers')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', effectiveUserId)
       .order('relationship', { ascending: true })
       .order('name', { ascending: true }),
     supabase
       .from('pharmacies')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', effectiveUserId)
       .order('preferred', { ascending: false })
       .order('name', { ascending: true }),
   ]);
@@ -213,6 +215,7 @@ export async function searchNetworkProviders(
   providers: CareNetworkProvider[];
   message?: string;
 }> {
+  const effectiveUserId = await resolveUserId(userId);
   const { query, specialty, insuranceId, limit = 20 } = opts || {};
 
   let insuranceContext: { providerName: string; planName: string } | null = null;
@@ -222,7 +225,7 @@ export async function searchNetworkProviders(
       .from('insurance_coverages')
       .select('id, plan_name, coverage_status, insurance_providers!inner(name)')
       .eq('id', insuranceId)
-      .eq('user_id', userId)
+      .eq('user_id', effectiveUserId)
       .maybeSingle();
     if (coverage) {
       insuranceContext = {
@@ -234,7 +237,7 @@ export async function searchNetworkProviders(
     const { data: primaryCoverage } = await supabase
       .from('insurance_coverages')
       .select('id, plan_name, coverage_status, insurance_providers!inner(name)')
-      .eq('user_id', userId)
+      .eq('user_id', effectiveUserId)
       .eq('coverage_status', 'active')
       .eq('is_primary', true)
       .maybeSingle();
@@ -249,7 +252,7 @@ export async function searchNetworkProviders(
   let dbQuery = supabase
     .from('providers')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', effectiveUserId)
     .order('name', { ascending: true })
     .limit(limit);
 

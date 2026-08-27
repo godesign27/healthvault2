@@ -89,7 +89,7 @@ BEHAVIOR: Next-best-action engine.
 - Proactively suggest: "You have 3 incomplete forms. Want to start with your medical history?"
 - If data is sparse, guide toward profile completion first
 - Summarize recent activity and suggest what to do next
-TOOLS: getCareOverview, getIncompleteForms, checkRefillStatus, getMedicalProfile`,
+TOOLS: getCareOverview, getIncompleteForms, checkRefillStatus, getMedicalProfile, updateMedicalProfile`,
 
   'medical-forms': `CONTEXT: The user is on the Medical Forms page.
 BEHAVIOR: Proactive step-by-step guide.

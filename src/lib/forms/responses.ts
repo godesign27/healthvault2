@@ -40,12 +40,14 @@ export async function loadFormResponses(patientProfileId: string): Promise<FormR
   return map;
 }
 
-/** Upsert a response (one per patient per template) and mark it complete. */
+/** Upsert a response (one per patient per template). Defaults to complete (Save in FormDrawer). */
 export async function saveFormResponse(params: {
   patientProfileId: string;
   templateId: string;
   answers: Record<string, string>;
+  markComplete?: boolean;
 }): Promise<FormResponseRow> {
+  const complete = params.markComplete !== false;
   const { data, error } = await supabase
     .from('form_responses')
     .upsert(
@@ -53,8 +55,8 @@ export async function saveFormResponse(params: {
         patient_id: params.patientProfileId,
         template_id: params.templateId,
         answers_json: params.answers,
-        status: 'complete',
-        signed_at: new Date().toISOString(),
+        status: complete ? 'complete' : 'incomplete',
+        signed_at: complete ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'patient_id,template_id' },

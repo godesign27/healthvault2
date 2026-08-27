@@ -1,16 +1,15 @@
 import { z } from "zod";
 import { createSupabaseServerClient } from "../supabase/server";
+import { syncFhirConnection } from "../network/fhir-oauth-api";
 import type {
   RecordImportPreviewItem,
   ProviderConnectionStrategy,
 } from "../provider-record-connection/types";
 
 /**
- * SCAFFOLD NOTE: This tool currently returns mock preview data when a connected
- * source exists but does not have a live FHIR token. When real FHIR connections
- * are available, it will fetch actual patient resources and normalize them.
- * The existing mock FHIR pipeline in src/lib/api/mock-fhir-api.ts and
- * src/lib/import/import-orchestrator.ts can be evolved for that purpose.
+ * Returns live FHIR preview data when the connection has an active token (via
+ * fhir-sync edge function). Falls back to scaffold preview when OAuth is not
+ * configured or sync fails.
  */
 
 export const fetchProviderRecordPreviewInputSchema = z.object({
@@ -69,8 +68,43 @@ export async function fetchProviderRecordPreview(input: unknown) {
 
       orgName = org?.name || orgName;
 
-      // If a real FHIR token existed, we would fetch live data here.
-      // Since tokens are not yet configured, fall through to scaffold preview.
+      if (conn.fhir_access_token) {
+        try {
+          const syncResult = await syncFhirConnection(connectionId);
+          const counts = syncResult.counts;
+          const itemsByType = syncResult.itemsByType as Record<string, RecordImportPreviewItem[]>;
+
+          const { data: job, error: jobError } = await supabase
+            .from("record_import_jobs")
+            .insert({
+              user_id: userId,
+              provider_connection_id: connectionId,
+              strategy: (parsed.data.strategy as ProviderConnectionStrategy) || "direct_provider_connection",
+              status: "preview",
+              preview_data: itemsByType,
+              counts,
+            })
+            .select("id")
+            .single();
+
+          if (jobError) {
+            console.warn("Failed to persist import job:", jobError.message);
+          }
+
+          return {
+            success: true,
+            data: {
+              counts,
+              itemsByType,
+              importJobId: job?.id || syncResult.importJobId,
+              source: "fhir",
+              message: syncResult.message || `Fetched ${counts.total} records from ${orgName}.`,
+            },
+          };
+        } catch (syncErr) {
+          console.warn("Live FHIR sync failed, using scaffold preview:", syncErr);
+        }
+      }
     } else if (providerOrganizationId) {
       const { data: org } = await supabase
         .from("provider_organizations")

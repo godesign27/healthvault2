@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { supabase } from '../supabase';
+import { buildShareRequestBody, type ShareFormItem } from '../forms/share-api';
 import { toolSuccess, toolError, type ToolResult } from './types';
 
 export const GetIncompleteFormsInputZ = z.object({
@@ -317,36 +318,62 @@ export async function shareForm(
 
     const { formIds, recipientName, recipientEmail, recipientOrg, note } = parsed.data;
 
-    for (const formId of formIds) {
-      const { data: response, error } = await supabase
-        .from('form_responses')
-        .select('status')
-        .eq('id', formId)
-        .maybeSingle();
+    const { data: formRows, error: formsError } = await supabase
+      .from('form_responses')
+      .select('id, template_id, status, signed_at, form_templates(title, version)')
+      .in('id', formIds);
 
-      if (error) return toolError(`Database error checking form ${formId}: ${error.message}`);
-      if (!response) return toolError(`Form ${formId} not found.`);
-      if (response.status !== 'complete') {
+    if (formsError) {
+      return toolError(`Database error loading forms: ${formsError.message}`);
+    }
+    if (!formRows?.length) {
+      return toolError('No matching form responses found.');
+    }
+
+    const rowById = new Map(formRows.map((row) => [row.id, row]));
+    for (const formId of formIds) {
+      const row = rowById.get(formId);
+      if (!row) return toolError(`Form ${formId} not found.`);
+      if (row.status !== 'complete') {
         return toolError(`Form ${formId} is not complete. Only completed forms can be shared.`);
       }
     }
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('first_name, last_name, date_of_birth')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const patientName = profile
+      ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+      : '';
+
+    const forms: ShareFormItem[] = formIds.map((formId) => {
+      const row = rowById.get(formId)!;
+      const template = row.form_templates as { title?: string; version?: string } | null;
+      return {
+        id: row.id,
+        title: template?.title || row.template_id,
+        version: template?.version || '2025.01',
+        signedAt: row.signed_at || undefined,
+      };
+    });
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token;
 
-    const sharePayload = {
+    const sharePayload = buildShareRequestBody({
       patientId: userId,
-      formResponseIds: formIds,
-      method: 'SecureLink',
-      recipient: {
-        providerName: recipientOrg || recipientName,
-        patientName: '',
-        email: recipientEmail,
-        displayName: recipientName,
-      },
-      note: note || '',
-    };
+      forms,
+      recipientName,
+      recipientEmail,
+      recipientOrg,
+      patientName,
+      patientDob: profile?.date_of_birth || undefined,
+      note,
+    });
 
     const res = await fetch(`${supabaseUrl}/functions/v1/share`, {
       method: 'POST',
@@ -369,7 +396,8 @@ export async function shareForm(
         shareId: result.id,
         status: result.status || 'sent',
         recipientEmail,
-        expiresAt: result.expiresAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        shareUrl: result.shareUrl,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
       `Forms shared with ${recipientName} (${recipientEmail}). They will receive a secure link.`
     );
