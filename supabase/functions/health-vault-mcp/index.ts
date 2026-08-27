@@ -6,55 +6,55 @@ import { z } from "npm:zod@4.1.13";
 import {
   DASHBOARD_WIDGET_HTML,
   DASHBOARD_WIDGET_URI,
-} from "./dashboard-widget.ts";
+} from "../../../packages/health-vault-mcp/src/dashboard-widget.ts";
 import {
   SHARE_WIDGET_HTML,
   SHARE_WIDGET_URI,
-} from "./share-widget.ts";
+} from "../../../packages/health-vault-mcp/src/share-widget.ts";
 import {
   ONBOARDING_WIDGET_HTML,
   ONBOARDING_WIDGET_URI,
-} from "./onboarding-widget.ts";
+} from "../../../packages/health-vault-mcp/src/onboarding-widget.ts";
 import {
   APPOINTMENT_PREP_WIDGET_HTML,
   APPOINTMENT_PREP_WIDGET_URI,
-} from "./appointment-prep-widget.ts";
+} from "../../../packages/health-vault-mcp/src/appointment-prep-widget.ts";
 import {
   DIET_CONFIRMATION_WIDGET_HTML,
   DIET_CONFIRMATION_WIDGET_URI,
-} from "./diet-confirmation-widget.ts";
+} from "../../../packages/health-vault-mcp/src/diet-confirmation-widget.ts";
 import {
   LIFE_SIGNAL_WIDGET_HTML,
   LIFE_SIGNAL_WIDGET_URI,
-} from "./life-signal-widget.ts";
+} from "../../../packages/health-vault-mcp/src/life-signal-widget.ts";
 import {
   MEDICAL_FORM_WIDGET_HTML,
   MEDICAL_FORM_WIDGET_URI,
-} from "./medical-form-widget.ts";
+} from "../../../packages/health-vault-mcp/src/medical-form-widget.ts";
 import {
   MEDICAL_FORM_REVIEW_WIDGET_HTML,
   MEDICAL_FORM_REVIEW_WIDGET_URI,
-} from "./medical-form-review-widget.ts";
+} from "../../../packages/health-vault-mcp/src/medical-form-review-widget.ts";
 import {
   MEDICAL_FORM_PROGRESS_WIDGET_HTML,
   MEDICAL_FORM_PROGRESS_WIDGET_URI,
-} from "./medical-form-progress-widget.ts";
+} from "../../../packages/health-vault-mcp/src/medical-form-progress-widget.ts";
 import {
   MEDICAL_FORM_SHARE_WIDGET_HTML,
   MEDICAL_FORM_SHARE_WIDGET_URI,
-} from "./medical-form-share-widget.ts";
-import { buildOnboardingStatus } from "./onboarding.ts";
+} from "../../../packages/health-vault-mcp/src/medical-form-share-widget.ts";
+import { buildOnboardingStatus } from "../../../packages/health-vault-mcp/src/onboarding.ts";
 import {
   getAllergies,
   getConditions,
   getHealthRecords,
   getMedications,
-} from "./health-details.ts";
+} from "../../../packages/health-vault-mcp/src/health-details.ts";
 import {
   createAppointment,
   previewAppointment,
-} from "./appointments.ts";
-import { getHealthSummary as getSharedHealthSummary } from "./health-summary.ts";
+} from "../../../packages/health-vault-mcp/src/appointments.ts";
+import { getHealthSummary as getSharedHealthSummary } from "../../../packages/health-vault-mcp/src/health-summary.ts";
 import {
   cancelAppointment,
   createAllergy,
@@ -66,14 +66,14 @@ import {
   previewCondition,
   previewHealthRecord,
   previewMedication,
-} from "./health-writes.ts";
+} from "../../../packages/health-vault-mcp/src/health-writes.ts";
 import {
   createHealthShare,
   HEALTH_SHARE_CATEGORIES,
   previewHealthShare,
   revokeHealthShare,
-} from "./health-sharing.ts";
-import { createAppointmentPrep } from "./appointment-prep.ts";
+} from "../../../packages/health-vault-mcp/src/health-sharing.ts";
+import { createAppointmentPrep } from "../../../packages/health-vault-mcp/src/appointment-prep.ts";
 import {
   getDietSummary,
   listLifeSignals,
@@ -82,7 +82,7 @@ import {
   logLifeSignal,
   previewDietLog,
   previewLifeSignal,
-} from "./wellness.ts";
+} from "../../../packages/health-vault-mcp/src/wellness.ts";
 import {
   confirmFormAnswers,
   getMedicalForm,
@@ -90,7 +90,7 @@ import {
   GPT_MEDICAL_FORM_IDS,
   listMedicalForms,
   proposeFormAnswers,
-} from "./medical-forms.ts";
+} from "../../../packages/health-vault-mcp/src/medical-forms.ts";
 import {
   createMedicalFormShare,
   previewMedicalFormShare,

@@ -45,6 +45,67 @@ test("secure-share preview widget emits executable JavaScript", () => {
   assert.doesNotThrow(() => new Function(script));
 });
 
+test("secure-share widget does not rewrite the loading DOM while polling", () => {
+  const script = MEDICAL_FORM_SHARE_WIDGET_HTML.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(script);
+
+  let writes = 0;
+  let markup = '<section class="card loading">Loading secure share review…</section>';
+  const polls: Array<() => void> = [];
+  const listeners = new Map<string, (event: Record<string, unknown>) => void>();
+  const parent = { postMessage() {} };
+  const app = {
+    dataset: { state: "loading" },
+    get innerHTML() { return markup; },
+    set innerHTML(value: string) { writes += 1; markup = value; },
+  };
+  const document = {
+    getElementById(id: string) { return id === "app" ? app : null; },
+  };
+  const window = {
+    parent,
+    openai: undefined,
+    addEventListener(name: string, handler: (event: Record<string, unknown>) => void) {
+      listeners.set(name, handler);
+    },
+  };
+
+  new Function("window", "document", "setInterval", "clearInterval", script)(
+    window,
+    document,
+    (callback: () => void) => { polls.push(callback); return 1; },
+    () => {},
+  );
+
+  assert.equal(writes, 0);
+  polls[0]?.();
+  polls[0]?.();
+  assert.equal(writes, 0);
+
+  listeners.get("message")?.({
+    source: parent,
+    data: {
+      jsonrpc: "2.0",
+      method: "ui/notifications/tool-result",
+      params: {
+        structuredContent: {
+          share: {
+            templateId: "patient-reg",
+            templateTitle: "Patient Registration",
+            recipientName: "Dr. Rivera",
+            recipientEmail: "rivera@clinic.example",
+            expiresInHours: 72,
+            confirmationState: "pending",
+          },
+        },
+      },
+    },
+  });
+
+  assert.equal(writes, 1);
+  assert.match(markup, /Patient Registration/);
+  assert.match(markup, /Confirm & Email Secure Share/);
+});
 test("a newly saved complete answer set is immediately shareable", async () => {
   const registration = GPT_MEDICAL_FORMS.find(({ id }) => id === "patient-reg");
   assert.ok(registration);
@@ -144,7 +205,7 @@ test("typed share confirmation reuses the preview without extra reads or verbose
 });
 
 test("medical-form email widget uses a versioned resource and contains no legacy non-email CTA", async () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v8\.html$/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_URI, /-v9\.html$/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Confirm & Email Secure Share/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /Nothing is sent automatically|>Confirm Secure Share</);
 
@@ -159,6 +220,7 @@ test("medical-form share widget waits for late ChatGPT tool output without becom
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /globals\.toolOutput\|\|detail\.toolOutput/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
+  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval\(function\(\)\{render\(\)/);
   assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/notifications\/tool-result/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /request\('tools\/call'/);

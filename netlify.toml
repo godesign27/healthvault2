@@ -1,0 +1,15 @@
+[build]
+  base = "."
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# The web client handles routes such as /dashboard, /share/*, and
+# /oauth/consent. Serve the Vite entry point when a route is requested
+# directly so browser refreshes do not return Netlify's 404 page.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
