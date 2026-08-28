@@ -120,7 +120,7 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const uiState = { details: {}, viewMore: {}, medicalId: false, setupOpen: null };
     const openVault = () => {
-      const href = 'https://healthvault27.com/?app=dashboard&source=chatgpt';
+      const href = 'https://healthvault.me/?app=dashboard&source=chatgpt';
       if (window.openai?.openExternal) window.openai.openExternal({ href });
       else window.open(href, '_blank', 'noopener,noreferrer');
     };

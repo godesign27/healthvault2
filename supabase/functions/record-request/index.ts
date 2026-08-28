@@ -287,7 +287,7 @@ async function handleCreateRequest(
         dateRangeEnd: dateRangeEnd || null,
       });
 
-      const fromField = "Health Vault <noreply@healthvault27.com>";
+      const fromField = "Health Vault <noreply@healthvault.me>";
 
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -425,7 +425,7 @@ async function handleResendRequest(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Health Vault <noreply@healthvault27.com>",
+          from: "Health Vault <noreply@healthvault.me>",
           to: [request.provider_email],
           subject: `${patient.fullName} is re-sending a health records request via Health Vault`,
           html: emailHtml,

@@ -49,12 +49,12 @@ export function MarketingFooter({ darkMode = false, onPageChange }: MarketingFoo
             <h3 className={`text-sm font-semibold mb-4 ${
               darkMode ? 'text-white' : 'text-content-primary'
             }`}>Media Inquiries</h3>
-            <a href="mailto:team@healthvault27.com" className={`text-sm transition-colors ${
+            <a href="mailto:team@healthvault.me" className={`text-sm transition-colors ${
               darkMode
                 ? 'text-indigo-400 hover:text-indigo-300'
                 : 'text-indigo-600 hover:text-indigo-700'
             }`}>
-              team@healthvault27.com
+              team@healthvault.me
             </a>
 
             <h3 className={`text-sm font-semibold mt-8 mb-4 ${

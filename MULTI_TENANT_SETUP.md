@@ -6,10 +6,10 @@ This guide explains how to set up and use the multi-tenant subdomain routing sys
 
 HealthVault supports multiple organizations through subdomain-based routing:
 
-- **Super Admin Interface**: `admin.healthvault27.com` or `healthvault27.com/admin` - System administration
-- **Provider Admin Interfaces**: `[org-subdomain].healthvault27.com` - Organization-specific dashboards
-  - Example: `acme-clinic.healthvault27.com`
-  - Example: `riverside-health.healthvault27.com`
+- **Super Admin Interface**: `admin.healthvault.me` or `healthvault.me/admin` - System administration
+- **Provider Admin Interfaces**: `[org-subdomain].healthvault.me` - Organization-specific dashboards
+  - Example: `acme-clinic.healthvault.me`
+  - Example: `riverside-health.healthvault.me`
 
 ## DNS Configuration
 
@@ -24,7 +24,7 @@ Value: your-deployment-url.netlify.app (or your hosting platform URL)
 TTL: Auto or 3600
 ```
 
-This allows any subdomain (e.g., `acme-clinic.healthvault27.com`, `riverside-health.healthvault27.com`) to resolve to your application.
+This allows any subdomain (e.g., `acme-clinic.healthvault.me`, `riverside-health.healthvault.me`) to resolve to your application.
 
 ### 2. Add Admin Subdomain (Optional)
 
@@ -115,7 +115,7 @@ VALUES ('New Clinic', 'new-clinic', 'new-clinic', 'contact@new-clinic.com', '(55
 
 ### Via Super Admin Interface
 
-1. Navigate to `admin.healthvault27.com`
+1. Navigate to `admin.healthvault.me`
 2. Click "Add Organization"
 3. Fill in the organization details
 4. The subdomain will be automatically available
@@ -161,7 +161,7 @@ Super admin status is controlled via the `auth.users.raw_app_meta_data` field:
 ```sql
 UPDATE auth.users
 SET raw_app_meta_data = raw_app_meta_data || '{"is_super_admin": true}'::jsonb
-WHERE email = 'admin@healthvault27.com';
+WHERE email = 'admin@healthvault.me';
 ```
 
 ## Routing Logic
@@ -181,9 +181,9 @@ The application checks subdomains in this order:
 
 ### Production
 
-- Super Admin: `https://admin.healthvault27.com` or `https://healthvault27.com/admin`
-- Provider (Acme Clinic): `https://acme-clinic.healthvault27.com`
-- Provider (Riverside Health): `https://riverside-health.healthvault27.com`
+- Super Admin: `https://admin.healthvault.me` or `https://healthvault.me/admin`
+- Provider (Acme Clinic): `https://acme-clinic.healthvault.me`
+- Provider (Riverside Health): `https://riverside-health.healthvault.me`
 
 ### Local Development
 

@@ -60,7 +60,7 @@ export const APPOINTMENT_PREP_WIDGET_HTML = `<!doctype html>
         + '<div class="notice">' + esc(brief.medicalDisclaimer || 'Review this informational brief for accuracy before your visit.') + '</div></div>'
         + '<div class="actions"><button id="open-vault">Open Health Vault</button></div>';
       document.getElementById('open-vault')?.addEventListener('click', () => {
-        const href = 'https://healthvault27.com/?app=dashboard&source=chatgpt';
+        const href = 'https://healthvault.me/?app=dashboard&source=chatgpt';
         if (window.openai?.openExternal) window.openai.openExternal({ href });
         else window.open(href, '_blank', 'noopener,noreferrer');
       });

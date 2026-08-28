@@ -7,7 +7,7 @@ test("share email contains a generic secure-link message without form answers", 
   const email = buildMedicalFormShareEmail({
     recipientName: "Dr. Amy Rose",
     patientName: "Timothy McGuire",
-    shareUrl: "https://healthvault27.com/share/share-id?token=secret-token",
+    shareUrl: "https://healthvault.me/share/share-id?token=secret-token",
     expiresAt: "2026-08-28T15:11:55.952Z",
   });
 
@@ -27,13 +27,13 @@ test("email sender reports provider delivery and optional patient receipt indepe
 
   const result = await sendMedicalFormShareEmail({
     apiKey: "test-key",
-    from: "Health Vault <team@healthvault27.com>",
+    from: "Health Vault <team@healthvault.me>",
     recipientEmail: "amy@clinic.example",
     patientEmail: "timothy@example.com",
     sendPatientCopy: true,
     recipientName: "Dr. Amy Rose",
     patientName: "Timothy McGuire",
-    shareUrl: "https://healthvault27.com/share/share-id?token=secret-token",
+    shareUrl: "https://healthvault.me/share/share-id?token=secret-token",
     expiresAt: "2026-08-28T15:11:55.952Z",
     fetcher,
   });
@@ -46,12 +46,12 @@ test("email sender reports provider delivery and optional patient receipt indepe
 test("provider email failure is returned instead of being reported as delivered", async () => {
   const result = await sendMedicalFormShareEmail({
     apiKey: "test-key",
-    from: "Health Vault <team@healthvault27.com>",
+    from: "Health Vault <team@healthvault.me>",
     recipientEmail: "amy@clinic.example",
     sendPatientCopy: false,
     recipientName: "Dr. Amy Rose",
     patientName: "Timothy McGuire",
-    shareUrl: "https://healthvault27.com/share/share-id?token=secret-token",
+    shareUrl: "https://healthvault.me/share/share-id?token=secret-token",
     expiresAt: "2026-08-28T15:11:55.952Z",
     fetcher: async () => new Response("rejected", { status: 422 }),
   });

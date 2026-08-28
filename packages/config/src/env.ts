@@ -27,7 +27,7 @@ export const envSchema = z.object({
   HEALTHEX_MCP_ENABLED: z.coerce.boolean().default(false),
 
   // App
-  APP_URL: z.string().url().default("https://healthvault27.com"),
+  APP_URL: z.string().url().default("https://healthvault.me"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

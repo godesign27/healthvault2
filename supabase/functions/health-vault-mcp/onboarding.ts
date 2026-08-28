@@ -1,4 +1,4 @@
-export const HEALTH_VAULT_WEB_URL = "https://healthvault27.com";
+export const HEALTH_VAULT_WEB_URL = "https://healthvault.me";
 
 type ChecklistItem = {
   key: string;

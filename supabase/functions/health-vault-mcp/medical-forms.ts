@@ -349,14 +349,14 @@ export async function listMedicalForms(supabase: SupabaseClient, userId: string)
     status: responses.get(form.id)?.status ?? "not_started",
     updatedAt: responses.get(form.id)?.updated_at ?? null,
     chatEditable: GPT_MEDICAL_FORM_IDS.includes(form.id),
-    resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(form.id)}&source=chatgpt`,
+    resumeUrl: `https://healthvault.me/?app=medical-forms&form=${encodeURIComponent(form.id)}&source=chatgpt`,
   }));
   const completedCount = forms.filter(({ status }) => status === "complete" || status === "completed").length;
   return {
     forms,
     completedCount,
-    uploadUrl: "https://healthvault27.com/?app=medical-forms&action=upload&source=chatgpt",
-    allFormsUrl: "https://healthvault27.com/?app=medical-forms&source=chatgpt",
+    uploadUrl: "https://healthvault.me/?app=medical-forms&action=upload&source=chatgpt",
+    allFormsUrl: "https://healthvault.me/?app=medical-forms&source=chatgpt",
   };
 }
 
@@ -389,7 +389,7 @@ export async function getMedicalForm(supabase: SupabaseClient, userId: string, t
       readyFields: progress.completedFields,
     },
     expectedUpdatedAt: response?.updated_at ?? null,
-    resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(templateId)}&source=chatgpt`,
+    resumeUrl: `https://healthvault.me/?app=medical-forms&form=${encodeURIComponent(templateId)}&source=chatgpt`,
   };
 }
 
@@ -475,7 +475,7 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
       confirmationState: "confirmed",
       savedAs: progress.remainingFields === 0 ? "completed_form" : "draft",
       progress,
-      resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
+      resumeUrl: `https://healthvault.me/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
       safeSummary: `This ${definitionFor(proposal.template_id).title} proposal was already saved. Nothing was added twice.`,
     };
   }
@@ -507,7 +507,7 @@ export async function confirmFormAnswers(supabase: SupabaseClient, userId: strin
     confirmationState: "confirmed",
     savedAs: completed ? "completed_form" : "draft",
     progress,
-    resumeUrl: `https://healthvault27.com/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
+    resumeUrl: `https://healthvault.me/?app=medical-forms&form=${encodeURIComponent(proposal.template_id)}&source=chatgpt`,
     safeSummary: completed
       ? `${definition.title} completed with your confirmed answers.`
       : `${definition.title} draft updated. ${progress.remainingFields} required answer${progress.remainingFields === 1 ? " remains" : "s remain"}.`,

@@ -37,7 +37,7 @@ Provider Operations may expose analytics about both GPT App and SaaS Cloud usage
 - Keep application code, database migrations, Edge Functions, tests, and operating documentation in the existing GitHub repository.
 - Use pull requests and required CI checks before merging to the production branch.
 - Connect the repository to a web deployment provider such as Vercel, Netlify, or Cloudflare Pages for automatic preview and production deployments.
-- Use a dedicated URL such as `admin.healthvault27.com` or an isolated `/admin/intelligence` route. Prefer the subdomain if operational isolation and a separate deployment are affordable.
+- Use a dedicated URL such as `admin.healthvault.me` or an isolated `/admin/intelligence` route. Prefer the subdomain if operational isolation and a separate deployment are affordable.
 - Keep secrets in the deployment provider and Supabase secret stores; never commit them to GitHub.
 
 GitHub Pages alone is not recommended. The frontend can be static, but authentication, role checks, audit recording, aggregation, and privileged mutations require the existing Supabase backend.
@@ -65,7 +65,7 @@ GitHub Pages alone is not recommended. The frontend can be static, but authentic
 - Scope every admin request to an explicit product. The server must reject a missing, unknown, or unauthorized product key.
 - Allow roles to be assigned globally or per product so a GPT Product admin does not automatically gain future SaaS Cloud access.
 - Place platform-side provider management under `/providers/*` in `apps/admin`; it is a platform operation rather than a product-selection route.
-- Place provider-organization self-service under a separate URL such as `providers.healthvault27.com` with tenant context resolved from the authenticated assignment, never trusted from a URL parameter alone.
+- Place provider-organization self-service under a separate URL such as `providers.healthvault.me` with tenant context resolved from the authenticated assignment, never trusted from a URL parameter alone.
 
 ### Recommended repository structure
 
@@ -366,7 +366,7 @@ Tenant-scoped provider API       Validate -> dedupe -> quarantine
 
 **Work**
 
-- Confirm whether the admin experience uses `admin.healthvault27.com` or `/admin/intelligence`, and whether it is a separate Vite build.
+- Confirm whether the admin experience uses `admin.healthvault.me` or `/admin/intelligence`, and whether it is a separate Vite build.
 - Confirm `apps/admin` as the deployable boundary and approve `gpt_app` and `saas_cloud` as permanent product keys.
 - Define the shared event envelope and the GPT App v1 event catalog; explicitly document which semantics are GPT-only.
 - Approve the canonical provider-account model and migration/linking strategy for existing `organizations`, `provider_organizations`, personal-network `providers`, and `inbound_api_keys`.

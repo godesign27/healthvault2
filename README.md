@@ -153,7 +153,7 @@ All backend logic runs as Deno-based Edge Functions. There is no Express server.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Injected automatically by Supabase runtime |
 | `OPENAI_API_KEY` | No | OpenAI key for AI record summaries and assistant (`sk-...`) |
 | `KERAGON_WEBHOOK_URL` | No | Keragon webhook endpoint for EHR sync |
-| `APP_URL` | No | Canonical app URL (default: `https://healthvault27.com`) |
+| `APP_URL` | No | Canonical app URL (default: `https://healthvault.me`) |
 | `NODE_ENV` | No | `development` / `test` / `production` |
 
 ---

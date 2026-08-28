@@ -287,7 +287,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
@@ -309,7 +309,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A compact confirmation card for a scoped, expiring Health Vault share.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: [],
@@ -331,7 +331,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A compact, privacy-first five-stage Health Vault onboarding and resume card.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -350,7 +350,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A concise appointment brief with visit priorities, questions, and confirmed Health Vault context.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -369,7 +369,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "An accessible five-slider Life Signal check-in with a single Log button.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -388,7 +388,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A single confirmation card for one or more diet entries that becomes a Wellness summary after saving.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -407,7 +407,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "The authenticated user's common reusable forms, a single authoritative form interview, final review with Confirm & Save, and secure provider-form upload option.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
           ui: { resourceUri: MEDICAL_FORM_WIDGET_URI },
         },
@@ -427,7 +427,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A typed reusable-form answer review with explicit confirmation that saves progress or completes the form.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -446,7 +446,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         _meta: {
           "openai/widgetDescription": "A compact progress card for a conversational medical-form interview, including the next missing field.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault27.com",
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],
@@ -756,8 +756,8 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     async ({ confirmed: _confirmed, ...input }) => {
       try {
         const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
-        const from = Deno.env.get("RESEND_FROM_EMAIL") || "Health Vault <team@healthvault27.com>";
-        const share = await createMedicalFormShare(supabase, userId, "https://healthvault27.com", input, async (email) => {
+        const from = Deno.env.get("RESEND_FROM_EMAIL") || "Health Vault <team@healthvault.me>";
+        const share = await createMedicalFormShare(supabase, userId, "https://healthvault.me", input, async (email) => {
           if (!resendApiKey) return { recipient: { sent: false, error: "Email delivery is not configured." } };
           return sendMedicalFormShareEmail({ ...email, apiKey: resendApiKey, from });
         });
@@ -1182,7 +1182,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     _meta: { "openai/widgetAccessible": true },
   }, async ({ confirmed: _confirmed, ...input }) => {
     try {
-      const share = await createHealthShare(supabase, userId, "https://healthvault27.com", input);
+      const share = await createHealthShare(supabase, userId, "https://healthvault.me", input);
       return {
         structuredContent: { share },
         content: [{

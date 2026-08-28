@@ -650,7 +650,7 @@ Deno.serve(async (req: Request) => {
           console.error(emailError);
         } else {
           const emailPayload = {
-            from: 'Health Vault <team@healthvault27.com>',
+            from: 'Health Vault <team@healthvault.me>',
             to: [recipient.email],
             subject: `${recipient.patientName || 'A patient'} shared health forms with you via Health Vault`,
             html: emailHtml,
@@ -687,7 +687,7 @@ Deno.serve(async (req: Request) => {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  from: 'Health Vault <team@healthvault27.com>',
+                  from: 'Health Vault <team@healthvault.me>',
                   to: [patientProfile.email],
                   subject: 'Your Health Vault secure-share receipt',
                   html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#17223b"><h1 style="font-size:24px">Health Vault</h1><p>Your secure form link for ${recipient.providerName || recipient.displayName || 'your recipient'} was created and sent.</p><p>You can revoke it from Health Vault.</p></div>`,
