@@ -226,7 +226,7 @@ Deno.serve(async (req: Request) => {
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "Health Vault <onboarding@resend.dev>";
-    const appUrl = Deno.env.get("APP_URL") || "https://healthvault.app";
+    const appUrl = Deno.env.get("APP_URL") || "https://healthvault.me";
 
     if (!resendApiKey) {
       console.error("RESEND_API_KEY not configured");

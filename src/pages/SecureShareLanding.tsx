@@ -404,8 +404,8 @@ export default function SecureShareLanding() {
                 This secure document and any attached files contain confidential health information shared with authorization from the patient through Health Vault.
                 It is intended solely for the named recipient and may contain protected health information (PHI) governed by HIPAA and related privacy laws.
                 Any unauthorized review, use, disclosure, or distribution is prohibited. If you received this in error, please notify{' '}
-                <a href="mailto:support@healthvault.app" className="text-slate-900 hover:underline">
-                  support@healthvault.app
+                <a href="mailto:support@healthvault.me" className="text-slate-900 hover:underline">
+                  support@healthvault.me
                 </a>{' '}
                 and delete the message immediately.
               </p>
