@@ -20,16 +20,22 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
   server.registerResource(
     "health-vault-dashboard",
     DASHBOARD_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Interactive Health Vault dashboard" },
+    { mimeType: "text/html;profile=mcp-app", description: "Interactive Health Vault dashboard" },
     async () => ({
       contents: [{
         uri: DASHBOARD_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: DASHBOARD_WIDGET_HTML,
         _meta: {
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault.me",
+          ui: {
+            prefersBorder: true,
+            csp: {
+              connectDomains: [],
+              resourceDomains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
+            },
+          },
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],

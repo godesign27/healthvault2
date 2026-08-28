@@ -283,16 +283,22 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-dashboard",
     DASHBOARD_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Interactive Health Vault dashboard" },
+    { mimeType: "text/html;profile=mcp-app", description: "Interactive Health Vault dashboard" },
     async () => ({
       contents: [{
         uri: DASHBOARD_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: DASHBOARD_WIDGET_HTML,
         _meta: {
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault.me",
+          ui: {
+            prefersBorder: true,
+            csp: {
+              connectDomains: [],
+              resourceDomains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
+            },
+          },
           "openai/widgetCSP": {
             connect_domains: [],
             resource_domains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
@@ -403,18 +409,20 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-medical-forms",
     MEDICAL_FORM_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault medical forms" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault medical forms" },
     async () => ({
       contents: [{
         uri: MEDICAL_FORM_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: MEDICAL_FORM_WIDGET_HTML,
         _meta: {
           "openai/widgetDescription": "The authenticated user's common reusable forms, a single authoritative form interview, final review with Confirm & Save, and secure provider-form upload option.",
           "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
-          ui: { resourceUri: MEDICAL_FORM_WIDGET_URI },
+          ui: {
+            prefersBorder: true,
+            csp: { connectDomains: [], resourceDomains: [] },
+          },
         },
       }],
     }),
@@ -554,6 +562,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       _meta: {
+        ui: { resourceUri: MEDICAL_FORM_WIDGET_URI, visibility: ["model", "app"] },
         "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
         "openai/widgetAccessible": true,
         "openai/toolInvocation/invoking": "Loading your medical forms",
@@ -789,6 +798,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         openWorldHint: false,
       },
       _meta: {
+        ui: { resourceUri: DASHBOARD_WIDGET_URI, visibility: ["model", "app"] },
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
         "openai/toolInvocation/invoking": "Loading your Health Vault",
         "openai/toolInvocation/invoked": "Health Vault dashboard ready",
@@ -1017,7 +1027,10 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     inputSchema: schema,
     outputSchema: z.object({ summary: z.unknown(), recentChange: z.unknown() }),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
-    _meta: { "openai/outputTemplate": DASHBOARD_WIDGET_URI },
+    _meta: {
+      ui: { resourceUri: DASHBOARD_WIDGET_URI, visibility: ["model", "app"] },
+      "openai/outputTemplate": DASHBOARD_WIDGET_URI,
+    },
   }, async (input) => {
     try {
       const saved = await save(input as T);

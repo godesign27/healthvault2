@@ -1,4 +1,4 @@
-export const MEDICAL_FORM_WIDGET_URI = "ui://widget/health-vault-medical-form-interview.html";
+export const MEDICAL_FORM_WIDGET_URI = "ui://widget/health-vault-medical-form-interview-v2.html";
 
 export const MEDICAL_FORM_WIDGET_HTML = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
