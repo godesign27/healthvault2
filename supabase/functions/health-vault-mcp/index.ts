@@ -56,6 +56,11 @@ import {
 } from "../../../packages/health-vault-mcp/src/appointments.ts";
 import { getHealthSummary as getSharedHealthSummary } from "../../../packages/health-vault-mcp/src/health-summary.ts";
 import {
+  formatProfileAddress,
+  previewProfileAddressUpdate,
+  updateProfileAddress,
+} from "../../../packages/health-vault-mcp/src/profile-address.ts";
+import {
   cancelAppointment,
   createAllergy,
   createCondition,
@@ -489,6 +494,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         { title: "Complete a Life Signal", prompt: "Health Vault, guide me through today's Life Signal check-in.", category: "check_in" },
         { title: "Log a meal", prompt: "Health Vault, log what I ate today.", category: "wellness" },
         { title: "Add health information", prompt: "Health Vault, help me add a medication, allergy, condition, appointment, or health note.", category: "update" },
+        { title: "Update Medical ID address", prompt: "Health Vault, update the address on my Medical ID.", category: "update" },
         { title: "Continue a medical form", prompt: "Health Vault, show my incomplete medical forms.", category: "forms" },
         { title: "Create a secure share", prompt: "Health Vault, prepare a secure share for my provider.", category: "share" },
       ];
@@ -974,6 +980,13 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     summary: z.string().trim().max(4000).optional(),
     tags: z.array(z.string().trim().min(1).max(50)).max(12).optional(),
   });
+  const profileAddressSchema = z.object({
+    addressLine1: z.string().trim().min(1).max(240).describe("Street address only; do not repeat city, state, or postal code here."),
+    addressLine2: z.string().trim().max(120).nullable().optional().default(null),
+    city: z.string().trim().min(1).max(120),
+    state: z.string().trim().min(1).max(80),
+    postalCode: z.string().trim().min(1).max(24),
+  });
 
   const previewTool = <T>(name: string, title: string, description: string, schema: z.ZodType<T>, preview: (input: T) => unknown) =>
     server.registerTool(name, {
@@ -1040,6 +1053,31 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : `Unable to ${title}` }] };
     }
   });
+
+  previewTool(
+    "preview_profile_address_update",
+    "Review Medical ID address update",
+    "Prepare a complete replacement address for review without saving. Use when the user asks to change or correct the address on their Medical ID or profile. Show the exact formatted address and ask for explicit confirmation before update_profile_address.",
+    profileAddressSchema,
+    previewProfileAddressUpdate,
+  );
+  confirmedTool(
+    "update_profile_address",
+    "Save confirmed Medical ID address",
+    "Replace all saved profile address fields only after preview_profile_address_update and explicit confirmation of the exact formatted address. Never call from the initial request or implied consent.",
+    profileAddressSchema.extend({ confirmed: z.literal(true) }),
+    ({ confirmed: _confirmed, ...input }) => updateProfileAddress(supabase, userId, input),
+    (saved) => ({
+      title: "Medical ID address updated",
+      message: `Your confirmed address is now ${formatProfileAddress({
+        addressLine1: saved.address_line1,
+        addressLine2: saved.address_line2,
+        city: saved.city,
+        state: saved.state,
+        postalCode: saved.postal_code,
+      })}.`,
+    }),
+  );
 
   const oneToFive = z.number().int().min(1).max(5);
   const lifeSignalSchema = z.object({

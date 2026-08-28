@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { formatProfileAddress } from "./profile-address.js";
 
 type QueryResult = {
   count: number | null;
@@ -155,11 +156,19 @@ export async function getHealthSummary(supabase: SupabaseClient) {
         dateOfBirth: profileRow?.date_of_birth || null,
         email: profileRow?.email || null,
         phone: profileRow?.phone || null,
-        address: [
-          profileRow?.address_line1,
-          profileRow?.address_line2,
-          [profileRow?.city, profileRow?.state, profileRow?.postal_code].filter(Boolean).join(" "),
-        ].filter(Boolean).join(", ") || null,
+        address: profileRow?.address_line1 && profileRow?.city && profileRow?.state && profileRow?.postal_code
+          ? formatProfileAddress({
+              addressLine1: profileRow.address_line1,
+              addressLine2: profileRow.address_line2,
+              city: profileRow.city,
+              state: profileRow.state,
+              postalCode: profileRow.postal_code,
+            })
+          : [
+              profileRow?.address_line1,
+              profileRow?.address_line2,
+              [profileRow?.city, profileRow?.state, profileRow?.postal_code].filter(Boolean).join(" "),
+            ].filter(Boolean).join(", ") || null,
         bloodType: patientProfileRow?.blood_type || null,
         organDonor: typeof patientProfileRow?.organ_donor === "boolean" ? patientProfileRow.organ_donor : null,
         emergencyContact: patientProfileRow?.emergency_contact_name
