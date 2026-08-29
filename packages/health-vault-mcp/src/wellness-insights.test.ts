@@ -1,0 +1,40 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  CHECK_IN_QUESTION_KEYS,
+  WellnessInsightSchema,
+  answeredQuestionCount,
+  containsUnsafeWellnessLanguage,
+} from "../../wellness-contracts/src/index.ts";
+
+test("the partner check-in has six stable questions", () => {
+  assert.deepEqual(CHECK_IN_QUESTION_KEYS, [
+    "sleep", "meal_rhythm", "energy_cravings", "stress", "hydration", "movement",
+  ]);
+  assert.equal(answeredQuestionCount({ sleep: "Restless", stress: null, movement: "Daily walk" }), 2);
+});
+
+test("structured insights require all four pillars and provenance", () => {
+  const result = WellnessInsightSchema.safeParse({
+    snapshot: "Your routines show a useful place to start.",
+    pillars: {
+      sleep: { status: "needs_support", summary: "Sleep has felt uneven.", contributingFactors: [], suggestions: ["Keep a consistent wind-down time."] },
+      blood_sugar: { status: "needs_support", summary: "Meal rhythm may be contributing to energy swings.", contributingFactors: [], suggestions: ["Pair breakfast with a protein source."] },
+      nourishment: { status: "strong", summary: "You are building variety.", contributingFactors: [], suggestions: ["Keep adding colorful whole foods."] },
+      stress: { status: "significant_opportunity", summary: "Stress has been running high.", contributingFactors: [], suggestions: ["Try a short pause between tasks."] },
+    },
+    topPriorities: ["Support a steadier morning rhythm."],
+    startingPoints: ["Choose one small change this week."],
+    followUpRecommended: false,
+    ctaRelevant: true,
+    disclaimer: "Wellness guidance from Nourished Rebel, not medical advice.",
+    provenance: { frameworkVersion: 1, promptVersion: 1, generatedAt: new Date().toISOString(), sourceKinds: ["check_in"] },
+  });
+  assert.equal(result.success, true);
+});
+
+test("safety screening rejects diagnoses and medication direction", () => {
+  assert.equal(containsUnsafeWellnessLanguage("This means you have diabetes."), true);
+  assert.equal(containsUnsafeWellnessLanguage("Stop taking your medication."), true);
+  assert.equal(containsUnsafeWellnessLanguage("A regular breakfast may support steadier energy."), false);
+});

@@ -1,7 +1,7 @@
 import { ADMIN_PRODUCTS, type AdminRoleAssignment } from '@health-vault/admin-contracts';
-import { Activity, Building2, LogOut, ShieldCheck } from 'lucide-react';
+import { Activity, Building2, Leaf, LogOut, ShieldCheck } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { canAccessProduct, canAccessProviderOperations } from '../platform/auth/admin-access';
+import { canAccessProduct, canAccessProviderOperations, canAccessWellnessPartners } from '../platform/auth/admin-access';
 import { supabase } from '../lib/supabase';
 
 interface AdminShellProps {
@@ -11,6 +11,7 @@ interface AdminShellProps {
 
 export function AdminShell({ assignments, children }: AdminShellProps) {
   const canAccessProviders = canAccessProviderOperations(assignments);
+  const canAccessPartners = canAccessWellnessPartners(assignments);
 
   return (
     <div className="admin-layout">
@@ -28,6 +29,7 @@ export function AdminShell({ assignments, children }: AdminShellProps) {
           })}
           <p className="nav-label">Operations</p>
           <a href="/providers/directory" aria-disabled={!canAccessProviders} className={!canAccessProviders ? 'disabled' : ''}><Building2 size={18} />Providers</a>
+          <a href="/wellness-partners/overview" aria-disabled={!canAccessPartners} className={!canAccessPartners ? 'disabled' : ''}><Leaf size={18} />Wellness Partners</a>
           <a href="/security/audit" aria-disabled="true" className="disabled"><ShieldCheck size={18} />Security &amp; Audit<em>Next</em></a>
         </nav>
         <button className="sign-out" type="button" onClick={() => void supabase.auth.signOut()}><LogOut size={18} />Sign out</button>

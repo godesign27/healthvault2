@@ -18,6 +18,8 @@ export const ADMIN_PERMISSIONS = [
   'providers.manage',
   'roles.manage',
   'rollouts.manage',
+  'wellness_partners.read',
+  'wellness_partners.manage',
 ] as const;
 
 export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
@@ -40,5 +42,5 @@ export interface AdminProductDefinition {
 
 export const ADMIN_PRODUCTS: readonly AdminProductDefinition[] = [
   { key: 'gpt_app', label: 'GPT App', path: '/products/gpt-app', status: 'active' },
-  { key: 'saas_cloud', label: 'SaaS Cloud', path: '/products/saas-cloud', status: 'reserved' },
+  { key: 'saas_cloud', label: 'SaaS Cloud', path: '/products/saas-cloud', status: 'active' },
 ];

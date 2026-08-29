@@ -18,6 +18,7 @@ import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
 import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
 import { WellnessPage } from './WellnessPage';
+import { NourishedRebelInsights } from '../components/wellness/NourishedRebelInsights';
 
 interface DashboardPageProps {
   onViewChange?: (view: 'health-vault' | 'design-system' | 'projects' | 'marketing') => void;
@@ -56,6 +57,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     return requested === 'medical-forms' ? requested : 'dashboard';
   });
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
+  const [assistantWellnessInsightId, setAssistantWellnessInsightId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
@@ -288,7 +290,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     if (currentPage === 'wellness') {
-      return <WellnessPage onOpenAssistant={() => setIsAIPanelOpen(true)} />;
+      return <WellnessPage onOpenAssistant={(insightId) => { setAssistantWellnessInsightId(insightId ?? null); setIsAIPanelOpen(true); }} />;
     }
 
     if (currentPage === 'vitals') {
@@ -370,6 +372,9 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:gap-6">
+          <div className="md:col-span-6 lg:col-span-12">
+            <NourishedRebelInsights compact onAsk={(insightId) => { setAssistantWellnessInsightId(insightId); setCurrentPage('wellness'); setIsAIPanelOpen(true); }} />
+          </div>
           {/* Medical ID Card - Takes 2/3 width on medium, 1/2 on large */}
           <div className="md:col-span-4 lg:col-span-6 lg:row-span-2">
             <div className="h-full">
@@ -616,6 +621,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <AIAssistantPanel
               darkMode={darkMode}
               currentPage={currentPage}
+              wellnessInsightId={assistantWellnessInsightId}
               onAddCondition={() => medicalProfileActionsRef.current.openAddCondition?.()}
               onAddMedication={() => medicalProfileActionsRef.current.openAddMedication?.()}
               onAddAllergy={() => medicalProfileActionsRef.current.openAddAllergy?.()}

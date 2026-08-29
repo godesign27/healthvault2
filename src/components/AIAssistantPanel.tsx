@@ -35,6 +35,7 @@ interface AIAssistantPanelProps {
   onRequestRecords?: () => void;
   startProviderConnection?: boolean;
   onProviderConnectionStarted?: () => void;
+  wellnessInsightId?: string | null;
 }
 
 export function AIAssistantPanel({
@@ -53,6 +54,7 @@ export function AIAssistantPanel({
   onRequestRecords,
   startProviderConnection: startProviderConnectionProp,
   onProviderConnectionStarted,
+  wellnessInsightId,
 }: AIAssistantPanelProps) {
   const getInitialMessage = () => {
     return getVoiceMessageForContext((currentPage || 'dashboard') as PageContext);
@@ -304,7 +306,7 @@ export function AIAssistantPanel({
       const data = await sendChatMessage({
         message: userMessage,
         page: currentPage,
-        pageContext: buildPageContext(currentPage),
+        pageContext: buildPageContext(currentPage, wellnessInsightId ? { wellnessInsightId, assistantMode: 'nourished_rebel' } : undefined),
         conversationHistory: updatedHistory,
       });
       setConversationHistory([
@@ -380,7 +382,7 @@ export function AIAssistantPanel({
       const data = await sendChatMessage({
         message: prompt,
         page: currentPage,
-        pageContext: buildPageContext(currentPage),
+        pageContext: buildPageContext(currentPage, wellnessInsightId ? { wellnessInsightId, assistantMode: 'nourished_rebel' } : undefined),
         conversationHistory: updatedHistory,
       });
       setConversationHistory([

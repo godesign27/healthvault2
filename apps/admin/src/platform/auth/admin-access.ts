@@ -48,3 +48,7 @@ export function canAccessProviderOperations(assignments: readonly AdminRoleAssig
       || assignment.permissions.includes('providers.manage'),
   );
 }
+
+export function canAccessWellnessPartners(assignments: readonly AdminRoleAssignment[]): boolean {
+  return assignments.some((assignment) => assignment.roleKey === 'platform_owner' || assignment.permissions.includes('wellness_partners.read') || assignment.permissions.includes('wellness_partners.manage'));
+}

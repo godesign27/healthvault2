@@ -1,4 +1,4 @@
-import { canAccessProduct, canAccessProviderOperations } from './platform/auth/admin-access';
+import { canAccessProduct, canAccessProviderOperations, canAccessWellnessPartners } from './platform/auth/admin-access';
 import { useAdminSession } from './platform/auth/use-admin-session';
 import { parseAdminRoute } from './platform/product-registry/routes';
 import { LoginForm } from './features/auth/login-form';
@@ -7,6 +7,7 @@ import { ProviderOperationsPage } from './features/providers/provider-operations
 import { AdminShell } from './layouts/admin-shell';
 import { StatePanel } from './components/state-panel';
 import { supabase } from './lib/supabase';
+import { WellnessPartnersPage } from './features/wellness-partners/wellness-partners-page';
 
 export default function App() {
   const sessionState = useAdminSession();
@@ -35,12 +36,14 @@ export default function App() {
   if (route.kind === 'providers' && !canAccessProviderOperations(sessionState.assignments)) {
     return <StatePanel title="Provider access denied" description="Your administrator role does not include Provider Operations." />;
   }
+  if (route.kind === 'wellness-partners' && !canAccessWellnessPartners(sessionState.assignments)) return <StatePanel title="Wellness partner access denied" description="Your administrator role does not include Wellness Partners." />;
 
   return (
     <AdminShell assignments={sessionState.assignments}>
       {route.kind === 'product' && route.productKey === 'gpt_app' && <GptAppPage section={route.section} />}
-      {route.kind === 'product' && route.productKey === 'saas_cloud' && <StatePanel title="SaaS Cloud is reserved" description="This product boundary is ready, but its analytics module has not been configured." />}
+      {route.kind === 'product' && route.productKey === 'saas_cloud' && <StatePanel title="SaaS Cloud analytics" description="Nourished Rebel site events are available from Wellness Partners; broader SaaS analytics remain intentionally separate." />}
       {route.kind === 'providers' && <ProviderOperationsPage section={route.section} />}
+      {route.kind === 'wellness-partners' && <WellnessPartnersPage section={route.section} />}
     </AdminShell>
   );
 }

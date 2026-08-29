@@ -351,3 +351,13 @@ _Last updated: 2026-08-27_
 - [ ] Instrument live GPT App events and replace the synthetic snapshot with reproducible live aggregation.
 - [x] Build synthetic narrative dashboards for all six GPT App admin tabs.
 - [ ] Build the canonical provider-account migration and separate provider integration portal.
+
+## 10. Nourished Rebel Insights
+
+- [x] Add partner-ready wellness contracts, enrollment/check-in/insight/feedback/funnel schema, and patient RLS.
+- [x] Add structured generation service with versioning, source fingerprints, 24-hour refresh behavior, and safety rejection.
+- [x] Add shared GPT MCP check-in/result tools and authenticated cloud dashboard/Wellness experiences.
+- [x] Add a privacy-safe `nurishedrebel.com` CTA and protected Wellness Partners admin controls; defer Nutri-Q booking integration.
+- [ ] Apply migrations and deploy `wellness-insights`, `wellness-partner-admin`, `health-vault-mcp`, and `ai-health-assistant`.
+- [ ] Confirm the approved partner-site URL, activate partner surfaces, grant admin permissions, and complete legal/privacy review.
+- [ ] Run closed-beta prompt evals and live GPT/site parity checks before public launch.

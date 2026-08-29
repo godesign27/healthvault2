@@ -7,6 +7,13 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-08-28 (Nourished Rebel Insights)
+
+- **supabase / AI** — Added partner-ready, RLS-protected wellness enrollment, resumable six-question check-ins, immutable structured insight versions, feedback, privacy-minimized funnel events, deterministic source fingerprints, safety validation, and a non-PHI partner-site CTA. Nutri-Q booking integration is deferred.
+- **web / GPT** — Added shared Nourished Rebel dashboard and Wellness experiences, autosaving check-in drawer, stored four-pillar results, history, feedback, assistant deep-dive context, and MCP tools/widget backed by the same authoritative insight.
+- **admin** — Added protected Wellness Partners configuration, product-scoped aggregate metrics, audited controls, prompt version publication, capacity settings, and emergency disable to `apps/admin`.
+- **infra** — MCP typecheck, 33 MCP tests, web production build, and admin typecheck/build pass. Database migrations, Edge Function deployment, legal approval, partner-site configuration, and live beta verification remain deployment gates.
+
 ## 2026-08-24 (ChatGPT Patient Registration interview)
 
 - **supabase / mcp** — Patient Registration in ChatGPT now keeps one authoritative interview per user and form. Accepted answers persist before progress is calculated, related questions are asked in groups, the same interview widget is reused for progress/review/save, and Confirm & Save still requires an explicit second step. After a completed save the card offers a secure share. Review prefilled answers calls the interview tool instead of a no-op follow-up.

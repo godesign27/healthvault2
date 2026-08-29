@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Dialog } from '../components/ui/Dialog';
+import { NourishedRebelInsights } from '../components/wellness/NourishedRebelInsights';
+import { requestWellnessRefresh } from '../lib/wellness-insights';
 
 type WellnessTab = 'diet' | 'signals';
 type MealFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink' | 'other';
@@ -105,7 +107,7 @@ function Rating({ label, value, inverse = false }: { label: string; value: numbe
 }
 
 interface WellnessPageProps {
-  onOpenAssistant: () => void;
+  onOpenAssistant: (insightId?: string) => void;
 }
 
 export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
@@ -206,6 +208,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
     }
     setEditing(null);
     setEditForm(null);
+    void requestWellnessRefresh().catch(() => undefined);
     await loadWellness();
   };
 
@@ -219,6 +222,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
       return;
     }
     setDeleting(null);
+    void requestWellnessRefresh().catch(() => undefined);
     await loadWellness();
   };
 
@@ -234,12 +238,16 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             </p>
           </div>
           <button
-            onClick={onOpenAssistant}
+            onClick={() => onOpenAssistant()}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-hv-button bg-action-primary px-4 py-2.5 text-sm font-semibold text-content-on-action transition-colors hover:bg-action-primary-hover active:translate-y-px"
           >
             <Plus className="h-4 w-4" />
             {tab === 'diet' ? 'Log a meal' : 'Start check-in'}
           </button>
+        </div>
+
+        <div className="mb-8">
+          <NourishedRebelInsights onAsk={(insightId) => onOpenAssistant(insightId)} />
         </div>
 
         <div className="mb-7 flex items-center gap-1 border-b border-stroke-subtle" role="tablist" aria-label="Wellness sections">
@@ -300,7 +308,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Utensils className="h-5 w-5 text-action-primary" /></div>
                 <h2 className="text-lg font-semibold text-content-primary">No meals logged yet</h2>
                 <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">Tell the Health Vault assistant what you ate or drank. You will review the details before anything is saved.</p>
-                <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Log your first meal</button>
+            <button onClick={() => onOpenAssistant()} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Log your first meal</button>
               </div>
             ) : (
               <div className="space-y-8">
@@ -359,7 +367,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Activity className="h-5 w-5 text-action-primary" /></div>
             <h2 className="text-lg font-semibold text-content-primary">No Life Signals yet</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">A short daily check-in records energy, sleep, mood, stress, and pain on a 1–5 scale.</p>
-            <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Start your first check-in</button>
+            <button onClick={() => onOpenAssistant()} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Start your first check-in</button>
           </div>
         ) : (
           <div className="space-y-4">

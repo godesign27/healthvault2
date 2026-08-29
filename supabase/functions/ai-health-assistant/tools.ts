@@ -9,6 +9,32 @@ function error(msg: string): ToolResult<never> {
 }
 
 export const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  getNourishedRebelInsight: {
+    confirmationRequired: false,
+    definition: {
+      type: 'function',
+      function: {
+        name: 'getNourishedRebelInsight',
+        description: 'Returns the user\'s latest stored Nourished Rebel wellness insight. This stored object is authoritative; discuss it without inventing or independently reinterpreting labs.',
+        parameters: {
+          type: 'object',
+          properties: { insightId: { type: 'string', description: 'Optional insight ID supplied by the current page.' } },
+        },
+      },
+    },
+    execute: async (args, userId, sb) => {
+      try {
+        let query = sb.from('wellness_insights').select('id,version,insight,generated_at,source_kinds').eq('user_id', userId).eq('partner_key', 'nourished_rebel').eq('status', 'succeeded');
+        query = args.insightId ? query.eq('id', String(args.insightId)) : query.order('version', { ascending: false }).limit(1);
+        const { data, error: dbErr } = await query.maybeSingle();
+        if (dbErr) return error(`Database error: ${dbErr.message}`);
+        if (!data) return error('No Nourished Rebel insight is available yet. Invite the user to complete the wellness check-in.');
+        return success(data, `Retrieved stored Nourished Rebel insight version ${data.version}.`);
+      } catch (err: any) {
+        return error(`Unexpected error: ${err.message}`);
+      }
+    },
+  },
   getMedicalHistory: {
     confirmationRequired: false,
     definition: {
