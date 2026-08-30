@@ -53,6 +53,10 @@ import { OnboardingPreferencesPage } from './pages/OnboardingPreferencesPage';
 import { OnboardingCompletePage } from './pages/OnboardingCompletePage';
 import SuperAdminPage from './pages/SuperAdminPage';
 import ProviderAdminPage from './pages/ProviderAdminPage';
+import { ProviderInvitationPage } from './pages/ProviderInvitationPage';
+import { ProviderWorkspacePage } from './pages/ProviderWorkspacePage';
+import { PatientAccessInvitationPage } from './pages/PatientAccessInvitationPage';
+import { ConnectedProvidersPage } from './pages/ConnectedProvidersPage';
 import { OAuthConsentPage } from './pages/OAuthConsentPage';
 import { supabase } from './lib/supabase';
 import { parseSubdomain } from './lib/subdomain';
@@ -595,6 +599,25 @@ function App() {
   };
 
   const isShareRoute = window.location.pathname.startsWith('/share/');
+
+  const providerInvitationMatch = window.location.pathname.match(/^\/provider\/invitations\/([0-9a-f-]+)$/i);
+  if (providerInvitationMatch) {
+    return <ProviderInvitationPage invitationId={providerInvitationMatch[1]} />;
+  }
+
+  const patientAccessInvitationMatch = window.location.pathname.match(/^\/patient-access\/invitations\/([0-9a-f-]+)$/i);
+  if (patientAccessInvitationMatch) {
+    return <PatientAccessInvitationPage invitationId={patientAccessInvitationMatch[1]} />;
+  }
+
+  if (window.location.pathname === '/connected-providers' || window.location.pathname === '/connected-providers/') {
+    return <ConnectedProvidersPage />;
+  }
+
+  if (window.location.pathname === '/provider' || window.location.pathname === '/provider/') {
+    return <ProviderWorkspacePage />;
+  }
+
   if (isShareRoute) {
     return <SecureShareLanding />;
   }

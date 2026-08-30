@@ -1,0 +1,3906 @@
+{
+  "schemaVersion": "health_vault_clinical_bulk_json_v1",
+  "synthetic": true,
+  "patients": [
+    {
+      "organizationPatientNumber": "HV-DEMO-0001",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0001-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0001-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0001-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0002",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0002-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0002-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0002-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0003",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0003-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0003-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0003-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0004",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0004-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0004-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0004-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0005",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0005-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0005-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0005-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0006",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0006-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0006-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0006-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0007",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0007-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0007-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0007-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0008",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0008-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0008-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0008-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0009",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0009-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0009-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0009-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0010",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0010-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0010-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0010-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0011",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0011-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0011-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0011-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0012",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0012-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0012-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0012-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0013",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0013-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0013-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0013-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0014",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0014-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0014-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0014-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0015",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0015-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0015-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0015-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0016",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0016-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0016-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0016-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0017",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0017-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0017-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0017-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0018",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0018-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0018-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0018-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0019",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0019-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0019-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0019-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0020",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0020-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0020-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0020-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0021",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0021-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0021-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0021-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0022",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0022-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0022-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0022-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0023",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0023-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0023-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0023-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0024",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0024-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0024-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0024-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0025",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0025-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0025-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0025-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0026",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0026-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0026-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0026-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0027",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0027-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0027-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0027-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0028",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0028-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0028-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0028-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0029",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0029-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0029-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0029-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0030",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0030-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0030-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0030-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0031",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0031-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0031-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0031-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0032",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0032-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0032-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0032-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0033",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0033-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0033-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0033-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0034",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0034-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0034-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0034-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0035",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0035-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0035-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0035-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0036",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0036-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0036-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0036-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0037",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0037-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0037-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0037-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0038",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0038-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0038-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0038-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0039",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0039-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0039-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0039-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0040",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0040-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0040-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0040-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0041",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0041-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0041-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0041-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0042",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0042-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0042-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0042-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0043",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0043-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0043-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0043-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0044",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0044-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0044-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0044-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0045",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0045-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0045-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0045-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0046",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0046-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0046-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0046-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0047",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0047-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0047-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0047-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0048",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0048-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0048-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0048-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0049",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0049-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0049-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0049-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0050",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0050-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0050-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0050-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0051",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0051-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0051-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0051-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0052",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0052-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0052-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0052-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0053",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0053-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0053-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0053-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0054",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0054-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0054-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0054-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0055",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0055-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0055-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0055-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0056",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0056-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0056-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0056-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0057",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0057-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0057-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0057-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0058",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0058-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0058-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0058-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0059",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0059-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0059-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0059-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0060",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0060-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0060-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0060-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0061",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0061-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0061-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0061-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0062",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0062-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0062-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0062-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0063",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0063-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0063-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0063-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0064",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0064-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0064-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0064-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0065",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0065-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0065-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0065-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0066",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0066-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0066-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0066-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0067",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0067-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0067-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0067-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0068",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0068-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0068-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0068-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0069",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0069-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0069-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0069-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0070",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0070-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0070-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0070-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0071",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0071-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0071-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0071-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0072",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0072-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0072-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0072-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0073",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0073-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0073-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0073-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0074",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0074-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0074-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0074-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0075",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0075-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0075-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0075-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0076",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0076-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0076-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0076-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0077",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0077-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0077-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0077-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0078",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0078-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0078-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0078-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0079",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0079-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0079-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0079-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0080",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0080-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0080-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0080-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0081",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0081-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0081-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0081-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0082",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0082-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0082-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0082-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0083",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0083-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0083-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0083-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0084",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0084-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0084-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0084-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0085",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0085-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0085-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0085-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0086",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0086-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0086-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0086-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0087",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0087-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0087-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0087-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0088",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0088-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0088-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0088-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0089",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0089-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0089-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0089-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0090",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0090-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0090-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0090-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0091",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0091-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0091-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0091-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0092",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0092-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0092-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0092-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0093",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0093-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0093-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0093-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0094",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0094-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0094-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0094-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0095",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0095-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0095-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0095-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0096",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0096-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0096-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0096-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0097",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0097-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0097-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0097-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0098",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0098-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0098-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0098-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0099",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0099-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0099-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0099-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    },
+    {
+      "organizationPatientNumber": "HV-DEMO-0100",
+      "resources": [
+        {
+          "type": "health_record",
+          "externalId": "encounter-0100-2026-07-14",
+          "title": "Synthetic annual wellness visit",
+          "occurredAt": "2026-07-14T15:30:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic wellness encounter for demonstration only.",
+            "status": "completed"
+          }
+        },
+        {
+          "type": "lab",
+          "externalId": "lab-0100-2026-07-14",
+          "title": "Synthetic wellness laboratory panel",
+          "occurredAt": "2026-07-14T16:10:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic laboratory results for demonstration only.",
+            "status": "final",
+            "resultCount": 6
+          }
+        },
+        {
+          "type": "vital",
+          "externalId": "vital-0100-2026-07-14",
+          "title": "Synthetic visit vital signs",
+          "occurredAt": "2026-07-14T15:25:00Z",
+          "providerName": "Health Vault Demo Provider",
+          "data": {
+            "summary": "Synthetic vital-sign set for demonstration only.",
+            "measurementCount": 4
+          }
+        }
+      ]
+    }
+  ]
+}

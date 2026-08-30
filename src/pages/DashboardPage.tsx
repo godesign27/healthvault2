@@ -31,6 +31,11 @@ interface ActivityItem {
   timestamp: string;
 }
 
+interface ProviderConnectionNotice {
+  providerDisplayName: string;
+  dataSummary: { profileDetails: number; healthRecords: number; labs: number; medications: number; vitals: number } | null;
+}
+
 function relativeTime(iso: string | null): string {
   if (!iso) return '';
   const then = new Date(iso).getTime();
@@ -108,6 +113,13 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     } catch { return new Set(); }
   });
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
+  const [providerConnectionNotice, setProviderConnectionNotice] = useState<ProviderConnectionNotice | null>(() => {
+    try {
+      const stored = sessionStorage.getItem('hv-provider-connection-accepted');
+      sessionStorage.removeItem('hv-provider-connection-accepted');
+      return stored ? JSON.parse(stored) as ProviderConnectionNotice : null;
+    } catch { return null; }
+  });
 
   useEffect(() => {
     if (dismissedDashboardBanners.size > 0) {
@@ -323,6 +335,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             Welcome back{userFirstName ? `, ${userFirstName}` : ''}! Here's your health overview.
           </p>
         </div>
+
+        {providerConnectionNotice && <div className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${darkMode ? 'border-indigo-800 bg-indigo-950/30' : 'border-indigo-200 bg-indigo-50'}`} role="status"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${darkMode ? 'bg-indigo-900' : 'bg-indigo-100'}`}><CheckCircle className={`h-5 w-5 ${darkMode ? 'text-indigo-300' : 'text-indigo-700'}`} /></div><div className="min-w-0 flex-1"><p className={`font-semibold ${darkMode ? 'text-indigo-200' : 'text-indigo-950'}`}>{providerConnectionNotice.providerDisplayName} is now connected</p><p className={`mt-1 text-sm ${darkMode ? 'text-indigo-300/80' : 'text-indigo-800'}`}>{providerConnectionNotice.dataSummary ? `${providerConnectionNotice.dataSummary.profileDetails} profile details added to your patient-controlled connection. Clinical records will appear as your provider imports them.` : 'Your patient-controlled provider connection is ready.'}</p></div><button className={`text-xs font-semibold ${darkMode ? 'text-indigo-300' : 'text-indigo-700'}`} onClick={() => setProviderConnectionNotice(null)}>Dismiss</button></div>}
 
         {receivedRequests.filter(r => !dismissedDashboardBanners.has(r.id)).map(req => (
           <div

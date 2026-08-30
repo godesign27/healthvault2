@@ -36,11 +36,15 @@ export default function App() {
     return <StatePanel title="Provider access denied" description="Your administrator role does not include Provider Operations." />;
   }
 
+  if (route.kind === 'providers' && ['patient-access', 'mfa-recovery'].includes(route.section) && !sessionState.assignments.some((assignment) => assignment.roleKey === 'platform_owner')) {
+    return <StatePanel title="Health Vault super-admin access required" description="Patient access intervention is reserved for the normalized platform owner role." />;
+  }
+
   return (
     <AdminShell assignments={sessionState.assignments}>
       {route.kind === 'product' && route.productKey === 'gpt_app' && <GptAppPage section={route.section} />}
       {route.kind === 'product' && route.productKey === 'saas_cloud' && <StatePanel title="SaaS Cloud is reserved" description="This product boundary is ready, but its analytics module has not been configured." />}
-      {route.kind === 'providers' && <ProviderOperationsPage section={route.section} />}
+      {route.kind === 'providers' && <ProviderOperationsPage section={route.section} isPlatformOwner={sessionState.assignments.some((assignment) => assignment.roleKey === 'platform_owner')} />}
     </AdminShell>
   );
 }

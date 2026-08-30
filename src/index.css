@@ -6,6 +6,31 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .provider-workspace-layout > nav {
+    display: flex;
+    gap: 0.375rem;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--color-stroke-subtle, #e2e8f0);
+    padding-bottom: 0.75rem;
+  }
+
+  .provider-workspace-layout > nav > button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .provider-workspace-layout > nav > button + button {
+    margin-top: 0;
+  }
+
+  .provider-workspace-layout > section {
+    margin-top: 1.75rem;
+    min-width: 0;
+  }
+}
+
 /* ── 3. Base resets ──────────────────────────────────────────────────────────── */
 @layer base {
   html {
