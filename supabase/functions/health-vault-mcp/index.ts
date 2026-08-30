@@ -257,7 +257,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.7.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep the user in ChatGPT: call get_medical_form, review profile-derived suggestions as unconfirmed, ask one logical missing question at a time, and call get_medical_form_progress after each answer batch so the user sees a progress card. Never redirect a ChatGPT-supported reusable form to the web app. When the required safe answer set is ready, use propose_form_answers to show the exact review card, and call confirm_form_answers only after explicit confirmation. A confirmed form becomes complete when all required safe fields are present; completion never signs or shares it. Only completed forms may be shared: call preview_medical_form_share first and create_medical_form_share only after explicit confirmation. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep one authoritative interview: call get_medical_form once, then after each accepted answer call get_medical_form_progress with only the new answer. Do not call get_medical_form again for the same form, and never reconstruct the full answer set unless the user is correcting a value. The server persists answers and returns the same interview card. Never redirect a ChatGPT-supported reusable form to the web app. When progress is 13/13 or remainingFields is 0, get_medical_form_progress already returns the final review card; do not invent expectedUpdatedAt. Call propose_form_answers only if the review card is missing. Call confirm_form_answers only after explicit Confirm & Save. Never auto-save. After a completed save, offer a secure share via preview_medical_form_share, then create_medical_form_share only after explicit confirmation. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -401,10 +401,11 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         mimeType: "text/html+skybridge",
         text: MEDICAL_FORM_WIDGET_HTML,
         _meta: {
-          "openai/widgetDescription": "The authenticated user's common reusable forms, completion status, and secure provider-form upload option.",
+          "openai/widgetDescription": "The authenticated user's common reusable forms, a single authoritative form interview, final review with Confirm & Save, and secure provider-form upload option.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault27.com",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
+          ui: { resourceUri: MEDICAL_FORM_WIDGET_URI },
         },
       }],
     }),
@@ -562,27 +563,37 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     },
   );
 
+  const formAnswerMap = z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]));
+  const formInterviewMeta = (invoking: string, invoked: string) => ({
+    "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
+    "openai/widgetAccessible": true,
+    "openai/toolInvocation/invoking": invoking,
+    "openai/toolInvocation/invoked": invoked,
+    ui: { resourceUri: MEDICAL_FORM_WIDGET_URI, visibility: ["model", "app"] },
+  });
+
   server.registerTool(
     "get_medical_form",
     {
       title: "Get reusable medical form",
-      description: "Load a supported reusable form, its saved draft answers, missing fields, and suggestions derived from confirmed Health Vault data. Never treat suggestions as confirmed form answers.",
+      description: "Load the authenticated user's single authoritative interview for a reusable form, including saved drafts, persisted interview answers, missing related-question groups, and unconfirmed profile suggestions. Call this once per form. Later answers must go through get_medical_form_progress so the same interview is updated instead of starting over.",
       inputSchema: z.object({ templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]) }),
       outputSchema: z.object({ form: z.unknown() }),
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-      _meta: {
-        "openai/outputTemplate": MEDICAL_FORM_WIDGET_URI,
-        "openai/widgetAccessible": true,
-        "openai/toolInvocation/invoking": "Preparing your form interview",
-        "openai/toolInvocation/invoked": "Form interview ready",
-      },
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+      _meta: formInterviewMeta("Preparing your form interview", "Form interview ready"),
     },
     async ({ templateId }) => {
       try {
         const form = await getMedicalForm(supabase, userId, templateId);
+        const group = form.nextGroup;
+        const nextText = group
+          ? `Ask this related group together: ${group.title}. ${group.prompt}`
+          : form.nextQuestion
+            ? `Ask the next missing question: ${form.nextQuestion.label}.`
+            : "All required safe fields are ready. Prepare the final review card with Confirm & Save.";
         return {
           structuredContent: { form },
-          content: [{ type: "text", text: `The selected reusable form is loaded. ${form.progress.completedFields} of ${form.progress.totalFields} safe fields are ready (${form.progress.percentReady}%). Review profile suggestions as unconfirmed, then ask one logical missing question at a time. Do not request restricted fields or send the user to the web app for this reusable form.` }],
+          content: [{ type: "text", text: `The selected reusable form interview is loaded. ${form.progress.completedFields} of ${form.progress.totalFields} safe fields are ready (${form.progress.percentReady}%). ${nextText} Do not call get_medical_form again for this form. Never request SSN, signatures, legal consent, or payment information.` }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to load the medical form" }] };
@@ -593,34 +604,45 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerTool(
     "get_medical_form_progress",
     {
-      title: "Show medical form progress",
-      description: "Show completion progress and the next missing question while conducting a reusable medical-form interview in ChatGPT. Pass answers already collected in the conversation so the progress card stays current.",
+      title: "Update medical form interview",
+      description: "Persist accepted answers into the user's one active interview for this form, then return the authoritative progress card and next related-question group. Pass only the newly accepted answers; the server merges them. Do not call get_medical_form again. When remainingFields is 0 this returns the final review card with Confirm & Save.",
       inputSchema: z.object({
         templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
-        answers: z.record(z.string(), z.string()).optional(),
+        answers: formAnswerMap.optional(),
+        acceptSuggestions: z.boolean().optional(),
       }),
-      outputSchema: z.object({ templateId: z.string(), templateTitle: z.string(), formProgress: z.unknown(), nextQuestion: z.unknown().nullable() }),
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-      _meta: {
-        "openai/outputTemplate": MEDICAL_FORM_PROGRESS_WIDGET_URI,
-        "openai/toolInvocation/invoking": "Updating your form progress",
-        "openai/toolInvocation/invoked": "Form progress updated",
-      },
+      outputSchema: z.object({
+        view: z.string(),
+        templateId: z.string(),
+        templateTitle: z.string(),
+        status: z.string(),
+        formProgress: z.unknown(),
+        progress: z.unknown(),
+        nextQuestion: z.unknown().nullable(),
+        nextGroup: z.unknown().nullable(),
+        form: z.unknown(),
+        preview: z.unknown().nullable(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: formInterviewMeta("Updating your form interview", "Form interview updated"),
     },
-    async ({ templateId, answers }) => {
+    async ({ templateId, answers, acceptSuggestions }) => {
       try {
-        const result = await getMedicalFormProgress(supabase, userId, templateId, answers ?? {});
+        const result = await getMedicalFormProgress(supabase, userId, templateId, answers ?? {}, { acceptSuggestions });
+        const group = result.nextGroup;
+        const nextText = result.preview
+          ? `${result.preview.safeSummary} Use Confirm & Save in the card only if every answer is correct. Do not auto-save.`
+          : group
+            ? `Progress is ${result.progress.completedFields}/${result.progress.totalFields}. Ask this related group together: ${group.title}. ${group.prompt}`
+            : result.nextQuestion
+              ? `Progress is ${result.progress.completedFields}/${result.progress.totalFields}. Ask the next missing question: ${result.nextQuestion.label}.`
+              : "All required safe fields are ready. Show the final review card with Confirm & Save.";
         return {
-          structuredContent: {
-            templateId: result.templateId,
-            templateTitle: result.templateTitle,
-            formProgress: result.progress,
-            nextQuestion: result.nextQuestion,
-          },
-          content: [{ type: "text", text: result.nextQuestion ? `Form progress is ${result.progress.percentReady}%. Ask the next missing question: ${result.nextQuestion.label}.` : "All required safe fields are ready. Prepare the answers for explicit review and confirmation." }],
+          structuredContent: result,
+          content: [{ type: "text", text: nextText }],
         };
       } catch (error) {
-        return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to calculate form progress" }] };
+        return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to update form progress" }] };
       }
     },
   );
@@ -629,26 +651,22 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     "propose_form_answers",
     {
       title: "Review medical form answers",
-      description: "Validate and prepare one or more supported reusable-form answers for explicit review. This never saves the answers. Call get_medical_form first and pass its exact expectedUpdatedAt value.",
+      description: "Prepare the authoritative interview answers for explicit review. This never saves the form. Answers and expectedUpdatedAt are optional; omitted values are read from the persisted interview. At 13/13 this returns the complete final-review card with Confirm & Save.",
       inputSchema: z.object({
         templateId: z.enum(GPT_MEDICAL_FORM_IDS as [string, ...string[]]),
-        answers: z.record(z.string(), z.string()),
-        expectedUpdatedAt: z.string().datetime({ offset: true }).nullable(),
+        answers: formAnswerMap.optional(),
+        expectedUpdatedAt: z.string().nullable().optional(),
       }),
       outputSchema: z.object({ preview: z.unknown() }),
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
-      _meta: {
-        "openai/outputTemplate": MEDICAL_FORM_REVIEW_WIDGET_URI,
-        "openai/toolInvocation/invoking": "Preparing your form review",
-        "openai/toolInvocation/invoked": "Medical form answers ready to review",
-      },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+      _meta: formInterviewMeta("Preparing your form review", "Medical form answers ready to review"),
     },
     async ({ templateId, answers, expectedUpdatedAt }) => {
       try {
-        const preview = await proposeFormAnswers(supabase, userId, templateId, answers, expectedUpdatedAt);
+        const preview = await proposeFormAnswers(supabase, userId, templateId, answers ?? {}, expectedUpdatedAt);
         return {
           structuredContent: { preview },
-          content: [{ type: "text", text: `${preview.safeSummary} Use ${preview.willComplete ? "Confirm & Complete Form" : "Confirm & Save Progress"} in the card only if every answer is correct.` }],
+          content: [{ type: "text", text: `${preview.safeSummary} Use Confirm & Save in the card only if every answer is correct. Do not auto-save.` }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to prepare the form review" }] };
@@ -660,18 +678,18 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     "confirm_form_answers",
     {
       title: "Save confirmed medical form",
-      description: "Save the exact, unexpired answer proposal after explicit user confirmation. The form is completed when all required safe fields are present; otherwise progress is saved as a private draft. This never signs or shares the form.",
+      description: "Save the exact, unexpired answer proposal only after explicit user confirmation from Confirm & Save. Never call this from an implied or initial request. Completion never signs or shares the form; offer a secure share afterwards.",
       inputSchema: z.object({ proposalId: z.string().uuid(), confirmed: z.literal(true) }),
       outputSchema: z.object({ saved: z.unknown() }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-      _meta: { "openai/widgetAccessible": true },
+      _meta: formInterviewMeta("Saving your confirmed answers", "Form answers saved"),
     },
     async ({ proposalId }) => {
       try {
         const saved = await confirmFormAnswers(supabase, userId, proposalId);
         return {
           structuredContent: { saved },
-          content: [{ type: "text", text: saved.savedAs === "completed_form" ? `${saved.safeSummary} The completed form remains private and unshared until you explicitly prepare and confirm a secure share.` : `${saved.safeSummary} It remains incomplete and unshared. Continue the interview with the next missing question.` }],
+          content: [{ type: "text", text: saved.savedAs === "completed_form" ? `${saved.safeSummary} The completed form remains private. Offer to create a secure share using preview_medical_form_share, then create_medical_form_share only after explicit confirmation.` : `${saved.safeSummary} It remains incomplete and unshared. Continue the interview with the next related-question group.` }],
         };
       } catch (error) {
         return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to save the form draft" }] };
