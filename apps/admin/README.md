@@ -32,4 +32,13 @@ npm run admin:typecheck
 npm run admin:build
 ```
 
+## Deployment
+
+The admin application deploys as a separate Cloudflare Worker with SPA routing:
+
+```bash
+npm run admin:build
+npm run admin:deploy
+```
+
 The admin frontend must never use the Supabase service-role key. Future analytics and provider mutations belong behind role-aware Edge Functions or database RPCs.
