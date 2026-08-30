@@ -3,6 +3,8 @@ import { Activity, Building2, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Shiel
 import { useEffect, useState, type ReactNode } from 'react';
 import { canAccessProduct, canAccessProviderOperations } from '../platform/auth/admin-access';
 import { supabase } from '../lib/supabase';
+import healthVaultLogoDark from '../../../../public/hv_logo-dark.png';
+import healthVaultLogoLight from '../../../../public/hv_logo-light.png';
 
 interface AdminShellProps {
   assignments: readonly AdminRoleAssignment[];
@@ -35,7 +37,7 @@ export function AdminShell({ assignments, children }: AdminShellProps) {
   return (
     <div className={`admin-layout${sidebarCollapsed ? ' admin-layout-collapsed' : ''}`}>
       <aside className={`sidebar${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-        <div className="sidebar-heading"><a className="brand sidebar-tooltip" data-tooltip="Health Vault Admin" aria-label="Health Vault Admin" href="/products/gpt-app/insights"><span>HV</span><strong>Admin</strong></a><button className="sidebar-toggle" type="button" onClick={toggleSidebar} aria-label={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!sidebarCollapsed} title={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}>{sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}</button></div>
+        <div className="sidebar-heading"><a className="brand sidebar-tooltip" data-tooltip="Health Vault Admin" aria-label="Health Vault Admin" href="/products/gpt-app/insights"><span className="sidebar-brand-mark" aria-hidden="true"><img className="sidebar-brand-logo sidebar-brand-logo-light" src={healthVaultLogoLight} alt="" /><img className="sidebar-brand-logo sidebar-brand-logo-dark" src={healthVaultLogoDark} alt="" /></span><strong>Admin</strong></a><button className="sidebar-toggle" type="button" onClick={toggleSidebar} aria-label={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!sidebarCollapsed} title={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}>{sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}</button></div>
         <nav aria-label="Admin navigation">
           <p className="nav-label">Products</p>
           {ADMIN_PRODUCTS.map((product) => {

@@ -490,6 +490,9 @@ _Last updated: 2026-08-29_
 - [x] Add a persistent admin light/dark appearance control using the shared semantic token system,
       operating-system preference on first use, corrected dark feedback contrast, and full support
       in both expanded and collapsed navigation states.
+- [x] Reframe MFA recovery guidance as a dedicated informational card beside a simplified Email
+      lookup, including identity verification, session invalidation, authenticator re-enrollment,
+      patient-profile preservation, and super-admin fresh-MFA expectations.
 - [x] Audit and explicitly migrate legacy `organizations`, `organization_admins`, and
       `organization_patients`: three empty seeded organizations now map to draft provider
       accounts with immutable audit evidence; any legacy memberships are suspended without

@@ -508,3 +508,8 @@ _Older history predates this log. See git history and the chat transcript for de
   corrected dark semantic action/link/feedback tokens so selected summaries, statuses, banners,
   and destructive states remain legible. Verified dark Patient Access visually, switched back to
   light mode, reloaded, and confirmed the saved preference remained active.
+- **MFA recovery information hierarchy** — Replaced the yellow warning-style recovery banner with
+  a right-side informational card that explains identity verification, forced sign-out, required
+  authenticator re-enrollment, patient-profile preservation, and the operator's own fresh-MFA
+  requirement. Simplified the lookup label to `Email` and positioned `Find account` directly after
+  the field. The layout stacks cleanly on narrow screens and the admin production build passes.

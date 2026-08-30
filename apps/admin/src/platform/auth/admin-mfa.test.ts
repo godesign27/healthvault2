@@ -24,6 +24,6 @@ test('recent TOTP is derived from the signed access token AMR timestamp', () => 
   const now = new Date('2026-08-29T20:00:00Z');
   const token = `x.${Buffer.from(JSON.stringify({ aal: 'aal2', amr: [{ method: 'totp', timestamp: Math.floor(new Date('2026-08-29T19:55:00Z').getTime() / 1000) }] })).toString('base64url')}.x`;
   assert.equal(hasRecentTotpInAccessToken(token, now), true);
-  assert.equal(hasRecentTotpInAccessToken(token, new Date('2026-08-30T19:59:59Z')), true);
-  assert.equal(hasRecentTotpInAccessToken(token, new Date('2026-08-30T20:00:01Z')), false);
+  assert.equal(hasRecentTotpInAccessToken(token, new Date('2026-08-30T19:55:00Z')), true);
+  assert.equal(hasRecentTotpInAccessToken(token, new Date('2026-08-30T19:55:01Z')), false);
 });
