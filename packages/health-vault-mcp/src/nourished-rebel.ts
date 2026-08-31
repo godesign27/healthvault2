@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export const NOURISHED_REBEL_WIDGET_URI = "ui://health-vault/nourished-rebel.html";
+export const NOURISHED_REBEL_WIDGET_URI = "ui://health-vault/nourished-rebel-v2.html";
 
 export async function callNourishedRebel(supabase: SupabaseClient, action: string, input: Record<string, unknown> = {}) {
   const { data, error } = await supabase.functions.invoke("wellness-insights", {

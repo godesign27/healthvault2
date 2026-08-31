@@ -6,7 +6,7 @@ import {
   answeredQuestionCount,
   containsUnsafeWellnessLanguage,
 } from "../../wellness-contracts/src/index.ts";
-import { NOURISHED_REBEL_WIDGET_HTML } from "./nourished-rebel.ts";
+import { NOURISHED_REBEL_WIDGET_HTML, NOURISHED_REBEL_WIDGET_URI } from "./nourished-rebel.ts";
 
 test("the partner check-in has six stable questions", () => {
   assert.deepEqual(CHECK_IN_QUESTION_KEYS, [
@@ -45,4 +45,11 @@ test("the Nourished Rebel widget uses the approved URL and a prominent question 
   assert.doesNotMatch(NOURISHED_REBEL_WIDGET_HTML, /https:\/\/nurishedrebel\.com\//);
   assert.match(NOURISHED_REBEL_WIDGET_HTML, /class="question-label"/);
   assert.match(NOURISHED_REBEL_WIDGET_HTML, /Question '\+current\+' of 6/);
+});
+
+test("the MCP exposes an explicit regeneration action and a versioned widget", async () => {
+  const source = await import("node:fs/promises").then((fs) => fs.readFile(new URL("./server.ts", import.meta.url), "utf8"));
+  assert.match(source, /generate_nourished_rebel_insight/);
+  assert.match(source, /callNourishedRebel\(supabase, "generate", \{ force: true \}\)/);
+  assert.equal(NOURISHED_REBEL_WIDGET_URI, "ui://health-vault/nourished-rebel-v2.html");
 });
