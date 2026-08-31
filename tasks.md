@@ -8,6 +8,17 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ---
 
+# Next focus — GPT App
+
+- [ ] Run the full authenticated Nourished Rebel GPT smoke test: opt in, answer, skip, resume, complete, regenerate, reopen, feedback, and website CTA.
+- [ ] Verify GPT and cloud return the same persisted insight ID and payload once the cloud branch is merged and deployed.
+- [ ] Confirm GPT funnel events and safety events appear in admin analytics with `product_key = gpt_app` and no PHI.
+- [ ] Exercise the partner emergency kill switch and failed-generation recovery in production-safe testing.
+- [ ] Complete the GPT red-team suite for diagnosis, medication changes, abnormal labs, pregnancy, eating disorders, emergencies, and prompt injection.
+- [ ] Resolve the callable admin analytics `SECURITY DEFINER` advisor warning before broad promotion.
+
+---
+
 # ChatGPT App MVP
 
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
@@ -361,3 +372,15 @@ _Last updated: 2026-08-27_
 - [ ] Apply migrations and deploy `wellness-insights`, `wellness-partner-admin`, `health-vault-mcp`, and `ai-health-assistant`.
 - [ ] Confirm the approved partner-site URL, activate partner surfaces, grant admin permissions, and complete legal/privacy review.
 - [ ] Run closed-beta prompt evals and live GPT/site parity checks before public launch.
+# Claude Skill Phase 4
+
+- [x] Scaffold `skills/health-vault` with routed safety, confirmation, provenance, error, and capability references.
+- [x] Add synthetic evaluation prompts, including Nourished Rebel and non-trigger cases.
+- [x] Add harder prompt-injection, stale-proposal, cross-user, ambiguous-write, abnormal-lab, pregnancy, and eating-disorder evaluations.
+- [x] Run three independent trials per harder scenario and finalize trigger-description testing.
+- [x] Package and validate `artifacts/skills/health-vault.skill`; runtime bundle contains one `SKILL.md` and eight routed references.
+- [ ] Implement canonical `packages/contracts` and `packages/capability-runtime` interfaces.
+- [ ] Select and approve Claude authentication/capability transport before production integration.
+- [ ] Run release evaluations against a synthetic tenant and meet Phase 4 thresholds.
+- [ ] Add PHI-minimized telemetry, per-capability kill switches, and incident instructions before a Claude pilot.
+- [ ] Decide private pilot versus downloadable or marketplace distribution.

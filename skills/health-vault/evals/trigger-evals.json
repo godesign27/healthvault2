@@ -1,0 +1,22 @@
+[
+  {"query":"Can you open Health Vault and show me the medications it has for me, including which ones are still marked active?","should_trigger":true},
+  {"query":"I started amoxicillin yesterday. Add it to my Health Vault after showing me exactly what will be saved.","should_trigger":true},
+  {"query":"Health Vault has my lisinopril dose wrong. Help me correct it from 10 mg to 20 mg without overwriting anything silently.","should_trigger":true},
+  {"query":"Remove the old shellfish allergy from my Health Vault, but let me review the change before it happens.","should_trigger":true},
+  {"query":"Use what is already in my Health Vault to make a short prep sheet for my cardiology appointment next Tuesday.","should_trigger":true},
+  {"query":"Log today's energy, sleep, mood, stress, and pain as a Life Signal in Health Vault.","should_trigger":true},
+  {"query":"Pick up my Nourished Rebel check-in where I left off and show me the next question.","should_trigger":true},
+  {"query":"Show me the latest Nourished Rebel insight stored in Health Vault and explain which source types it used.","should_trigger":true},
+  {"query":"My Health Vault login expired while I was trying to review my allergies. Help me reconnect and continue.","should_trigger":true},
+  {"query":"I want to share selected Health Vault records with a new doctor. What supported secure options do I have?","should_trigger":true},
+  {"query":"What are the most common causes of headaches, and when should someone seek urgent care?","should_trigger":false},
+  {"query":"Here is a cholesterol result copied from paper: LDL 118 mg/dL. Explain generally what LDL measures; don't use Health Vault.","should_trigger":false},
+  {"query":"Can you suggest a balanced vegetarian breakfast with more protein? This is just a general nutrition question.","should_trigger":false},
+  {"query":"What does the phrase 'health data vault' mean in software architecture? I'm designing an encrypted database.","should_trigger":false},
+  {"query":"Help me write a product requirements document for a startup feature called Health Vault.","should_trigger":false},
+  {"query":"What do you remember about my writing preferences from this Claude conversation?","should_trigger":false},
+  {"query":"Summarize this lab-report PDF I attached, but don't save it anywhere or access my account.","should_trigger":false},
+  {"query":"Build me a seven-day running plan for a beginner with no known injuries.","should_trigger":false},
+  {"query":"I'm having crushing chest pain and trouble breathing right now.","should_trigger":false},
+  {"query":"Compare Epic, Oracle Health, and athenahealth as EHR vendors for a small clinic.","should_trigger":false}
+]

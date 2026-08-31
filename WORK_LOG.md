@@ -154,3 +154,24 @@ _Older history predates this log. See git history and the chat transcript for de
 - **admin foundation** — Added a separately buildable `apps/admin` workspace with fail-closed Supabase authentication, product-scoped role checks, GPT App navigation, a reserved SaaS Cloud boundary, and an isolated Provider Operations area. Added shared `admin-contracts`, `analytics-contracts`, and `provider-contracts` packages plus the initial product registry/admin-role migration. No administrator is granted automatically.
 - **GPT analytics slice** — Added service-only versioned analytics event storage, role-aware metric snapshot access, and a deterministic GPT App Insights fixture. Built accessible metric cards, usage trend, task outcome, intent ranking, and quality-attention visualizations with explicit synthetic-data labeling and table alternatives.
 - **GPT admin narratives** — Built synthetic, evidence-oriented narratives for Users, Interactions, Capabilities, Unmet Needs, and Weekly Briefs. Added activation funnel/cohorts, failure ranking, capability health table, opportunity clusters, and fact/interpretation/recommendation separation.
+# 2026-08-30 — Claude Skill Phase 4 scaffold
+
+- Added the non-production `skills/health-vault` Claude Skill package defined by the Phase 4 PRD.
+- Added routed references for canonical capabilities, authentication, preview/confirm semantics, provenance, medical safety, error handling, and evaluation cases.
+- Added Nourished Rebel as an optional canonical capability while explicitly prohibiting Claude-specific persistence or independent insight generation.
+- Added synthetic evaluation prompts for authorization, changed proposals, emergencies, Nourished Rebel privacy, and non-trigger behavior.
+- Production integration remains blocked on shared contracts/runtime, approved Claude authentication, synthetic tenant validation, telemetry, and kill switches.
+
+# 2026-08-31 — Claude Skill communication revision
+
+- Added a portable member-communication reference based on the Health Vault AI Communication Guide.
+- Standardized answer-first responses, one plain-language caveat, no internal engineering language, situation-appropriate tone, and a concrete closing next step.
+- Expanded Skill evaluations to grade communication quality without weakening authentication, confirmation, privacy, provenance, or emergency behavior.
+
+# 2026-08-31 — Claude Skill final evaluation pass
+
+- Added seven harder cases covering stored prompt injection, stale proposals, cross-user access, ambiguous writes, abnormal labs, pregnancy dehydration, and restrictive eating.
+- Ran three independent synthetic trials per case; all 21 responses passed all 72 graded expectations.
+- Tested 20 trigger and near-miss queries across three independent trials. The selected description scored 60/60 with no false positives, compared with 59/60 for the prior description.
+- Packaged and validated `artifacts/skills/health-vault.skill`; SHA-256 `e7e723e7e5079c0c86b6c45ae786c71bd7c342bf329f5bfe3c1f0447bf7603af`.
+- Recorded the next GPT App priorities at the top of `tasks.md`; canonical Claude runtime, authentication, telemetry, kill switches, and distribution remain deferred.
