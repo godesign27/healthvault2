@@ -387,9 +387,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:gap-6">
-          <div className="md:col-span-2 lg:col-span-3">
-            <NourishedRebelInsights compact onOpen={() => { setWellnessInitialTab('insights'); setCurrentPage('wellness'); }} onAsk={(insightId) => { setAssistantWellnessInsightId(insightId); setCurrentPage('wellness'); setIsAIPanelOpen(true); }} />
-          </div>
           {/* Medical ID Card - Takes 2/3 width on medium, 1/2 on large */}
           <div className="md:col-span-4 lg:col-span-6 lg:row-span-2">
             <div className="h-full">
@@ -453,7 +450,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
-          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+          <div className="md:col-span-6 lg:col-span-12 flex h-full flex-col hv-surface-card p-6">
             <div className="mb-3 flex items-center gap-2">
               <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
                 <Sparkles className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
@@ -494,7 +491,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </div>
 
           {/* Recent Activity - Balanced layout */}
-          <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
+          <div className="md:col-span-4 lg:col-span-9 flex h-full flex-col hv-surface-card p-6">
             <div className="mb-3 flex items-center gap-2">
               <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
                 <Activity className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
@@ -544,6 +541,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
             )}
+          </div>
+
+          <div className="md:col-span-2 lg:col-span-3">
+            <NourishedRebelInsights compact onOpen={() => { setWellnessInitialTab('insights'); setCurrentPage('wellness'); }} onAsk={(insightId) => { setAssistantWellnessInsightId(insightId); setCurrentPage('wellness'); setIsAIPanelOpen(true); }} />
           </div>
         </div>
       </div>
