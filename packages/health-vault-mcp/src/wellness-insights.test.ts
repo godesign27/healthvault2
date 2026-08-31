@@ -53,3 +53,11 @@ test("the MCP exposes an explicit regeneration action and a versioned widget", a
   assert.match(source, /callNourishedRebel\(supabase, "generate", \{ force: true \}\)/);
   assert.equal(NOURISHED_REBEL_WIDGET_URI, "ui://health-vault/nourished-rebel-v2.html");
 });
+
+test("failed insight attempts can be retried without conflicting with their fingerprint", async () => {
+  const source = await import("node:fs/promises").then((fs) => fs.readFile(new URL("../../../supabase/functions/wellness-insights/index.ts", import.meta.url), "utf8"));
+  assert.match(source, /existingAttempt\.data\?\.status === "succeeded"/);
+  assert.match(source, /update\(\{ status: "generating"/);
+  assert.match(source, /error_code: null/);
+  assert.match(NOURISHED_REBEL_WIDGET_HTML, /We couldn’t refresh your insight/);
+});

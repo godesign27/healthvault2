@@ -131,12 +131,20 @@ async function generateInsight(db: any, userId: string, body: ActionBody, force 
   if (!state.checkIn || state.checkIn.answered_count < 1) throw new Error("Answer at least one check-in question before generating an insight.");
   const assembled = await assembleContext(db, userId, state.checkIn);
   const sourceFingerprint = await fingerprint({ frameworkVersion: state.partner.frameworkVersion, promptVersion: state.partner.promptVersion, ...assembled.context });
-  const duplicate = await db.from("wellness_insights").select("id,version,insight,generated_at").eq("user_id", userId).eq("partner_key", PARTNER_KEY).eq("source_fingerprint", sourceFingerprint).eq("status", "succeeded").maybeSingle();
-  if (duplicate.data) return duplicate.data;
+  const existingAttempt = await db.from("wellness_insights").select("id,version,insight,generated_at,status").eq("user_id", userId).eq("partner_key", PARTNER_KEY).eq("source_fingerprint", sourceFingerprint).maybeSingle();
+  if (existingAttempt.error) throw existingAttempt.error;
+  if (existingAttempt.data?.status === "succeeded") return existingAttempt.data;
+  if (existingAttempt.data?.status === "generating") throw new Error("Your wellness insight is already being refreshed. Please try again shortly.");
   if (!force && state.latestInsight?.generated_at && Date.now() - new Date(state.latestInsight.generated_at).getTime() < 86_400_000 && state.checkIn.status !== "completed") return state.latestInsight;
-  const latestVersion = await db.from("wellness_insights").select("version").eq("user_id", userId).eq("partner_key", PARTNER_KEY).order("version", { ascending: false }).limit(1).maybeSingle();
-  const version = (latestVersion.data?.version ?? 0) + 1;
-  const pending = await db.from("wellness_insights").insert({ user_id: userId, partner_key: PARTNER_KEY, version, framework_version: state.partner.frameworkVersion, prompt_version: state.partner.promptVersion, source_fingerprint: sourceFingerprint, source_kinds: assembled.sourceKinds, status: "generating", model: MODEL }).select("id").single();
+  let pending;
+  if (existingAttempt.data) {
+    pending = await db.from("wellness_insights").update({ status: "generating", insight: null, safety_flags: [], duration_ms: null, error_code: null, model: MODEL }).eq("id", existingAttempt.data.id).select("id").single();
+  } else {
+    const latestVersion = await db.from("wellness_insights").select("version").eq("user_id", userId).eq("partner_key", PARTNER_KEY).order("version", { ascending: false }).limit(1).maybeSingle();
+    if (latestVersion.error) throw latestVersion.error;
+    const version = (latestVersion.data?.version ?? 0) + 1;
+    pending = await db.from("wellness_insights").insert({ user_id: userId, partner_key: PARTNER_KEY, version, framework_version: state.partner.frameworkVersion, prompt_version: state.partner.promptVersion, source_fingerprint: sourceFingerprint, source_kinds: assembled.sourceKinds, status: "generating", model: MODEL }).select("id").single();
+  }
   if (pending.error) throw pending.error;
   const started = Date.now();
   try {
