@@ -27,3 +27,6 @@ supabase/.temp/
 
 # Cursor agent worktrees (local-only, embedded git repos)
 .claude/worktrees/
+
+# Local Skill evaluation runs and generated review pages
+health-vault-workspace/
