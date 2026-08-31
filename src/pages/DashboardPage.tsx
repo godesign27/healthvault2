@@ -17,7 +17,7 @@ import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
 import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
-import { WellnessPage } from './WellnessPage';
+import { WellnessPage, type WellnessTab } from './WellnessPage';
 import { NourishedRebelInsights } from '../components/wellness/NourishedRebelInsights';
 
 interface DashboardPageProps {
@@ -63,6 +63,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
   });
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const [assistantWellnessInsightId, setAssistantWellnessInsightId] = useState<string | null>(null);
+  const [wellnessInitialTab, setWellnessInitialTab] = useState<WellnessTab>('diet');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
@@ -302,7 +303,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     if (currentPage === 'wellness') {
-      return <WellnessPage onOpenAssistant={(insightId) => { setAssistantWellnessInsightId(insightId ?? null); setIsAIPanelOpen(true); }} />;
+      return <WellnessPage initialTab={wellnessInitialTab} onOpenAssistant={(insightId) => { setAssistantWellnessInsightId(insightId ?? null); setIsAIPanelOpen(true); }} />;
     }
 
     if (currentPage === 'vitals') {
@@ -386,8 +387,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:gap-6">
-          <div className="md:col-span-6 lg:col-span-12">
-            <NourishedRebelInsights compact onAsk={(insightId) => { setAssistantWellnessInsightId(insightId); setCurrentPage('wellness'); setIsAIPanelOpen(true); }} />
+          <div className="md:col-span-2 lg:col-span-3">
+            <NourishedRebelInsights compact onOpen={() => { setWellnessInitialTab('insights'); setCurrentPage('wellness'); }} onAsk={(insightId) => { setAssistantWellnessInsightId(insightId); setCurrentPage('wellness'); setIsAIPanelOpen(true); }} />
           </div>
           {/* Medical ID Card - Takes 2/3 width on medium, 1/2 on large */}
           <div className="md:col-span-4 lg:col-span-6 lg:row-span-2">
@@ -558,6 +559,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       <DashboardSidebar
         onViewChange={onViewChange}
         onPageChange={(page) => {
+          if (page === 'wellness') setWellnessInitialTab('diet');
           setCurrentPage(page);
           setIsMobileMenuOpen(false);
         }}

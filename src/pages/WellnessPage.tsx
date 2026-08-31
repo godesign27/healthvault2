@@ -18,7 +18,7 @@ import { Dialog } from '../components/ui/Dialog';
 import { NourishedRebelInsights } from '../components/wellness/NourishedRebelInsights';
 import { requestWellnessRefresh } from '../lib/wellness-insights';
 
-type WellnessTab = 'insights' | 'diet' | 'signals';
+export type WellnessTab = 'insights' | 'diet' | 'signals';
 type MealFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink' | 'other';
 
 type DietItem = { name?: string; amount?: string | null; notes?: string | null };
@@ -109,10 +109,11 @@ function Rating({ label, value, inverse = false }: { label: string; value: numbe
 
 interface WellnessPageProps {
   onOpenAssistant: (insightId?: string) => void;
+  initialTab?: WellnessTab;
 }
 
-export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
-  const [tab, setTab] = useState<WellnessTab>('insights');
+export function WellnessPage({ onOpenAssistant, initialTab = 'diet' }: WellnessPageProps) {
+  const [tab, setTab] = useState<WellnessTab>(initialTab);
   const [mealFilter, setMealFilter] = useState<MealFilter>('all');
   const [dietEntries, setDietEntries] = useState<DietEntry[]>([]);
   const [lifeSignals, setLifeSignals] = useState<LifeSignal[]>([]);
@@ -250,14 +251,6 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         <div className="mb-7 flex items-center gap-1 border-b border-stroke-subtle" role="tablist" aria-label="Wellness sections">
           <button
             role="tab"
-            aria-selected={tab === 'insights'}
-            onClick={() => setTab('insights')}
-            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${tab === 'insights' ? 'border-action-primary text-action-primary' : 'border-transparent text-content-secondary hover:text-content-primary'}`}
-          >
-            <Leaf className="h-4 w-4" /> Insights
-          </button>
-          <button
-            role="tab"
             aria-selected={tab === 'diet'}
             onClick={() => setTab('diet')}
             className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${tab === 'diet' ? 'border-action-primary text-action-primary' : 'border-transparent text-content-secondary hover:text-content-primary'}`}
@@ -271,6 +264,14 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${tab === 'signals' ? 'border-action-primary text-action-primary' : 'border-transparent text-content-secondary hover:text-content-primary'}`}
           >
             <Activity className="h-4 w-4" /> Life Signals
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'insights'}
+            onClick={() => setTab('insights')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${tab === 'insights' ? 'border-action-primary text-action-primary' : 'border-transparent text-content-secondary hover:text-content-primary'}`}
+          >
+            <Leaf className="h-4 w-4" /> Nourished Rebel Insights
           </button>
           {tab !== 'insights' && <button onClick={() => void loadWellness()} className="ml-auto rounded-lg p-2 text-content-tertiary transition-colors hover:bg-action-secondary hover:text-content-primary" aria-label="Refresh wellness entries">
             <RefreshCw className="h-4 w-4" />

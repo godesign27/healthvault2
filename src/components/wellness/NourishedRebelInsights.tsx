@@ -58,7 +58,7 @@ function InsightBody({ row, onAsk }: { row: WellnessInsightRow; onAsk: (id: stri
   );
 }
 
-export function NourishedRebelInsights({ compact = false, onAsk }: { compact?: boolean; onAsk: (insightId: string) => void }) {
+export function NourishedRebelInsights({ compact = false, onAsk, onOpen }: { compact?: boolean; onAsk: (insightId: string) => void; onOpen?: () => void }) {
   const [state, setState] = useState<WellnessState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -77,11 +77,38 @@ export function NourishedRebelInsights({ compact = false, onAsk }: { compact?: b
     void trackWellnessEvent('check_in_started', { surface: compact ? 'dashboard' : 'wellness' });
   };
   const save = async (skipped = false) => { const key = CHECK_IN_QUESTION_KEYS[questionIndex]; if (!skipped && !answer.trim()) return; setSaving(true); try { const next = await saveWellnessAnswer(key, skipped ? null : answer.trim(), skipped); setState(next); const following = CHECK_IN_QUESTION_KEYS.findIndex((candidate, index) => index > questionIndex && !next.checkIn?.answers?.[candidate] && !next.checkIn?.skipped_questions?.includes(candidate)); if (following < 0) setCheckInOpen(false); else { setQuestionIndex(following); setAnswer(''); } } catch (e) { setError(e instanceof Error ? e.message : 'Unable to save answer.'); } finally { setSaving(false); } };
-  if (loading) return <div className="h-48 animate-pulse rounded-xl bg-surface-sunken" aria-label="Loading Nourished Rebel Insights" />;
+  if (loading) return <div className={`${compact ? 'h-32' : 'h-48'} animate-pulse rounded-xl bg-surface-sunken`} aria-label="Loading Nourished Rebel Insights" />;
   if (error && !state) return <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>;
   if (!state?.partner?.cloudEnabled || state.partner.status !== 'active') return null;
   if (compact && state.enrollment?.snoozed_until && new Date(state.enrollment.snoozed_until).getTime() > Date.now()) return null;
   const row = state.enrollment?.active ? state.latestInsight : null;
+  if (compact) {
+    const pillars = row ? Object.values(row.insight.pillars) : [];
+    const strongCount = pillars.filter((pillar) => pillar.status === 'strong').length;
+    const supportCount = pillars.length - strongCount;
+    const firstSnapshotPoint = row?.insight.snapshot.match(/[^.!?]+[.!?]+|[^.!?]+$/)?.[0]?.trim();
+    return (
+      <section className="rounded-xl border border-stroke-subtle bg-surface-raised p-4" aria-labelledby="nourished-rebel-moment-title">
+        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-action-primary"><Leaf className="h-3.5 w-3.5" /> Nourished Rebel Insights</p>
+        <h2 id="nourished-rebel-moment-title" className="mt-2 text-base font-semibold text-content-primary">{row ? 'Your latest wellness moment' : state.checkIn?.answered_count ? 'Your check-in is in progress' : 'A quick wellness check-in'}</h2>
+        {row ? (
+          <>
+            <p className="mt-2 line-clamp-2 text-sm leading-5 text-content-secondary">{firstSnapshotPoint}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {strongCount > 0 && <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-800">{strongCount} strong</span>}
+              {supportCount > 0 && <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-900">{supportCount} to support</span>}
+            </div>
+            <button onClick={() => onOpen ? onOpen() : onAsk(row.id)} className="mt-4 text-sm font-semibold text-action-primary hover:underline">View in Wellness</button>
+          </>
+        ) : (
+          <>
+            <p className="mt-2 text-sm leading-5 text-content-secondary">Six optional questions create a personalized wellness snapshot.</p>
+            <button onClick={() => void openCheckIn()} className="mt-4 text-sm font-semibold text-action-primary hover:underline">{state.checkIn?.answered_count ? `Resume · ${state.checkIn.answered_count} of 6` : 'Start the 2-minute check-in'}</button>
+          </>
+        )}
+      </section>
+    );
+  }
   return (
     <section className={`rounded-2xl border border-stroke-subtle bg-surface-raised ${compact ? 'p-5' : 'p-6'}`} aria-labelledby="nourished-rebel-title">
       <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-action-primary"><Leaf className="h-4 w-4" /> Nourished Rebel · Wellness Insights</p><h2 id="nourished-rebel-title" className="mt-2 text-xl font-semibold text-content-primary">{row ? "Here's where things stand" : state.checkIn?.answered_count ? 'Pick up where you left off' : 'Your wellness insights are waiting'}</h2></div>{!compact && state.enrollment?.active && <button onClick={() => void optOutWellness().then(load)} className="text-xs font-medium text-content-tertiary hover:text-content-primary">Turn off insights</button>}</div>
