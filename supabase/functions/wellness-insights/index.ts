@@ -110,16 +110,16 @@ const outputSchema = {
     type: "object", additionalProperties: false,
     required: ["snapshot","pillars","topPriorities","startingPoints","followUpRecommended","ctaRelevant","disclaimer"],
     properties: {
-      snapshot: { type: "string" },
+      snapshot: { type: "string", minLength: 1, maxLength: 1200 },
       pillars: {
         type: "object", additionalProperties: false, required: ["sleep","blood_sugar","nourishment","stress"],
         properties: Object.fromEntries(["sleep","blood_sugar","nourishment","stress"].map((key) => [key, {
           type: "object", additionalProperties: false, required: ["status","summary","contributingFactors","suggestions"],
-          properties: { status: { enum: ["strong","needs_support","significant_opportunity"] }, summary: { type: "string" }, contributingFactors: { type: "array", items: { type: "string" } }, suggestions: { type: "array", items: { type: "string" } } },
+          properties: { status: { type: "string", enum: ["strong","needs_support","significant_opportunity"] }, summary: { type: "string", minLength: 1, maxLength: 1200 }, contributingFactors: { type: "array", items: { type: "string", maxLength: 500 }, maxItems: 8 }, suggestions: { type: "array", items: { type: "string", maxLength: 500 }, minItems: 1, maxItems: 5 } },
         }])),
       },
-      topPriorities: { type: "array", items: { type: "string" } }, startingPoints: { type: "array", items: { type: "string" } },
-      followUpRecommended: { type: "boolean" }, ctaRelevant: { type: "boolean" }, disclaimer: { type: "string" },
+      topPriorities: { type: "array", items: { type: "string", maxLength: 500 }, minItems: 1, maxItems: 4 }, startingPoints: { type: "array", items: { type: "string", maxLength: 500 }, minItems: 1, maxItems: 5 },
+      followUpRecommended: { type: "boolean" }, ctaRelevant: { type: "boolean" }, disclaimer: { type: "string", minLength: 1, maxLength: 500 },
     },
   },
 };
@@ -150,7 +150,14 @@ async function generateInsight(db: any, userId: string, body: ActionBody, force 
     const completion = await response.json();
     const raw = JSON.parse(completion.choices?.[0]?.message?.content ?? "{}");
     raw.provenance = { frameworkVersion: state.partner.frameworkVersion, promptVersion: state.partner.promptVersion, generatedAt: new Date().toISOString(), sourceKinds: assembled.sourceKinds };
-    const insight = WellnessInsightSchema.parse(raw);
+    const parsedInsight = WellnessInsightSchema.safeParse(raw);
+    if (!parsedInsight.success) {
+      const paths = [...new Set(parsedInsight.error.issues.map((issue) => issue.path.join(".") || "root"))].slice(0, 8);
+      console.error("Wellness insight contract validation failed", { insightId: pending.data.id, paths });
+      await db.from("wellness_insights").update({ status: "failed", duration_ms: Date.now() - started, error_code: "contract_validation_failed" }).eq("id", pending.data.id).eq("status", "generating");
+      throw new Error("The wellness insight could not be finalized. Please try generating it again.");
+    }
+    const insight = parsedInsight.data;
     if (containsUnsafeWellnessLanguage(insight)) {
       await db.from("wellness_insights").update({ status: "rejected", safety_flags: ["unsafe_language"], duration_ms: Date.now() - started, error_code: "safety_rejected" }).eq("id", pending.data.id);
       await recordEvent(db, userId, body, "safety_rejected", { source: "generator" });

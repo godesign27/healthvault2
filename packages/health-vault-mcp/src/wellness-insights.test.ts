@@ -6,6 +6,7 @@ import {
   answeredQuestionCount,
   containsUnsafeWellnessLanguage,
 } from "../../wellness-contracts/src/index.ts";
+import { NOURISHED_REBEL_WIDGET_HTML } from "./nourished-rebel.ts";
 
 test("the partner check-in has six stable questions", () => {
   assert.deepEqual(CHECK_IN_QUESTION_KEYS, [
@@ -37,4 +38,11 @@ test("safety screening rejects diagnoses and medication direction", () => {
   assert.equal(containsUnsafeWellnessLanguage("This means you have diabetes."), true);
   assert.equal(containsUnsafeWellnessLanguage("Stop taking your medication."), true);
   assert.equal(containsUnsafeWellnessLanguage("A regular breakfast may support steadier energy."), false);
+});
+
+test("the Nourished Rebel widget uses the approved URL and a prominent question heading", () => {
+  assert.match(NOURISHED_REBEL_WIDGET_HTML, /https:\/\/nourishedrebel\.com\//);
+  assert.doesNotMatch(NOURISHED_REBEL_WIDGET_HTML, /https:\/\/nurishedrebel\.com\//);
+  assert.match(NOURISHED_REBEL_WIDGET_HTML, /class="question-label"/);
+  assert.match(NOURISHED_REBEL_WIDGET_HTML, /Question '\+current\+' of 6/);
 });
