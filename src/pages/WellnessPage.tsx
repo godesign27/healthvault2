@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Droplets,
   MessageCircle,
+  Leaf,
   Pencil,
   Plus,
   RefreshCw,
@@ -17,7 +18,7 @@ import { Dialog } from '../components/ui/Dialog';
 import { NourishedRebelInsights } from '../components/wellness/NourishedRebelInsights';
 import { requestWellnessRefresh } from '../lib/wellness-insights';
 
-type WellnessTab = 'diet' | 'signals';
+type WellnessTab = 'insights' | 'diet' | 'signals';
 type MealFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink' | 'other';
 
 type DietItem = { name?: string; amount?: string | null; notes?: string | null };
@@ -111,7 +112,7 @@ interface WellnessPageProps {
 }
 
 export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
-  const [tab, setTab] = useState<WellnessTab>('diet');
+  const [tab, setTab] = useState<WellnessTab>('insights');
   const [mealFilter, setMealFilter] = useState<MealFilter>('all');
   const [dietEntries, setDietEntries] = useState<DietEntry[]>([]);
   const [lifeSignals, setLifeSignals] = useState<LifeSignal[]>([]);
@@ -242,15 +243,19 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-hv-button bg-action-primary px-4 py-2.5 text-sm font-semibold text-content-on-action transition-colors hover:bg-action-primary-hover active:translate-y-px"
           >
             <Plus className="h-4 w-4" />
-            {tab === 'diet' ? 'Log a meal' : 'Start check-in'}
+            {tab === 'insights' ? 'Ask about my insights' : tab === 'diet' ? 'Log a meal' : 'Start check-in'}
           </button>
         </div>
 
-        <div className="mb-8">
-          <NourishedRebelInsights onAsk={(insightId) => onOpenAssistant(insightId)} />
-        </div>
-
         <div className="mb-7 flex items-center gap-1 border-b border-stroke-subtle" role="tablist" aria-label="Wellness sections">
+          <button
+            role="tab"
+            aria-selected={tab === 'insights'}
+            onClick={() => setTab('insights')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${tab === 'insights' ? 'border-action-primary text-action-primary' : 'border-transparent text-content-secondary hover:text-content-primary'}`}
+          >
+            <Leaf className="h-4 w-4" /> Insights
+          </button>
           <button
             role="tab"
             aria-selected={tab === 'diet'}
@@ -267,9 +272,9 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
           >
             <Activity className="h-4 w-4" /> Life Signals
           </button>
-          <button onClick={() => void loadWellness()} className="ml-auto rounded-lg p-2 text-content-tertiary transition-colors hover:bg-action-secondary hover:text-content-primary" aria-label="Refresh wellness entries">
+          {tab !== 'insights' && <button onClick={() => void loadWellness()} className="ml-auto rounded-lg p-2 text-content-tertiary transition-colors hover:bg-action-secondary hover:text-content-primary" aria-label="Refresh wellness entries">
             <RefreshCw className="h-4 w-4" />
-          </button>
+          </button>}
         </div>
 
         {error && (
@@ -279,7 +284,9 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
           </div>
         )}
 
-        {loading ? (
+        {tab === 'insights' ? (
+          <NourishedRebelInsights onAsk={(insightId) => onOpenAssistant(insightId)} />
+        ) : loading ? (
           <div className="space-y-3" aria-label="Loading wellness entries">
             {[1, 2, 3].map((item) => <div key={item} className="h-28 animate-pulse rounded-xl bg-surface-sunken" />)}
           </div>
@@ -393,13 +400,13 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
           </div>
         )}
 
-        <div className="mt-10 flex items-center justify-between border-t border-stroke-subtle pt-5 text-xs text-content-tertiary">
+        {tab !== 'insights' && <div className="mt-10 flex items-center justify-between border-t border-stroke-subtle pt-5 text-xs text-content-tertiary">
           <span>Showing the most recent 7 days</span>
           <div className="flex items-center gap-1" aria-label="Date range navigation coming soon">
             <button disabled className="rounded p-1 opacity-40"><ChevronLeft className="h-4 w-4" /></button>
             <button disabled className="rounded p-1 opacity-40"><ChevronRight className="h-4 w-4" /></button>
           </div>
-        </div>
+        </div>}
       </div>
 
       <Dialog

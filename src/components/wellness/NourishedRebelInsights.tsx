@@ -20,6 +20,7 @@ const statusStyle: Record<string, string> = {
 
 function InsightBody({ row, onAsk }: { row: WellnessInsightRow; onAsk: (id: string) => void }) {
   const insight = row.insight;
+  const snapshotPoints = insight.snapshot.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((item) => item.trim()).filter(Boolean) ?? [insight.snapshot];
   const [feedback, setFeedback] = useState<string | null>(null);
   const openPartnerSite = () => {
     const popup = window.open('about:blank', '_blank', 'noopener,noreferrer');
@@ -28,7 +29,9 @@ function InsightBody({ row, onAsk }: { row: WellnessInsightRow; onAsk: (id: stri
   const rate = async (rating: 'up' | 'down') => { await sendWellnessFeedback(row.id, 'headline', rating); setFeedback(rating); };
   return (
     <>
-      <p className="text-base leading-7 text-content-secondary">{insight.snapshot}</p>
+      <ul className="space-y-2 pl-5 text-base leading-7 text-content-secondary">
+        {snapshotPoints.map((point) => <li key={point} className="list-disc pl-1 marker:text-action-primary">{point}</li>)}
+      </ul>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {Object.entries(insight.pillars).map(([key, pillar]) => (
           <section key={key} className="rounded-xl border border-stroke-subtle bg-surface-raised p-4">
