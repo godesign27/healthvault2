@@ -31,6 +31,7 @@
     "admin:dev": "npm run dev -w @health-vault/admin",
     "admin:build": "npm run build -w @health-vault/admin",
     "admin:typecheck": "npm run typecheck -w @health-vault/admin",
+    "admin:deploy": "npm run deploy -w @health-vault/admin",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

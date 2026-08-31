@@ -1,4 +1,4 @@
-import { X, Upload, Mail, Calendar, Shield, Bell, Globe, User, LogOut } from 'lucide-react';
+import { X, Upload, Mail, Calendar, Shield, Bell, Globe, User, LogOut, Building2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -492,6 +492,16 @@ export function ProfileSettingsDrawer({
               <p className={`text-sm font-medium ${
                 'text-content-primary'
               }`}>{memberSince || '—'}</p>
+            </div>
+          </div>
+
+          <div className={`rounded-lg border p-6 ${darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'}`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-indigo-50 p-2.5"><Building2 className="h-5 w-5 text-indigo-600" /></div>
+                <div><h3 className="text-sm font-semibold text-content-primary">Connected providers</h3><p className="mt-0.5 text-xs text-content-secondary">Review provider access and withdraw a connection you previously accepted.</p></div>
+              </div>
+              <button type="button" onClick={() => { window.location.href = '/connected-providers'; }} className="rounded-lg border border-stroke-default px-4 py-2.5 text-sm font-semibold text-content-primary hover:bg-surface-sunken">Manage access</button>
             </div>
           </div>
 

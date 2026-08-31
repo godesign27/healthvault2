@@ -350,7 +350,7 @@ this audit (demo UUIDs, dual backends, tool/schema mismatches, missing tools).
 
 ---
 
-_Last updated: 2026-08-27_
+_Last updated: 2026-08-29_
 ## 9. Admin Intelligence Platform
 
 - [x] Scaffold dedicated `apps/admin` workspace and protected application shell.
@@ -384,3 +384,147 @@ _Last updated: 2026-08-27_
 - [ ] Run release evaluations against a synthetic tenant and meet Phase 4 thresholds.
 - [ ] Add PHI-minimized telemetry, per-capability kill switches, and incident instructions before a Claude pilot.
 - [ ] Decide private pilot versus downloadable or marketplace distribution.
+- [x] Additive M1 provider security foundation: canonical provider accounts/memberships,
+      practitioner profiles and panels, provider-managed patient identities, explicit
+      identity links/access grants, append-only audit envelope, and fail-closed access contracts.
+- [x] Add the first server-side provider administration API: active tenant resolution,
+      safe membership listing, server-owned role templates, bounded role delegation, and
+      immutable success/denial/failure audit events. Direct client mutations remain revoked.
+- [x] Add provider invitation records plus guarded membership activation/suspension/removal,
+      last-owner protection, self-lockout prevention, and recent AAL2 checks for role and
+      lifecycle mutations. Invitation email delivery remains a separate integration step.
+- [x] Build a locally reviewable Provider Directory and Memberships interface with explicit
+      synthetic-data labeling, roster-only fields, lifecycle summaries, search/status filters,
+      and disabled mutations until the provider API, MFA, and acceptance flow are deployed.
+- [x] Add atomic invitation acceptance with verified-email matching, verified TOTP enrollment,
+      AAL2 enforcement, provider/invitation lifecycle checks, and immutable success auditing.
+- [x] Add a provider-facing invitation route with sign-in gating, verified-email handling,
+      TOTP enrollment, AAL2 challenge, role review, and explicit invitation acceptance.
+- [x] Add passwordless invitation email delivery and account provisioning through Supabase Auth,
+      invitation-specific redirect validation, delivery-state tracking, and rate-limited resend.
+- [x] Apply the three provider migrations and deploy JWT-protected `provider-admin-api` and
+      `provider-invitation-api` to the connected Health Vault Supabase project.
+- [x] Seed an active synthetic Health Vault Demo Provider and link the approved existing
+      `godesigngo@aol.com` Auth identity as its organization owner without changing credentials.
+- [x] Define `health_vault_roster_csv_v1`, deploy protected import staging/reconciliation and
+      rollback support, and load 100 validated roster-only MITRE Synthea patients into the demo
+      provider with provenance, idempotency, synthetic labeling, and immutable auditing.
+- [x] Add the provider-facing roster upload/preview/exception-review UI and Edge Function with
+      server revalidation, idempotent protected staging, explicit commit, history, and rollback.
+- [x] Add a canonical `/provider` workspace with verified-email, TOTP/AAL2, active tenant and
+      permission gates, organization overview, and searchable read-only synthetic roster view.
+- [ ] Set/verify `APP_URL`, allow the provider invitation redirect in Supabase Auth, and verify
+      the live email-to-MFA-to-acceptance round trip.
+- [x] Replace Provider Operations fixtures with a dedicated deployed platform-admin API and
+      enable invite/resend controls behind `providers.manage` plus recent AAL2.
+- [x] Add provider-owned practitioner panel management: automatic unverified practitioner
+      profiles, membership lifecycle synchronization, verified-credential and tenant gates,
+      roster assignment/revocation, grant-status visibility, and explicit separation from
+      patient consent/access grants.
+- [x] Add provider-facing Practitioner invitations, pending/accepted member visibility,
+      resend controls, and an explicit fresh-MFA challenge for protected mutations.
+- [x] Add a platform-admin professional verification workflow so an authorized reviewer can
+      move practitioner credentials through pending/verified/rejected/expired states with
+      evidence references and immutable auditing.
+- [x] Scale practitioner credential review for operational queues: summary counts, identity and
+      identifier search, credential-status filtering, 25-row pagination, page-aware persistent
+      checkbox selection, and confirmed bulk decisions with shared evidence and feedback.
+- [x] Complete the provider-operations UX/UI audit: dismissible pilot and verified-session notices,
+      secondary utility actions, interactive summary filters, sortable review columns,
+      indeterminate page selection, sticky/scannable bulk and table states, tokenized feedback
+      colors, accessible focus/touch behavior, reduced-motion support, and a compact tablet shell.
+- [x] Add the synthetic-pilot patient identity and consent workflow: provider-created,
+      roster-email-matched invitations; explicit patient accept/decline; atomic identity-link
+      and time-limited roster-demographics grant creation; and practitioner authorization that
+      requires the assignment, active identity link, and matching active grant.
+- [ ] Obtain Privacy/Legal approval for production patient-link consent language, evidence,
+      audit retention, revocation behavior, and practitioner-visible field scope before removing
+      the synthetic-only gate.
+- [x] Add service-only, tenant-scoped patient invitation digest delivery jobs with recipient
+      deduplication, queued/sent/failed/cancelled lifecycle state, provider retry/cancel controls,
+      bounded indexes, and immutable provider audit events.
+- [ ] Onboard and authenticate a transactional sender domain, configure the external email
+      service secrets, and activate the queued digest processor; do not mark jobs sent before the
+      provider returns a delivered or queued result.
+- [x] Add the practitioner-facing assigned-patient workspace with verified-profile enforcement
+      and server-side intersection of active assignment, active identity link, and matching
+      unexpired access grant; expose roster demographics only and audit every view.
+- [x] Expose atomic patient-controlled provider-access withdrawal with an active linked-identity
+      ownership check enforced inside the database transaction. Providers cannot call this path
+      or revoke patient-owned identity/access; Health Vault super-admin intervention is exposed
+      separately to `platform_owner` only with fresh MFA, a required reason, and immutable audit.
+- [x] Reconcile elapsed patient access grants and invitations into explicit expired lifecycle
+      states without revoking patient-owned identity links; allow renewed consent to reuse only
+      the same authenticated patient's established identity link.
+- [x] Make the synthetic patient invitation round trip locally reviewable with deterministic
+      newest-lifecycle selection, full-roster counts, pending-only Open review / Copy link actions,
+      and visible clipboard confirmation without bypassing provider MFA.
+- [x] Capture immutable, versioned synthetic consent receipts atomically when a patient accepts,
+      including scope, purpose, grant period, verified-email evidence, request ID, and patient/
+      provider identity references; expose receipts only through patient-owned and platform-owner
+      read models while retaining the production Privacy/Legal gate.
+- [x] Replace the Provider Directory's placeholder connection count with a fail-closed live metric
+      requiring an active roster identity, active patient-owned identity link, and matching active,
+      effective, unexpired grant for the same consumer; deduplicate lifecycle rows.
+- [x] Add benefit-first patient invitation language aligned to the HealthVault.me narrative,
+      clearly separate the ownership promise from consent, and version the materially changed
+      synthetic consent statement as `health-vault-synthetic-pilot-access-v2`.
+- [x] Show a server-derived invitation package summary, route successful acceptance to the
+      Health Vault dashboard, and bootstrap roster demographics only when no patient-owned
+      profile exists; never overwrite an established profile.
+- [x] Establish a synthetic-only provider clinical package quarantine with provenance,
+      idempotent source digests, normalized resource categories, revoked browser access, and
+      live validated-package counts on patient invitations.
+- [x] Add provider-facing clinical JSON staging and validation with strict schema checks,
+      fresh-MFA protection, duplicate digest detection, package history/counts, and a synthetic
+      demo fixture; validation does not release records into a patient-owned vault.
+- [x] Expand clinical staging to one bulk JSON upload for up to 250 roster patients and 5,000
+      resources in the interactive pilot, while preserving a separate quarantine package and
+      provenance trail per patient; document private resumable storage and async processing as
+      the required production path for larger exports.
+- [x] Consolidate patient navigation: label the primary workspace `Patients`, remove the separate
+      roster-import tab, and expose CSV roster operations through an `Import patients` CTA and
+      right-side `Patient roster import` drawer.
+- [x] Add identity-safe, consent-bound release of validated clinical packages into the patient
+      vault; require explicit v3 clinical consent, an active matching link/grant, and exact roster
+      name/date-of-birth matching so shared demo email addresses cannot authorize cross-patient
+      clinical attachment.
+- [x] Add a provider security-activity timeline gated by `provider_audit.read`, with bounded,
+      sanitized operational evidence, search/outcome filters, and no raw metadata or clinical data.
+- [x] Add centralized platform-owner MFA recovery for any Health Vault identity, including
+      provider owners, practitioners, and patients, with exact-email lookup and confirmation,
+      fresh admin AAL2, required reason, self-reset prevention, session invalidation, supported
+      Supabase Admin factor deletion, and immutable audit evidence.
+- [x] Add bulk practitioner CSV import for 1–2,000 rows with client and server validation,
+      duplicate pending-invitation reconciliation, queued delivery, imported specialty and
+      identifier metadata, unverified credential state, immutable audit evidence, and no
+      inferred practitioner-to-patient access.
+- [x] Scale the provider practitioner directory for bulk imports with pending/active/attention
+      metrics, name/email/specialty/source search, lifecycle filters, 25-row pagination, CSV
+      provenance labels, and bounded delivery-status visibility.
+- [x] Add provider-controlled cancellation for individual pending practitioner invitations and
+      immutable CSV import batches, with exact tenant/batch scoping, fresh MFA, `members.manage`,
+      confirmation UX, accepted-membership protection, indexed lookup, and immutable auditing.
+- [x] Expose accepted-practitioner lifecycle controls in the provider directory: suspend active
+      access, reactivate suspended access, and remove only after suspension, using the existing
+      fresh-MFA and tenant-authorized member-status endpoint while preserving the practitioner’s
+      independent Health Vault identity and account.
+- [x] Add bulk practitioner-panel CSV assignment for 1–2,000 rows with a downloadable template,
+      local preview, exact practitioner-email and provider-patient-number resolution, active and
+      verified same-tenant enforcement, duplicate reconciliation, fresh MFA, bounded auditing,
+      and no implied patient consent, access grant, or clinical visibility.
+- [x] Scale the platform Patient Access workspace with lifecycle summary filters, consent-aware
+      search, sortable columns, 25-row pagination, full consent evidence review, responsive table
+      containment, and an explicit acknowledgment plus confirmation before individual super-admin
+      termination; preserve the patient-owned profile and prohibit bulk termination.
+- [x] Add a persistent desktop collapse control to the platform admin sidebar, reducing it to an
+      accessible icon rail with hover/focus labels while preserving the horizontal small-screen
+      navigation and full sign-out/product semantics.
+- [x] Add a persistent admin light/dark appearance control using the shared semantic token system,
+      operating-system preference on first use, corrected dark feedback contrast, and full support
+      in both expanded and collapsed navigation states.
+- [x] Audit and explicitly migrate legacy `organizations`, `organization_admins`, and
+      `organization_patients`: three empty seeded organizations now map to draft provider
+      accounts with immutable audit evidence; any legacy memberships are suspended without
+      permissions and legacy patient assignments are quarantined roster identities, with no
+      inferred practitioner role, identity link, consent, or provider access grant.

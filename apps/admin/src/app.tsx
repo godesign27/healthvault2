@@ -38,11 +38,15 @@ export default function App() {
   }
   if (route.kind === 'wellness-partners' && !canAccessWellnessPartners(sessionState.assignments)) return <StatePanel title="Wellness partner access denied" description="Your administrator role does not include Wellness Partners." />;
 
+  if (route.kind === 'providers' && ['patient-access', 'mfa-recovery'].includes(route.section) && !sessionState.assignments.some((assignment) => assignment.roleKey === 'platform_owner')) {
+    return <StatePanel title="Health Vault super-admin access required" description="Patient access intervention is reserved for the normalized platform owner role." />;
+  }
+
   return (
     <AdminShell assignments={sessionState.assignments}>
       {route.kind === 'product' && route.productKey === 'gpt_app' && <GptAppPage section={route.section} />}
       {route.kind === 'product' && route.productKey === 'saas_cloud' && <StatePanel title="SaaS Cloud analytics" description="Nourished Rebel site events are available from Wellness Partners; broader SaaS analytics remain intentionally separate." />}
-      {route.kind === 'providers' && <ProviderOperationsPage section={route.section} />}
+      {route.kind === 'providers' && <ProviderOperationsPage section={route.section} isPlatformOwner={sessionState.assignments.some((assignment) => assignment.roleKey === 'platform_owner')} />}
       {route.kind === 'wellness-partners' && <WellnessPartnersPage section={route.section} />}
     </AdminShell>
   );

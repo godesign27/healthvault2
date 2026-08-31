@@ -4,5 +4,13 @@
   "private": true,
   "type": "module",
   "main": "src/index.ts",
-  "types": "src/index.ts"
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "tsx --test src/*.test.ts ../../supabase/functions/provider-admin-api/*.test.ts ../../supabase/functions/platform-admin-provider-api/*.test.ts ../../supabase/functions/provider-invitation-api/*.test.ts ../../supabase/functions/patient-provider-access-api/*.test.ts ../../apps/admin/src/features/providers/*.test.ts ../../src/lib/provider-*.test.ts ../../src/lib/patient-*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.5.3"
+  }
 }

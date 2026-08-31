@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "health_vault_clinical_json_v1",
+  "synthetic": true,
+  "patient": {
+    "organizationPatientNumber": "HV-DEMO-0058"
+  },
+  "resources": [
+    {
+      "type": "health_record",
+      "externalId": "encounter-0058-2026-07-14",
+      "title": "Annual wellness visit",
+      "occurredAt": "2026-07-14T15:30:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Synthetic annual wellness encounter for demonstration only.",
+        "status": "completed"
+      }
+    },
+    {
+      "type": "lab",
+      "externalId": "lab-0058-cbc-2026-07-14",
+      "title": "Complete blood count",
+      "occurredAt": "2026-07-14T16:10:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Synthetic CBC panel",
+        "status": "final",
+        "resultCount": 8
+      }
+    },
+    {
+      "type": "lab",
+      "externalId": "lab-0058-lipid-2026-07-14",
+      "title": "Lipid panel",
+      "occurredAt": "2026-07-14T16:12:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Synthetic lipid panel",
+        "status": "final",
+        "resultCount": 4
+      }
+    },
+    {
+      "type": "medication",
+      "externalId": "medication-0058-001",
+      "title": "Synthetic maintenance medication",
+      "occurredAt": "2026-07-14T15:45:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "status": "active",
+        "note": "Demonstration record; not a prescription or medical advice."
+      }
+    },
+    {
+      "type": "condition",
+      "externalId": "condition-0058-001",
+      "title": "Synthetic historical condition",
+      "occurredAt": "2024-02-11T09:00:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "clinicalStatus": "resolved",
+        "verificationStatus": "confirmed"
+      }
+    },
+    {
+      "type": "allergy",
+      "externalId": "allergy-0058-001",
+      "title": "Synthetic environmental allergy",
+      "occurredAt": "2021-05-03T12:00:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "clinicalStatus": "active",
+        "criticality": "low"
+      }
+    },
+    {
+      "type": "immunization",
+      "externalId": "immunization-0058-2025-001",
+      "title": "Synthetic seasonal immunization",
+      "occurredAt": "2025-10-02T18:20:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "status": "completed"
+      }
+    },
+    {
+      "type": "vital",
+      "externalId": "vital-0058-2026-07-14",
+      "title": "Visit vital signs",
+      "occurredAt": "2026-07-14T15:25:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Synthetic vital-sign set",
+        "measurementCount": 4
+      }
+    }
+  ]
+}

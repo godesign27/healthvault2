@@ -153,8 +153,13 @@ All backend logic runs as Deno-based Edge Functions. There is no Express server.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Injected automatically by Supabase runtime |
 | `OPENAI_API_KEY` | No | OpenAI key for AI record summaries and assistant (`sk-...`) |
 | `KERAGON_WEBHOOK_URL` | No | Keragon webhook endpoint for EHR sync |
-| `APP_URL` | No | Canonical app URL (default: `https://healthvault.me`) |
+| `APP_URL` | Conditional | Canonical HTTPS app URL. Required by provider invitation delivery; some legacy functions retain their own defaults. |
 | `NODE_ENV` | No | `development` / `test` / `production` |
+
+Provider invitation emails use Supabase passwordless authentication so the same link can sign
+in an existing provider or provision a new provider account. Add
+`$APP_URL/provider/invitations/**` to the Supabase Auth redirect allowlist before enabling live
+invitations. The acceptance route still requires a verified email, TOTP enrollment, and AAL2.
 
 ---
 

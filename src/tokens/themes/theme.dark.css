@@ -35,6 +35,17 @@
   --hv-color-text-placeholder: #64748B;
   --hv-color-text-disabled:    #475569;
   --hv-color-text-inverse:     #0F172A;
+  --hv-color-text-on-action:   #F8FAFC;
+  --hv-color-text-feedback-error:   #FCA5A5;
+  --hv-color-text-feedback-success: #86EFAC;
+  --hv-color-text-feedback-warning: #FDE047;
+  --hv-color-text-feedback-info:    #93C5FD;
+  --hv-color-text-link:       #60A5FA;
+  --hv-color-text-link-hover: #93C5FD;
+
+  /* ── Semantic: Action overrides ── */
+  --hv-color-action-primary-subtle: rgba(59, 156, 255, 0.16);
+  --hv-color-action-destructive-subtle: rgba(193, 41, 46, 0.18);
 
   /* ── Semantic: Border overrides ── */
   --hv-color-border-subtle:  #334155;

@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "health_vault_clinical_json_v1",
+  "synthetic": true,
+  "patient": {
+    "organizationPatientNumber": "HV-DEMO-TIMOTHY"
+  },
+  "resources": [
+    {
+      "type": "health_record",
+      "externalId": "demo-timothy-wellness-2026",
+      "title": "Synthetic annual wellness visit",
+      "occurredAt": "2026-07-14T15:30:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Fictional wellness encounter created only to review the provider-to-patient import flow.",
+        "status": "completed",
+        "synthetic": true
+      }
+    },
+    {
+      "type": "lab",
+      "externalId": "demo-timothy-cbc-2026",
+      "title": "Synthetic complete blood count",
+      "occurredAt": "2026-07-14T16:10:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Fictional CBC with all demo values in range.",
+        "status": "final",
+        "resultCount": 8,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "lab",
+      "externalId": "demo-timothy-lipid-2026",
+      "title": "Synthetic lipid panel",
+      "occurredAt": "2026-07-14T16:12:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Fictional lipid panel for interface testing.",
+        "status": "final",
+        "resultCount": 4,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "medication",
+      "externalId": "demo-timothy-medication-001",
+      "title": "Synthetic maintenance medication",
+      "occurredAt": "2026-07-14T15:45:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "status": "active",
+        "note": "Fictional demonstration record; not a prescription or medical advice.",
+        "synthetic": true
+      }
+    },
+    {
+      "type": "condition",
+      "externalId": "demo-timothy-condition-001",
+      "title": "Synthetic resolved condition",
+      "occurredAt": "2024-02-11T09:00:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "clinicalStatus": "resolved",
+        "verificationStatus": "confirmed",
+        "synthetic": true
+      }
+    },
+    {
+      "type": "allergy",
+      "externalId": "demo-timothy-allergy-001",
+      "title": "Synthetic environmental allergy",
+      "occurredAt": "2021-05-03T12:00:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "clinicalStatus": "active",
+        "criticality": "low",
+        "synthetic": true
+      }
+    },
+    {
+      "type": "immunization",
+      "externalId": "demo-timothy-immunization-001",
+      "title": "Synthetic seasonal immunization",
+      "occurredAt": "2025-10-02T18:20:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "status": "completed",
+        "synthetic": true
+      }
+    },
+    {
+      "type": "vital",
+      "externalId": "demo-timothy-vitals-2026",
+      "title": "Synthetic visit vital signs",
+      "occurredAt": "2026-07-14T15:25:00Z",
+      "providerName": "Health Vault Demo Provider",
+      "data": {
+        "summary": "Fictional vital-sign set for interface testing.",
+        "measurementCount": 4,
+        "synthetic": true
+      }
+    }
+  ]
+}
