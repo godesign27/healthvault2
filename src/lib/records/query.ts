@@ -21,6 +21,21 @@ function mapFileType(ft: string | null): HealthRecord['fileType'] {
   return 'pdf';
 }
 
+function mapConnectedKind(recordType: string): RecordKind {
+  const map: Record<string, RecordKind> = {
+    lab: RecordKind.Lab,
+    document: RecordKind.SpecialistReport,
+    encounter: RecordKind.SpecialistReport,
+  };
+  return map[recordType?.toLowerCase()] || RecordKind.Other;
+}
+
+function titleCase(value: string): string {
+  return value
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, character => character.toUpperCase());
+}
+
 async function fetchSupabaseRecords(): Promise<HealthRecord[]> {
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -54,12 +69,50 @@ async function fetchSupabaseRecords(): Promise<HealthRecord[]> {
   }
 }
 
-export async function listRecords(filters?: { kind?: RecordKind }): Promise<HealthRecord[]> {
-  const supabaseRecords = await fetchSupabaseRecords();
+async function fetchConnectedHealthRecords(): Promise<HealthRecord[]> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user?.id) return [];
 
-  const supabaseIds = new Set(supabaseRecords.map(r => r.id));
+    const { data, error } = await supabase
+      .from('connected_health_records')
+      .select('id, record_type, title, status, effective_date, provider_name, source_name, created_at')
+      .eq('user_id', session.user.id)
+      .order('effective_date', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+
+    return data.map((record: any) => ({
+      id: record.id,
+      kind: mapConnectedKind(record.record_type),
+      title: record.title,
+      providerName: record.provider_name || record.source_name || undefined,
+      serviceDate: record.effective_date || undefined,
+      receivedAt: record.created_at,
+      source: RecordSource.Connected,
+      fileType: 'unknown' as const,
+      tags: [
+        titleCase(record.record_type),
+        ...(record.status ? [titleCase(record.status)] : []),
+        'Imported through ChatGPT Health',
+      ],
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function listRecords(filters?: { kind?: RecordKind }): Promise<HealthRecord[]> {
+  const [supabaseRecords, connectedRecords] = await Promise.all([
+    fetchSupabaseRecords(),
+    fetchConnectedHealthRecords(),
+  ]);
+
+  const supabaseIds = new Set([...supabaseRecords, ...connectedRecords].map(r => r.id));
   const all = [
     ...supabaseRecords,
+    ...connectedRecords,
     ...localUploads.filter(r => !supabaseIds.has(r.id)),
   ];
 
