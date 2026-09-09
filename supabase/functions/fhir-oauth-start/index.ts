@@ -13,6 +13,21 @@ const corsHeaders = {
     "Content-Type, Authorization, X-Client-Info, Apikey, X-Platform",
 };
 
+const EPIC_SANDBOX_PROVIDER_ID = "00000000-0000-4000-8000-000000000604";
+const EPIC_SANDBOX_PROVIDER = {
+  id: EPIC_SANDBOX_PROVIDER_ID,
+  name: "Epic Sandbox (Test Patients)",
+  ehr_vendor: "Epic",
+  portal_brand: "MyChart Sandbox",
+  fhir_endpoint_url: "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4",
+  authorization_endpoint: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize",
+  token_endpoint: "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token",
+  smart_scopes: "patient/*.read openid fhirUser offline_access",
+  supports_direct_connection: false,
+  supports_epic_connection: true,
+  supports_manual_request: false,
+};
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -61,6 +76,15 @@ Deno.serve(async (req: Request) => {
 
     const connectionMethod = body.connectionMethod || "direct_provider_connection";
     const sb = createClient(supabaseUrl, serviceKey);
+
+    const isBuiltInEpicSandbox =
+      body.providerOrganizationId === EPIC_SANDBOX_PROVIDER_ID;
+    if (isBuiltInEpicSandbox) {
+      const { error: seedError } = await sb
+        .from("provider_organizations")
+        .upsert(EPIC_SANDBOX_PROVIDER, { onConflict: "id" });
+      if (seedError) return json({ error: seedError.message }, 500);
+    }
 
     const { data: org, error: orgError } = await sb
       .from("provider_organizations")

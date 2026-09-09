@@ -4,6 +4,10 @@ import {
   mapOrganizationRow,
   organizationSearchFilter,
 } from "../network/provider-organizations";
+import {
+  EPIC_SANDBOX_PROVIDER,
+  queryMatchesEpicSandbox,
+} from "../provider-record-connection/epic-sandbox";
 
 /**
  * Queries the `provider_organizations` directory table (seeded health systems).
@@ -41,6 +45,12 @@ export async function searchProviderOrganizations(input: unknown) {
     }
 
     const organizations = (orgs || []).map(mapOrganizationRow);
+    if (
+      queryMatchesEpicSandbox(query) &&
+      !organizations.some((org) => org.id === EPIC_SANDBOX_PROVIDER.id)
+    ) {
+      organizations.unshift(EPIC_SANDBOX_PROVIDER);
+    }
 
     if (organizations.length === 0) {
       return {

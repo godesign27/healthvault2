@@ -5,6 +5,10 @@ import type {
   ProviderOrganizationSummary,
   ProviderRecordConnectionResolution,
 } from "./types";
+import {
+  EPIC_SANDBOX_PROVIDER,
+  EPIC_SANDBOX_PROVIDER_ID,
+} from "./epic-sandbox";
 
 interface ResolveInput {
   userId: string;
@@ -23,6 +27,14 @@ export async function resolveProviderRecordConnection(
   try {
     // 1. If a specific org is targeted, check for existing connection first
     if (providerOrganizationId) {
+      if (providerOrganizationId === EPIC_SANDBOX_PROVIDER_ID) {
+        return resolveFromOrganization({
+          ...EPIC_SANDBOX_PROVIDER,
+          fhirEndpointUrl:
+            "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4",
+        });
+      }
+
       const existing = await findExistingConnection(
         supabase,
         userId,

@@ -663,7 +663,7 @@ function ResolvedStep({
 
         <button
           onClick={config.action}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all hover:shadow-lg active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all hover:shadow-lg active:scale-[0.98]"
         >
           {config.actionLabel}
           <ChevronRight className="w-4 h-4" />

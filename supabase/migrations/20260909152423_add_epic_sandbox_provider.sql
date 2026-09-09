@@ -19,9 +19,10 @@ SET
   city = NULL,
   state = NULL,
   updated_at = now()
-WHERE name = 'Epic Sandbox (Test Patients)';
+WHERE id = '00000000-0000-4000-8000-000000000604';
 
 INSERT INTO public.provider_organizations (
+  id,
   name,
   ehr_vendor,
   portal_brand,
@@ -34,6 +35,7 @@ INSERT INTO public.provider_organizations (
   supports_manual_request
 )
 SELECT
+  '00000000-0000-4000-8000-000000000604',
   'Epic Sandbox (Test Patients)',
   'Epic',
   'MyChart Sandbox',
@@ -47,5 +49,5 @@ SELECT
 WHERE NOT EXISTS (
   SELECT 1
   FROM public.provider_organizations
-  WHERE name = 'Epic Sandbox (Test Patients)'
+  WHERE id = '00000000-0000-4000-8000-000000000604'
 );

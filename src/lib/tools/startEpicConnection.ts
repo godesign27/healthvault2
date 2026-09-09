@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { startFhirOAuth } from '../network/fhir-oauth-api';
 import { createSupabaseServerClient } from '../supabase/server';
+import {
+  EPIC_SANDBOX_PROVIDER,
+  EPIC_SANDBOX_PROVIDER_ID,
+} from '../provider-record-connection/epic-sandbox';
 
 export const startEpicConnectionInputSchema = z.object({
   userId: z.string().min(1),
@@ -21,11 +25,23 @@ export async function startEpicConnection(input: unknown) {
     const supabase = createSupabaseServerClient();
     const { providerOrganizationId } = parsed.data;
 
-    const { data: org, error: orgError } = await supabase
-      .from('provider_organizations')
-      .select('*')
-      .eq('id', providerOrganizationId)
-      .maybeSingle();
+    const isEpicSandbox = providerOrganizationId === EPIC_SANDBOX_PROVIDER_ID;
+    const { data: storedOrg, error: orgError } = isEpicSandbox
+      ? { data: null, error: null }
+      : await supabase
+          .from('provider_organizations')
+          .select('*')
+          .eq('id', providerOrganizationId)
+          .maybeSingle();
+    const org = isEpicSandbox
+      ? {
+          ...EPIC_SANDBOX_PROVIDER,
+          supports_epic_connection: true,
+          fhir_endpoint_url: 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4',
+          authorization_endpoint: 'https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize',
+          token_endpoint: 'https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token',
+        }
+      : storedOrg;
 
     if (orgError) {
       return { success: false, error: `Database error: ${orgError.message}` };
