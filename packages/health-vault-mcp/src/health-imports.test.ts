@@ -70,9 +70,11 @@ test("preview copy clearly states that no measurements were saved", () => {
 });
 
 test("vital previews use an explicit review-and-import card", () => {
-  assert.equal(HEALTH_IMPORT_WIDGET_URI, "ui://widget/health-vault-vitals-import-v1.html");
+  assert.equal(HEALTH_IMPORT_WIDGET_URI, "ui://widget/health-vault-vitals-import-v2.html");
   assert.match(HEALTH_IMPORT_WIDGET_HTML, /Nothing has been added to Health Vault/);
   assert.match(HEALTH_IMPORT_WIDGET_HTML, /Import to Health Vault/);
+  assert.match(HEALTH_IMPORT_WIDGET_HTML, /Saved to your Health Vault/);
+  assert.match(HEALTH_IMPORT_WIDGET_HTML, /openai:set_globals/);
   assert.match(HEALTH_IMPORT_WIDGET_HTML, /callTool\('confirm_health_data_import'/);
   assert.match(serverSource, /"openai\/outputTemplate": HEALTH_IMPORT_WIDGET_URI/);
   assert.match(serverSource, /"openai\/widgetAccessible": true/);

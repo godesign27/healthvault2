@@ -17,7 +17,8 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] Add Health Vault GPT actions to preview ChatGPT Health/provider vitals, confirm the exact proposal, and review imported measurements.
 - [x] Apply the patient-health import schema and deploy `health-vault-mcp` v109 with preview, explicit review/confirm, and vital-history actions.
 - [x] Refresh the ChatGPT app action catalog and verify `preview_health_data_import`, `confirm_health_data_import`, and `list_vital_measurements` are exposed.
-- [ ] Run an authenticated cross-plugin smoke test with `@Health`, review the proposed measurements, and confirm only from the displayed preview.
+- [x] Run an authenticated cross-plugin smoke test with `@Health`, review the proposed measurements, and confirm only from the displayed preview.
+- [ ] Smoke-test the v110 post-import success panel in a fresh ChatGPT conversation.
 - [ ] Expand the common proposal to conditions, medications, allergies, immunizations, labs, encounters, and documents with per-item conflict resolution.
 - [ ] Add patient-facing import history, source management, revocation semantics, and a Vitals experience to web and mobile.
 - [ ] Complete the direct SMART on FHIR production pilot and add provider connection refresh scheduling.

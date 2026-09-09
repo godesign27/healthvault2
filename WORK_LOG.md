@@ -549,3 +549,8 @@ _Older history predates this log. See git history and the chat transcript for de
   actions and an explicit review-and-confirm widget. Refreshed ChatGPT's action catalog and verified
   all three actions are exposed. A user-confirmed import from the displayed preview is the remaining
   release check for this slice.
+- **health import confirmation feedback** — Verified the first production widget confirmations
+  created separate import batches for three Apple Health measurements and one provider measurement,
+  with no duplicates. Updated the versioned review widget to recognize both direct action responses
+  and ChatGPT global tool-output updates, then replace the CTA with a prominent accessible success
+  panel and exact imported/duplicate counts. Deployed `health-vault-mcp` v110.
