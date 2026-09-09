@@ -23,6 +23,7 @@ import {
   DIET_CONFIRMATION_WIDGET_HTML,
   DIET_CONFIRMATION_WIDGET_URI,
 } from "../../../packages/health-vault-mcp/src/diet-confirmation-widget.ts";
+import { HEALTH_IMPORT_WIDGET_HTML, HEALTH_IMPORT_WIDGET_URI } from "../../../packages/health-vault-mcp/src/health-import-widget.ts";
 import {
   LIFE_SIGNAL_WIDGET_HTML,
   LIFE_SIGNAL_WIDGET_URI,
@@ -84,6 +85,7 @@ import {
   previewLifeSignal,
 } from "../../../packages/health-vault-mcp/src/wellness.ts";
 import { callNourishedRebel, NOURISHED_REBEL_WIDGET_HTML, NOURISHED_REBEL_WIDGET_URI } from "../../../packages/health-vault-mcp/src/nourished-rebel.ts";
+import { confirmHealthImport, HEALTH_IMPORT_SOURCES, listVitalMeasurements, previewHealthImport, VITAL_METRICS } from "../../../packages/health-vault-mcp/src/health-imports.ts";
 import {
   confirmFormAnswers,
   getMedicalForm,
@@ -262,7 +264,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     { name: "health-vault", version: "0.7.1" },
     {
       instructions: MEDICAL_FORM_EMAIL_SHARE_INSTRUCTIONS +
-        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep one authoritative interview: call get_medical_form once, then after each accepted answer call get_medical_form_progress with only the new answer. Do not call get_medical_form again for the same form, and never reconstruct the full answer set unless the user is correcting a value. The server persists answers and returns the same interview card. Never redirect a ChatGPT-supported reusable form to the web app. When progress is 13/13 or remainingFields is 0, get_medical_form_progress already returns the final review card; do not invent expectedUpdatedAt. Call propose_form_answers only if the review card is missing. Call confirm_form_answers only after explicit Confirm & Save. Never auto-save. After a completed save, offer a secure share via preview_medical_form_share, then create_medical_form_share only after explicit confirmation. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
+        "Use Health Vault tools only for the authenticated user's records. If the user asks what Health Vault can do, call get_health_vault_capabilities and present its actionable prompts. If the user asks to start, continue, resume, or check setup, call get_onboarding_status. When the user asks to bring their own information from ChatGPT Health or a connected provider into Health Vault, use preview_health_data_import first, explain that nothing has been saved, and stop. Never call confirm_health_data_import in the same assistant turn as the preview. Wait for a new user message that explicitly approves the displayed proposal, then confirm that exact proposal. Never silently import, infer missing clinical values, or overwrite existing information. The server supports resumable onboarding, dashboard and profile reads, reusable medical form discovery and confirmation-gated completion, appointment prep, Life Signal check-ins, diet logging and general wellness observations, confirmation-gated health-data writes, and secure sharing. When the user asks to complete a medical form without naming one, call list_medical_forms first and ask them to choose from the stored common forms or upload a provider PDF/photo in the secure Health Vault app. Do not immediately ask for a PDF when reusable forms are available. For a selected ChatGPT-supported form, keep one authoritative interview: call get_medical_form once, then after each accepted answer call get_medical_form_progress with only the new answer. Do not call get_medical_form again for the same form, and never reconstruct the full answer set unless the user is correcting a value. The server persists answers and returns the same interview card. Never redirect a ChatGPT-supported reusable form to the web app. When progress is 13/13 or remainingFields is 0, get_medical_form_progress already returns the final review card; do not invent expectedUpdatedAt. Call propose_form_answers only if the review card is missing. Call confirm_form_answers only after explicit Confirm & Save. Never auto-save. After a completed save, offer a secure share via preview_medical_form_share, then create_medical_form_share only after explicit confirmation. Send signatures, legal consent, SSN, payment information, uploads, and unsupported form fields to the secure Health Vault web app. When a user wants to log one or more foods or drinks, group everything into one preview_diet_entries call so the user gets one confirmation card and one save action; do not call log_diet_entry once per meal. When a user wants a Life Signal check-in but has not supplied all five ratings, call start_life_signal_check_in to show sliders; clicking Log Life Signal is explicit confirmation. Keep identity and insurance entry in the secure Health Vault web experience. Always use the preview tool before its matching write tool and require explicit user confirmation. Treat results as informational health data, not diagnosis, emergency advice, or a personalized medical nutrition plan.",
     },
   );
 
@@ -403,6 +405,8 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       }],
     }),
   );
+
+  server.registerResource("health-vault-vitals-import", HEALTH_IMPORT_WIDGET_URI, { mimeType: "text/html+skybridge", description: "Review and explicitly confirm vital measurements" }, async () => ({ contents: [{ uri: HEALTH_IMPORT_WIDGET_URI, mimeType: "text/html+skybridge", text: HEALTH_IMPORT_WIDGET_HTML, _meta: { "openai/widgetDescription": "A private review of proposed vital measurements. Nothing is saved until the user presses Import to Health Vault.", "openai/widgetPrefersBorder": true, "openai/widgetDomain": "https://widgets.healthvault.me", "openai/widgetCSP": { connect_domains: [], resource_domains: [] } } }] }));
 
   server.registerResource(
     "health-vault-medical-forms",
@@ -865,6 +869,59 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     "List the authenticated user's most recent Health Vault records with dates, type, and provider.",
     z.object({ limit: z.number().int().min(1).max(25).default(10) }),
     ({ limit }) => getHealthRecords(supabase, limit),
+  );
+
+  const vitalImportSchema = z.object({
+    metric: z.enum(VITAL_METRICS),
+    value: z.number().finite(),
+    secondaryValue: z.number().finite().optional(),
+    unit: z.string().trim().min(1).max(32),
+    observedAt: z.string().datetime({ offset: true }),
+    sourceRecordId: z.string().trim().max(240).optional(),
+    deviceName: z.string().trim().max(160).optional(),
+  });
+  const healthImportSchema = z.object({
+    sourceKind: z.enum(HEALTH_IMPORT_SOURCES),
+    sourceName: z.string().trim().min(1).max(160),
+    idempotencyKey: z.string().uuid(),
+    vitals: z.array(vitalImportSchema).min(1).max(100),
+  });
+  server.registerTool("preview_health_data_import", {
+    title: "Prepare health measurements for review",
+    description: "Create a temporary review of the authenticated user's explicitly authorized vital information from ChatGPT Health, Apple Health, or a connected provider. Nothing is imported or saved to Health Vault by this action. Say that clearly, show what is new or duplicated, and stop. Never call confirm_health_data_import in the same assistant turn; wait for a new user message explicitly approving the displayed proposal.",
+    inputSchema: healthImportSchema,
+    outputSchema: z.object({ preview: z.unknown() }),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    _meta: { "openai/outputTemplate": HEALTH_IMPORT_WIDGET_URI, "openai/widgetAccessible": true },
+  }, async (input) => {
+    try {
+      const preview = await previewHealthImport(supabase, userId, input);
+      return { structuredContent: { preview }, content: [{ type: "text", text: "Nothing has been added to Health Vault. Review the measurements and source below. Adding them requires a separate confirmation from you." }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to prepare the health import." }] };
+    }
+  });
+  server.registerTool("confirm_health_data_import", {
+    title: "Import confirmed health data",
+    description: "Add the exact measurements from a current preview only after a new user message explicitly approves it. Never call this in the same assistant turn as preview_health_data_import, and never treat a request to prepare or preview as confirmation. Accept only the proposal ID; never resend or alter the health payload.",
+    inputSchema: z.object({ proposalId: z.string().uuid(), confirmed: z.literal(true) }),
+    outputSchema: z.object({ imported: z.unknown() }),
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+    _meta: { "openai/outputTemplate": HEALTH_IMPORT_WIDGET_URI, "openai/widgetAccessible": true },
+  }, async ({ proposalId }) => {
+    try {
+      const imported = await confirmHealthImport(supabase, proposalId);
+      return { structuredContent: { imported }, content: [{ type: "text", text: "Your confirmed measurements are now in Health Vault." }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to import the health information." }] };
+    }
+  });
+  registerReadTool(
+    "list_vital_measurements",
+    "Review vital measurements",
+    "Review the authenticated user's imported vital measurements and their sources. Summarize trends without diagnosing or treating the user.",
+    z.object({ days: z.number().int().min(1).max(365).default(30) }),
+    ({ days }) => listVitalMeasurements(supabase, days),
   );
 
   server.registerTool(

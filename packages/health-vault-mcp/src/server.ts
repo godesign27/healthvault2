@@ -8,17 +8,20 @@ import { buildOnboardingStatus } from "./onboarding.js";
 import { getAllergies, getConditions, getHealthRecords, getMedications } from "./health-details.js";
 import { createAppointment, previewAppointment } from "./appointments.js";
 import { callNourishedRebel, NOURISHED_REBEL_WIDGET_HTML, NOURISHED_REBEL_WIDGET_URI } from "./nourished-rebel.js";
+import { confirmHealthImport, HEALTH_IMPORT_SOURCES, listVitalMeasurements, previewHealthImport, VITAL_METRICS } from "./health-imports.js";
+import { HEALTH_IMPORT_WIDGET_HTML, HEALTH_IMPORT_WIDGET_URI } from "./health-import-widget.js";
 
 export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): McpServer {
   const server = new McpServer(
     { name: "health-vault", version: "0.1.0" },
     {
       instructions:
-        "Use Health Vault tools only for the authenticated user's records. Treat results as informational health data, not diagnosis or emergency medical advice.",
+        "Use Health Vault tools only for the authenticated user's records. When the user asks to bring their own information from ChatGPT Health or a connected provider into Health Vault, use preview_health_data_import first, explain that nothing has been saved, and stop. Never call confirm_health_data_import in the same assistant turn as the preview. Wait for a new user message that explicitly approves the displayed proposal, then confirm that exact proposal. Never silently import or overwrite clinical information. Treat results as informational health data, not diagnosis or emergency medical advice.",
     },
   );
 
   server.registerResource("nourished-rebel-insights", NOURISHED_REBEL_WIDGET_URI, { mimeType: "text/html+skybridge", description: "Nourished Rebel wellness check-in and insight" }, async () => ({ contents: [{ uri: NOURISHED_REBEL_WIDGET_URI, mimeType: "text/html+skybridge", text: NOURISHED_REBEL_WIDGET_HTML, _meta: { "openai/widgetDescription": "The authenticated user's resumable Nourished Rebel check-in or latest stored insight.", "openai/widgetPrefersBorder": true, "openai/widgetDomain": "https://widgets.healthvault.me", "openai/widgetCSP": { connect_domains: [], resource_domains: [] } } }] }));
+  server.registerResource("health-vault-vitals-import", HEALTH_IMPORT_WIDGET_URI, { mimeType: "text/html+skybridge", description: "Review and explicitly confirm vital measurements" }, async () => ({ contents: [{ uri: HEALTH_IMPORT_WIDGET_URI, mimeType: "text/html+skybridge", text: HEALTH_IMPORT_WIDGET_HTML, _meta: { "openai/widgetDescription": "A private review of proposed vital measurements. Nothing is saved until the user presses Import to Health Vault.", "openai/widgetPrefersBorder": true, "openai/widgetDomain": "https://widgets.healthvault.me", "openai/widgetCSP": { connect_domains: [], resource_domains: [] } } }] }));
 
   server.registerTool("get_nourished_rebel_insight", { title: "View Nourished Rebel insight", description: "Get the authenticated user's authoritative stored Nourished Rebel insight or check-in progress. Do not create a competing assessment.", inputSchema: z.object({}), annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }, _meta: { "openai/outputTemplate": NOURISHED_REBEL_WIDGET_URI } }, async () => { try { const state = await callNourishedRebel(supabase, "status"); return { structuredContent: { state }, content: [{ type: "text", text: state.latestInsight ? "The stored Nourished Rebel insight is displayed." : "The resumable wellness check-in is displayed." }] }; } catch (error) { return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to load wellness insight" }] }; } });
   server.registerTool("generate_nourished_rebel_insight", { title: "Generate Nourished Rebel insight", description: "Generate or regenerate the authenticated user's authoritative Nourished Rebel insight from their latest saved check-in. Use this whenever the user explicitly asks to generate, regenerate, refresh, or update their insight; do not substitute the view action.", inputSchema: z.object({ confirmed: z.literal(true) }), annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }, _meta: { "openai/outputTemplate": NOURISHED_REBEL_WIDGET_URI } }, async () => { try { const state = await callNourishedRebel(supabase, "generate", { force: true }); return { structuredContent: { state }, content: [{ type: "text", text: "Your refreshed Nourished Rebel insight is displayed." }] }; } catch (error) { return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to generate the wellness insight" }] }; } });
@@ -189,6 +192,37 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
     z.object({ limit: z.number().int().min(1).max(25).default(10) }),
     ({ limit }) => getHealthRecords(supabase, limit),
   );
+
+  const vitalImportSchema = z.object({
+    metric: z.enum(VITAL_METRICS),
+    value: z.number().finite(),
+    secondaryValue: z.number().finite().optional(),
+    unit: z.string().trim().min(1).max(32),
+    observedAt: z.string().datetime({ offset: true }),
+    sourceRecordId: z.string().trim().max(240).optional(),
+    deviceName: z.string().trim().max(160).optional(),
+  });
+  const healthImportSchema = z.object({
+    sourceKind: z.enum(HEALTH_IMPORT_SOURCES),
+    sourceName: z.string().trim().min(1).max(160),
+    idempotencyKey: z.string().uuid(),
+    vitals: z.array(vitalImportSchema).min(1).max(100),
+  });
+  server.registerTool("preview_health_data_import", {
+    title: "Prepare health measurements for review",
+    description: "Create a temporary review of the authenticated user's explicitly authorized vital information from ChatGPT Health, Apple Health, or a connected provider. Nothing is imported or saved to Health Vault by this action. Say that clearly, show what is new or duplicated, and stop. Never call confirm_health_data_import in the same assistant turn; wait for a new user message explicitly approving the displayed proposal.",
+    inputSchema: healthImportSchema,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    _meta: { "openai/outputTemplate": HEALTH_IMPORT_WIDGET_URI, "openai/widgetAccessible": true },
+  }, async (input) => { try { const preview = await previewHealthImport(supabase, userId, input); return { structuredContent: { preview }, content: [{ type: "text", text: "Nothing has been added to Health Vault. Review the measurements and source below. Adding them requires a separate confirmation from you." }] }; } catch (error) { return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to prepare the health import." }] }; } });
+  server.registerTool("confirm_health_data_import", {
+    title: "Import confirmed health data",
+    description: "Add the exact measurements from a current preview only after a new user message explicitly approves it. Never call this in the same assistant turn as preview_health_data_import, and never treat a request to prepare or preview as confirmation. Accept only the proposal ID; never resend or alter the health payload.",
+    inputSchema: z.object({ proposalId: z.string().uuid(), confirmed: z.literal(true) }),
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+    _meta: { "openai/outputTemplate": HEALTH_IMPORT_WIDGET_URI, "openai/widgetAccessible": true },
+  }, async ({ proposalId }) => { try { const imported = await confirmHealthImport(supabase, proposalId); return { structuredContent: { imported }, content: [{ type: "text", text: "Your confirmed measurements are now in Health Vault." }] }; } catch (error) { return { isError: true, content: [{ type: "text", text: error instanceof Error ? error.message : "Unable to import the health information." }] }; } });
+  registerReadTool("list_vital_measurements", "Review vital measurements", "Review the authenticated user's imported vital measurements and their sources. Summarize trends without diagnosing or treating the user.", z.object({ days: z.number().int().min(1).max(365).default(30) }), ({ days }) => listVitalMeasurements(supabase, days));
 
   const appointmentSchema = {
     providerName: z.string().trim().min(1).max(160),

@@ -10,6 +10,19 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 # Next focus — GPT App
 
+## ChatGPT Health and provider import
+
+- [x] Add the patient-owned vital measurement model with source provenance, strict units, broad plausibility bounds, deduplication fingerprints, and RLS.
+- [x] Add short-lived, idempotent import proposals and an atomic preview/explicit-confirmation transaction.
+- [x] Add Health Vault GPT actions to preview ChatGPT Health/provider vitals, confirm the exact proposal, and review imported measurements.
+- [x] Apply the patient-health import schema and deploy `health-vault-mcp` v109 with preview, explicit review/confirm, and vital-history actions.
+- [x] Refresh the ChatGPT app action catalog and verify `preview_health_data_import`, `confirm_health_data_import`, and `list_vital_measurements` are exposed.
+- [ ] Run an authenticated cross-plugin smoke test with `@Health`, review the proposed measurements, and confirm only from the displayed preview.
+- [ ] Expand the common proposal to conditions, medications, allergies, immunizations, labs, encounters, and documents with per-item conflict resolution.
+- [ ] Add patient-facing import history, source management, revocation semantics, and a Vitals experience to web and mobile.
+- [ ] Complete the direct SMART on FHIR production pilot and add provider connection refresh scheduling.
+- [ ] Add release evals for cross-user access, stale proposals, partial/ambiguous outcomes, unit conversion, duplicates, revoked consent, and abnormal results.
+
 - [ ] Run the full authenticated Nourished Rebel GPT smoke test: opt in, answer, skip, resume, complete, regenerate, reopen, feedback, and website CTA.
 - [ ] Verify GPT and cloud return the same persisted insight ID and payload once the cloud branch is merged and deployed.
 - [ ] Confirm GPT funnel events and safety events appear in admin analytics with `product_key = gpt_app` and no PHI.

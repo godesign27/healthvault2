@@ -536,3 +536,16 @@ _Older history predates this log. See git history and the chat transcript for de
   corrected dark semantic action/link/feedback tokens so selected summaries, statuses, banners,
   and destructive states remain legible. Verified dark Patient Access visually, switched back to
   light mode, reloaded, and confirmed the saved preference remained active.
+- **patient-owned health import foundation** — Added a normalized vital-measurement model for
+  ChatGPT Health, Apple Health, and direct-provider sources with explicit units, broad malformed-
+  value bounds that retain abnormal readings, timestamps, source provenance, and deterministic
+  deduplication. Added private 30-minute import proposals and an owner-scoped atomic confirmation
+  function so the GPT previews exact information before any write, cannot change the payload at
+  confirmation, safely replays completed requests, and never exposes a direct measurement-insert
+  policy to the browser. Added GPT tools for preview, confirmation, and vital review plus regression
+  coverage for blood-pressure pairing, unit mismatch, future dates, abnormal values, duplicate
+  payloads, stale proposals, cross-user isolation, and ambiguous retries. The production schema
+  is applied with covering indexes, and `health-vault-mcp` v109 is active with the three import
+  actions and an explicit review-and-confirm widget. Refreshed ChatGPT's action catalog and verified
+  all three actions are exposed. A user-confirmed import from the displayed preview is the remaining
+  release check for this slice.
