@@ -554,3 +554,10 @@ _Older history predates this log. See git history and the chat transcript for de
   with no duplicates. Updated the versioned review widget to recognize both direct action responses
   and ChatGPT global tool-output updates, then replace the CTA with a prominent accessible success
   panel and exact imported/duplicate counts. Deployed `health-vault-mcp` v110.
+- **existing ChatGPT Health record bridge** — Added a separate review and confirmation flow for
+  medications, conditions, allergies, immunizations, labs, encounters, and documents already held
+  in the user's ChatGPT Health area. The flow preserves provider/source provenance, identifies
+  duplicates, expires unused proposals, prevents direct browser writes, and does not trigger a new
+  provider sync. Added owner-only storage, atomic confirmation, a record review/success widget, and
+  a read tool for confirmed imports. Applied the schema and privilege hardening, then deployed
+  `health-vault-mcp` v112. All 51 MCP tests and type checking pass.

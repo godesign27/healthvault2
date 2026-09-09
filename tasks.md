@@ -19,7 +19,8 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] Refresh the ChatGPT app action catalog and verify `preview_health_data_import`, `confirm_health_data_import`, and `list_vital_measurements` are exposed.
 - [x] Run an authenticated cross-plugin smoke test with `@Health`, review the proposed measurements, and confirm only from the displayed preview.
 - [ ] Smoke-test the v110 post-import success panel in a fresh ChatGPT conversation.
-- [ ] Expand the common proposal to conditions, medications, allergies, immunizations, labs, encounters, and documents with per-item conflict resolution.
+- [x] Expand the common proposal to conditions, medications, allergies, immunizations, labs, encounters, and documents with duplicate detection and atomic confirmation.
+- [ ] Add per-item selection and field-level conflict resolution for non-identical clinical records.
 - [ ] Add patient-facing import history, source management, revocation semantics, and a Vitals experience to web and mobile.
 - [ ] Complete the direct SMART on FHIR production pilot and add provider connection refresh scheduling.
 - [ ] Add release evals for cross-user access, stale proposals, partial/ambiguous outcomes, unit conversion, duplicates, revoked consent, and abnormal results.
