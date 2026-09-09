@@ -216,23 +216,19 @@ export function ProviderRecordConnectionFlow({
 
         const status = connectResult.data?.status;
         if (status === 'not_configured' || status === 'not_supported') {
-          setStep('fetching');
-          await handleFetchPreview(selectedOrg.id, null);
+          setErrorMessage(connectResult.data?.message || 'This provider connection is not available yet.');
+          setStep('error');
         } else {
-          setStep('fetching');
-          await handleFetchPreview(
-            selectedOrg.id,
-            connectResult.data?.connectionId || null,
-          );
+          setErrorMessage(connectResult.data?.message || 'The provider did not return an authorization link.');
+          setStep('error');
         }
       } else {
-        setStep('fetching');
-        await handleFetchPreview(selectedOrg.id, null);
+        setErrorMessage(connectResult?.error || 'Connection could not be established.');
+        setStep('error');
       }
     } catch {
-      setErrorMessage('Connection could not be established. Fetching available preview data instead.');
-      setStep('fetching');
-      await handleFetchPreview(selectedOrg.id, null);
+      setErrorMessage('Connection could not be established. No records were retrieved or saved.');
+      setStep('error');
     }
   };
 
@@ -656,6 +652,14 @@ function ResolvedStep({
             Your data is encrypted and transferred securely. Health Vault never stores provider credentials.
           </p>
         </div>
+
+        {resolution.strategy !== 'existing_connection' && (
+          <ol className="space-y-2 text-xs text-content-secondary">
+            <li><strong className="text-content-primary">1.</strong> Sign in on your provider's secure portal.</li>
+            <li><strong className="text-content-primary">2.</strong> Choose what to share and how long access lasts.</li>
+            <li><strong className="text-content-primary">3.</strong> Return to Health Vault to review records before importing.</li>
+          </ol>
+        )}
 
         <button
           onClick={config.action}

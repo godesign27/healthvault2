@@ -6,11 +6,7 @@ import type {
   ProviderConnectionStrategy,
 } from "../provider-record-connection/types";
 
-/**
- * Returns live FHIR preview data when the connection has an active token (via
- * fhir-sync edge function). Falls back to scaffold preview when OAuth is not
- * configured or sync fails.
- */
+/** Returns only live FHIR data from an authenticated, active connection. */
 
 export const fetchProviderRecordPreviewInputSchema = z.object({
   userId: z.string().min(1),
@@ -102,9 +98,15 @@ export async function fetchProviderRecordPreview(input: unknown) {
             },
           };
         } catch (syncErr) {
-          console.warn("Live FHIR sync failed, using scaffold preview:", syncErr);
+          const message = syncErr instanceof Error ? syncErr.message : "Live provider sync failed.";
+          return { success: false, error: message };
         }
       }
+
+      return {
+        success: false,
+        error: "This connection does not have an active provider authorization token.",
+      };
     } else if (providerOrganizationId) {
       const { data: org } = await supabase
         .from("provider_organizations")
@@ -115,118 +117,12 @@ export async function fetchProviderRecordPreview(input: unknown) {
       orgName = org?.name || orgName;
     }
 
-    // Generate scaffold preview — clearly mock data, not from a real provider
-    const previewItems = generateScaffoldPreview(orgName);
-
-    const counts = {
-      conditions: previewItems.filter((i) => i.resourceType === "condition").length,
-      medications: previewItems.filter((i) => i.resourceType === "medication").length,
-      allergies: previewItems.filter((i) => i.resourceType === "allergy").length,
-      immunizations: previewItems.filter((i) => i.resourceType === "immunization").length,
-      total: previewItems.length,
-      duplicates: previewItems.filter((i) => i.isDuplicate).length,
-    };
-
-    const itemsByType: Record<string, RecordImportPreviewItem[]> = {};
-    for (const item of previewItems) {
-      if (!itemsByType[item.resourceType]) {
-        itemsByType[item.resourceType] = [];
-      }
-      itemsByType[item.resourceType].push(item);
-    }
-
-    // Persist an import job in "preview" state
-    const { data: job, error: jobError } = await supabase
-      .from("record_import_jobs")
-      .insert({
-        user_id: userId,
-        provider_connection_id: connectionId || null,
-        strategy: (parsed.data.strategy as ProviderConnectionStrategy) || "manual_fallback",
-        status: "preview",
-        preview_data: itemsByType,
-        counts,
-      })
-      .select("id")
-      .single();
-
-    const importJobId = job?.id || null;
-    if (jobError) {
-      console.warn("Failed to persist import job:", jobError.message);
-    }
-
     return {
-      success: true,
-      data: {
-        counts,
-        itemsByType,
-        importJobId,
-        source: "scaffold",
-        message: `Preview generated for ${orgName}. Note: This is scaffold data — real records will be available once a live provider connection is established.`,
-      },
+      success: false,
+      error: `Connect and authorize ${orgName} before retrieving records. No records were retrieved or saved.`,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
-}
-
-function generateScaffoldPreview(orgName: string): RecordImportPreviewItem[] {
-  return [
-    {
-      resourceType: "condition",
-      name: "Essential Hypertension",
-      date: "2020-03-10",
-      source: orgName,
-      status: "Active",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "condition",
-      name: "Asthma",
-      date: "2015-06-15",
-      source: orgName,
-      status: "Active",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "medication",
-      name: "Lisinopril 10mg",
-      date: "2020-03-10",
-      source: orgName,
-      status: "Active",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "medication",
-      name: "Albuterol Inhaler 90mcg",
-      date: "2015-06-15",
-      source: orgName,
-      status: "Active",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "allergy",
-      name: "Penicillin",
-      date: "2005-01-15",
-      source: orgName,
-      status: "Active",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "immunization",
-      name: "COVID-19 mRNA Vaccine",
-      date: "2021-04-15",
-      source: orgName,
-      status: "Completed",
-      isDuplicate: false,
-    },
-    {
-      resourceType: "immunization",
-      name: "Influenza Vaccine (2024-2025)",
-      date: "2024-10-01",
-      source: orgName,
-      status: "Completed",
-      isDuplicate: false,
-    },
-  ];
 }
