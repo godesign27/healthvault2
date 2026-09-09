@@ -1,9 +1,34 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
+  createEpicClientAssertion,
   exchangeAuthorizationCode,
   tokenExpiresAt,
 } from "../_shared/smart-oauth.ts";
+
+async function epicClientAssertion(params: {
+  clientId: string;
+  tokenEndpoint: string;
+  environment?: string | null;
+}): Promise<string | undefined> {
+  const prefix = params.environment === "production"
+    ? "FHIR_EPIC_PRODUCTION"
+    : "FHIR_EPIC_SANDBOX";
+  const privateKeyPkcs8Base64 = Deno.env.get(`${prefix}_PRIVATE_KEY_PKCS8_BASE64`);
+  const keyId = Deno.env.get(`${prefix}_KEY_ID`);
+  const jwksUrl = Deno.env.get(`${prefix}_JWKS_URL`);
+  if (!privateKeyPkcs8Base64 && !keyId) return undefined;
+  if (!privateKeyPkcs8Base64 || !keyId) {
+    throw new Error(`${prefix} signing key is incomplete`);
+  }
+  return createEpicClientAssertion({
+    clientId: params.clientId,
+    tokenEndpoint: params.tokenEndpoint,
+    privateKeyPkcs8Base64,
+    keyId,
+    jwksUrl,
+  });
+}
 
 function redirectUri(): string {
   const explicit = Deno.env.get("FHIR_REDIRECT_URI");
@@ -43,10 +68,7 @@ Deno.serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const clientId = Deno.env.get("FHIR_CLIENT_ID");
     const clientSecret = Deno.env.get("FHIR_CLIENT_SECRET");
-
-    if (!clientId) return errorRedirect("FHIR_CLIENT_ID is not configured");
 
     const sb = createClient(supabaseUrl, serviceKey);
 
@@ -75,12 +97,33 @@ Deno.serve(async (req: Request) => {
       return errorRedirect("Provider organization configuration missing");
     }
 
+    const isEpic = org.ehr_vendor?.toLowerCase() === "epic" ||
+      oauthState.connection_method === "epic_connection";
+    const isEpicSandbox = isEpic &&
+      (org.fhir_environment === "sandbox" ||
+        org.fhir_endpoint_url?.includes("fhir.epic.com"));
+    const clientId = isEpic
+      ? isEpicSandbox
+        ? Deno.env.get("FHIR_EPIC_SANDBOX_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+        : Deno.env.get("FHIR_EPIC_PRODUCTION_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+      : Deno.env.get("FHIR_CLIENT_ID");
+    if (!clientId) return errorRedirect("FHIR client ID is not configured");
+
+    const clientAssertion = isEpic
+      ? await epicClientAssertion({
+        clientId,
+        tokenEndpoint: org.token_endpoint,
+        environment: isEpicSandbox ? "sandbox" : "production",
+      })
+      : undefined;
+
     const tokenPayload = await exchangeAuthorizationCode({
       tokenEndpoint: org.token_endpoint,
       code,
       redirectUri: redirectUri(),
       clientId,
-      clientSecret: clientSecret || undefined,
+      clientSecret: clientAssertion ? undefined : clientSecret || undefined,
+      clientAssertion,
       codeVerifier: oauthState.code_verifier,
     });
 

@@ -32,6 +32,8 @@
     "admin:build": "npm run build -w @health-vault/admin",
     "admin:typecheck": "npm run typecheck -w @health-vault/admin",
     "admin:deploy": "npm run deploy -w @health-vault/admin",
+    "epic:generate-jwks": "node scripts/generate-epic-jwks.mjs",
+    "epic:prepare-secrets": "node scripts/prepare-epic-supabase-secrets.mjs",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

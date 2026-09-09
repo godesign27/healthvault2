@@ -37,7 +37,6 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const clientId = Deno.env.get("FHIR_CLIENT_ID");
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "Missing authorization" }, 401);
@@ -87,6 +86,17 @@ Deno.serve(async (req: Request) => {
         status: "not_configured",
       }, 422);
     }
+
+    const isEpic = org.ehr_vendor?.toLowerCase() === "epic" ||
+      connectionMethod === "epic_connection";
+    const isEpicSandbox = isEpic &&
+      (org.fhir_environment === "sandbox" ||
+        org.fhir_endpoint_url.includes("fhir.epic.com"));
+    const clientId = isEpic
+      ? isEpicSandbox
+        ? Deno.env.get("FHIR_EPIC_SANDBOX_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+        : Deno.env.get("FHIR_EPIC_PRODUCTION_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+      : Deno.env.get("FHIR_CLIENT_ID");
 
     if (!clientId) {
       return json({

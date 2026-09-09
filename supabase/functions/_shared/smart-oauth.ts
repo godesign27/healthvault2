@@ -8,6 +8,58 @@ export function randomUrlSafeString(byteLength = 32): string {
   return base64UrlEncode(crypto.getRandomValues(new Uint8Array(byteLength)));
 }
 
+function base64ToBytes(value: string): Uint8Array {
+  const binary = atob(value);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+export async function createEpicClientAssertion(params: {
+  clientId: string;
+  tokenEndpoint: string;
+  privateKeyPkcs8Base64: string;
+  keyId: string;
+  jwksUrl?: string;
+  now?: number;
+}): Promise<string> {
+  const now = params.now ?? Math.floor(Date.now() / 1000);
+  const header: Record<string, string> = {
+    alg: "ES384",
+    typ: "JWT",
+    kid: params.keyId,
+  };
+  if (params.jwksUrl) header.jku = params.jwksUrl;
+
+  const payload = {
+    iss: params.clientId,
+    sub: params.clientId,
+    aud: params.tokenEndpoint,
+    jti: crypto.randomUUID(),
+    iat: now,
+    nbf: now,
+    exp: now + 300,
+  };
+  const encodedHeader = base64UrlEncode(
+    new TextEncoder().encode(JSON.stringify(header)),
+  );
+  const encodedPayload = base64UrlEncode(
+    new TextEncoder().encode(JSON.stringify(payload)),
+  );
+  const signingInput = `${encodedHeader}.${encodedPayload}`;
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    base64ToBytes(params.privateKeyPkcs8Base64),
+    { name: "ECDSA", namedCurve: "P-384" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign(
+    { name: "ECDSA", hash: "SHA-384" },
+    privateKey,
+    new TextEncoder().encode(signingInput),
+  );
+  return `${signingInput}.${base64UrlEncode(new Uint8Array(signature))}`;
+}
+
 export async function createPkcePair(): Promise<{
   codeVerifier: string;
   codeChallenge: string;
@@ -50,6 +102,7 @@ export async function exchangeAuthorizationCode(params: {
   redirectUri: string;
   clientId: string;
   clientSecret?: string;
+  clientAssertion?: string;
   codeVerifier: string;
 }): Promise<Record<string, unknown>> {
   const body = new URLSearchParams({
@@ -61,6 +114,13 @@ export async function exchangeAuthorizationCode(params: {
   });
   if (params.clientSecret) {
     body.set("client_secret", params.clientSecret);
+  }
+  if (params.clientAssertion) {
+    body.set(
+      "client_assertion_type",
+      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    );
+    body.set("client_assertion", params.clientAssertion);
   }
 
   const res = await fetch(params.tokenEndpoint, {
@@ -87,6 +147,7 @@ export async function refreshAccessToken(params: {
   refreshToken: string;
   clientId: string;
   clientSecret?: string;
+  clientAssertion?: string;
 }): Promise<Record<string, unknown>> {
   const body = new URLSearchParams({
     grant_type: "refresh_token",
@@ -95,6 +156,13 @@ export async function refreshAccessToken(params: {
   });
   if (params.clientSecret) {
     body.set("client_secret", params.clientSecret);
+  }
+  if (params.clientAssertion) {
+    body.set(
+      "client_assertion_type",
+      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    );
+    body.set("client_assertion", params.clientAssertion);
   }
 
   const res = await fetch(params.tokenEndpoint, {

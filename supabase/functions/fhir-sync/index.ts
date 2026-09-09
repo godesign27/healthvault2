@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
+  createEpicClientAssertion,
   refreshAccessToken,
   tokenExpiresAt,
 } from "../_shared/smart-oauth.ts";
@@ -31,8 +32,18 @@ async function ensureAccessToken(
   let accessToken = connection.fhir_access_token as string | null;
   const refreshToken = connection.fhir_refresh_token as string | null;
   const expiresAt = connection.token_expires_at as string | null;
-  const clientId = Deno.env.get("FHIR_CLIENT_ID");
   const clientSecret = Deno.env.get("FHIR_CLIENT_SECRET");
+  const isEpic = typeof org.ehr_vendor === "string" &&
+    org.ehr_vendor.toLowerCase() === "epic";
+  const isEpicSandbox = isEpic &&
+    (org.fhir_environment === "sandbox" ||
+      (typeof org.fhir_endpoint_url === "string" &&
+        org.fhir_endpoint_url.includes("fhir.epic.com")));
+  const clientId = isEpic
+    ? isEpicSandbox
+      ? Deno.env.get("FHIR_EPIC_SANDBOX_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+      : Deno.env.get("FHIR_EPIC_PRODUCTION_CLIENT_ID") || Deno.env.get("FHIR_CLIENT_ID")
+    : Deno.env.get("FHIR_CLIENT_ID");
 
   const isExpired = expiresAt
     ? new Date(expiresAt).getTime() <= Date.now() + 60_000
@@ -43,11 +54,26 @@ async function ensureAccessToken(
     throw new Error("Connection token expired and cannot be refreshed");
   }
 
+  const prefix = isEpicSandbox ? "FHIR_EPIC_SANDBOX" : "FHIR_EPIC_PRODUCTION";
+  const privateKeyPkcs8Base64 = Deno.env.get(`${prefix}_PRIVATE_KEY_PKCS8_BASE64`);
+  const keyId = Deno.env.get(`${prefix}_KEY_ID`);
+  const jwksUrl = Deno.env.get(`${prefix}_JWKS_URL`);
+  const clientAssertion = isEpic && privateKeyPkcs8Base64 && keyId
+    ? await createEpicClientAssertion({
+      clientId,
+      tokenEndpoint: org.token_endpoint as string,
+      privateKeyPkcs8Base64,
+      keyId,
+      jwksUrl,
+    })
+    : undefined;
+
   const refreshed = await refreshAccessToken({
     tokenEndpoint: org.token_endpoint as string,
     refreshToken,
     clientId,
-    clientSecret: clientSecret || undefined,
+    clientSecret: clientAssertion ? undefined : clientSecret || undefined,
+    clientAssertion,
   });
 
   accessToken = typeof refreshed.access_token === "string"
