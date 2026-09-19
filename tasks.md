@@ -10,10 +10,13 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 # ChatGPT App MVP
 
+- [x] Add missing domain metadata to the medical-form email-share widget for app submission; use the existing Health Vault widget origin and retain restrictive CSP.
+
 - [x] Repair browser dashboard rendering and diet confirmation payload/lifecycle; deployed MCP version 122, user verified button save, and authenticated read verified both intended entries appear once.
 - [x] Audit remaining confirmation buttons and auth/CSP configuration; findings in `packages/health-vault-mcp/RELEASE_REVIEW.md`.
-- [ ] Harden remaining Life Signal, form, and sharing buttons against host updates, missing bridge responses, and ambiguous retries; add isolated behavioral tests.
-- [ ] Verify all widgets with ChatGPT CSP enforcement enabled before broader release; current user screenshots show CSP off.
+- [x] Harden remaining Life Signal, form, and sharing buttons against host updates, missing bridge responses, and ambiguous retries; deployed version 124 with isolated behavioral tests.
+- [~] Verify all widgets with ChatGPT CSP enforcement enabled before broader release; enforcement is now enabled and existing diet cards render, full fresh-card coverage remains.
+- [ ] Add durable mutation idempotency across cards and atomic duplicate protection; existing condition checks are limited to 100 rows and race under concurrent requests.
 - [ ] Reconcile production MCP source drift before deploying the full checkout; current fixes were applied to live snapshots.
 
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.

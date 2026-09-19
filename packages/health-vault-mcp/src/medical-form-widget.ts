@@ -1,3 +1,5 @@
+import { WIDGET_HOST_SCRIPT } from "./widget-host.ts";
+
 export const MEDICAL_FORM_WIDGET_URI = "ui://widget/health-vault-medical-form-interview.html";
 
 export const MEDICAL_FORM_WIDGET_HTML = `<!doctype html>
@@ -51,6 +53,7 @@ button:disabled{opacity:.65;cursor:wait}
 </style></head>
 <body><main id="app" class="card"><div class="body">Loading medical forms…</div></main>
 <script>
+${WIDGET_HOST_SCRIPT}
 const esc=(v)=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const outputOf=(result)=>result?.structuredContent||result||{};
 let interactiveOutput=null;
@@ -66,8 +69,7 @@ function showError(message){
 async function call(name,args,button,label){
   try{
     if(button)setBusy(button,label);
-    if(!window.openai?.callTool)throw new Error('This action is unavailable in the current ChatGPT session. Continue in chat.');
-    const result=await window.openai.callTool(name,args);
+    const result=await hvHost.callTool(name,args);
     interactiveOutput=outputOf(result);
     renderOutput(interactiveOutput);
     return interactiveOutput;
@@ -175,7 +177,7 @@ async function saveReview(preview){
   }catch(error){
     const target=document.getElementById('error');
     if(target)target.innerHTML='<div class="notice error" role="alert">'+esc(error?.message||'Unable to save the form.')+'</div>';
-    if(button){button.disabled=false;button.textContent='Confirm & Save';}
+    if(button){button.disabled=hvHost.confirmationSubmitted;button.textContent=hvHost.confirmationSubmitted?'Check Health Vault':'Confirm & Save';}
   }finally{submitting=false}
 }
 function renderSaved(saved){
@@ -203,15 +205,7 @@ function renderOutput(out){
   if(out.form)return renderInterview(out.form,out);
   if(out.forms)return renderCatalog(out);
 }
-function render(){renderOutput(interactiveOutput||window.openai?.toolOutput||{})}
-window.addEventListener('openai:set_globals',render);
-window.addEventListener('message',(event)=>{
-  if(event.source!==window.parent)return;
-  const message=event.data;
-  if(!message||message.jsonrpc!=='2.0')return;
-  if(message.method!=='ui/notifications/tool-result')return;
-  const data=message.params?.structuredContent||message.params;
-  if(data){interactiveOutput=data;renderOutput(data)}
-},{passive:true});
+function render(){renderOutput(interactiveOutput||hvHost.output||{})}
+hvHost.subscribe(()=>{interactiveOutput=null;render()});
 render();
 </script></body></html>`;

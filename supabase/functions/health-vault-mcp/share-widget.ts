@@ -1,3 +1,5 @@
+import { WIDGET_HOST_SCRIPT } from "./widget-host.ts";
+
 export const SHARE_WIDGET_URI = "ui://widget/health-vault-share-confirmation.html";
 
 export const SHARE_WIDGET_HTML = `<!doctype html>
@@ -41,12 +43,13 @@ export const SHARE_WIDGET_HTML = `<!doctype html>
 <body>
   <main id="app" class="card">Preparing secure share…</main>
   <script>
+${WIDGET_HOST_SCRIPT}
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     let submitting = false;
     let completedShare = null;
     const label = (value) => String(value || '').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
     function render() {
-      const preview = window.openai?.toolOutput?.preview;
+      const preview = hvHost.output?.preview;
       if (!preview) return;
       const initials = String(preview.recipientName || 'Secure Share').split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase();
       const result = completedShare
@@ -66,12 +69,12 @@ export const SHARE_WIDGET_HTML = `<!doctype html>
       });
     }
     async function confirmShare() {
-      const preview = window.openai?.toolOutput?.preview;
+      const preview = hvHost.output?.preview;
       if (!preview || submitting) return;
       submitting = true;
       render();
       try {
-        const result = await window.openai.callTool('create_health_share', {
+        const result = await hvHost.callTool('create_health_share', {
           recipientName: preview.recipientName,
           recipientOrganization: preview.recipientOrganization || undefined,
           categories: preview.categories,
@@ -89,11 +92,11 @@ export const SHARE_WIDGET_HTML = `<!doctype html>
         if (completedShare) render();
         else {
           const button = document.getElementById('confirm-share');
-          if (button) { button.disabled = false; button.textContent = 'Confirm Secure Share'; }
+          if (button) { button.disabled = hvHost.confirmationSubmitted; button.textContent = hvHost.confirmationSubmitted ? 'Check Health Vault' : 'Confirm Secure Share'; }
         }
       }
     }
-    window.addEventListener('openai:set_globals', render);
+    hvHost.subscribe(render);
     render();
   </script>
 </body>

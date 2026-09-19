@@ -1,3 +1,5 @@
+import { WIDGET_HOST_SCRIPT } from "./widget-host.ts";
+
 export const LIFE_SIGNAL_WIDGET_URI = "ui://widget/health-vault-life-signal.html";
 
 export const LIFE_SIGNAL_WIDGET_HTML = `<!doctype html>
@@ -48,6 +50,7 @@ export const LIFE_SIGNAL_WIDGET_HTML = `<!doctype html>
     <div id="result" aria-live="polite"></div>
   </main>
   <script>
+${WIDGET_HOST_SCRIPT}
     const definitions = [['sleep', 'Sleep'], ['energy', 'Energy'], ['mood', 'Mood'], ['stress', 'Stress'], ['pain', 'Pain']];
     let submitting = false;
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -64,15 +67,15 @@ export const LIFE_SIGNAL_WIDGET_HTML = `<!doctype html>
       try {
         const input = Object.fromEntries(definitions.map(([key]) => [key, Number(document.getElementById(key).value)]));
         const note = document.getElementById('note').value.trim();
-        const result = await window.openai.callTool('log_life_signal', { ...input, note: note || undefined, confirmed: true });
+        const result = await hvHost.callTool('log_life_signal', { ...input, note: note || undefined, confirmed: true });
         const saved = result?.structuredContent?.saved || result?.saved;
         if (!saved) throw new Error('Health Vault did not return the saved check-in.');
         resultTarget.innerHTML = '<div class="result" role="status"><strong>Life Signal logged</strong><br>Your confirmed check-in is now in Health Vault.</div>';
         button.textContent = 'Logged';
       } catch (error) {
         resultTarget.innerHTML = '<div class="result error" role="alert">' + esc(error?.message || 'Unable to log this Life Signal.') + '</div>';
-        button.disabled = false;
-        button.textContent = 'Try Again';
+        button.disabled = hvHost.confirmationSubmitted;
+        button.textContent = hvHost.confirmationSubmitted ? 'Check Health Vault' : 'Try Again';
       } finally { submitting = false; }
     });
   </script>

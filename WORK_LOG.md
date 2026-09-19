@@ -9,6 +9,11 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ## 2026-09-19 (ChatGPT dashboard and diet confirmation repair)
 
+- **confirmation hardening** — Deployed version 124 with a shared standard/legacy host bridge for five remaining confirmation widgets. Added stable state, tool-error rejection, 30-second timeout, and per-card repeat-dispatch protection. All 59 tests pass, including isolated sharing expiry/revocation/token checks. No live health writes or emails were performed.
+- **security verification** — Checked enabled RLS and owner-scoped policies on shares, diet logs, Life Signals, and form proposals. Enabled ChatGPT CSP enforcement; complete fresh-card and second-account acceptance tests remain outstanding. Durable server idempotency and atomic duplicate protection remain tracked.
+
+- **submission metadata follow-up** — Added the existing Health Vault widget domain to the medical-form email-share resource in both standard and legacy metadata, plus the standard empty CSP allowlists. This fixes the missing-domain configuration reported by ChatGPT; cached plugin metadata needs refreshing. It does not establish CSP-on or submission approval.
+
 - **supabase / mcp** — Deployed through version 122: authenticated OAuth discovery configuration, current dashboard widget metadata/bridge, stable diet confirmation lifecycle, and normalization of nullable preview fields before saving. Preserved unrelated production changes by patching live snapshots.
 - **verification** — User verified a browser button save; authenticated read confirmed the two current-day entries each appear once. All 40 package tests pass. Public discovery returns 200; missing and invalid tokens return 401.
 - **release review** — Audited other confirmation buttons and recorded bridge, redraw, timeout, and retry gaps in `packages/health-vault-mcp/RELEASE_REVIEW.md`. CSP enforcement, second-account isolation, and remaining button hardening are still required before broader release. No review-generated writes or emails.

@@ -3,6 +3,30 @@
 Reviewed production `health-vault-mcp` version 122 and the local widget sources.
 This is a targeted confirmation-flow review, not a full security audit.
 
+## Follow-up: version 124
+
+- Life Signal, general sharing, standalone form review, form interview, and form
+  email sharing now embed one shared host bridge. It supports standard
+  initialization/calls and legacy calls, ignores unrelated/repeated globals,
+  preserves confirmation state, rejects tool errors, and bounds waiting to 30
+  seconds. Confirmed requests cannot be dispatched again from the same card.
+- All 59 package tests pass, including ten tests of the actual five cards across
+  both bridges, timeout/error tests, and isolated sharing-handler rejection tests.
+- Local sharing-handler tests reject revoked, expired, and incorrect-token
+  requests before reading form contents. A snapshot test verifies only selected
+  categories are queried/included. A duplicate-condition test prevents insertion.
+- Production RLS is enabled on shares, diet logs, Life Signals, and form
+  proposals; policies require owner identity for reads/writes. This inspection
+  does not substitute for a second-account integration test.
+- ChatGPT's **Enforce CSP in developer mode** switch was enabled and verified on.
+  Existing diet cards still render, and dashboard v2 renders in a newly opened browser page under enforcement. Full fresh-card coverage remains pending.
+- The source findings below describe the pre-124 implementation; the shared host
+  changes resolve their bridge, redraw, timeout, and same-card retry gaps.
+- Still pending: cross-card/server idempotency, simultaneous duplicate writes,
+  second-account RLS exercise, and a full set of live CSP-on widget interactions.
+  The condition duplicate check reads at most 100 rows and is not atomic; do not
+  treat its passing unit test as a guarantee against concurrent duplicates.
+
 ## Verified
 
 - The user successfully saved a diet preview with its button. A subsequent

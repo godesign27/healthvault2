@@ -308,13 +308,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-share-confirmation",
     SHARE_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Secure Health Vault share confirmation" },
+    { mimeType: "text/html;profile=mcp-app", description: "Secure Health Vault share confirmation" },
     async () => ({
       contents: [{
         uri: SHARE_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: SHARE_WIDGET_HTML,
         _meta: {
+          ui: { prefersBorder: true, domain: "https://widgets.healthvault.me", csp: { connectDomains: [], resourceDomains: [] } },
           "openai/widgetDescription": "A compact confirmation card for a scoped, expiring Health Vault share.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -368,13 +369,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-life-signal",
     LIFE_SIGNAL_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault Life Signal check-in" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault Life Signal check-in" },
     async () => ({
       contents: [{
         uri: LIFE_SIGNAL_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: LIFE_SIGNAL_WIDGET_HTML,
         _meta: {
+          ui: { prefersBorder: true, domain: "https://widgets.healthvault.me", csp: { connectDomains: [], resourceDomains: [] } },
           "openai/widgetDescription": "An accessible five-slider Life Signal check-in with a single Log button.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -407,11 +409,11 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-medical-forms",
     MEDICAL_FORM_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault medical forms" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault medical forms" },
     async () => ({
       contents: [{
         uri: MEDICAL_FORM_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: MEDICAL_FORM_WIDGET_HTML,
         _meta: {
           "openai/widgetDescription": "The authenticated user's common reusable forms, a single authoritative form interview, final review with Confirm & Save, and secure provider-form upload option.",
@@ -427,13 +429,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-medical-form-review",
     MEDICAL_FORM_REVIEW_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault medical form answer review" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault medical form answer review" },
     async () => ({
       contents: [{
         uri: MEDICAL_FORM_REVIEW_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: MEDICAL_FORM_REVIEW_WIDGET_HTML,
         _meta: {
+          ui: { prefersBorder: true, domain: "https://widgets.healthvault.me", csp: { connectDomains: [], resourceDomains: [] } },
           "openai/widgetDescription": "A typed reusable-form answer review with explicit confirmation that saves progress or completes the form.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -472,9 +475,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         mimeType: "text/html;profile=mcp-app",
         text: MEDICAL_FORM_SHARE_WIDGET_HTML,
         _meta: {
-          ui: { prefersBorder: true },
+          ui: {
+            prefersBorder: true,
+            domain: "https://widgets.healthvault.me",
+            csp: { connectDomains: [], resourceDomains: [] },
+          },
           "openai/widgetDescription": "The complete final review for one scoped, expiring medical-form email share. Do not duplicate its details in prose or request typed confirmation; the card's button is the explicit confirmation.",
           "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://widgets.healthvault.me",
           "openai/widgetCSP": { connect_domains: [], resource_domains: [] },
         },
       }],

@@ -216,15 +216,11 @@ test("medical-form email widget uses a versioned resource and contains no legacy
   assert.doesNotMatch(legacyEdgeWidget, /Nothing is sent automatically|>Confirm Secure Share</);
 });
 
-test("medical-form share widget waits for late ChatGPT tool output without becoming blank", () => {
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /globals\.toolOutput\|\|detail\.toolOutput/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval/);
-  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /setInterval\(function\(\)\{render\(\)/);
-  assert.doesNotMatch(MEDICAL_FORM_SHARE_WIDGET_HTML, /document\.body\.hidden=true/);
+test("medical-form share supports late output through the shared host", () => {
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /hvHost.subscribe\(render\)/);
   assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/notifications\/tool-result/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /request\('tools\/call'/);
-  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /\(function\(\)\{/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /ui\/initialize/);
+  assert.match(MEDICAL_FORM_SHARE_WIDGET_HTML, /Loading secure share review/);
 });
 
 test("medical-form share uses the current MCP Apps resource contract", async () => {
@@ -238,6 +234,9 @@ test("medical-form share uses the current MCP Apps resource contract", async () 
   );
   assert.match(resourceRegistration, /text\/html;profile=mcp-app/);
   assert.match(resourceRegistration, /ui:\s*\{\s*prefersBorder:\s*true/);
+  assert.match(resourceRegistration, /domain: "https:\/\/widgets\.healthvault\.me"/);
+  assert.match(resourceRegistration, /"openai\/widgetDomain": "https:\/\/widgets\.healthvault\.me"/);
+  assert.match(resourceRegistration, /csp: \{ connectDomains: \[\], resourceDomains: \[\] \}/);
 
   const previewTool = edgeIndex.slice(
     edgeIndex.indexOf('"preview_medical_form_email_share"'),
