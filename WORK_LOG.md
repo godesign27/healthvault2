@@ -9,6 +9,9 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ## 2026-09-19 (ChatGPT dashboard and diet confirmation repair)
 
+- **atomic wellness saves** — Applied the `atomic_wellness_confirmation` migration and deployed MCP version 125. Diet and Life Signal saves now serialize per user, reuse exact timestamp/content matches, and atomically roll back failed batches. Preview timestamps remain stable across card interactions. All 62 Node tests pass.
+- **database isolation** — A rolled-back test under two synthetic authenticated identities verified repeated saves, whole-batch rollback, cross-identity read/update/insert rejection, and missing-identity rejection. Follow-up counts show zero test rows. Share/email retry protection remains separate work.
+
 - **confirmation hardening** — Deployed version 124 with a shared standard/legacy host bridge for five remaining confirmation widgets. Added stable state, tool-error rejection, 30-second timeout, and per-card repeat-dispatch protection. All 59 tests pass, including isolated sharing expiry/revocation/token checks. No live health writes or emails were performed.
 - **security verification** — Checked enabled RLS and owner-scoped policies on shares, diet logs, Life Signals, and form proposals. Enabled ChatGPT CSP enforcement; complete fresh-card and second-account acceptance tests remain outstanding. Durable server idempotency and atomic duplicate protection remain tracked.
 

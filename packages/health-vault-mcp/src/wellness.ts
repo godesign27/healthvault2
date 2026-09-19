@@ -28,22 +28,15 @@ export function previewLifeSignal(input: LifeSignalInput) {
 }
 
 export async function logLifeSignal(supabase: SupabaseClient, userId: string, input: LifeSignalInput) {
-  const preview = previewLifeSignal(input);
-  const { requiresConfirmation: _requiresConfirmation, scale: _scale, provenance: _provenance, ...value } = preview;
-  const { data, error } = await supabase.from("life_signal_entries").insert({
-    user_id: userId,
-    energy: value.energy,
-    sleep: value.sleep,
-    mood: value.mood,
-    stress: value.stress,
-    pain: value.pain,
-    note: value.note,
-    recorded_at: value.recordedAt,
-    source: "chatgpt",
-    confirmation_status: "confirmed",
-  }).select("id, energy, sleep, mood, stress, pain, note, recorded_at, source, confirmation_status").single();
+  if (!input.recordedAt) throw new Error("Reopen the Life Signal preview before confirming.");
+  const value = previewLifeSignal(input);
+  const { data, error } = await supabase.rpc("confirm_wellness_entries", {
+    p_kind: "life_signal",
+    p_entries: [{ event_time: value.recordedAt, energy: value.energy, sleep: value.sleep,
+      mood: value.mood, stress: value.stress, pain: value.pain, note: value.note }],
+  });
   if (error) throw new Error(`Unable to save Life Signal: ${error.message}`);
-  return data;
+  return data?.[0];
 }
 
 export async function listLifeSignals(supabase: SupabaseClient, days: number) {
@@ -82,38 +75,17 @@ export function previewDietLog(input: DietLogInput) {
 }
 
 export async function logDietEntry(supabase: SupabaseClient, userId: string, input: DietLogInput) {
-  const preview = previewDietLog(input);
-  const { requiresConfirmation: _requiresConfirmation, provenance: _provenance, ...value } = preview;
-  const { data, error } = await supabase.from("diet_log_entries").insert({
-    user_id: userId,
-    meal_type: value.mealType,
-    consumed_at: value.consumedAt,
-    items: value.items,
-    water_ml: value.waterMl,
-    notes: value.notes,
-    source: "chatgpt",
-    confirmation_status: "confirmed",
-  }).select("id, meal_type, consumed_at, items, water_ml, notes, source, confirmation_status").single();
-  if (error) throw new Error(`Unable to save diet entry: ${error.message}`);
-  return data;
+  return (await logDietEntries(supabase, userId, [input]))[0];
 }
 
 export async function logDietEntries(supabase: SupabaseClient, userId: string, inputs: DietLogInput[]) {
-  const rows = inputs.map((input) => {
-    const preview = previewDietLog(input);
-    return {
-      user_id: userId,
-      meal_type: preview.mealType,
-      consumed_at: preview.consumedAt,
-      items: preview.items,
-      water_ml: preview.waterMl,
-      notes: preview.notes,
-      source: "chatgpt",
-      confirmation_status: "confirmed",
-    };
+  if (inputs.some((input) => !input.consumedAt)) throw new Error("Reopen the diet preview before confirming.");
+  const entries = inputs.map((input) => {
+    const value = previewDietLog(input);
+    return { event_time: value.consumedAt, meal_type: value.mealType,
+      items: value.items, water_ml: value.waterMl, notes: value.notes };
   });
-  const { data, error } = await supabase.from("diet_log_entries").insert(rows)
-    .select("id, meal_type, consumed_at, items, water_ml, notes, source, confirmation_status");
+  const { data, error } = await supabase.rpc("confirm_wellness_entries", { p_kind: "diet", p_entries: entries });
   if (error) throw new Error(`Unable to save diet entries: ${error.message}`);
   return data ?? [];
 }

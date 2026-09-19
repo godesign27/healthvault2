@@ -53,6 +53,7 @@ export const LIFE_SIGNAL_WIDGET_HTML = `<!doctype html>
 ${WIDGET_HOST_SCRIPT}
     const definitions = [['sleep', 'Sleep'], ['energy', 'Energy'], ['mood', 'Mood'], ['stress', 'Stress'], ['pain', 'Pain']];
     let submitting = false;
+    const openedAt = new Date().toISOString();
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     document.getElementById('signals').innerHTML = definitions.map(([key, label]) => '<div class="signal"><label for="' + key + '">' + label + '</label><input id="' + key + '" type="range" min="1" max="5" step="1" value="3"><output id="' + key + '-value" for="' + key + '">3</output></div>').join('');
     definitions.forEach(([key]) => document.getElementById(key).addEventListener('input', (event) => { document.getElementById(key + '-value').textContent = event.target.value; }));
@@ -67,7 +68,7 @@ ${WIDGET_HOST_SCRIPT}
       try {
         const input = Object.fromEntries(definitions.map(([key]) => [key, Number(document.getElementById(key).value)]));
         const note = document.getElementById('note').value.trim();
-        const result = await hvHost.callTool('log_life_signal', { ...input, note: note || undefined, confirmed: true });
+        const result = await hvHost.callTool('log_life_signal', { ...input, recordedAt: hvHost.output?.checkIn?.recordedAt || openedAt, note: note || undefined, confirmed: true });
         const saved = result?.structuredContent?.saved || result?.saved;
         if (!saved) throw new Error('Health Vault did not return the saved check-in.');
         resultTarget.innerHTML = '<div class="result" role="status"><strong>Life Signal logged</strong><br>Your confirmed check-in is now in Health Vault.</div>';

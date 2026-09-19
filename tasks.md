@@ -15,8 +15,10 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] Repair browser dashboard rendering and diet confirmation payload/lifecycle; deployed MCP version 122, user verified button save, and authenticated read verified both intended entries appear once.
 - [x] Audit remaining confirmation buttons and auth/CSP configuration; findings in `packages/health-vault-mcp/RELEASE_REVIEW.md`.
 - [x] Harden remaining Life Signal, form, and sharing buttons against host updates, missing bridge responses, and ambiguous retries; deployed version 124 with isolated behavioral tests.
-- [~] Verify all widgets with ChatGPT CSP enforcement enabled before broader release; enforcement is now enabled and existing diet cards render, full fresh-card coverage remains.
-- [ ] Add durable mutation idempotency across cards and atomic duplicate protection; existing condition checks are limited to 100 rows and race under concurrent requests.
+- [~] Verify all widgets with ChatGPT CSP enforcement enabled before broader release; enforcement is now enabled; dashboard, existing diet cards, and a fresh Life Signal card render. Form/share fresh-card coverage remains.
+- [x] Atomic duplicate-safe diet and Life Signal RPC saves, deployed in version 125; repeated exact events reuse their row and batches roll back together.
+- [x] Test wellness database isolation with two synthetic authenticated identities in a rolled-back transaction; zero fixture rows remain.
+- [ ] Add durable share/email retry protection and atomic duplicate protection for other health-data writes; existing condition checks are limited to 100 rows and race under concurrent requests.
 - [ ] Reconcile production MCP source drift before deploying the full checkout; current fixes were applied to live snapshots.
 
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.

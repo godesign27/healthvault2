@@ -1082,7 +1082,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       "openai/toolInvocation/invoked": "Life Signal check-in ready",
     },
   }, async () => ({
-    structuredContent: { checkIn: { scaleMin: 1, scaleMax: 5, signals: ["sleep", "energy", "mood", "stress", "pain"] } },
+    structuredContent: { checkIn: { recordedAt: new Date().toISOString(), scaleMin: 1, scaleMax: 5, signals: ["sleep", "energy", "mood", "stress", "pain"] } },
     content: [{ type: "text", text: "Use the sliders in the Life Signal card, then select Log Life Signal." }],
   }));
   previewTool("preview_life_signal", "Preview Life Signal", "Preview a Life Signal check-in without saving it. Explain the 1–5 scale and request explicit confirmation before log_life_signal.", lifeSignalSchema, previewLifeSignal);

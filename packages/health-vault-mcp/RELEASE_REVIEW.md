@@ -27,6 +27,32 @@ This is a targeted confirmation-flow review, not a full security audit.
   The condition duplicate check reads at most 100 rows and is not atomic; do not
   treat its passing unit test as a guarantee against concurrent duplicates.
 
+## Follow-up: version 125 — atomic wellness saves
+
+- Diet batch/single-entry and Life Signal tools now use the same authenticated
+  `SECURITY INVOKER` RPC. A transaction-scoped advisory lock serializes saves for
+  each user. An exact match (event timestamp plus normalized content) returns the
+  existing row; new entries are inserted atomically as a batch. Existing rows
+  are neither deleted nor rewritten. This applies to these RPC-based writes,
+  not arbitrary direct inserts from other clients.
+- Preview timestamps are required for saving. Life Signal check-in output now
+  includes a stable timestamp that its card sends back. A newly requested
+  check-in is a new event; this does not collapse different timestamps or
+  differently described foods into the same event.
+- Applied `20260919175918_atomic_wellness_confirmation.sql`. Anonymous execution
+  is revoked. RLS remains active and the database derives identity from
+  `auth.uid()`, not an input user ID.
+- `supabase/tests/wellness-confirmation.sql` passed against the database under
+  the authenticated role using two synthetic JWT identities: repeated saves,
+  no partial batch after validation failure, read/update/insert isolation, and
+  missing identity rejection. The transaction rolled back and a subsequent
+  count confirmed zero remaining test rows. No new auth accounts were created.
+- A freshly requested Life Signal card rendered all five sliders and its button in ChatGPT with CSP enforcement enabled. No ratings were submitted.
+- 62 Node tests pass. Browser OAuth isolation still needs separate signed-in
+  accounts; database identity simulation is not a browser sign-in test.
+- Remaining server work: durable share/email retry protection and atomic
+  duplicate protection for the other health-data writes.
+
 ## Verified
 
 - The user successfully saved a diet preview with its button. A subsequent
