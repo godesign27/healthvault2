@@ -1,0 +1,4 @@
+# MCP discovery must be reachable before login. The handler validates every
+# tool request with auth.getUser(accessToken) and uses the user's token for RLS.
+[functions.health-vault-mcp]
+verify_jwt = false

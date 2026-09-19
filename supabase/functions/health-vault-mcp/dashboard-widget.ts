@@ -1,4 +1,4 @@
-export const DASHBOARD_WIDGET_URI = "ui://widget/health-vault-dashboard.html";
+export const DASHBOARD_WIDGET_URI = "ui://widget/health-vault-dashboard-v2.html";
 
 export const DASHBOARD_WIDGET_HTML = `<!doctype html>
 <html lang="en">
@@ -118,6 +118,10 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
   <main id="app" class="card"><div class="empty">Loading your Health Vault…</div></main>
   <script>
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    let latestOutput = window.openai?.toolOutput;
+    let latestMetadata = window.openai?.toolResponseMetadata;
+    let initialized = false;
+    const post = (message) => window.parent.postMessage({ jsonrpc: '2.0', ...message }, '*');
     const uiState = { details: {}, viewMore: {}, medicalId: false, setupOpen: null };
     const openVault = () => {
       const href = 'https://healthvault.me/?app=dashboard&source=chatgpt';
@@ -125,15 +129,15 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
       else window.open(href, '_blank', 'noopener,noreferrer');
     };
     function render() {
-      const summary = window.openai?.toolOutput?.summary;
+      const summary = latestOutput?.summary;
       if (!summary) return;
       const appointment = summary.nextAppointment;
       const checklist = summary.onboarding?.checklist ?? [];
       const details = summary.details ?? {};
       const profile = summary.profile ?? {};
       const privateProfile = profile.private ?? {};
-      const recentChange = window.openai?.toolOutput?.recentChange;
-      const responseMetadata = window.openai?.toolResponseMetadata ?? {};
+      const recentChange = latestOutput?.recentChange;
+      const responseMetadata = latestMetadata ?? {};
       const hiddenMetadata = responseMetadata?.mcp_tool_result?._meta
         ?? responseMetadata?.call_tool_result?._meta
         ?? responseMetadata?._meta
@@ -258,7 +262,40 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
         syncAllDetailsLabel();
       });
     }
-    window.addEventListener('openai:set_globals', render);
+    window.addEventListener('openai:set_globals', (event) => {
+      const globals = event.detail?.globals ?? window.openai ?? {};
+      if (globals.toolOutput !== undefined) latestOutput = globals.toolOutput;
+      if (globals.toolResponseMetadata !== undefined) latestMetadata = globals.toolResponseMetadata;
+      render();
+    });
+    window.addEventListener('message', (event) => {
+      if (event.source !== window.parent) return;
+      const message = event.data;
+      if (!message || message.jsonrpc !== '2.0') return;
+      if (message.id === 'dashboard-init' && message.result && !initialized) {
+        initialized = true;
+        post({ method: 'ui/notifications/initialized', params: {} });
+      }
+      if (message.method === 'ui/notifications/tool-result') {
+        if (message.params?.isError) {
+          document.getElementById('app').innerHTML = '<div class="empty">Unable to load your dashboard. Please try again.</div>';
+          return;
+        }
+        latestOutput = message.params?.structuredContent;
+        latestMetadata = message.params?._meta;
+        render();
+      }
+      if (message.method === 'ping' && message.id !== undefined) {
+        post({ id: message.id, result: {} });
+      }
+    });
+    if (window.parent !== window) {
+      post({ id: 'dashboard-init', method: 'ui/initialize', params: {
+        protocolVersion: '2026-01-26',
+        appInfo: { name: 'health-vault-dashboard', version: '2.0.0' },
+        appCapabilities: { availableDisplayModes: ['inline'] },
+      } });
+    }
     render();
   </script>
 </body>

@@ -20,13 +20,21 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
   server.registerResource(
     "health-vault-dashboard",
     DASHBOARD_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Interactive Health Vault dashboard" },
+    { mimeType: "text/html;profile=mcp-app", description: "Interactive Health Vault dashboard" },
     async () => ({
       contents: [{
         uri: DASHBOARD_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: DASHBOARD_WIDGET_HTML,
         _meta: {
+          ui: {
+            prefersBorder: true,
+            domain: "https://widgets.healthvault.me",
+            csp: {
+              connectDomains: [],
+              resourceDomains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
+            },
+          },
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -99,6 +107,7 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
         openWorldHint: false,
       },
       _meta: {
+        ui: { resourceUri: DASHBOARD_WIDGET_URI },
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
         "openai/toolInvocation/invoking": "Loading your Health Vault",
         "openai/toolInvocation/invoked": "Health Vault dashboard ready",
@@ -112,7 +121,7 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
           content: [
             {
               type: "text",
-              text: "The current Health Vault dashboard is displayed in the widget.",
+              text: "Health Vault returned the current dashboard data. If no dashboard card is visible, summarize the returned data; do not claim the card is displayed.",
             },
           ],
         };
@@ -215,6 +224,7 @@ export function createHealthVaultMcpServer(supabase: SupabaseClient, userId: str
       inputSchema: z.object({ ...appointmentSchema, confirmed: z.literal(true) }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       _meta: {
+        ui: { resourceUri: DASHBOARD_WIDGET_URI },
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
         "openai/toolInvocation/invoking": "Saving your appointment",
         "openai/toolInvocation/invoked": "Appointment saved and dashboard updated",

@@ -1,4 +1,4 @@
-export const DIET_CONFIRMATION_WIDGET_URI = "ui://widget/health-vault-diet-confirmation.html";
+export const DIET_CONFIRMATION_WIDGET_URI = "ui://widget/health-vault-diet-confirmation-v2.html";
 
 export const DIET_CONFIRMATION_WIDGET_HTML = `<!doctype html>
 <html lang="en">
@@ -54,26 +54,66 @@ export const DIET_CONFIRMATION_WIDGET_HTML = `<!doctype html>
     const app = document.getElementById('app');
     let preview = null;
     let submitting = false;
+    let attempted = false;
+    let saved = false;
+    let bridgeReady = false;
+    let pendingSave = null;
+    function receive(result) {
+      const output = result?.structuredContent || result;
+      if (output?.confirmationState === 'confirmed' && output?.wellness) {
+        saved = true;
+        renderWellness(output.wellness);
+        return;
+      }
+      if (saved || attempted || !output?.preview?.entries?.length) return;
+      if (JSON.stringify(preview) === JSON.stringify(output.preview)) return;
+      preview = output.preview;
+      renderPreview();
+    }
     function renderPreview() {
-      preview = window.openai?.toolOutput?.preview;
-      if (!preview?.entries?.length) return;
       app.innerHTML = '<div class="hero"><p class="eyebrow">Diet Log</p><h1>Review before saving</h1></div><div class="body">' + preview.entries.map(entryMarkup).join('') + '<div class="notice">Nothing has been saved yet. Confirm once to add all ' + preview.entries.length + ' entr' + (preview.entries.length === 1 ? 'y' : 'ies') + ' to your Wellness log.</div></div><div class="actions"><button id="confirm">Confirm Diet Log</button><a href="https://healthvault.me/?app=wellness&source=chatgpt" id="wellness">Open Wellness</a></div><div id="error"></div>';
       document.getElementById('confirm')?.addEventListener('click', save);
       document.getElementById('wellness')?.addEventListener('click', (event) => { event.preventDefault(); const href = event.currentTarget.href; if (window.openai?.openExternal) window.openai.openExternal({ href }); else window.open(href, '_blank', 'noopener,noreferrer'); });
     }
     async function save() {
-      if (submitting || !preview) return;
+      if (submitting || attempted || saved || !preview) return;
       submitting = true;
       const button = document.getElementById('confirm');
       button.disabled = true; button.textContent = 'Saving…';
       try {
-        const result = await window.openai.callTool('log_diet_entries', { entries: preview.entries, confirmed: true });
+        // Preview data contains nullable display fields and provenance. Send only
+        // the save tool's input fields, omitting missing optional values.
+        const entries = preview.entries.map((entry) => ({
+          mealType: entry.mealType,
+          ...(entry.consumedAt != null ? { consumedAt: entry.consumedAt } : {}),
+          items: entry.items.map((item) => ({ name: item.name,
+            ...(item.amount != null ? { amount: item.amount } : {}),
+            ...(item.notes != null ? { notes: item.notes } : {}) })),
+          ...(entry.waterMl != null ? { waterMl: entry.waterMl } : {}),
+          ...(entry.notes != null ? { notes: entry.notes } : {}),
+        }));
+        const args = { entries, confirmed: true };
+        if (!window.openai?.callTool && !bridgeReady) throw new Error('The ChatGPT connection is not ready. Please reopen this preview.');
+        attempted = true;
+        const request = window.openai?.callTool
+          ? window.openai.callTool('log_diet_entries', args)
+          : new Promise((resolve, reject) => {
+              pendingSave = { resolve, reject };
+              window.parent.postMessage({ jsonrpc: '2.0', id: 'diet-save', method: 'tools/call', params: { name: 'log_diet_entries', arguments: args } }, '*');
+            });
+        let timer;
+        const result = await Promise.race([request, new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error('The save response timed out.')), 30000);
+        })]).finally(() => { clearTimeout(timer); pendingSave = null; });
+        if (result?.isError) throw new Error((result.content || []).filter((item) => item.type === 'text').map((item) => item.text).join(' ') || 'Unable to verify the save.');
         const wellness = result?.structuredContent?.wellness || result?.wellness;
         if (!wellness) throw new Error('Health Vault did not return the Wellness summary.');
+        saved = true;
         renderWellness(wellness);
       } catch (error) {
-        document.getElementById('error').innerHTML = '<div class="error" role="alert">' + esc(error?.message || 'Unable to save this diet log.') + '</div>';
-        button.disabled = false; button.textContent = 'Try Again';
+        if (saved) return;
+        document.getElementById('error').innerHTML = '<div class="error" role="alert">' + esc(error?.message || 'Unable to verify the save.') + (attempted ? ' Open Wellness to check whether these entries were saved before confirming again.' : '') + '</div>';
+        button.disabled = attempted; button.textContent = attempted ? 'Check Wellness before retrying' : 'Try Again';
       } finally { submitting = false; }
     }
     function renderWellness(wellness) {
@@ -82,8 +122,22 @@ export const DIET_CONFIRMATION_WIDGET_HTML = `<!doctype html>
       app.innerHTML = '<div class="hero"><p class="eyebrow">Wellness</p><h1>Diet log updated</h1></div><div class="body"><div class="stats"><div class="stat"><strong>' + esc(diet.loggedEntries || 0) + '</strong><span>Diet entries · 7 days</span></div><div class="stat"><strong>' + esc(diet.loggedWaterMl || 0) + '</strong><span>Water logged · mL</span></div><div class="stat"><strong>' + esc(signals.length) + '</strong><span>Life Signals · 7 days</span></div></div><div class="notice">Your confirmed entries were saved once and are now available on the Wellness page.</div></div><div class="actions"><a style="grid-column:1/-1" href="https://healthvault.me/?app=wellness&source=chatgpt" id="open-wellness">Open Wellness</a></div>';
       document.getElementById('open-wellness')?.addEventListener('click', (event) => { event.preventDefault(); const href = event.currentTarget.href; if (window.openai?.openExternal) window.openai.openExternal({ href }); else window.open(href, '_blank', 'noopener,noreferrer'); });
     }
-    window.addEventListener('openai:set_globals', renderPreview);
-    renderPreview();
+    window.addEventListener('openai:set_globals', (event) => receive(event.detail?.globals?.toolOutput));
+    window.addEventListener('message', (event) => {
+      if (event.source !== window.parent || event.data?.jsonrpc !== '2.0') return;
+      const message = event.data;
+      if (message.id === 'diet-init' && message.result) {
+        bridgeReady = true;
+        window.parent.postMessage({ jsonrpc: '2.0', method: 'ui/notifications/initialized', params: {} }, '*');
+      } else if (message.id === 'diet-save' && pendingSave) {
+        if (message.error) pendingSave.reject(new Error(message.error.message || 'Unable to verify the save.'));
+        else pendingSave.resolve(message.result);
+      } else if (message.method === 'ui/notifications/tool-result') receive(message.params);
+    });
+    receive(window.openai?.toolOutput);
+    window.parent.postMessage({ jsonrpc: '2.0', id: 'diet-init', method: 'ui/initialize', params: {
+      protocolVersion: '2026-01-26', appInfo: { name: 'health-vault-diet', version: '2.0.0' }, appCapabilities: {}
+    } }, '*');
   </script>
 </body>
 </html>`;

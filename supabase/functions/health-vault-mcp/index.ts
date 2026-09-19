@@ -278,13 +278,21 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-dashboard",
     DASHBOARD_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Interactive Health Vault dashboard" },
+    { mimeType: "text/html;profile=mcp-app", description: "Interactive Health Vault dashboard" },
     async () => ({
       contents: [{
         uri: DASHBOARD_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: DASHBOARD_WIDGET_HTML,
         _meta: {
+          ui: {
+            prefersBorder: true,
+            domain: "https://widgets.healthvault.me",
+            csp: {
+              connectDomains: [],
+              resourceDomains: ["https://sgwekxjlvadvdosyudgj.supabase.co"],
+            },
+          },
           "openai/widgetDescription": "A private dashboard of the authenticated user's Health Vault data and setup progress.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -379,13 +387,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
   server.registerResource(
     "health-vault-diet-confirmation",
     DIET_CONFIRMATION_WIDGET_URI,
-    { mimeType: "text/html+skybridge", description: "Health Vault diet-log confirmation" },
+    { mimeType: "text/html;profile=mcp-app", description: "Health Vault diet-log confirmation" },
     async () => ({
       contents: [{
         uri: DIET_CONFIRMATION_WIDGET_URI,
-        mimeType: "text/html+skybridge",
+        mimeType: "text/html;profile=mcp-app",
         text: DIET_CONFIRMATION_WIDGET_HTML,
         _meta: {
+          ui: { prefersBorder: true, domain: "https://widgets.healthvault.me", csp: { connectDomains: [], resourceDomains: [] } },
           "openai/widgetDescription": "A single confirmation card for one or more diet entries that becomes a Wellness summary after saving.",
           "openai/widgetPrefersBorder": true,
           "openai/widgetDomain": "https://widgets.healthvault.me",
@@ -783,6 +792,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         openWorldHint: false,
       },
       _meta: {
+        ui: { resourceUri: DASHBOARD_WIDGET_URI },
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
         "openai/toolInvocation/invoking": "Loading your Health Vault",
         "openai/toolInvocation/invoked": "Health Vault dashboard ready",
@@ -793,7 +803,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
         const summary = await getSharedHealthSummary(supabase);
         return {
           structuredContent: { summary },
-          content: [{ type: "text", text: "The current Health Vault dashboard is displayed in the widget." }],
+          content: [{ type: "text", text: "Health Vault returned the current dashboard data. If no dashboard card is visible, summarize the returned data; do not claim the card is displayed." }],
           _meta: await dashboardMetadata(summary),
         };
       } catch (error) {
@@ -922,6 +932,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
       outputSchema: z.object({ summary: z.unknown(), recentChange: z.unknown() }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       _meta: {
+        ui: { resourceUri: DASHBOARD_WIDGET_URI },
         "openai/outputTemplate": DASHBOARD_WIDGET_URI,
         "openai/toolInvocation/invoking": "Saving your appointment",
         "openai/toolInvocation/invoked": "Appointment saved and dashboard updated",
@@ -1072,14 +1083,14 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
 
   const dietLogSchema = z.object({
     mealType: z.enum(["breakfast", "lunch", "dinner", "snack", "drink", "other"]),
-    consumedAt: z.string().datetime({ offset: true }).optional(),
+    consumedAt: z.string().datetime({ offset: true }).nullish().transform((value) => value ?? undefined),
     items: z.array(z.object({
       name: z.string().trim().min(1).max(160),
-      amount: z.string().trim().max(120).optional(),
-      notes: z.string().trim().max(500).optional(),
+      amount: z.string().trim().max(120).nullish().transform((value) => value ?? undefined),
+      notes: z.string().trim().max(500).nullish().transform((value) => value ?? undefined),
     })).min(1).max(30),
-    waterMl: z.number().int().min(0).max(20_000).optional(),
-    notes: z.string().trim().max(2000).optional(),
+    waterMl: z.number().int().min(0).max(20_000).nullish().transform((value) => value ?? undefined),
+    notes: z.string().trim().max(2000).nullish().transform((value) => value ?? undefined),
   });
   server.registerTool("preview_diet_entries", {
     title: "Preview diet log",
@@ -1088,6 +1099,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     outputSchema: z.object({ preview: z.unknown() }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     _meta: {
+      ui: { resourceUri: DIET_CONFIRMATION_WIDGET_URI },
       "openai/outputTemplate": DIET_CONFIRMATION_WIDGET_URI,
       "openai/toolInvocation/invoking": "Preparing your diet log",
       "openai/toolInvocation/invoked": "Diet log ready to confirm",
@@ -1102,7 +1114,7 @@ function createHealthVaultMcpServer(supabase: SupabaseClient, userId: string): M
     inputSchema: z.object({ entries: z.array(dietLogSchema).min(1).max(20), confirmed: z.literal(true) }),
     outputSchema: z.object({ saved: z.unknown(), wellness: z.unknown(), confirmationState: z.literal("confirmed") }),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
-    _meta: { "openai/widgetAccessible": true },
+    _meta: { ui: { visibility: ["model", "app"] }, "openai/widgetAccessible": true },
   }, async ({ entries }) => {
     try {
       const saved = await logDietEntries(supabase, userId, entries);

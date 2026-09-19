@@ -10,6 +10,12 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 # ChatGPT App MVP
 
+- [x] Repair browser dashboard rendering and diet confirmation payload/lifecycle; deployed MCP version 122, user verified button save, and authenticated read verified both intended entries appear once.
+- [x] Audit remaining confirmation buttons and auth/CSP configuration; findings in `packages/health-vault-mcp/RELEASE_REVIEW.md`.
+- [ ] Harden remaining Life Signal, form, and sharing buttons against host updates, missing bridge responses, and ambiguous retries; add isolated behavioral tests.
+- [ ] Verify all widgets with ChatGPT CSP enforcement enabled before broader release; current user screenshots show CSP off.
+- [ ] Reconcile production MCP source drift before deploying the full checkout; current fixes were applied to live snapshots.
+
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
 - [x] Interactive dashboard widget with live summary, three-item detail previews with View More controls, profile photo, privacy-gated Medical ID, next appointment, and onboarding checklist.
 - [x] Read-only detail tools for conditions, medications, allergies, and recent records.

@@ -7,6 +7,12 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ---
 
+## 2026-09-19 (ChatGPT dashboard and diet confirmation repair)
+
+- **supabase / mcp** — Deployed through version 122: authenticated OAuth discovery configuration, current dashboard widget metadata/bridge, stable diet confirmation lifecycle, and normalization of nullable preview fields before saving. Preserved unrelated production changes by patching live snapshots.
+- **verification** — User verified a browser button save; authenticated read confirmed the two current-day entries each appear once. All 40 package tests pass. Public discovery returns 200; missing and invalid tokens return 401.
+- **release review** — Audited other confirmation buttons and recorded bridge, redraw, timeout, and retry gaps in `packages/health-vault-mcp/RELEASE_REVIEW.md`. CSP enforcement, second-account isolation, and remaining button hardening are still required before broader release. No review-generated writes or emails.
+
 ## 2026-08-24 (ChatGPT Patient Registration interview)
 
 - **supabase / mcp** — Patient Registration in ChatGPT now keeps one authoritative interview per user and form. Accepted answers persist before progress is calculated, related questions are asked in groups, the same interview widget is reused for progress/review/save, and Confirm & Save still requires an explicit second step. After a completed save the card offers a secure share. Review prefilled answers calls the interview tool instead of a no-op follow-up.
