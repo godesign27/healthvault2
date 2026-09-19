@@ -3,6 +3,37 @@
 Reviewed production `health-vault-mcp` version 122 and the local widget sources.
 This is a targeted confirmation-flow review, not a full security audit.
 
+## Follow-up: version 126 — durable share/email receipts
+
+- Added private owner-scoped `share_confirmation_receipts` and security-invoker
+  claim/completion RPCs. The claim is committed before a link or email is created.
+  Equivalent normalized requests reuse a completed active share. Concurrent or
+  interrupted pending requests never automatically dispatch another delivery.
+  Revoked, expired, or deleted completed links permit a new explicit confirmation.
+- General-share identities include the selected snapshot; medical-form identities
+  include the form revision, recipient, receipt choice, and patient identity.
+  A different snapshot, revision, recipient, or other input is a different request.
+  This is duplicate-dispatch protection, not an external email delivery guarantee.
+- Fixed production drift: the deployed medical-form helper was the old non-email
+  implementation even though its registered tool promised email. Deployed the
+  repository's email implementation with the durable guard. Preserved the live
+  general-sharing `vitals` category and synchronized it into the worktree.
+- All 67 Node tests pass, including the actual medical-form helper with a mocked
+  sender, repeated/concurrent calls, and lost delivery/receipt responses.
+- Database tests passed for pending claims, result reuse, owner isolation,
+  cross-owner revocation rejection, and revoked/expired replacement. Rolled back
+  every fixture; follow-up counts confirmed no receipt/share fixtures remained.
+  Anonymous RPC execution is denied. No real emails were sent.
+- A pending receipt deliberately has no automatic timeout/release. Recovery
+  requires inspecting the matching share and delivery service before clearing
+  or completing it; never blindly reset it or resend after an ambiguous failure.
+  Historical shares created before these receipts are not deduplicated by this
+  mechanism. Do not reconfirm an old pre-upgrade card just to test it.
+- A fresh medical-forms catalog rendered in ChatGPT with CSP enforcement enabled; no form was started or changed.
+- Remaining: atomic duplicate checks on other health-data writes, all live
+  confirmation/share CSP paths with legitimate test inputs, and browser OAuth
+  isolation across two signed-in accounts.
+
 ## Follow-up: version 124
 
 - Life Signal, general sharing, standalone form review, form interview, and form

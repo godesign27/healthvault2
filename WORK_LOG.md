@@ -9,6 +9,9 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ## 2026-09-19 (ChatGPT dashboard and diet confirmation repair)
 
+- **share/email retries** — Applied `durable_share_confirmation` and deployed MCP version 126. Owner-scoped receipts reserve each normalized share request before its side effects, reuse active completed shares, and block ambiguous retries. Revoked/expired completed links can be replaced after confirmation. Pending receipts require verified recovery, not automatic resend.
+- **deployment drift** — Replaced the live non-email medical-form helper with the repository email implementation and durable guard; preserved the live vitals-sharing support. All 67 Node tests pass, including a mocked sender; database receipt/isolation/revoke/expiry tests passed and rolled back with zero fixtures remaining. No real email delivery was invoked.
+
 - **atomic wellness saves** — Applied the `atomic_wellness_confirmation` migration and deployed MCP version 125. Diet and Life Signal saves now serialize per user, reuse exact timestamp/content matches, and atomically roll back failed batches. Preview timestamps remain stable across card interactions. All 62 Node tests pass.
 - **database isolation** — A rolled-back test under two synthetic authenticated identities verified repeated saves, whole-batch rollback, cross-identity read/update/insert rejection, and missing-identity rejection. Follow-up counts show zero test rows. Share/email retry protection remains separate work.
 

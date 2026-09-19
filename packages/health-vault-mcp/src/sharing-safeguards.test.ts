@@ -21,6 +21,8 @@ test('a share snapshots only the selected category and preserves expiration', as
     const q: any = { select: () => q, order: () => q, limit: async () => result, maybeSingle: async () => result };
     q.insert = async row => { inserted = row; return { error: null }; }; return q;
   } };
+  db.rpc = async (name) => name === 'claim_share_confirmation'
+    ? { data: { status: 'claimed', id: '00000000-0000-4000-8000-000000000001' } } : {};
   const before = Date.now();
   await createHealthShare(db, 'fixture-owner', 'https://example.invalid', { recipientName: 'Test', categories: ['conditions'], expiresInDays: 2 });
   assert.deepEqual(tables, ['conditions', 'user_profiles', 'share_events']);

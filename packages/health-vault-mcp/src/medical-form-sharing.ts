@@ -1,3 +1,4 @@
+import { confirmedShare } from "./share-confirmation.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPatientProfileId, GPT_MEDICAL_FORMS } from "./medical-forms.ts";
 
@@ -107,7 +108,7 @@ export async function createMedicalFormShare(
   const profileName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(" ").trim();
   const patientName = profileName || patientProfile?.name?.trim() || "Health Vault patient";
   const patientEmail = userProfile?.email_verified ? clean(userProfile.email) : null;
-  const shareId = crypto.randomUUID();
+  return confirmedShare(supabase, "medical_form_email", { ...preview, responseUpdatedAt: response.updated_at, patientName, patientEmail }, async (shareId) => {
   const shareToken = crypto.randomUUID();
   const createdAt = new Date().toISOString();
   const expiresAt = new Date(Date.now() + preview.expiresInHours * 3_600_000).toISOString();
@@ -181,4 +182,5 @@ export async function createMedicalFormShare(
       ? `Secure ${preview.templateTitle} share created and its email was accepted for delivery to ${preview.recipientName}.`
       : `Secure ${preview.templateTitle} share created for ${preview.recipientName}, but the email could not be delivered. Copy the secure link instead.`,
   };
+  });
 }

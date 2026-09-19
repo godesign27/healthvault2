@@ -1,3 +1,4 @@
+import { confirmedShare } from "./share-confirmation.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const HEALTH_SHARE_CATEGORIES = [
@@ -7,6 +8,7 @@ export const HEALTH_SHARE_CATEGORIES = [
   "records",
   "appointments",
   "medical_id",
+  "vitals",
 ] as const;
 
 export type HealthShareCategory = typeof HEALTH_SHARE_CATEGORIES[number];
@@ -54,6 +56,7 @@ async function getSnapshot(supabase: SupabaseClient, categories: HealthShareCate
   if (selected.has("records")) add("records", supabase.from("health_records").select("title, kind, provider_name, service_date, ai_summary, tags").order("service_date", { ascending: false, nullsFirst: false }).limit(50));
   if (selected.has("appointments")) add("appointments", supabase.from("appointments").select("provider_name, appointment_type, scheduled_at, location, status, notes").order("scheduled_at", { ascending: false }).limit(50));
   if (selected.has("medical_id")) add("medical_id", supabase.from("user_profiles").select("first_name, last_name, date_of_birth, email, phone, address_line1, address_line2, city, state, postal_code").maybeSingle());
+  if (selected.has("vitals")) add("vitals", supabase.from("vital_measurements").select("metric, value, secondary_value, unit, observed_at, source_name, device_name").order("observed_at", { ascending: false }).limit(250));
 
   const results = await Promise.all(queries);
   const snapshot: Record<string, unknown> = {};
@@ -80,7 +83,7 @@ export async function createHealthShare(
     .maybeSingle();
   if (profileError) throw new Error(`Unable to prepare patient identity for sharing: ${profileError.message}`);
   const patientName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "Health Vault member";
-  const shareId = crypto.randomUUID();
+  return confirmedShare(supabase, "health_share", { ...preview, categories: [...preview.categories].sort(), snapshot, patientName }, async (shareId) => {
   const shareToken = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + preview.expiresInDays * 86_400_000).toISOString();
   const { error } = await supabase.from("share_events").insert({
@@ -119,6 +122,7 @@ export async function createHealthShare(
     expiresAt,
     canBeRevoked: true,
   };
+  });
 }
 
 export async function revokeHealthShare(supabase: SupabaseClient, shareId: string) {
