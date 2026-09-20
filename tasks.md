@@ -10,6 +10,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 # ChatGPT App MVP
 
+- [x] Correct patient email receipts to distinguish service acceptance from unconfirmed delivery; version 127, 73 tests passing with mocked delivery.
+- [x] Prepare final live share/CSP and two-account OAuth acceptance steps in `packages/health-vault-mcp/LIVE_ACCEPTANCE.md`; execution awaits approved recipient/form and account setup.
+
 - [x] Add missing domain metadata to the medical-form email-share widget for app submission; use the existing Health Vault widget origin and retain restrictive CSP.
 
 - [x] Repair browser dashboard rendering and diet confirmation payload/lifecycle; deployed MCP version 122, user verified button save, and authenticated read verified both intended entries appear once.

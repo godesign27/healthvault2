@@ -63,11 +63,14 @@ export async function sendMedicalFormShareEmail(input: SendMedicalFormShareEmail
 
   let patientCopy: DeliveryResult | undefined;
   if (input.sendPatientCopy && input.patientEmail) {
+    const deliveryStatus = recipient.sent
+      ? "The email service accepted the recipient email. Inbox delivery is not yet confirmed."
+      : "We could not confirm that the email service accepted the recipient email. Check the share status in Health Vault before trying again.";
     patientCopy = await deliver(fetcher, input.apiKey, {
       from: input.from,
       to: [input.patientEmail],
       subject: "Your Health Vault secure-share receipt",
-      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#17223b"><h1 style="font-size:24px">Health Vault</h1><p>Your secure form link for ${escapeHtml(input.recipientName)} was created and sent.</p><p>The link expires ${escapeHtml(new Date(input.expiresAt).toLocaleString("en-US", { timeZone: "America/Denver", timeZoneName: "short" }))}. You can revoke it from Health Vault.</p></div>`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#17223b"><h1 style="font-size:24px">Health Vault</h1><p>Your secure form link for ${escapeHtml(input.recipientName)} was created.</p><p>${deliveryStatus}</p><p>The link expires ${escapeHtml(new Date(input.expiresAt).toLocaleString("en-US", { timeZone: "America/Denver", timeZoneName: "short" }))}. You can revoke it from Health Vault.</p></div>`,
     });
   }
 

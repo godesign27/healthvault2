@@ -1,7 +1,22 @@
 # ChatGPT widget release review — 2026-09-19
 
-Reviewed production `health-vault-mcp` version 122 and the local widget sources.
-This is a targeted confirmation-flow review, not a full security audit.
+Current deployment: `health-vault-mcp` version 127. This targeted confirmation-flow
+review began at version 122; the dated/versioned findings below retain that history.
+It is not a full security audit.
+
+## Follow-up: version 127 — accurate patient email receipts
+
+- Patient receipts previously said the recipient email was sent even when delivery
+  failed. They now distinguish service acceptance from an unconfirmed request;
+  neither outcome promises inbox delivery. Unconfirmed outcomes direct the patient
+  to check share status before retrying.
+- All 73 tests pass. Six new mocked cases exercise both package and deployed-edge
+  implementations for accepted, rejected, and timed-out recipient requests, including
+  escaped recipient names and no secure token in the patient receipt.
+- Deployed only the email helper on the fresh version-126 source snapshot, preserving
+  unrelated live files. No real email or health-record mutation occurred.
+- Final acceptance needs an approved recipient/form and two signed-in accounts.
+  Follow `LIVE_ACCEPTANCE.md`; it separates browser evidence from existing SQL tests.
 
 ## Follow-up: version 126 — durable share/email receipts
 

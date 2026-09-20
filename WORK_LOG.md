@@ -9,6 +9,9 @@ Areas: `mobile` · `web` · `supabase` · `design-system` · `infra`
 
 ## 2026-09-19 (ChatGPT dashboard and diet confirmation repair)
 
+- **email acceptance follow-up** — Found patient receipts incorrectly claimed a recipient send after failed delivery. Updated both helper copies to describe service acceptance or an unconfirmed send accurately; deployed the tested helper alone on the latest live snapshot as version 127. All 73 tests pass, including six new package/edge acceptance, rejection, and timeout cases. No real email was sent.
+- **live acceptance preparation** — Added `LIVE_ACCEPTANCE.md` with specific share/CSP, delivery, cleanup, and two-account OAuth checks. Asked for an approved recipient/form and second test account; live disclosure and account-switch tests remain pending those inputs.
+
 - **share/email retries** — Applied `durable_share_confirmation` and deployed MCP version 126. Owner-scoped receipts reserve each normalized share request before its side effects, reuse active completed shares, and block ambiguous retries. Revoked/expired completed links can be replaced after confirmation. Pending receipts require verified recovery, not automatic resend.
 - **deployment drift** — Replaced the live non-email medical-form helper with the repository email implementation and durable guard; preserved the live vitals-sharing support. All 67 Node tests pass, including a mocked sender; database receipt/isolation/revoke/expiry tests passed and rolled back with zero fixtures remaining. No real email delivery was invoked.
 
