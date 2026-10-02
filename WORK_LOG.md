@@ -534,3 +534,8 @@ _Older history predates this log. See git history and the chat transcript for de
 - Prepared proposed daily business-day review, two-business-day acknowledgement and 30-calendar-day routine resolution targets for owner review; no legal deadline or automatic purge claim.
 - Added per-request checklist and two-account synthetic erasure/recovery acceptance criteria. No account data changed, no alert installed and no readiness gate marked passed.
 - Validation: scoped diff whitespace check; documentation-only change.
+
+### 2026-10-02 — Account controls website release prepared
+- User authorized committing, pushing and deploying account controls and policy pages. Scoped release includes Settings export/reviewed-deletion UI, direct privacy/terms/support routes and corrected footer links. Draft notices remain explicitly non-final.
+- Restored root dependencies from lockfile. Build, five export tests and Cloudflare dry run pass. Live export function ACTIVE; deletion queue has RLS and two policies. Existing backend source/migration and synthetic tests included for reproducibility.
+- Web dependency audit reports eight advisories (five high, one moderate, two low); broader workspace advisories differ. These remain readiness work, not fixed in this scoped release. No patient export or deletion request executed.

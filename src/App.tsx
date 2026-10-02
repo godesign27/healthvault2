@@ -1,3 +1,4 @@
+import { AccountPolicyPage } from './pages/AccountPolicyPage';
 import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { DesignSystemDemoShell } from './components/DesignSystemDemoShell';
@@ -597,6 +598,11 @@ function App() {
 
     return <DesignSystemDemoShell>{designSystemContent}</DesignSystemDemoShell>;
   };
+
+  const policyPath = window.location.pathname.replace(/\/$/, '');
+  if (policyPath === '/privacy' || policyPath === '/terms' || policyPath === '/support') {
+    return <AccountPolicyPage page={policyPath.slice(1) as 'privacy' | 'terms' | 'support'} />;
+  }
 
   const isShareRoute = window.location.pathname.startsWith('/share/');
 

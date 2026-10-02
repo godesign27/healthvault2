@@ -110,7 +110,7 @@ export function MarketingFooter({ darkMode = false, onPageChange }: MarketingFoo
             }`}>Legal</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#privacy" className={`text-sm transition-colors ${
+                <a href="/privacy" className={`text-sm transition-colors ${
                   darkMode
                     ? 'text-content-secondary hover:text-white'
                     : 'text-content-secondary hover:text-content-primary'
@@ -119,7 +119,7 @@ export function MarketingFooter({ darkMode = false, onPageChange }: MarketingFoo
                 </a>
               </li>
               <li>
-                <a href="#disclaimer" className={`text-sm transition-colors ${
+                <a href="/terms#medical-disclaimer" className={`text-sm transition-colors ${
                   darkMode
                     ? 'text-content-secondary hover:text-white'
                     : 'text-content-secondary hover:text-content-primary'
@@ -128,7 +128,7 @@ export function MarketingFooter({ darkMode = false, onPageChange }: MarketingFoo
                 </a>
               </li>
               <li>
-                <a href="#terms" className={`text-sm transition-colors ${
+                <a href="/terms" className={`text-sm transition-colors ${
                   darkMode
                     ? 'text-content-secondary hover:text-white'
                     : 'text-content-secondary hover:text-content-primary'

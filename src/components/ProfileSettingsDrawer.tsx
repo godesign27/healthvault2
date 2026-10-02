@@ -1,3 +1,4 @@
+import { AccountDataControls } from './AccountDataControls';
 import { X, Upload, Mail, Calendar, Shield, Bell, Globe, User, LogOut, Building2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
@@ -694,16 +695,7 @@ export function ProfileSettingsDrawer({
                   </button>
                 </div>
               )}
-              <button className={`w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors text-left ${
-                darkMode
-                  ? 'border-stroke-default hover:bg-surface-sunken text-content-primary'
-                  : 'border-stroke-default hover:bg-surface-sunken text-content-primary'
-              }`}>
-                Download My Data
-              </button>
-              <button className="w-full px-4 py-2.5 rounded-lg border border-red-600 text-sm font-medium transition-colors text-left text-red-600 hover:bg-red-50">
-                Delete Account
-              </button>
+              <AccountDataControls />
             </div>
           </div>
 

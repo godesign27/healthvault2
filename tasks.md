@@ -513,3 +513,6 @@ _Last updated: 2026-08-29_
 
 - [x] Draft reviewed-deletion scope, response targets, verification checklist and synthetic rehearsal criteria in DELETION_RETENTION_REVIEW.md.
 - [ ] Accept operational deletion targets; approve category retention periods and implement/test erasure, access blocking and queue monitoring before readiness sign-off.
+
+- [x] Prepare scoped account-controls website release; lockfile build, five export tests, deployed backend availability and Cloudflare dry run verified.
+- [ ] Verify live website routes after deployment and complete authenticated synthetic export/deletion acceptance, dependency remediation and recovery gates.
