@@ -528,3 +528,9 @@ _Older history predates this log. See git history and the chat transcript for de
   corrected dark semantic action/link/feedback tokens so selected summaries, statuses, banners,
   and destructive states remain legible. Verified dark Patient Access visually, switched back to
   light mode, reloaded, and confirmed the saved preference remained active.
+
+### 2026-10-02 — Concrete deletion/retention procedure drafted
+- Reviewed existing queue operations, recovery evidence, export scope and share/record-request code. Documented categories beyond the export, including file bytes, pending proposals, access tokens, consent evidence and mail copies.
+- Prepared proposed daily business-day review, two-business-day acknowledgement and 30-calendar-day routine resolution targets for owner review; no legal deadline or automatic purge claim.
+- Added per-request checklist and two-account synthetic erasure/recovery acceptance criteria. No account data changed, no alert installed and no readiness gate marked passed.
+- Validation: scoped diff whitespace check; documentation-only change.

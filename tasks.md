@@ -510,3 +510,6 @@ _Last updated: 2026-08-29_
       accounts with immutable audit evidence; any legacy memberships are suspended without
       permissions and legacy patient assignments are quarantined roster identities, with no
       inferred practitioner role, identity link, consent, or provider access grant.
+
+- [x] Draft reviewed-deletion scope, response targets, verification checklist and synthetic rehearsal criteria in DELETION_RETENTION_REVIEW.md.
+- [ ] Accept operational deletion targets; approve category retention periods and implement/test erasure, access blocking and queue monitoring before readiness sign-off.
