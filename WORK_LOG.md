@@ -539,3 +539,8 @@ _Older history predates this log. See git history and the chat transcript for de
 - User authorized committing, pushing and deploying account controls and policy pages. Scoped release includes Settings export/reviewed-deletion UI, direct privacy/terms/support routes and corrected footer links. Draft notices remain explicitly non-final.
 - Restored root dependencies from lockfile. Build, five export tests and Cloudflare dry run pass. Live export function ACTIVE; deletion queue has RLS and two policies. Existing backend source/migration and synthetic tests included for reproducibility.
 - Web dependency audit reports eight advisories (five high, one moderate, two low); broader workspace advisories differ. These remain readiness work, not fixed in this scoped release. No patient export or deletion request executed.
+
+### 2026-10-02 — Account-controls website deployed and smoke-tested
+- Pushed release ef2d430 and deployed healthvault2 via Wrangler 4.127.0 with strict configuration checking and preserved variables. Production version 444c359b-ef92-4efb-aaec-537bf63eef4c; previous rollback candidate 2ef20640-dd6a-4afc-8392-1bcdf6badd88.
+- Browser verified healthvault.me/support, /privacy and /terms, including GO Design, Inc., Illinois, supplied mailing address and explicit non-final policy label. Authenticated Settings displays Download My Data and loads Request Account Deletion without an error.
+- No personal data downloaded and no real deletion request submitted. Authenticated synthetic end-to-end acceptance, operational erasure/recovery, final policies, age enforcement and dependency remediation remain open.

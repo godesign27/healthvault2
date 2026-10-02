@@ -516,3 +516,5 @@ _Last updated: 2026-08-29_
 
 - [x] Prepare scoped account-controls website release; lockfile build, five export tests, deployed backend availability and Cloudflare dry run verified.
 - [ ] Verify live website routes after deployment and complete authenticated synthetic export/deletion acceptance, dependency remediation and recovery gates.
+
+- [x] Deploy account-controls release ef2d430 to healthvault2 and verify live support/privacy/terms routes plus authenticated Settings controls.
