@@ -51,3 +51,7 @@ Worker `58de17f4-6c31-4ffa-bce2-fdfc2eb1d6a7` derives card status from explicit 
 ## Responsive insurance layout
 
 Worker `46d3e27c-34b8-41ee-ba5c-14aad18de3fb` preserves header clearance at phone/tablet widths and stacks narrow card content. Browser checks at 375px and 768px: document width equals viewport width, heading begins at 80px under the 56px header, and measured coverage actions are 48px tall. Focused regressions/build pass. Native device accessibility remains a separate gate.
+
+## Consistent insurer tiles and keyboard editing
+
+Worker `1f5a57ca-d569-4255-b873-4b7e0fbed836` provides initials on every coverage card and member-editor focus recovery. Browser verified Enter opens the editor, autofocus reaches its labeled input, blank Save is disabled, Tab reaches Cancel, and Escape/keyboard Cancel restore focus. Component/hook tests cover failed-save draft retention and duplicate writes. Initial browser load was blank without captured errors; reload recovered. Live network-failure simulation and native screen-reader acceptance remain unverified.

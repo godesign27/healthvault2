@@ -1,5 +1,5 @@
 import {useInsuranceMutation} from '../../../../packages/api-client/src/useInsuranceMutation';
-import {displayInsuranceMemberId,insuranceStatus,insuranceVerificationNotice,insuranceCoverageStatus,formatInsuranceDate} from '../../../../packages/api-client/src/insurance-status';
+import {insuranceProviderInitials,displayInsuranceMemberId,insuranceStatus,insuranceVerificationNotice,insuranceCoverageStatus,formatInsuranceDate} from '../../../../packages/api-client/src/insurance-status';
 import {useInsuranceData} from '../hooks/useInsuranceData';
 import {recordsColors} from '../theme/records';
 import {typeStyles,control,space,radius} from '../theme/layout';
@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
-  Image,
   Pressable,
   Alert,
   Platform,
@@ -61,13 +60,9 @@ function CoverageCardMobile({
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <View style={styles.cardHeaderLeft}>
-          {coverage.provider.logoUrl ? (
-            <Image source={{ uri: coverage.provider.logoUrl }} style={styles.providerLogo} />
-          ) : (
-            <View style={styles.providerLogoPlaceholder}>
-              <Ionicons name="business-outline" size={22} color={STEEL.textSecondary} />
-            </View>
-          )}
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.providerLogoPlaceholder}>
+            <Text variant="section" style={{color: STEEL.onAction, fontWeight: '700'}}>{insuranceProviderInitials(coverage.provider.name)}</Text>
+          </View>
           <View style={styles.cardTitleBlock}>
             <View style={styles.nameRow}>
               <Text variant="section" style={styles.providerName} numberOfLines={2}>
@@ -344,7 +339,7 @@ const createStyles = (STEEL) => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 10,
-    backgroundColor: STEEL.surfaceMuted,
+    backgroundColor: STEEL.navy,
     alignItems: 'center',
     justifyContent: 'center',
   },

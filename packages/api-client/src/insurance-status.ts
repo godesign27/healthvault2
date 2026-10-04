@@ -47,3 +47,9 @@ export function insuranceMemberIdFields(value: string | null | undefined) {
 export function insuranceCoverageStatus(coverage: {memberId?: string | null; effectiveEnd?: string | null}, now = new Date()) {
   return coverageEndState(coverage.effectiveEnd, now) || (coverage.memberId?.trim() ? 'saved' : 'missing_member_id');
 }
+
+/** Stable insurer initials for cards without depending on remote logo assets. */
+export function insuranceProviderInitials(name: string | null | undefined) {
+  const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+  return (words.length > 1 ? words.slice(0, 2).map(word => Array.from(word)[0]).join('') : Array.from(words[0] ?? '').slice(0, 2).join('')).toLocaleUpperCase() || 'IN';
+}

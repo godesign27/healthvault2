@@ -1,5 +1,5 @@
-import {useId, useState} from 'react';
-import {displayInsuranceMemberId,insuranceCoverageStatus,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
+import {useId, useRef, useState} from 'react';
+import {insuranceProviderInitials,displayInsuranceMemberId,insuranceCoverageStatus,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
 import { Edit2, Trash2, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
 import { CoverageWithProvider } from '../../schemas/insurance';
 import { StatusBadge } from './StatusBadge';
@@ -33,6 +33,8 @@ export function CoverageCard({
   const memberFieldId = useId();
   const [editingMember, setEditingMember] = useState(false);
   const [memberDraft, setMemberDraft] = useState('');
+  const restoreMemberFocus = useRef(false);
+  const cancelMemberEdit = () => { restoreMemberFocus.current = true; setEditingMember(false); setMemberDraft(''); };
   const badgeStatus = insuranceCoverageStatus(coverage);
   const isStopped = coverage.coverageStatus === 'stopped';
 
@@ -44,13 +46,9 @@ export function CoverageCard({
     >
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-4 sm:p-6 pb-4">
         <div className="flex min-w-0 items-start gap-4">
-          {coverage.provider.logoUrl && (
-            <img
-              src={coverage.provider.logoUrl}
-              alt={coverage.provider.name}
-              className="w-12 h-12 rounded-lg"
-            />
-          )}
+          <div aria-hidden="true" className="w-12 h-12 shrink-0 rounded-lg bg-action-primary text-white flex items-center justify-center text-xl font-semibold">
+            {insuranceProviderInitials(coverage.provider.name)}
+          </div>
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <h3 className={`font-semibold text-lg ${
@@ -84,20 +82,20 @@ export function CoverageCard({
           }`}>Member ID</p>
           <p className="font-mono text-sm break-words">{displayInsuranceMemberId(coverage.memberId)}</p>
           {showActions && onSaveMemberId && (editingMember ? (
-            <form className="mt-3 space-y-3" onSubmit={async event => {
+            <form className="mt-3 space-y-3" onKeyDown={event => { if (event.key === 'Escape' && !busy) { event.preventDefault(); cancelMemberEdit(); } }} onSubmit={async event => {
               event.preventDefault();
               if (await onSaveMemberId(coverage, memberDraft)) {setEditingMember(false); setMemberDraft('');}
             }}>
               <label htmlFor={memberFieldId} className="block text-sm">Member ID from your insurance card</label>
-              <input id={memberFieldId} value={memberDraft} onChange={event => setMemberDraft(event.target.value)}
+              <input autoFocus id={memberFieldId} value={memberDraft} onChange={event => setMemberDraft(event.target.value)}
                 required disabled={busy} autoComplete="off" spellCheck={false}
                 className="w-full min-h-12 rounded-lg border border-current bg-surface-default px-3 text-content-primary" />
               <div className="flex flex-wrap gap-2">
                 <button type="submit" disabled={busy || !memberDraft.trim()} className="min-h-12 px-3 rounded-lg bg-action-primary text-white">Save ID</button>
-                <button type="button" disabled={busy} className="min-h-12 px-3 rounded-lg text-content-primary" onClick={() => {setEditingMember(false); setMemberDraft('');}}>Cancel</button>
+                <button type="button" disabled={busy} className="min-h-12 px-3 rounded-lg text-content-primary" onClick={cancelMemberEdit}>Cancel</button>
               </div>
             </form>
-          ) : <button disabled={busy} onClick={() => setEditingMember(true)} className="min-h-12 mt-2 px-3 rounded-lg text-content-primary underline">
+          ) : <button ref={node => { if (node && restoreMemberFocus.current) { restoreMemberFocus.current = false; node.focus(); } }} disabled={busy} onClick={() => setEditingMember(true)} className="min-h-12 mt-2 px-3 rounded-lg text-content-primary underline">
             {coverage.memberId ? 'Update member ID' : 'Add member ID'}
           </button>)}
         </div>

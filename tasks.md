@@ -905,3 +905,4 @@ _Last updated: 2026-08-29_
 - [x] Keep insurance save feedback stable above the list through refresh; use persistent dismissible accessible banner instead of timed sliding toast.
 - [x] Derive insurance card badge from explicit member-ID completeness and end dates across web/native; clear missing-ID warning after confirmed save.
 - [x] Fix insurance header overlap below desktop; reflow narrow cards and ensure 48px coverage action targets.
+- [x] Give every insurance card a consistent insurer-initials tile; improve member-ID editor autofocus, Escape cancellation and return focus. Save failure/double-submit regressions pass.

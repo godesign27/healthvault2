@@ -12,3 +12,8 @@ assert.equal(label(status({memberId:'TEST-5677',effectiveEnd:'2026-10-03'},now))
 assert.equal(label(status({memberId:'TEST-5677',effectiveEnd:'2026-10-11'},now)).label,'Ending soon');
 for(const path of ['src/components/insurance/CoverageCard.tsx','apps/mobile/src/screens/InsuranceScreen.js'])assert.ok(fs.readFileSync(path,'utf8').includes('insuranceCoverageStatus(coverage)'));
 console.log('PASS saved ID clears missing-ID warning; legacy verified flags cannot hide missing IDs; end-date warnings remain; web/native share resolver');
+assert.equal(exports.insuranceProviderInitials('Aetna'),'AE');
+assert.equal(exports.insuranceProviderInitials('United Health Care'),'UH');
+assert.equal(exports.insuranceProviderInitials('UnitedHealthcare'),'UN');
+assert.equal(exports.insuranceProviderInitials(''),'IN');
+console.log('PASS consistent provider initials including missing names');
