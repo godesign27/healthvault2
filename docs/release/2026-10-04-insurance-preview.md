@@ -55,3 +55,7 @@ Worker `46d3e27c-34b8-41ee-ba5c-14aad18de3fb` preserves header clearance at phon
 ## Consistent insurer tiles and keyboard editing
 
 Worker `1f5a57ca-d569-4255-b873-4b7e0fbed836` provides initials on every coverage card and member-editor focus recovery. Browser verified Enter opens the editor, autofocus reaches its labeled input, blank Save is disabled, Tab reaches Cancel, and Escape/keyboard Cancel restore focus. Component/hook tests cover failed-save draft retention and duplicate writes. Initial browser load was blank without captured errors; reload recovered. Live network-failure simulation and native screen-reader acceptance remain unverified.
+
+## Browser failure recovery acceptance
+
+Local isolated fixture: real insurance card/hook sends same-origin HTTP requests. A 503 retains the draft, shows an error, re-enables controls and never claims success. Retrying with 200 saves once, closes editor and shows Saved/Member ID saved; two requests total. No real account data touched. Native theme/data/refresh suites pass. VoiceOver and ambiguous network outcomes remain unverified; this result is not production approval.

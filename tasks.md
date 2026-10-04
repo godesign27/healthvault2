@@ -906,3 +906,5 @@ _Last updated: 2026-08-29_
 - [x] Derive insurance card badge from explicit member-ID completeness and end dates across web/native; clear missing-ID warning after confirmed save.
 - [x] Fix insurance header overlap below desktop; reflow narrow cards and ensure 48px coverage action targets.
 - [x] Give every insurance card a consistent insurer-initials tile; improve member-ID editor autofocus, Escape cancellation and return focus. Save failure/double-submit regressions pass.
+- [x] Browser-test explicit HTTP save failure and successful retained-draft retry using local-only actual insurance components/hook.
+- [ ] Complete VoiceOver/device insurance acceptance; simulator exists but current computer-use surface does not expose Simulator.
