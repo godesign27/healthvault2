@@ -39,3 +39,7 @@ The initial HTTP/bundle checks missed a rendered Organization Not Found error. T
 ## Email verification unblock
 
 Preview Worker `2959233c-e4e0-4be4-8a0d-38cfefb719e9` replaces the six-slot OTP form with a full-code input and explicit submit. Component regression and isolated build pass; browser confirms the deployed labeled field and Verify email button. Account email can be re-entered when the verification step is reopened. Emailed-code acceptance remains pending user completion; no production auth configuration was changed.
+
+## Persistent insurance feedback
+
+Preview Worker `0fdd894c-1dc1-4027-94dd-c524e549912a` uses a static persistent Banner above the insurance list. Regression covers loading/refetch stability and accessible manual dismissal; isolated build passes. Interactive preview save showed the confirmation after cards returned and beyond the old timeout; manual dismissal passed. Test primary selection was restored to its original plan. No production release.

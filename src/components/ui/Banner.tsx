@@ -41,6 +41,8 @@ export function Banner({ message, variant = 'info', style = 'solid', onClose }: 
 
   return (
     <div
+      role={variant === 'error' ? 'alert' : 'status'}
+      aria-atomic="true"
       className={cn(
         'flex items-center gap-3 px-4 py-3 rounded w-full',
         style === 'outline' && cn('bg-surface-raised text-content-primary', outlineBorder[variant]),
@@ -52,10 +54,11 @@ export function Banner({ message, variant = 'info', style = 'solid', onClose }: 
       <span className="flex-1 text-sm font-medium">{message}</span>
       {onClose && (
         <button
+          aria-label="Dismiss notification"
           onClick={onClose}
-          className="shrink-0 p-1 rounded hover:bg-black/10 transition-colors"
+          className="shrink-0 min-h-12 min-w-12 inline-flex items-center justify-center rounded hover:bg-black/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
         >
-          <X className="w-4 h-4" />
+          <X aria-hidden="true" className="w-4 h-4" />
         </button>
       )}
     </div>

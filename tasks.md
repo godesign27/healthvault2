@@ -901,3 +901,5 @@ _Last updated: 2026-08-29_
 - [ ] Complete authenticated browser save acceptance and mobile physical interaction tests before production promotion.
 - [x] Correct dedicated preview hostname being mistaken for an organization; add routing regression.
 - [x] Remove six-digit onboarding verification limit; preserve full emailed codes and add explicit accessible submit with duplicate guard (preview).
+- [x] Populate verified preview account with user-authorized one-time structured data copy; verify counts, ownership visibility and rendered insurance cards. Live account remains isolated.
+- [x] Keep insurance save feedback stable above the list through refresh; use persistent dismissible accessible banner instead of timed sliding toast.

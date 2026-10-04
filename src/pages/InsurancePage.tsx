@@ -7,7 +7,7 @@ import { CoverageCard } from '../components/insurance/CoverageCard';
 import { CoverageWithProvider } from '../schemas/insurance';
 import { InsuranceAnalytics } from '../lib/insurance/analytics';
 import { supabase } from '../lib/supabase';
-import { Toast } from '../components/Toast';
+import { Banner } from '../components/ui/Banner';
 
 interface InsurancePageProps {
   darkMode?: boolean;
@@ -83,6 +83,11 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
       )}
 
       <p className="mb-6 text-content-secondary">{insuranceVerificationNotice}</p>
+      {toast && (
+        <div className="sticky top-20 z-30 mb-4">
+          <Banner key={toast.id} message={toast.message} variant={toast.type} style="light" onClose={() => setToast(null)} />
+        </div>
+      )}
       {busy && <p role="status" className="mb-4 text-content-secondary">Updating saved coverage…</p>}
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -124,14 +129,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
         </div>
       )}
 
-      {toast && (
-        <Toast
-          id={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+
     </div>
   );
 }
