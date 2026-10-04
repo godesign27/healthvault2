@@ -908,3 +908,13 @@ _Last updated: 2026-08-29_
 - [x] Give every insurance card a consistent insurer-initials tile; improve member-ID editor autofocus, Escape cancellation and return focus. Save failure/double-submit regressions pass.
 - [x] Browser-test explicit HTTP save failure and successful retained-draft retry using local-only actual insurance components/hook.
 - [ ] Complete VoiceOver/device insurance acceptance; simulator exists but current computer-use surface does not expose Simulator.
+
+### Current insurance promotion gates — 2026-10-04 source audit
+This section supersedes older pending preview acceptance entries above; it does not mark production or native acceptance complete.
+- [x] Accept preview signup, authenticated member-ID save, primary switch, persistent feedback, keyboard cancellation and responsive web layout.
+- [x] Audit isolated release source separately from working-tree checks; add a failing-on-error release check runner.
+- [ ] Review/integrate missing source fixes: isolated snapshot has 169 TypeScript diagnostics; working copy has 12 marketing-only diagnostics. Preserve unrelated changes and marketing scope.
+- [ ] Verify candidate dependency installation from its own lockfile, full typecheck and build on that same source before promotion.
+- [ ] Test ambiguous server-commit/client-response-loss recovery.
+- [ ] Complete native screen-reader, maximum text size and end-of-list action acceptance.
+- [ ] Run production insurance preflight and staged backend/web promotion; preview migrations alone do not satisfy production rollout.

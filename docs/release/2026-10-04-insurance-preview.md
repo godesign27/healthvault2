@@ -5,8 +5,34 @@ Other accumulated working-tree changes were excluded. No Git push or production 
 
 Web: https://healthvault2-insurance-preview.timothymcguire.workers.dev
 Cloudflare Worker: `healthvault2-insurance-preview`
-Version: `56b544d0-8b75-4372-9f6e-bd01352f7546`
+Current web version: `1f5a57ca-d569-4255-b873-4b7e0fbed836` (initial version: `56b544d0-8b75-4372-9f6e-bd01352f7546`).
 Backend: `roeudwddxvniazwufdqf`, the existing preview branch of `sgwekxjlvadvdosyudgj`.
+
+## Current promotion status
+
+**Blocked pending release-source integration and remaining acceptance gates.** Insurance preview behavior has passed scoped checks; this is not whole-app production approval.
+
+| Gate | Current evidence |
+| --- | --- |
+| Real preview account signup | User completed verification with the full emailed code. |
+| Authenticated insurance writes | Member-ID save and primary switch accepted; original primary restored. |
+| Feedback and keyboard | Persistent receipt, manual dismissal, editor autofocus, Escape and Cancel return focus accepted. |
+| Responsive layout | 375px and 768px checks passed; controls measured at least 48px high. |
+| Explicit failed save | Local real-component HTTP 503/200 fixture passed retained-draft retry; no real account writes. |
+| Full source typecheck | **Fail:** isolated preview source reports 169 diagnostics across 40 files; working copy reports 12 across four marketing files. Results are not interchangeable. |
+| Native accessibility | VoiceOver/TalkBack, maximum text size and end-of-list action reachability remain open. |
+| Ambiguous save outcome | Response lost after server commit remains untested. |
+| Production backend and web | Not promoted. Run production preflight and reviewed rollout after source/acceptance gates. |
+
+### Source consistency audit
+
+The isolated snapshot at `/tmp/hv-insurance-release` was built with the workspace's installed dependencies via a `node_modules` symlink. Its Vite build passing does not imply TypeScript validation passed or that installation is reproducible from its own lockfile. The snapshot retains older source consumers while the working copy contains additional uncommitted fixes. Examples include Zod `.errors` access, required Toast IDs, component prop mismatches, and network ownership types. The full 169 diagnostics include 79 unused-symbol diagnostics and 90 other diagnostics; none are reported directly in the insurance files.
+
+Do not copy the entire working tree to clear these failures. Review and integrate the missing dependencies/fixes in bounded batches, then install from the candidate lockfile and check that exact candidate. Marketing files are outside the current app-edit scope; their 12 unused-symbol diagnostics remain recorded rather than suppressed. No compiler exclusions or weakened checks were added.
+
+Audit result: working copy **12/13 checks pass** (only full typecheck fails); isolated snapshot **11/13 pass** (typecheck plus the cross-client completeness assertion fail). Current test scripts were copied into the temporary snapshot before checking it; application source was not changed. The snapshot still contains the older native status resolver, while the working copy has the shared completeness resolver. This is an additional native source-integration gap, not evidence that the deployed web badge is broken.
+
+Run `node /path/to/repository/scripts/check-insurance-release.mjs` **with the release source root as the working directory**. It runs the full web typecheck and 12 focused suites, continues after a failed check, and exits nonzero if any fail. It does not build, deploy, touch account data, or replace device/browser/database acceptance.
 
 ## Deployed in order
 
@@ -28,17 +54,17 @@ Backend: `roeudwddxvniazwufdqf`, the existing preview branch of `sgwekxjlvadvdos
 
 ## Limits and rollback
 
-This is a preview deployment, not production approval. Authenticated browser saves, mobile keyboard/screen-reader flows, full TypeScript/dependency gates and the broader readiness list remain open. No mobile store/OTA release was performed. The broader working tree still contains unrelated unfinished work.
+This is a preview deployment, not production approval. Authenticated browser saves have passed the checks above. Native screen-reader flows, ambiguous save outcomes, full TypeScript/dependency gates and the broader readiness list remain open. No mobile store/OTA release was performed. The broader working tree still contains unrelated unfinished work.
 
 Previous preview function versions: assistant 33 and account-export 3. Web preview Worker was created for this release. Reverting clients/functions must preserve newly stored explicit member IDs; do not drop the column as rollback. Keep the atomic RPC while any client depends on it.
 
 ## Preview routing correction
 
-The initial HTTP/bundle checks missed a rendered Organization Not Found error. The exact preview hostname now uses main-app routing; production tenant routing and deliberate organization previews remain intact. Regression test and build passed. Redeployed Worker version `6df6236c-5fa1-4456-b76c-ecc0e60cde5f`; browser reload verified the landing page and Log In opening the sign-in form. Authenticated saves remain unverified.
+The initial HTTP/bundle checks missed a rendered Organization Not Found error. The exact preview hostname now uses main-app routing; production tenant routing and deliberate organization previews remain intact. Regression test and build passed. Redeployed Worker version `6df6236c-5fa1-4456-b76c-ecc0e60cde5f`; browser reload verified the landing page and Log In opening the sign-in form. Authenticated saves were unverified at this routing step; later acceptance is recorded above.
 
 ## Email verification unblock
 
-Preview Worker `2959233c-e4e0-4be4-8a0d-38cfefb719e9` replaces the six-slot OTP form with a full-code input and explicit submit. Component regression and isolated build pass; browser confirms the deployed labeled field and Verify email button. Account email can be re-entered when the verification step is reopened. Emailed-code acceptance remains pending user completion; no production auth configuration was changed.
+Preview Worker `2959233c-e4e0-4be4-8a0d-38cfefb719e9` replaces the six-slot OTP form with a full-code input and explicit submit. Component regression and isolated build pass; browser confirms the deployed labeled field and Verify email button. Account email can be re-entered when the verification step is reopened. The user subsequently completed emailed-code verification; no production auth configuration was changed.
 
 ## Persistent insurance feedback
 
