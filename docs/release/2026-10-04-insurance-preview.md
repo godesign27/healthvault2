@@ -31,3 +31,7 @@ Backend: `roeudwddxvniazwufdqf`, the existing preview branch of `sgwekxjlvadvdos
 This is a preview deployment, not production approval. Authenticated browser saves, mobile keyboard/screen-reader flows, full TypeScript/dependency gates and the broader readiness list remain open. No mobile store/OTA release was performed. The broader working tree still contains unrelated unfinished work.
 
 Previous preview function versions: assistant 33 and account-export 3. Web preview Worker was created for this release. Reverting clients/functions must preserve newly stored explicit member IDs; do not drop the column as rollback. Keep the atomic RPC while any client depends on it.
+
+## Preview routing correction
+
+The initial HTTP/bundle checks missed a rendered Organization Not Found error. The exact preview hostname now uses main-app routing; production tenant routing and deliberate organization previews remain intact. Regression test and build passed. Redeployed Worker version `6df6236c-5fa1-4456-b76c-ecc0e60cde5f`; browser reload verified the landing page and Log In opening the sign-in form. Authenticated saves remain unverified.

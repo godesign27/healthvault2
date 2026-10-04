@@ -15,7 +15,8 @@ export function parseSubdomain(hostname: string = window.location.hostname): Sub
                        hostname.startsWith('192.168');
 
   // Check for cloud development platforms
-  const isCloudDev = hostname.includes('.bolt.new') ||
+  const isCloudDev = hostname === 'healthvault2-insurance-preview.timothymcguire.workers.dev' ||
+                     hostname.includes('.bolt.new') ||
                      hostname.endsWith('.bolt.new') ||
                      hostname.includes('bolt.new') ||
                      hostname.includes('.webcontainer-api.io') ||
@@ -77,7 +78,8 @@ export function buildUrl(subdomain: string | null, path: string = '/'): string {
                        hostname.startsWith('127.0.0.1') ||
                        hostname.startsWith('192.168');
 
-  const isCloudDev = hostname.includes('.bolt.new') ||
+  const isCloudDev = hostname === 'healthvault2-insurance-preview.timothymcguire.workers.dev' ||
+                     hostname.includes('.bolt.new') ||
                      hostname.endsWith('.bolt.new') ||
                      hostname.includes('bolt.new') ||
                      hostname.includes('.webcontainer-api.io') ||

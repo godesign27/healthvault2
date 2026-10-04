@@ -899,3 +899,4 @@ _Last updated: 2026-08-29_
 - [x] Deploy isolated web preview; verify backend isolation, hosted bundle integrity and unauthenticated denial.
 - [x] Re-run installed-schema rollback tests and confirm synthetic fixture cleanup.
 - [ ] Complete authenticated browser save acceptance and mobile physical interaction tests before production promotion.
+- [x] Correct dedicated preview hostname being mistaken for an organization; add routing regression.
