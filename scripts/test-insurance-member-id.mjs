@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+import {z} from 'zod';
+const compile=(file,dependencies={})=>{const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:name=>{if(name in dependencies)return dependencies[name];throw Error('Unexpected import '+name)},console});return exports};
+const {displayInsuranceMemberId:display,insuranceMemberIdFields:fields}=compile('packages/api-client/src/insurance-status.ts');
+assert.equal(display(undefined),'Not available');assert.equal(display('  '),'Not available');assert.equal(display('AB123456'),'••••3456');assert.equal(display('123'),'••••123');
+assert.equal(fields(' ABC-1234 ').member_id,'ABC-1234');assert.equal(fields(' ABC-1234 ').member_id_hash,'');assert.equal(fields(' ').member_id,null);
+let explicit;let stored='hash-abcd';
+const row=()=>({id:'plan',plan_name:'Fixture',provider_id:'insurer',member_id_hash:stored,member_id:explicit,coverage_status:'active',insurance_providers:{name:'Fixture'}});
+const sb={from(){const q={select:()=>q,eq:()=>q,order:()=>q,maybeSingle:async()=>({data:row()}),then(resolve){return Promise.resolve({data:[row()],error:null}).then(resolve)}};return q}};
+const types={toolSuccess:(data,message)=>({success:true,data,message}),toolError:error=>({success:false,error})};
+const legacy=compile('src/lib/ai-tools/insurance.ts',{'zod':{z},'../supabase':{supabase:sb},'./types':types});
+const edge=compile('supabase/functions/ai-health-assistant/tools.ts').TOOL_HANDLERS;
+const profile=compile('src/lib/services/profile-data.ts',{'../supabase':{supabase:sb}});
+const network=compile('src/lib/network/api.ts',{'../supabase':{supabase:sb}});
+const connected=compile('src/lib/tools/getConnectedInsurance.ts',{'zod':{z},'../supabase/server':{createSupabaseServerClient:()=>sb}});
+const coverages=compile('src/lib/tools/getInsuranceCoverages.ts',{'zod':{z},'../supabase/server':{createSupabaseServerClient:()=>sb}});
+for(const ambiguous of ['hash-abcd','PLAIN-123456']){
+ stored=ambiguous;
+ assert.equal((await legacy.getUserCoverages({},'owner')).data[0].memberIdMasked,'Not available');
+ assert.equal((await edge.getUserCoverages.execute({},'owner',sb)).data[0].memberIdMasked,'Not available');
+ assert.equal((await profile.fetchUserProfileData('owner')).insuranceInfo.memberId,undefined);
+ assert.equal((await network.fetchInsuranceContext('owner')).insurance[0].memberId,'');
+ assert.equal((await connected.getConnectedInsurance({userId:'owner'})).data.insurance[0].memberId,'');
+ assert.equal((await coverages.getInsuranceCoverages({userId:'owner'})).data.coverages[0].memberId,'');
+}
+explicit='EXPLICIT-9876';
+assert.equal((await legacy.getUserCoverages({},'owner')).data[0].memberIdMasked,'••••9876');
+assert.equal((await edge.getUserCoverages.execute({},'owner',sb)).data[0].memberIdMasked,'••••9876');
+assert.equal((await profile.fetchUserProfileData('owner')).insuranceInfo.memberId,explicit);
+assert.equal((await network.fetchInsuranceContext('owner')).insurance[0].memberId,explicit);
+assert.equal((await connected.getConnectedInsurance({userId:'owner'})).data.insurance[0].memberId,explicit);
+assert.equal((await coverages.getInsuranceCoverages({userId:'owner'})).data.coverages[0].memberId,explicit);
+console.log('PASS explicit write/read round trip and legacy member-ID display and six read/autofill paths: ambiguous legacy hashes/plaintext never become asserted identifiers');

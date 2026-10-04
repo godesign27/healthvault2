@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+let user={id:'owner'},failure=null;const calls=[];
+const sb={auth:{getUser:async()=>({data:{user}})},from(table){calls.push(['from',table]);const q={select:()=>q,order:()=>q,eq:(...a)=>{calls.push(a);return q},then(resolve){return Promise.resolve({data:[{id:'coverage',user_id:'owner',provider_id:'missing',plan_name:'Fixture',member_id_hash:'ambiguous-1234',provider:null}],error:failure}).then(resolve)}};return q}};
+const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/insurance/useInsuranceData.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:name=>name==='react'?{}:{supabase:sb}});
+const result=await exports.loadInsurance();assert.equal(result.userId,'owner');assert.equal(result.coverages.length,1);assert.equal(result.coverages[0].memberId,'');assert.equal(result.coverages[0].provider.name,'Insurance provider');assert.ok(calls.some(c=>c[0]==='user_id'&&c[1]==='owner'));
+failure=Error('Denied');await assert.rejects(exports.loadInsurance(),/Denied/);
+user=null;calls.length=0;await assert.rejects(exports.loadInsurance(),/Sign in/);assert.equal(calls.length,0);
+console.log('PASS web Insurance owner filter, retained plan with missing provider, failure propagation and anonymous rejection');

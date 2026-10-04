@@ -32,6 +32,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
     execute: async (args, userId, sb) => {
       try {
         const section = (args.section as string) || 'all';
+        if (!['conditions','medications','allergies','immunizations','all'].includes(section)) return error('Invalid medical history section');
         const result: Record<string, unknown[]> = {};
 
         const tables =
@@ -381,7 +382,9 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
         if (formsErr) return error(`Database error: ${formsErr.message}`);
         if (!formRows?.length) return error('No matching form responses found.');
 
-        const rowById = new Map(formRows.map((row: any) => [row.id, row]));
+        type ShareFormRow = {id:string; template_id:string; status:string; signed_at:string|null;
+          form_templates:{title?:string; version?:string}|null};
+        const rowById = new Map<string,ShareFormRow>((formRows as ShareFormRow[]).map(row => [row.id, row]));
         for (const fid of formIds) {
           const row = rowById.get(fid);
           if (!row) return error(`Form ${fid} not found.`);
@@ -842,7 +845,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
         let query = sb
           .from('insurance_coverages')
           .select(
-            `id, plan_name, member_id_hash, group_number, relationship,
+            `id, plan_name, member_id, group_number, relationship,
              is_primary, verification_status, coverage_status,
              effective_start, effective_end,
              insurance_providers!inner (name)`
@@ -861,9 +864,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
           id: r.id,
           planName: r.plan_name,
           providerName: (r.insurance_providers as any)?.name || 'Unknown',
-          memberIdMasked: r.member_id_hash
-            ? `****${r.member_id_hash.slice(-4)}`
-            : '****',
+          memberIdMasked: r.member_id?.trim() ? `••••${r.member_id.trim().slice(-4)}` : 'Not available',
           groupNumber: r.group_number,
           relationship: r.relationship,
           isPrimary: r.is_primary,
@@ -1160,10 +1161,9 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
     },
     execute: async (args, userId, sb) => {
       try {
-        if (!args.confirmed) return error('Setting primary insurance requires confirmation.');
-        await sb.from('insurance_coverages').update({ is_primary: false, updated_at: new Date().toISOString() }).eq('user_id', userId);
-        const { error: dbErr } = await sb.from('insurance_coverages').update({ is_primary: true, updated_at: new Date().toISOString() }).eq('id', args.coverageId).eq('user_id', userId);
-        if (dbErr) return error(`Database error: ${dbErr.message}`);
+        if (args.confirmed !== true) return error('Setting primary insurance requires confirmation.');
+        const { data, error: dbErr } = await sb.rpc('set_primary_insurance', { p_coverage_id: args.coverageId });
+        if (dbErr || data !== args.coverageId) return error('Unable to update primary insurance.');
         return success({ coverageId: args.coverageId, isPrimary: true }, 'Primary insurance updated.');
       } catch (err: any) {
         return error(`Unexpected error: ${err.message}`);
@@ -1177,7 +1177,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
       type: 'function',
       function: {
         name: 'verifyInsurance',
-        description: 'Marks an insurance coverage as verified.',
+        description: 'Reports that insurer verification is unavailable; never changes coverage status.',
         parameters: {
           type: 'object',
           properties: {
@@ -1187,18 +1187,7 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
         },
       },
     },
-    execute: async (args, userId, sb) => {
-      try {
-        const { data: coverage, error: fErr } = await sb.from('insurance_coverages').select('id').eq('id', args.coverageId).eq('user_id', userId).maybeSingle();
-        if (fErr) return error(`Database error: ${fErr.message}`);
-        if (!coverage) return error('Coverage not found or access denied.');
-        const { error: dbErr } = await sb.from('insurance_coverages').update({ verification_status: 'verified', last_verified_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', args.coverageId).eq('user_id', userId);
-        if (dbErr) return error(`Database error: ${dbErr.message}`);
-        return success({ coverageId: args.coverageId, verificationStatus: 'verified' }, 'Insurance verified.');
-      } catch (err: any) {
-        return error(`Unexpected error: ${err.message}`);
-      }
-    },
+    execute: async () => error('Insurer verification is not available. No coverage status was changed. Contact your insurer to confirm benefits and eligibility.'),
   },
 
   addProvider: {

@@ -1,5 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.112.3";
+import { requireVerifiedUser, requireActiveAccount, ImportAccessError } from "../inbound-records/access.ts";
+import { toolAllowed, MOBILE_READ_ONLY_VERSION } from "./mobile-policy.ts";
 import { getToolDefinitions, getToolHandler } from "./tools.ts";
 import { buildSystemPrompt } from "./system-prompt.ts";
 import {
@@ -74,7 +76,8 @@ async function callOpenAI(
 async function executeToolCall(
   toolCall: OpenAIToolCall,
   userId: string,
-  supabase: any
+  supabase: any,
+  readOnly = false
 ): Promise<{ result: string; event: ToolEvent }> {
   const start = Date.now();
   const name = toolCall.function.name;
@@ -97,6 +100,10 @@ async function executeToolCall(
     };
   }
 
+  if (!toolAllowed(name, readOnly)) {
+    return { result: JSON.stringify({success:false,error:'Mobile chat is read-only. Use the app form to make changes.'}),
+      event: {tool:name,input:{},success:false,message:'Read-only tool restriction',durationMs:Date.now()-start} };
+  }
   const handler = getToolHandler(name);
   if (!handler) {
     const event: ToolEvent = {
@@ -150,40 +157,40 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
+  if (req.method === "GET") {
+    return new Response(JSON.stringify({mobileReadOnlyVersion:MOBILE_READ_ONLY_VERSION}),
+      {headers:{...corsHeaders,"Content-Type":"application/json","Cache-Control":"no-store"}});
+  }
   const requestStart = Date.now();
 
   try {
-    if (!OPENAI_API_KEY) {
-      return errorResponse("OpenAI API key not configured", 500);
-    }
-
     const body: ChatRequest = await req.json();
     const { message, page, pageContext, conversationHistory = [] } = body;
 
-    if (!message?.trim()) {
+    if (typeof message !== "string" || !message.trim() || message.length > 8000) {
       return errorResponse("Message is required", 400);
     }
 
-    const authHeader = req.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "") || "";
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      global: { headers: { Authorization: authHeader! } },
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const user = {id: await requireVerifiedUser(admin, req)};
+    // Data reads use the caller's JWT/RLS, never the admin client's bypass privileges.
+    const supabase = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: {headers: {Authorization:req.headers.get("Authorization")!}},
     });
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      return errorResponse("User not authenticated", 401);
-    }
 
     logRequest(user.id, page);
 
-    const systemPrompt = buildSystemPrompt(page, pageContext);
-    const tools = getToolDefinitions();
+    const readOnly = body.readOnly === true || req.headers.get("X-Platform") === "mobile";
+    if (!Array.isArray(conversationHistory) || conversationHistory.length > 20 ||
+        conversationHistory.some(m => !['user','assistant'].includes(m.role) || typeof m.content !== 'string' || m.content.length > 8000)) {
+      return errorResponse("Invalid conversation history", 400);
+    }
+    const systemPrompt = buildSystemPrompt(page, pageContext) + (readOnly
+      ? "\nThis chat is read-only. Retrieve and summarize existing data only. You cannot save, share, delete, log entries, or schedule anything. Explain this limitation honestly and direct users to the relevant app form."
+      : "");
+    const tools = getToolDefinitions().filter(tool => toolAllowed(tool.function.name, readOnly));
 
+    if (!OPENAI_API_KEY) return errorResponse("AI service is not configured for this environment", 503);
     const messages: OpenAIMessage[] = [
       { role: "system", content: systemPrompt },
       ...conversationHistory.map((m) => ({
@@ -197,6 +204,7 @@ Deno.serve(async (req: Request) => {
     let round = 0;
 
     while (round < MAX_TOOL_ROUNDS) {
+      await requireActiveAccount(admin, user.id);
       const data = await callOpenAI(
         messages,
         round < MAX_TOOL_ROUNDS - 1 ? tools : undefined
@@ -223,10 +231,12 @@ Deno.serve(async (req: Request) => {
         const toolCalls: OpenAIToolCall[] = assistantMsg.tool_calls;
 
         for (const tc of toolCalls) {
+          await requireActiveAccount(admin, user.id);
           const { result, event } = await executeToolCall(
             tc,
             user.id,
-            supabase
+            supabase,
+            readOnly
           );
           toolEvents.push(event);
 
@@ -244,6 +254,7 @@ Deno.serve(async (req: Request) => {
       const totalDuration = Date.now() - requestStart;
       logResponse(user.id, toolEvents.length, totalDuration);
 
+      await requireActiveAccount(admin, user.id);
       return jsonResponse({
         message: assistantMsg.content || "I wasn't able to generate a response.",
         toolEvents: toolEvents.length > 0 ? toolEvents : undefined,
@@ -256,6 +267,7 @@ Deno.serve(async (req: Request) => {
       .filter((m) => m.role === "assistant" && m.content)
       .pop();
 
+    await requireActiveAccount(admin, user.id);
     return jsonResponse({
       message:
         lastAssistant?.content ||
@@ -263,7 +275,8 @@ Deno.serve(async (req: Request) => {
       toolEvents: toolEvents.length > 0 ? toolEvents : undefined,
     });
   } catch (err: any) {
-    console.error("Assistant error:", err);
+    if (err instanceof ImportAccessError) return errorResponse(err.message, err.status);
+    console.error("Assistant error:", err?.name || "Error");
 
     if (err.message?.includes("OpenAI API error")) {
       logOpenAIError("unknown", err.message);

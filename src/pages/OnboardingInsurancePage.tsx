@@ -1,3 +1,4 @@
+import {insuranceMemberIdFields} from '../../packages/api-client/src/insurance-status';
 import { useState } from 'react';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
@@ -108,7 +109,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
           user_id: userId,
           provider_id: providerId,
           plan_name: formData.carrierName.trim(),
-          member_id_hash: formData.memberId.trim(),
+          ...insuranceMemberIdFields(formData.memberId),
           group_number: formData.groupNumber || null,
           relationship: 'self',
           effective_start: new Date().toISOString(),
@@ -121,7 +122,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
       if (error) throw error;
 
       // Also write to insurance_policies for backward compatibility / card images
-      await supabase.from('insurance_policies').insert({
+      await Promise.resolve(supabase.from('insurance_policies').insert({
         user_id: userId,
         carrier_name: formData.carrierName,
         member_id: formData.memberId,
@@ -131,7 +132,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
         card_front_url: cardFrontUrl,
         card_back_url: cardBackUrl,
         is_primary: true,
-      }).then(() => {}).catch(() => {}); // non-blocking
+      })).catch(() => {}); // Best-effort legacy mirror; the canonical coverage is already saved.
 
       onNext();
     } catch (error) {

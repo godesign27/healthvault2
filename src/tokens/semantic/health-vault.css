@@ -1,0 +1,39 @@
+/* Product feedback only. Core brand, primary actions and marketing stay unchanged. */
+[data-hv-semantic] {
+ --hv-color-text-feedback-success: var(--meadow-100);
+ --hv-color-surface-feedback-success: var(--meadow-10);
+ --hv-color-border-feedback-success: var(--meadow-30);
+ --hv-color-text-feedback-error: var(--ember-100);
+ --hv-color-surface-feedback-error: var(--ember-10);
+ --hv-color-border-feedback-error: var(--ember-30);
+ --hv-color-text-feedback-warning: var(--dijon-100);
+ --hv-color-surface-feedback-warning: var(--dijon-10);
+ --hv-color-border-feedback-warning: var(--dijon-30);
+ --hv-color-text-feedback-info: var(--slate-100);
+ --hv-color-surface-feedback-info: var(--slate-10);
+ --hv-color-border-feedback-info: var(--slate-30);
+ --hv-color-border-focus: var(--focus-cyan-70);
+ --hv-color-action-destructive-default: var(--ember-80);
+ --hv-color-action-destructive-hover: var(--ember-90);
+ --hv-color-action-destructive-active: var(--ember-100);
+ --hv-color-action-success-default: var(--meadow-80);
+ --hv-color-text-ai: var(--ai-brand-blue-100);
+ --hv-color-surface-ai: var(--ai-brand-blue-10);
+ --hv-color-text-signal: var(--hv-signal-100);
+ --hv-color-surface-signal: var(--hv-signal-10);
+}
+[data-theme='dark'] [data-hv-semantic] {
+ --hv-color-text-feedback-success: var(--meadow-30);
+ --hv-color-surface-feedback-success: var(--meadow-100);
+ --hv-color-text-feedback-error: var(--ember-30);
+ --hv-color-surface-feedback-error: var(--ember-100);
+ --hv-color-text-feedback-warning: var(--dijon-30);
+ --hv-color-surface-feedback-warning: var(--dijon-100);
+ --hv-color-text-feedback-info: var(--slate-30);
+ --hv-color-surface-feedback-info: var(--slate-100);
+ --hv-color-border-focus: var(--focus-cyan-40);
+ --hv-color-text-ai: var(--ai-brand-blue-30);
+ --hv-color-surface-ai: var(--ai-brand-blue-100);
+ --hv-color-text-signal: var(--hv-signal-30);
+ --hv-color-surface-signal: var(--hv-signal-100);
+}

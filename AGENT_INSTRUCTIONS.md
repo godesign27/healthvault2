@@ -1,7 +1,8 @@
 # Agent Instructions — Health Vault
 
 Orientation for AI agents working in this repo. Read this first, then `TECH_STACK.md` for
-details, `tasks.md` for outstanding work, and `WORK_LOG.md` for recent history.
+details, `design.md` for shared product UI patterns and known consistency gaps,
+`tasks.md` for outstanding work, and `WORK_LOG.md` for recent history.
 
 ---
 
@@ -134,9 +135,8 @@ hardcoded demo data.
 - **Single source of truth:** `insurance_coverages` (+ `insurance_providers` FK). Onboarding
   and the Insurance page read/write here. `insurance_policies` is legacy/backward-compat for
   card images only.
-- **Member ID display:** `member_id_hash` stores the display value (not a hash in practice).
-- **Verification status:** `'verified'` and `'connected'` are both valid; AI tool may set
-  `'verified'`.
+- **Member ID display:** Read explicit `member_id` only after its migration. Legacy `member_id_hash` mixes hashes and plaintext and must not be inferred or backfilled.
+- **Verification status:** Legacy `'verified'`/`'connected'` flags mean Saved, not insurer eligibility. No verification tool may manufacture eligibility evidence.
 
 ### Onboarding
 

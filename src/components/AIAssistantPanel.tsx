@@ -1,4 +1,5 @@
-import { Send, Sparkles, FileText, Building2, Calendar, Pill, Loader2, Stethoscope, AlertTriangle, Link as LinkIcon, Users, ShieldCheck, Search, X, ArrowLeft, Upload, FlaskConical, MessageCircle, ClipboardCheck, SendHorizontal } from 'lucide-react';
+import {insuranceMemberIdFields} from '../../packages/api-client/src/insurance-status';
+import { Send, Sparkles, Loader2, ShieldCheck, Search, ArrowLeft, MessageCircle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { ProviderRecordConnectionFlow } from './records/ProviderRecordConnectionFlow';
 import { InlineRecordRequestForm } from './records/InlineRecordRequestForm';
@@ -6,7 +7,6 @@ import { InsuranceProvider, Coverage } from '../schemas/insurance';
 import { ConnectMethodTabs } from './insurance/ConnectMethodTabs';
 import { supabase } from '../lib/supabase';
 import { getVoiceMessageForContext, type PageContext } from '../lib/voice/context-messages';
-import { fetchUserProfileData, updateUserProfile, type UserProfileData } from '../lib/services/profile-data';
 import { sendChatMessage } from '../lib/openai/client';
 import { buildPageContext } from '../lib/openai/context';
 import type { ChatResponse, ConversationMessage } from '../lib/openai/types';
@@ -40,14 +40,6 @@ interface AIAssistantPanelProps {
 export function AIAssistantPanel({
   darkMode = false,
   currentPage = 'dashboard',
-  onAddCondition,
-  onAddMedication,
-  onAddAllergy,
-  onAddImmunization,
-  onAddCoverage,
-  onAddProvider,
-  onAddPharmacy,
-  onFindSpecialist,
   onImportComplete,
   onRefreshData,
   onRequestRecords,
@@ -89,15 +81,6 @@ export function AIAssistantPanel({
   // Record request flow state
   const [showRecordRequestFlow, setShowRecordRequestFlow] = useState(false);
 
-  // Form filling state
-  const [isFormFillingMode, setIsFormFillingMode] = useState(false);
-  const [userProfileData, setUserProfileData] = useState<UserProfileData | null>(null);
-  const [formFields, setFormFields] = useState<string[]>([]);
-  const [missingFields, setMissingFields] = useState<string[]>([]);
-  const [awaitingProfileDataConfirmation, setAwaitingProfileDataConfirmation] = useState(false);
-  const [collectingProfileData, setCollectingProfileData] = useState(false);
-  const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
-  const [collectedData, setCollectedData] = useState<any>({});
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -126,11 +109,6 @@ export function AIAssistantPanel({
     setShowInsuranceFlow(false);
     setShowProviderConnectionFlow(false);
     setShowRecordRequestFlow(false);
-    setIsFormFillingMode(false);
-    setAwaitingProfileDataConfirmation(false);
-    setCollectingProfileData(false);
-    setCurrentFieldIndex(0);
-    setCollectedData({});
     setConversationHistory([]);
   }, [currentPage]);
 
@@ -260,25 +238,6 @@ export function AIAssistantPanel({
           message: "Understood. Let me know if you need anything else!"
         }]);
       }
-      return;
-    }
-
-    if (awaitingProfileDataConfirmation) {
-      if (userMessage.toLowerCase() === 'yes') {
-        setAwaitingProfileDataConfirmation(false);
-        handleStartDataCollection();
-      } else {
-        setAwaitingProfileDataConfirmation(false);
-        setMessages(prev => [...prev, {
-          type: 'assistant',
-          message: "No problem! I've shown you the available information above. You can copy it to fill out your form. Let me know if you need anything else!"
-        }]);
-      }
-      return;
-    }
-
-    if (collectingProfileData) {
-      await handleCollectFieldData(userMessage);
       return;
     }
 
@@ -445,7 +404,6 @@ export function AIAssistantPanel({
           type: 'assistant',
           message: 'All your forms are already complete. Open Medical Forms to review or share them with a provider.'
         }]);
-        setIsFormFillingMode(false);
         return;
       }
 
@@ -474,7 +432,6 @@ export function AIAssistantPanel({
           type: 'assistant',
           message: "I couldn't find profile data to pre-fill your forms yet. Complete your Medical Profile and Insurance sections, then try again."
         }]);
-        setIsFormFillingMode(false);
         return;
       }
 
@@ -490,160 +447,14 @@ export function AIAssistantPanel({
         type: 'assistant',
         message: summary
       }]);
-
-      setIsFormFillingMode(true);
     } catch (error) {
       console.error('Error pre-filling forms:', error);
       setMessages(prev => [...prev, {
         type: 'assistant',
         message: "I'm sorry, I had trouble pre-filling your forms. Open Medical Forms to edit them directly, or try again in a moment."
       }]);
-      setIsFormFillingMode(false);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleStartDataCollection = () => {
-    setCollectingProfileData(true);
-    setCurrentFieldIndex(0);
-    setCollectedData({});
-
-    const fieldPrompts: { [key: string]: string } = {
-      'Full Name': "What's your full name? (First and Last)",
-      'Date of Birth': "What's your date of birth? (MM/DD/YYYY)",
-      'Email': "What's your email address?",
-      'Phone Number': "What's your phone number?",
-      'Address': "What's your street address?",
-    };
-
-    const firstField = missingFields[0];
-    const prompt = fieldPrompts[firstField] || `Please provide your ${firstField}:`;
-
-    setMessages(prev => [...prev, {
-      type: 'assistant',
-      message: `Great! Let's gather your information. ${prompt}\n\n(Type "skip" if you want to skip any field)`
-    }]);
-  };
-
-  const handleCollectFieldData = async (value: string) => {
-    const currentField = missingFields[currentFieldIndex];
-    const newData = { ...collectedData };
-
-    if (value.toLowerCase() === 'skip') {
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: `Okay, I'll skip ${currentField} for now.`
-      }]);
-    } else {
-      switch (currentField) {
-        case 'Full Name':
-          const nameParts = value.trim().split(' ');
-          if (nameParts.length >= 2) {
-            newData.firstName = nameParts[0];
-            newData.lastName = nameParts.slice(1).join(' ');
-          } else {
-            newData.firstName = value.trim();
-          }
-          break;
-        case 'Date of Birth':
-          newData.dateOfBirth = value.trim();
-          break;
-        case 'Email':
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value.trim())) {
-            setMessages(prev => [...prev, {
-              type: 'assistant',
-              message: "That doesn't look like a valid email address. Please try again with a format like: name@example.com"
-            }]);
-            return;
-          }
-          newData.email = value.trim();
-          break;
-        case 'Phone Number':
-          newData.phone = value.trim();
-          break;
-        case 'Address':
-          if (!newData.address) newData.address = {};
-          newData.address.street = value.trim();
-          break;
-      }
-    }
-
-    setCollectedData(newData);
-
-    if (currentFieldIndex < missingFields.length - 1) {
-      const nextIndex = currentFieldIndex + 1;
-      setCurrentFieldIndex(nextIndex);
-
-      const fieldPrompts: { [key: string]: string } = {
-        'Full Name': "What's your full name? (First and Last)",
-        'Date of Birth': "What's your date of birth? (MM/DD/YYYY)",
-        'Email': "What's your email address?",
-        'Phone Number': "What's your phone number?",
-        'Address': "What's your street address?",
-      };
-
-      const nextField = missingFields[nextIndex];
-      const prompt = fieldPrompts[nextField] || `Please provide your ${nextField}:`;
-
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: `Got it! ${prompt}`
-      }]);
-    } else {
-      setCollectingProfileData(false);
-      setIsLoading(true);
-
-      setMessages(prev => [...prev, {
-        type: 'assistant',
-        message: "Perfect! Let me save this information to your profile..."
-      }]);
-
-      await new Promise(resolve => setTimeout(resolve, 600));
-
-      const userId = currentUserId;
-      if (!userId) throw new Error('Not authenticated');
-      const success = await updateUserProfile(userId, newData);
-
-      if (success) {
-        const updatedProfile = await fetchUserProfileData(userId);
-        setUserProfileData(updatedProfile);
-
-        let summary = "Your profile has been updated! Here's your complete information:\n\n";
-
-        if (updatedProfile.personalInfo.fullName) {
-          summary += `**Name**: ${updatedProfile.personalInfo.fullName}\n`;
-        }
-        if (updatedProfile.personalInfo.dateOfBirth) {
-          const dob = new Date(updatedProfile.personalInfo.dateOfBirth);
-          summary += `**Date of Birth**: ${dob.toLocaleDateString()}\n`;
-        }
-        if (updatedProfile.personalInfo.email) {
-          summary += `**Email**: ${updatedProfile.personalInfo.email}\n`;
-        }
-        if (updatedProfile.personalInfo.phone) {
-          summary += `**Phone**: ${updatedProfile.personalInfo.phone}\n`;
-        }
-        if (updatedProfile.personalInfo.address?.street) {
-          summary += `**Address**: ${updatedProfile.personalInfo.address.street}\n`;
-        }
-
-        summary += "\nYou can now use this information to fill out your form!";
-
-        setMessages(prev => [...prev, {
-          type: 'assistant',
-          message: summary
-        }]);
-      } else {
-        setMessages(prev => [...prev, {
-          type: 'assistant',
-          message: "I'm sorry, there was an error saving your profile. Please try again or update it manually in the Medical Profile section."
-        }]);
-      }
-
-      setIsLoading(false);
-      setIsFormFillingMode(false);
     }
   };
 
@@ -822,15 +633,13 @@ export function AIAssistantPanel({
   const handleInsuranceSubmit = async (coverage: Partial<Coverage>) => {
     setSavingCoverage(true);
     try {
-      // Generate a simple hash of the member ID for storage (in production, use proper encryption)
-      const memberIdHash = coverage.memberId || '';
 
       if (!currentUserId) throw new Error('Not authenticated');
       const insertData = {
         user_id: currentUserId,
         provider_id: coverage.providerId,
         plan_name: coverage.planName,
-        member_id_hash: memberIdHash,
+        ...insuranceMemberIdFields(coverage.memberId),
         group_number: coverage.groupNumber || null,
         bin: coverage.bin || null,
         pcn: coverage.pcn || null,
@@ -842,7 +651,6 @@ export function AIAssistantPanel({
         verification_status: 'connected',
       };
 
-      console.log('Attempting insert with data:', insertData);
 
       // Save to database
       const { data, error } = await supabase
@@ -851,15 +659,8 @@ export function AIAssistantPanel({
         .select()
         .single();
 
-      console.log('Insert result:', { data, error });
 
-      if (error) {
-        console.error('Full error details:', JSON.stringify(error, null, 2));
-        console.error('Error code:', error.code);
-        console.error('Error hint:', error.hint);
-        console.error('Error details:', error.details);
-        throw error;
-      }
+      if (error || !data?.id) throw new Error('Coverage was not saved');
 
       // Store the submitted coverage for confirmation display
       setSubmittedCoverage(coverage);
@@ -870,11 +671,10 @@ export function AIAssistantPanel({
         await onRefreshData();
       }
     } catch (error: any) {
-      console.error('Error saving coverage:', error);
-      const errorMessage = error?.message || 'Unknown error occurred';
+
       setMessages(prev => [...prev, {
         type: 'assistant',
-        message: `I'm sorry, there was an error saving your insurance coverage: ${errorMessage}. Please try again.`
+        message: 'Your coverage could not be saved. Refresh to check its current state before trying again.'
       }]);
       setInsuranceStep('form');
       setSavingCoverage(false);
@@ -897,63 +697,6 @@ export function AIAssistantPanel({
     setSubmittedCoverage(null);
     setProviderSearchQuery('');
   };
-
-  const getQuickActions = () => {
-    if (currentPage === 'medical-profile') {
-      return [
-        { icon: LinkIcon, label: 'Connect Provider', action: handleStartProviderConnection },
-        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
-        { icon: Stethoscope, label: 'Add Condition', action: onAddCondition },
-        { icon: Pill, label: 'Add Medication', action: onAddMedication },
-        { icon: AlertTriangle, label: 'Add Allergy', action: onAddAllergy }
-      ];
-    }
-
-    if (currentPage === 'care') {
-      return [
-        { icon: Pill, label: 'Refill Medication', prompt: 'I need to refill my medication' },
-        { icon: Calendar, label: 'Schedule Appointment', prompt: 'I want to schedule an appointment' },
-        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
-        { icon: FileText, label: 'Care Summary', prompt: 'Give me a summary of my recent care activities' }
-      ];
-    }
-
-    if (currentPage === 'insurance') {
-      return [
-        { icon: ShieldCheck, label: 'Add Coverage', action: handleStartInsuranceFlow },
-        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
-        { icon: FileText, label: 'View Benefits', prompt: 'What benefits does my insurance cover?' },
-        { icon: Building2, label: 'Find Providers', prompt: 'Help me find in-network providers' }
-      ];
-    }
-
-    if (currentPage === 'network') {
-      return [
-        { icon: Users, label: 'Add Provider', action: onAddProvider },
-        { icon: Building2, label: 'Add Pharmacy', action: onAddPharmacy },
-        { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
-        { icon: Search, label: 'Find Specialist', action: onFindSpecialist }
-      ];
-    }
-
-    if (currentPage === 'health-records') {
-      return [
-        { icon: LinkIcon, label: 'Connect Provider', action: handleStartProviderConnection },
-        { icon: SendHorizontal, label: 'Request Records', prompt: 'Request health records manually' },
-        { icon: FlaskConical, label: 'Show my lab results', prompt: 'Show my lab results' },
-        { icon: Upload, label: 'Upload a new record', prompt: 'I want to upload a new health record' }
-      ];
-    }
-
-    return [
-      { icon: ClipboardCheck, label: 'Fill Form', prompt: 'Help me fill out my incomplete forms' },
-      { icon: FileText, label: 'Show my forms', prompt: 'What forms do I need to complete?' },
-      { icon: Calendar, label: 'Check appointments', prompt: 'When is my next appointment?' },
-      { icon: Pill, label: 'View medications', prompt: 'What medications am I taking?' }
-    ];
-  };
-
-  const quickActions = getQuickActions();
 
   const getSuggestions = () => {
     if (currentPage === 'medical-profile') {

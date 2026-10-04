@@ -74,7 +74,7 @@ export function fhirToCoverage(
     isPrimary: false,
     verificationStatus: fhirCoverage.status === 'active' ? 'connected' : 'needs_attention',
     source: 'oauth',
-    rawFhir: fhirCoverage,
+    rawFhir: { ...fhirCoverage },
   };
 
   return CoverageZ.partial().parse(coverage);

@@ -153,7 +153,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   },
   {
     name: 'verifyInsurance',
-    description: 'Marks an insurance coverage as verified. Updates the verification status and timestamp.',
+    description: 'Reports that insurer verification is unavailable; never changes coverage status.',
     parameters: VerifyInsuranceInputZ,
     handler: (input, userId) => verifyInsurance(input as any, userId),
     requiresAuth: true,

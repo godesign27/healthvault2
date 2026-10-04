@@ -1,5 +1,7 @@
-import { Edit2, Trash2, RefreshCw, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
-import { CoverageWithProvider, maskMemberId } from '../../schemas/insurance';
+import {useId, useState} from 'react';
+import {displayInsuranceMemberId,coverageEndState,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
+import { Edit2, Trash2, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
+import { CoverageWithProvider } from '../../schemas/insurance';
 import { StatusBadge } from './StatusBadge';
 import { Card } from '../ui/Card';
 
@@ -7,10 +9,11 @@ interface CoverageCardProps {
   coverage: CoverageWithProvider;
   darkMode?: boolean;
   showActions?: boolean;
+  busy?: boolean;
+  onSaveMemberId?: (coverage: CoverageWithProvider, value: string) => Promise<boolean>;
   onEdit?: (coverage: CoverageWithProvider) => void;
   onDelete?: (coverage: CoverageWithProvider) => void;
   onSetPrimary?: (coverage: CoverageWithProvider) => void;
-  onRefreshVerification?: (coverage: CoverageWithProvider) => void;
   onStopCoverage?: (coverage: CoverageWithProvider) => void;
   onResumeCoverage?: (coverage: CoverageWithProvider) => void;
 }
@@ -19,22 +22,25 @@ export function CoverageCard({
   coverage,
   darkMode = false,
   showActions = true,
+  busy = false,
+  onSaveMemberId,
   onEdit,
   onDelete,
   onSetPrimary,
-  onRefreshVerification,
   onStopCoverage,
   onResumeCoverage,
 }: CoverageCardProps) {
-  const effectiveEndDate = coverage.effectiveEnd ? new Date(coverage.effectiveEnd) : null;
-  const isExpiringSoon = effectiveEndDate && effectiveEndDate.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000;
+  const memberFieldId = useId();
+  const [editingMember, setEditingMember] = useState(false);
+  const [memberDraft, setMemberDraft] = useState('');
+  const endState = coverageEndState(coverage.effectiveEnd);
   const isStopped = coverage.coverageStatus === 'stopped';
 
   return (
     <Card
       shadow="blur"
-      className={`h-full ${isStopped ? 'opacity-75' : ''}`}
-      state={isStopped ? 'disabled' : 'default'}
+      className="h-full"
+      state="default"
     >
       <div className="mb-4 flex items-start justify-between p-6 pb-4">
         <div className="flex items-start gap-4">
@@ -67,16 +73,33 @@ export function CoverageCard({
             }`}>{coverage.planName}</p>
           </div>
         </div>
-        <StatusBadge status={isExpiringSoon ? 'expiring' : coverage.verificationStatus} darkMode={darkMode} />
+        <StatusBadge status={endState || coverage.verificationStatus} darkMode={darkMode} />
       </div>
       <div className={`grid grid-cols-2 gap-4 px-6 pb-4 ${
         darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
-        <div>
+        <div className={editingMember ? "col-span-2" : undefined}>
           <p className={`text-xs mb-1 ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>Member ID</p>
-          <p className="font-mono text-sm">{maskMemberId(coverage.memberId || '')}</p>
+          <p className="font-mono text-sm">{displayInsuranceMemberId(coverage.memberId)}</p>
+          {showActions && onSaveMemberId && (editingMember ? (
+            <form className="mt-3 space-y-3" onSubmit={async event => {
+              event.preventDefault();
+              if (await onSaveMemberId(coverage, memberDraft)) {setEditingMember(false); setMemberDraft('');}
+            }}>
+              <label htmlFor={memberFieldId} className="block text-sm">Member ID from your insurance card</label>
+              <input id={memberFieldId} value={memberDraft} onChange={event => setMemberDraft(event.target.value)}
+                required disabled={busy} autoComplete="off" spellCheck={false}
+                className="w-full min-h-12 rounded-lg border border-current bg-surface-default px-3 text-content-primary" />
+              <div className="flex flex-wrap gap-2">
+                <button type="submit" disabled={busy || !memberDraft.trim()} className="min-h-12 px-3 rounded-lg bg-action-primary text-white">Save ID</button>
+                <button type="button" disabled={busy} className="min-h-12 px-3 rounded-lg text-content-primary" onClick={() => {setEditingMember(false); setMemberDraft('');}}>Cancel</button>
+              </div>
+            </form>
+          ) : <button disabled={busy} onClick={() => setEditingMember(true)} className="min-h-12 mt-2 px-3 rounded-lg text-content-primary underline">
+            {coverage.memberId ? 'Update member ID' : 'Add member ID'}
+          </button>)}
         </div>
         {coverage.groupNumber && (
           <div>
@@ -106,15 +129,15 @@ export function CoverageCard({
       <div className={`px-6 pb-4 text-xs ${
         darkMode ? 'text-content-secondary' : 'text-content-secondary'
       }`}>
-        Effective: {new Date(coverage.effectiveStart).toLocaleDateString()}
-        {effectiveEndDate && ` - ${effectiveEndDate.toLocaleDateString()}`}
+        Effective: {formatInsuranceDate(coverage.effectiveStart)}
+        {coverage.effectiveEnd && ` - ${formatInsuranceDate(coverage.effectiveEnd)}`}
       </div>
       {showActions && (
-        <div className="flex items-center gap-2 border-t border-stroke-default px-6 pb-2 pt-4">
+        <div className="flex flex-wrap items-center gap-2 border-t border-stroke-default px-6 pb-2 pt-4">
           {!isStopped && (
             <>
               {onEdit && (
-                <button
+                <button disabled={busy}
                   onClick={() => onEdit(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
@@ -127,7 +150,7 @@ export function CoverageCard({
                 </button>
               )}
               {!coverage.isPrimary && onSetPrimary && (
-                <button
+                <button disabled={busy}
                   onClick={() => onSetPrimary(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
@@ -139,21 +162,8 @@ export function CoverageCard({
                   Set Primary
                 </button>
               )}
-              {onRefreshVerification && (
-                <button
-                  onClick={() => onRefreshVerification(coverage)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    darkMode
-                      ? 'text-content-primary hover:bg-surface-sunken'
-                      : 'text-content-primary hover:bg-surface-overlay'
-                  }`}
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Verify
-                </button>
-              )}
               {onStopCoverage && (
-                <button
+                <button disabled={busy}
                   onClick={() => onStopCoverage(coverage)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     darkMode
@@ -162,13 +172,13 @@ export function CoverageCard({
                   }`}
                 >
                   <StopCircle className="w-4 h-4" />
-                  Stop Coverage
+                  Mark Stopped
                 </button>
               )}
             </>
           )}
           {isStopped && onResumeCoverage && (
-            <button
+            <button disabled={busy}
               onClick={() => onResumeCoverage(coverage)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 darkMode
@@ -177,11 +187,11 @@ export function CoverageCard({
               }`}
             >
               <PlayCircle className="w-4 h-4" />
-              Resume Coverage
+              Mark Active
             </button>
           )}
           {onDelete && (
-            <button
+            <button disabled={busy}
               onClick={() => onDelete(coverage)}
               className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >

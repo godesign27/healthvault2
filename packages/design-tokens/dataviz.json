@@ -1,0 +1,532 @@
+{
+  "series": [
+    {
+      "slot": 1,
+      "key": "harbor",
+      "token": "data-01-harbor",
+      "steps": {
+        "00": "#EEF9F9",
+        "10": "#D9F1F0",
+        "20": "#B9E5E4",
+        "30": "#92D6D5",
+        "40": "#62C4C3",
+        "50": "#21B1B1",
+        "60": "#009B9C",
+        "70": "#008788",
+        "80": "#007172",
+        "90": "#00585A",
+        "100": "#003C3D"
+      },
+      "chartLight": 60,
+      "chartDark": 50,
+      "dash": "0",
+      "marker": "circle",
+      "pattern": "solid"
+    },
+    {
+      "slot": 2,
+      "key": "indigo",
+      "token": "data-02-indigo",
+      "steps": {
+        "00": "#F1F7FF",
+        "10": "#E0ECFC",
+        "20": "#C7DDF9",
+        "30": "#AACAF4",
+        "40": "#89B4EB",
+        "50": "#6A9EE0",
+        "60": "#4C86D0",
+        "70": "#3271BD",
+        "80": "#215CA2",
+        "90": "#164781",
+        "100": "#0F3059"
+      },
+      "chartLight": 60,
+      "chartDark": 40,
+      "dash": "6 4",
+      "marker": "square",
+      "pattern": "diagonal"
+    },
+    {
+      "slot": 3,
+      "key": "orchid",
+      "token": "data-03-orchid",
+      "steps": {
+        "00": "#F8F5FE",
+        "10": "#EDE8FA",
+        "20": "#DFD5F5",
+        "30": "#CEBEEE",
+        "40": "#BAA4E3",
+        "50": "#A68BD6",
+        "60": "#9171C6",
+        "70": "#7D5BB2",
+        "80": "#684899",
+        "90": "#523779",
+        "100": "#372553"
+      },
+      "chartLight": 60,
+      "chartDark": 60,
+      "dash": "2 3",
+      "marker": "triangle",
+      "pattern": "dots"
+    },
+    {
+      "slot": 4,
+      "key": "rose",
+      "token": "data-04-rose",
+      "steps": {
+        "00": "#FDF4F9",
+        "10": "#F8E5EF",
+        "20": "#F2CFE2",
+        "30": "#E9B6D1",
+        "40": "#DC9ABE",
+        "50": "#CD7EAB",
+        "60": "#BA6296",
+        "70": "#A54B82",
+        "80": "#8C396C",
+        "90": "#6F2B55",
+        "100": "#4C1C3A"
+      },
+      "chartLight": 80,
+      "chartDark": 60,
+      "dash": "10 4",
+      "marker": "diamond",
+      "pattern": "grid"
+    },
+    {
+      "slot": 5,
+      "key": "ember",
+      "token": "data-05-ember",
+      "steps": {
+        "00": "#FFF4F3",
+        "10": "#FCE5E3",
+        "20": "#F7D0CC",
+        "30": "#F1B7B1",
+        "40": "#E69A94",
+        "50": "#D87F78",
+        "60": "#C6635D",
+        "70": "#B14B46",
+        "80": "#973836",
+        "90": "#782A28",
+        "100": "#521C1A"
+      },
+      "chartLight": 60,
+      "chartDark": 40,
+      "dash": "6 3 2 3",
+      "marker": "cross",
+      "pattern": "back-diagonal"
+    },
+    {
+      "slot": 6,
+      "key": "brass",
+      "token": "data-06-brass",
+      "steps": {
+        "00": "#FDF5EF",
+        "10": "#F8E8DB",
+        "20": "#F2D4BE",
+        "30": "#E9BE9B",
+        "40": "#DDA375",
+        "50": "#CE8A4F",
+        "60": "#BB7025",
+        "70": "#A75900",
+        "80": "#8E4600",
+        "90": "#713500",
+        "100": "#4D2400"
+      },
+      "chartLight": 70,
+      "chartDark": 60,
+      "dash": "1 4",
+      "marker": "circle",
+      "pattern": "horizontal"
+    },
+    {
+      "slot": 7,
+      "key": "fern",
+      "token": "data-07-fern",
+      "steps": {
+        "00": "#F4F9F0",
+        "10": "#E6EFDE",
+        "20": "#D1E1C2",
+        "30": "#B9D1A2",
+        "40": "#9EBD7F",
+        "50": "#84A95D",
+        "60": "#6B9339",
+        "70": "#557F19",
+        "80": "#436900",
+        "90": "#335200",
+        "100": "#223801"
+      },
+      "chartLight": 60,
+      "chartDark": 40,
+      "dash": "12 3 2 3",
+      "marker": "square",
+      "pattern": "vertical"
+    },
+    {
+      "slot": 8,
+      "key": "jade",
+      "token": "data-08-jade",
+      "steps": {
+        "00": "#F0F9F5",
+        "10": "#DDF1E7",
+        "20": "#C0E5D3",
+        "30": "#9ED6BC",
+        "40": "#76C4A3",
+        "50": "#4CB18A",
+        "60": "#079C71",
+        "70": "#00885C",
+        "80": "#00714A",
+        "90": "#005938",
+        "100": "#003D26"
+      },
+      "chartLight": 80,
+      "chartDark": 70,
+      "dash": "4 2",
+      "marker": "triangle",
+      "pattern": "checker"
+    },
+    {
+      "slot": 9,
+      "key": "lapis",
+      "token": "data-09-lapis",
+      "steps": {
+        "00": "#EFF9FD",
+        "10": "#DAEFF8",
+        "20": "#BCE2F1",
+        "30": "#97D1E9",
+        "40": "#6BBEDD",
+        "50": "#3BA9CF",
+        "60": "#0093BE",
+        "70": "#007EAB",
+        "80": "#006992",
+        "90": "#005274",
+        "100": "#00384F"
+      },
+      "chartLight": 80,
+      "chartDark": 70,
+      "dash": "8 2 2 2 2 2",
+      "marker": "diamond",
+      "pattern": "zigzag"
+    },
+    {
+      "slot": 10,
+      "key": "olive",
+      "token": "data-10-olive",
+      "steps": {
+        "00": "#FAF6EE",
+        "10": "#F3EAD9",
+        "20": "#E8D9BA",
+        "30": "#DCC595",
+        "40": "#CCAD6B",
+        "50": "#BB9540",
+        "60": "#A87D00",
+        "70": "#946700",
+        "80": "#7D5400",
+        "90": "#624100",
+        "100": "#432C00"
+      },
+      "chartLight": 80,
+      "chartDark": 40,
+      "dash": "3 5",
+      "marker": "cross",
+      "pattern": "sparse-dots"
+    },
+    {
+      "slot": 11,
+      "key": "slate",
+      "token": "data-11-slate",
+      "steps": {
+        "00": "#F3F7F9",
+        "10": "#E4ECF0",
+        "20": "#CFDDE3",
+        "30": "#B6CBD4",
+        "40": "#9AB5C1",
+        "50": "#7FA1AE",
+        "60": "#648A99",
+        "70": "#4D7685",
+        "80": "#3B616F",
+        "90": "#2C4B57",
+        "100": "#1D333B"
+      },
+      "chartLight": 60,
+      "chartDark": 40,
+      "dash": "14 4",
+      "marker": "square",
+      "pattern": "back-diagonal"
+    },
+    {
+      "slot": 12,
+      "key": "clay",
+      "token": "data-12-clay",
+      "steps": {
+        "00": "#FEF4F5",
+        "10": "#F9E7E9",
+        "20": "#F3D3D7",
+        "30": "#EBBCC2",
+        "40": "#DEA1AA",
+        "50": "#CF8893",
+        "60": "#BB6E7C",
+        "70": "#A75867",
+        "80": "#8E4554",
+        "90": "#703440",
+        "100": "#4D232B"
+      },
+      "chartLight": 60,
+      "chartDark": 40,
+      "dash": "2 2 8 2",
+      "marker": "triangle",
+      "pattern": "grid"
+    }
+  ],
+  "order": [
+    "harbor",
+    "brass",
+    "rose",
+    "orchid",
+    "jade",
+    "indigo",
+    "olive",
+    "fern",
+    "lapis",
+    "ember",
+    "slate",
+    "clay"
+  ],
+  "colorOnlyCap": 5,
+  "encodeFrom": 5,
+  "separatorStroke": 1.5,
+  "restrictedPairs": [
+    [
+      "brass",
+      "olive"
+    ],
+    [
+      "indigo",
+      "lapis"
+    ]
+  ],
+  "theme": {
+    "surface": {
+      "light": "#FFFFFF",
+      "dark": "#12151C"
+    },
+    "ink": {
+      "light": "#1A1628",
+      "dark": "#E7EAF0"
+    },
+    "soft": {
+      "light": "#5B6472",
+      "dark": "#9AA3B2"
+    },
+    "grid": {
+      "light": "#E6E8EC",
+      "dark": "#252A34"
+    }
+  },
+  "signal": {
+    "accent": {
+      "light": "#C75300",
+      "dark": "#FF9A4D"
+    },
+    "rail": {
+      "light": "#C6CBD2",
+      "dark": "#39404D"
+    },
+    "tint": {
+      "light": "#FBEADC",
+      "dark": "#32220F"
+    }
+  },
+  "ai": {
+    "accent": {
+      "light": "#4D60E6",
+      "dark": "#93A1FF"
+    },
+    "rail": {
+      "light": "#C6CBD2",
+      "dark": "#39404D"
+    },
+    "tint": {
+      "light": "#EEF0FE",
+      "dark": "#1B1F3A"
+    }
+  },
+  "motion": {
+    "enter": {
+      "ms": 900,
+      "easing": "easeOutCubic"
+    },
+    "stagger": {
+      "ms": 90,
+      "easing": "\u2014"
+    },
+    "update": {
+      "ms": 480,
+      "easing": "easeInOutSine"
+    },
+    "exit": {
+      "ms": 260,
+      "easing": "easeInCubic"
+    },
+    "signal": {
+      "ms": 1400,
+      "easing": "easeOutCubic"
+    },
+    "ai": {
+      "ms": 1200,
+      "easing": "easeOutCubic"
+    },
+    "tooltip": {
+      "ms": 120,
+      "easing": "linear"
+    }
+  },
+  "seed": [
+    [
+      34,
+      41,
+      38,
+      52,
+      60,
+      57,
+      68,
+      74
+    ],
+    [
+      58,
+      54,
+      61,
+      49,
+      55,
+      62,
+      58,
+      64
+    ],
+    [
+      22,
+      28,
+      31,
+      35,
+      33,
+      44,
+      47,
+      52
+    ],
+    [
+      70,
+      66,
+      62,
+      65,
+      58,
+      54,
+      49,
+      44
+    ],
+    [
+      12,
+      18,
+      26,
+      24,
+      32,
+      38,
+      41,
+      49
+    ],
+    [
+      46,
+      44,
+      50,
+      55,
+      48,
+      45,
+      52,
+      57
+    ],
+    [
+      30,
+      36,
+      33,
+      29,
+      37,
+      43,
+      40,
+      46
+    ],
+    [
+      64,
+      60,
+      57,
+      61,
+      67,
+      63,
+      70,
+      73
+    ],
+    [
+      18,
+      22,
+      20,
+      27,
+      31,
+      29,
+      35,
+      39
+    ],
+    [
+      52,
+      49,
+      55,
+      58,
+      54,
+      60,
+      56,
+      62
+    ],
+    [
+      26,
+      31,
+      29,
+      38,
+      42,
+      40,
+      45,
+      51
+    ],
+    [
+      41,
+      38,
+      44,
+      47,
+      43,
+      50,
+      53,
+      58
+    ]
+  ],
+  "diverging": [
+    "#8C396C",
+    "#BA6296",
+    "#E9B6D1",
+    "#F4F1EC",
+    "#9ED6BC",
+    "#079C71",
+    "#00714A"
+  ],
+  "status": {
+    "positive": [
+      "#1F7A4D",
+      "#54C58C"
+    ],
+    "negative": [
+      "#A32B32",
+      "#F0868B"
+    ],
+    "warning": [
+      "#8B6D00",
+      "#E0C24A"
+    ],
+    "info": [
+      "#2B5FC9",
+      "#8FB2F5"
+    ]
+  }
+}

@@ -16,7 +16,7 @@ export const EXPORT_TABLES: Record<string, string> = {
   preventive_care: 'id,user_id,item_name,category,status,recommended_date,completed_date,next_due_date,frequency,provider,notes,source,created_at,updated_at',
   providers: 'id,user_id,npi,name,specialty,clinic,phone,email,address,relationship,connection_source,last_visit_date,in_network,notes,created_at,updated_at',
   pharmacies: 'id,user_id,name,chain,phone,address,preferred,delivery_options,in_network,notes,created_at,updated_at',
-  insurance_coverages: 'id,user_id,provider_id,plan_name,member_id_hash,group_number,bin,pcn,relationship,effective_start,effective_end,is_primary,verification_status,last_verified_at,source,coverage_status,stopped_at,created_at,updated_at',
+  insurance_coverages: 'id,user_id,provider_id,plan_name,member_id,member_id_hash,group_number,bin,pcn,relationship,effective_start,effective_end,is_primary,verification_status,last_verified_at,source,coverage_status,stopped_at,created_at,updated_at',
   insurance_policies: 'id,user_id,carrier_name,member_id,group_number,plan_type,claims_phone,is_primary,created_at,updated_at',
   claims: 'id,user_id,coverage_id,claim_number,provider_name,service_date,billed_amount,allowed_amount,patient_responsibility,status,description,created_at,updated_at',
   health_records: 'id,user_id,kind,title,provider_name,provider_id,service_date,received_at,source,file_type,file_size_bytes,ai_summary,tags,created_at,updated_at',

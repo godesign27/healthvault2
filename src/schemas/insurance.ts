@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const RelationshipZ = z.enum(['self', 'spouse', 'dependent', 'other']);
 
-// 'verified' is set by the Edge Function's verifyInsurance tool; treat as alias for 'connected'
+// Legacy flags are retained for compatibility; none establish insurer eligibility.
 export const VerificationStatusZ = z.enum(['connected', 'verified', 'verifying', 'needs_attention', 'expiring']);
 
 export const ConnectionSourceZ = z.enum(['oauth', 'upload', 'manual']);
@@ -33,12 +33,12 @@ export const CoverageZ = z.object({
   effectiveStart: z.string().datetime('Effective start date is required'),
   effectiveEnd: z.string().datetime().nullable().optional(),
   isPrimary: z.boolean().default(false),
-  verificationStatus: VerificationStatusZ.default('connected'),
+  verificationStatus: VerificationStatusZ.default('needs_attention'),
   lastVerifiedAt: z.string().datetime().optional(),
   source: ConnectionSourceZ.default('manual'),
   coverageStatus: CoverageStatusZ.default('active'),
   stoppedAt: z.string().datetime().nullable().optional(),
-  rawFhir: z.record(z.unknown()).optional(),
+  rawFhir: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
 });
@@ -52,7 +52,7 @@ export const AuditEventZ = z.object({
   userId: z.string().uuid(),
   entity: z.string(),
   action: z.enum(['create', 'update', 'delete', 'verify', 'set_primary']),
-  metadata: z.record(z.unknown()).default({}),
+  metadata: z.record(z.string(), z.unknown()).default({}),
   createdAt: z.string().datetime().optional(),
 });
 

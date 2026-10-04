@@ -18,6 +18,9 @@ Deno.serve(async (req: Request) => {
   });
   const { data: { user }, error } = await client.auth.getUser();
   if (error || !user) return json({ error: 'Sign in to download your data.' }, 401);
+  const access = await client.rpc('current_account_access_allowed');
+  if (access.error) return json({ error: 'Account access could not be verified. Please try again.' }, 503);
+  if (access.data !== true) return json({ error: 'This account is unavailable. Contact support.' }, 403);
   try {
     // Never accept a target user ID, table name or filter from the request body.
     return json(await collectAccountExport(client, user.id), 200);

@@ -24,7 +24,7 @@ export async function getInsuranceCoverages(input: unknown) {
       .select(`
         id,
         plan_name,
-        member_id_hash,
+        member_id,
         group_number,
         relationship,
         effective_start,
@@ -58,7 +58,7 @@ export async function getInsuranceCoverages(input: unknown) {
       providerName: row.insurance_providers?.name || "Unknown",
       providerLogoUrl: row.insurance_providers?.logo_url || null,
       planName: row.plan_name,
-      memberId: row.member_id_hash,
+      memberId: row.member_id || '',
       groupNumber: row.group_number,
       relationship: row.relationship,
       effectiveStart: row.effective_start,

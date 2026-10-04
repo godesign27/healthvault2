@@ -14,6 +14,7 @@ export interface ToolEvent {
 }
 
 export interface ChatRequest {
+  readOnly?: boolean;
   message: string;
   page?: string;
   pageContext?: Record<string, unknown>;

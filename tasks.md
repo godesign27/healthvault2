@@ -1,3 +1,32 @@
+## Current release queue — October 3, 2026
+
+Use [docs/release/READINESS.md](docs/release/READINESS.md) for the consolidated current queue
+and [validation evidence](docs/release/2026-10-03-validation.md) for the latest pass.
+The entries below retain historical snapshots; an earlier unchecked item may be superseded
+by a later verified entry. They are not a fresh release certification.
+
+### Latest follow-up
+
+- [x] Prepare isolated SDK 52 candidate, matching modules and native lockfiles; web/iOS JS export, pod install and targeted tests pass.
+- [x] Resolve candidate fmt/Xcode 27 native compile failure using a guarded upstream backport; format validation and unsigned arm64 Debug simulator build pass.
+- [x] Install/launch SDK 52 candidate in clean simulator; local-fixture sign-in, session reload and Records/Forms navigation/error checks pass.
+- [ ] Complete successful backend flows, Release, Android and physical-device acceptance before adoption.
+- [x] Remove fabricated dashboard activity/unsupported counts and wire three quick actions; actual-component regression passes.
+- [x] Replace active Care samples with owner-scoped queries and truthful failures; implement native recovery flow and sign-in accessibility. Isolated regressions pass.
+- [ ] Verify hosted recovery redirect/email flow, interactive Care/recovery and physical VoiceOver; resolve remaining placeholder routes.
+
+- [x] Apply isolated, compatible security patches; web build/iOS export and targeted tests pass. Audit 87→84; critical tar remains for coordinated native-stack migration.
+
+- [x] Scope both form-save helpers to the owner patient profile and require returned-row confirmation; six focused regression suites and web build pass.
+- [x] Audit and retire unused mock import chain and unreachable assistant interview; active autofill/chat/provider modules retained.
+
+- [x] Repair accordion caller/content contract, segmented selection semantics, wizard descriptions/types and legacy navigation type errors; component regression checks pass.
+
+- [x] Fix timeline patient-profile lookup and query error handling; regression checks pass.
+- [x] Derive provider/pharmacy create ownership from signed-in session; reject absent sessions.
+- [x] Repair dynamic icon rendering and insurance/component type mismatches.
+- [~] Full TypeScript gate: 12 unused-code diagnostics remain, all in protected marketing/public-site files (previously 45); web build passes.
+
 # Health Vault — Tasks
 
 Outstanding work for both clients:
@@ -10,8 +39,26 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 # ChatGPT App MVP
 
+- [x] Harden vital and clinical import widgets with shared standard/legacy host handling, stable pending/success, bounded waiting, error rejection and no uncertain retry; deployed v131 with fresh template URIs and 100 passing tests.
+- [~] Concurrent SQL test requests completed but did not overlap (second RPC measured 0.012 seconds); concurrency remains unproven because the tool appears to queue requests. Both transactions rolled back and zero fixtures remain.
+
+- [x] Reconcile all 31 MCP v129 deployed source files; restore missing health-import/clinical-import/Nourished Rebel modules, record hashes, and add a read-only source comparison script.
+- [x] Prepare isolated-test CI and production-readiness/recovery/reviewer runbook; 84 tests and package typecheck pass. Remote CI, Deno validation, backup restore, operational alerts, and remaining acceptance gates are not yet complete.
+
+- [x] Verify live revoked-share and invalid-token denial on viewer, PDF, and bundle routes; expand isolated expiry/revocation/token coverage (84 tests).
+- [x] Refresh ChatGPT plugin metadata and verify medical-form share domain warning is cleared with the deployed redirect origin.
+- [~] Finish two-account OAuth isolation: exact consent approved and both accounts connected. Fresh ChatGPT AOL-only dashboard request returned the AOL identity and zero counts; cross-owner proposal/mutation denial remains untested through OAuth. Live approved-share expiry remains pending after 2026-09-20 13:23:04 UTC.
+
+- [x] Reconnect original owner and complete approved one-hour Patient Registration email test: widget accepted, Resend Delivered, emailed recipient link renders one read-only form (2026-09-20).
+- [x] Harden post-send Open secure share with validated real URL/native fallback and redirect metadata (v129, 78 tests). Earlier apparent failure also involved a delayed ChatGPT external-site prompt.
+- [x] Add non-enforcing DMARC policy and recipient plain-text email alternative. Inbox placement remains recipient-dependent; original Gmail spam classification cause is unconfirmed.
+
+- [x] Repair Resend receiving/tracking DNS: root MX and DNS-only `talk` CNAME added with user authorization and independently resolved; user confirmed DNS verified. Incoming-email delivery remains untested.
+
+- [x] Correct malformed live `RESEND_FROM_EMAIL` to the approved Health Vault <team@healthvault.me>; original-account reconnect and replacement delivery succeeded. Failed share was revoked with explicit approval.
+
 - [x] Correct patient email receipts to distinguish service acceptance from unconfirmed delivery; version 127, 73 tests passing with mocked delivery.
-- [x] Prepare final live share/CSP and two-account OAuth acceptance steps in `packages/health-vault-mcp/LIVE_ACCEPTANCE.md`; execution awaits approved recipient/form and account setup.
+- [x] Prepare and maintain live share/CSP and two-account OAuth acceptance evidence in `packages/health-vault-mcp/LIVE_ACCEPTANCE.md`; remaining gates are recorded separately.
 
 - [x] Add missing domain metadata to the medical-form email-share widget for app submission; use the existing Health Vault widget origin and retain restrictive CSP.
 
@@ -22,8 +69,10 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] Atomic duplicate-safe diet and Life Signal RPC saves, deployed in version 125; repeated exact events reuse their row and batches roll back together.
 - [x] Test wellness database isolation with two synthetic authenticated identities in a rolled-back transaction; zero fixture rows remain.
 - [x] Add durable share/email confirmation receipts; version 126 reuses identical active shares, blocks pending retries, and fixes the deployed non-email helper mismatch. Mock delivery and rolled-back two-identity database tests pass.
-- [ ] Add atomic duplicate protection for other health-data writes; existing condition checks are limited to 100 rows and race under concurrent requests.
-- [ ] Reconcile production MCP source drift before deploying the full checkout; current fixes were applied to live snapshots.
+- [x] Deploy atomic RPC duplicate protection for condition, medication, allergy, record, and appointment confirmations (v130): exact retries reuse records; differing-details conflicts fail; owner-isolation rollback tests and 90 Node tests pass. Direct inserts from other clients are outside this lock protocol.
+- [ ] Exercise simultaneous independent-session saves and cross-owner proposal/mutation denial through real OAuth sessions.
+- [x] Verify the approved expired share rejects viewer, PDF, and bundle requests with HTTP 410; normal owner-authenticated revocation round trip remains pending.
+- [x] Reconcile production MCP source drift at v129; compare a fresh production snapshot again before the next deployment. Other functions and the Node server entrypoint are outside this parity claim.
 
 - [x] OAuth installation and authenticated, user-scoped `get_health_summary` tool.
 - [x] Interactive dashboard widget with live summary, three-item detail previews with View More controls, profile photo, privacy-gated Medical ID, next appointment, and onboarding checklist.
@@ -511,6 +560,59 @@ _Last updated: 2026-08-29_
       permissions and legacy patient assignments are quarantined roster identities, with no
       inferred practitioner role, identity link, consent, or provider access grant.
 
+- [x] 2026-10-02: Deploy MCP v132 Nourished Rebel v5 widget with dual-host confirmation, pending/error feedback, verified saves, completion handling; 108 tests and typecheck passed.
+- [ ] Fresh CSP-enforced ChatGPT browser acceptance for Nourished Rebel v5, vitals v3, and clinical import v2 remains required before beta approval.
+- [x] 2026-10-02: Actual MCP edge entrypoint passes isolated Deno 2.9.6 check with frozen dependencies; repeatable script and CI job prepared.
+- [x] Restore secondary-account read-only wellness/dashboard rendering through reconnect and metadata refresh; live Start and blank-answer validation pass.
+- [ ] Complete fresh CSP-settings verification and real save/error/timeout browser acceptance.
+
+- [x] 2026-10-02: Reproduced and fixed live cross-account reads of patient_profiles/form_responses; rollback isolation regression suite passes and zero fixtures remain.
+- [x] User verified live wellness save with their entered sleep answer.
+- [ ] Investigate cause of live demo-policy drift and historical access; complete real OAuth cross-account proposal/revoke tests and review dependent privileged access paths before beta.
+
+- [x] 2026-10-02: Both share types pass rollback owner/revoke/receipt/replay isolation checks; no fixtures remain.
+- [x] Added live-target ownership-policy release gate for 11 private tables; passes.
+- [x] Confirmed older owner-form migration is absent from live recorded migration history; exact cause and historical access remain unresolved.
+
+- [x] 2026-10-02: Real ChatGPT OAuth owner revoke succeeded; foreign-owner revoke rejected with unchanged fixture; both test shares cleaned up.
+- [x] Deploy clearer inaccessible-share revocation error as MCP v133; 111 tests, Deno check, source parity and auth smoke checks pass.
+- [ ] Identify a dedicated staging database with two independent connections for simultaneous-save acceptance; awaiting user's environment choice.
+
+- [x] 2026-10-02: Real OAuth foreign form-proposal confirmation rejected; fixture unchanged, no form saved, cleanup verified. Proposal database regression suite passes.
+- [x] Deploy MCP v134 terminal error/timeout rendering for failed form confirmations; preserves mutation locking and never retries automatically.
+
+- [x] 2026-10-02: Live ChatGPT rejected-save card visibly shows server error and Check Health Vault after v134 metadata refresh; no indefinite loading.
+
+- [x] 2026-10-02: Audit public privacy/terms/support routes and account export/deletion controls; documented concrete failures in USER_CONTROLS_AUDIT.md.
+- [x] Implement authenticated owner-scoped account export and verify file contents/isolation with synthetic data; live authenticated acceptance remains tracked below.
+- [ ] Define retention/deletion fulfillment scope and test a dedicated disposable account; reviewed request submission is implemented per owner choice.
+- [ ] Publish approved privacy/terms and a monitored support destination; replace placeholder links and verify direct public routing.
+
+- [x] Implement and deploy owner-scoped structured account-export endpoint; pagination/isolation tests and auth-denial check pass.
+- [x] Implement approved reviewed-deletion request queue; live RLS/duplicate/confirmation tests pass in rollback.
+- [x] Wire account controls and verify synthetic browser receipt/download behavior locally.
+- [x] Prepare real privacy/terms/support routes, corrected footer links, and reviewable draft content locally.
+- [ ] Confirm policy operator/contact/retention facts, assign monitored support/deletion owner, approve text, and deploy website.
+- [ ] Verify authenticated deployed export using a dedicated synthetic account and complete operational deletion fulfillment procedure before readiness sign-off.
+- [x] Correct local policy drafts to GO Design, Inc. as operator of Health Vault; supersedes the earlier unincorporated Health Vault, Inc. designation.
+- [x] Complete team@healthvault.me inbound routing to godesigngo@gmail.com; verify delivery and original Reply-To.
+- [x] Prepare tested support forwarding to owner-selected godesigngo@gmail.com; deploy closed endpoint and restricted receipt ledger.
+- [x] Activate approved Resend webhook and signing secret; receiving access, delivery and Reply-To verified.
+- [x] Activate owner-approved Resend webhook and configure signing secret; verify signed/unsigned authentication live.
+- [x] Verify owner-approved support forward test reaches Gmail Inbox and preserves original Reply-To.
+- [x] 2026-10-02: Owner-approved plain-text support-forward test delivered to godesigngo@gmail.com Inbox/Updates; SPF/DKIM/DMARC and Reply-To verified.
+- [x] Complete SMTP credential handoff, verify Gmail alias and outbound From/Reply-To.
+- [ ] Plan a durable mailbox before Gmail third-party send-as retires in January 2027.
+- [x] 2026-10-02: User completed Resend SMTP credential and Gmail verification; Health Vault send-as alias now present and verified in Gmail settings.
+- [x] 2026-10-02: Outbound Gmail/Resend SMTP test delivered to Gmail Inbox/Personal with team@healthvault.me From/Reply-To and SPF/DKIM/DMARC passing.
+- [x] Record founder Timothy McGuire as support/deletion owner and initial release as adults 18+ in draft policies/runbook.
+- [ ] Validate and enforce adults-only signup eligibility before release; draft wording alone is not enforcement.
+- [ ] Future: design authorized parent/guardian/dependent access, consent, account separation and revocation before enabling family records; define sibling/dependent relationships explicitly.
+- [x] Record owner-provided business mailing address in local support/policy drafts.
+
+- [x] Confirm GO Design, Inc. incorporation in Illinois, USA and the same Barrington business mailing address; update local policy/support drafts.
+- [x] Record owner-provided GO Design, Inc. FEIN in internal review notes only.
+
 - [x] Draft reviewed-deletion scope, response targets, verification checklist and synthetic rehearsal criteria in DELETION_RETENTION_REVIEW.md.
 - [ ] Accept operational deletion targets; approve category retention periods and implement/test erasure, access blocking and queue monitoring before readiness sign-off.
 
@@ -518,3 +620,275 @@ _Last updated: 2026-08-29_
 - [ ] Verify live website routes after deployment and complete authenticated synthetic export/deletion acceptance, dependency remediation and recovery gates.
 
 - [x] Deploy account-controls release ef2d430 to healthvault2 and verify live support/privacy/terms routes plus authenticated Settings controls.
+
+- [x] Make deletion isolation regression self-contained with rollback-only synthetic Auth identities; live test passes and leaves zero fixture users.
+- [x] Verify all 34 export projections compile against live schema with authenticated-role grants and zero data rows read.
+- [ ] Update/choose isolated preview for real authenticated two-account export and deletion-request tests; existing preview lacks nine export dependencies.
+
+- [x] Update owner-approved preview schema without copying production data; preserve reference rows and keep ancillary integrations inactive.
+- [x] Pass two-account authenticated HTTP export/deletion-request acceptance including pagination, indirect ownership and concurrent duplicate protection; verify complete fixture cleanup.
+- [ ] Complete full browser acceptance with disposable preview sessions, actual erasure/access-block testing and independent file/database recovery rehearsal.
+
+- [x] Verify real account-controls component browser download, confirmation gate, receipt and reload persistence against disposable preview account; verify cleanup.
+- [x] Activate approved count-only deletion-queue digest with delivery verification and restricted failure/stale status; independent outage alerts remain below.
+
+- [x] Activate owner-approved weekday 9 AM Mountain count-only deletion digest; verify Inbox delivery, authentication, stable retries, duplicate protection and empty/failure receipts.
+- [ ] Observe first real scheduled digest check (Oct5 2026 09:00 America/Denver); current state awaiting_first_run.
+- [ ] Add independent outage alerting if required; current monitor failure/stale visibility requires Timothy's weekday manual review.
+- [ ] Review existing provider/consent SECURITY DEFINER execution grants reported by production advisor; do not blanket-revoke intentional authenticated RPCs.
+
+- [x] Rehearse preview-only reviewed account block, old-JWT/refresh denial, partial-failure preservation, synthetic row/file/Auth erasure and second-account isolation.
+- [ ] Fix sensitive-file delivery/revocation: warmed signed Storage URL still returned cached bytes after deletion; immediate revocation gate FAILED. Verify cache invalidation and avoid long-lived direct bearer file URLs.
+- [ ] Extend block checks to privileged service jobs, anonymous share/request endpoints, OAuth/provider grants and all production ownership relationships before deploying candidate SQL/export guard.
+- [ ] Complete full erasure/recovery/retention acceptance; fixture cleanup is not full production erasure readiness.
+
+- [x] Implement/test preview protected record-file endpoint: ownership checks, bounded no-store bytes, post-I/O recheck and immediate unlink/account-block denial.
+- [x] Verify real document viewer protected-image rendering and visible denied-access state; clean all synthetic test artifacts.
+- [ ] Review/deploy coordinated producer/API/viewer changes after access-block dependencies; test actual incoming record-import delivery in preview.
+- [ ] Migrate/revoke previously issued direct Storage URLs and verify cache invalidation; new mediated endpoint does not fix legacy links retroactively.
+
+
+- [x] Verify inbound key-management JWTs and active key owners; constrain personal keys/email resolution to owner Vault; pass preview synthetic upload/protected-download and isolation tests.
+- [ ] Add atomic import/block interlock, upload/metadata failure cleanup and honest partial results; extend guards to record-request and explicitly authorized provider ingestion before production rollout.
+
+
+- [x] Preview inbound import journal, transactional finalization coordinated with reviewed block, serialized compensation and honest indexed partial results; verify invalid-metadata cleanup and concurrent block/save denial.
+- [ ] Add/test stale-attempt and late-upload reconciliation worker; retain journal until settled, handle request retries and total body bounds, and extend guarded writes to record-request before production rollout.
+
+
+- [x] Extend transactional upload protection to provider requests; verify token rotation/block denial, atomic metadata rollback, partial-result UI and owner-only resend.
+- [x] Activate preview-only 15-minute failed-upload recovery after proving stale/late cleanup, saved/recent preservation and retry behavior.
+- [x] Observe successful preview cron-triggered upload-recovery dispatches and completed worker receipt (October 2, 23:15/23:30 UTC; zero failures).
+- [ ] Approve journal retention/backlog alerts and finish retry/body-bound/legacy-link rollout gates before production deployment.
+
+- [x] Rehearse preview legacy file rotation and exact-object CDN purge: replacement verified before old deletion, cached old URL denied after 10 seconds at observed location, second account preserved and fixtures cleaned.
+- [ ] Build durable production file-reference migration and verify all reference types before retiring the one inventoried legacy health-record link.
+
+- [x] Bound preview upload JSON bodies before parsing (40 MiB upload / 64 KiB control, actual streamed-byte counting, 30-second read timeout); add local provider preflight and conservative retry handling for missing receipts.
+- [x] Add preview provider-request durable per-file receipts across reloads/concurrent clients; recover committed results and preserve active attempts.
+- [x] Add preview inbound batch-key receipts: same-key recovery, changed-payload rejection, owner isolation and concurrent slot protection.
+- [ ] Approve receipt retention/historical cutover and update all inbound clients for required Idempotency-Key before production rollout.
+- [x] Replace shared-client multipart mismatch with JWT JSON personal-upload route; add separate retry-aware integration client and verify real preview uploads.
+- [x] Replace web in-memory upload helper with an actual file picker and durable client receipts; verify preview save, reload, and same-file recovery without duplicates.
+- [x] Wire native Records picker/save to authenticated base64 uploads with stable content/owner/category retry identity; verify adapter/transport and preflight tests.
+- [x] Install mobile dependencies/pods, export the iOS bundle, build/install the development client and verify native file IO/hash/upload/retry/restart against preview.
+- [ ] Complete native Files picker/cancellation and interrupted-network UI acceptance; settle supported iOS/Xcode release matrix.
+- [x] Resolve hosted large-body rejection: discard unread rejected bytes under the absolute deadline; preview 42 MiB request now returns JSON 413 and creates no upload attempts.
+- [x] Track GPT/SaaS/mobile feature parity and wire native assistant read-only chat with capability handshake and server tool restrictions (local implementation).
+- [ ] Audit assistant account-block/ownership checks, deploy read-only changes to preview and complete real two-account chat/error/denied-write acceptance.
+- [ ] Wire native record sharing and provider request submit/resend/cancel; replace sample provider selection.
+
+- [x] Deploy preview assistant read-only restrictions and active-account/RLS guards; verify blocked/anonymous access and forged history denial with disposable accounts.
+- [ ] Configure preview OPENAI_API_KEY via Supabase secrets; then run live two-account answer isolation and requested-write denial tests (currently blocked by missing configuration).
+
+- [x] Wire native provider-request resend with explicit review, JWT auth, truthful delivery feedback and persistent uncertain-outcome protection; remove fabricated email timeline.
+- [ ] Verify native resend confirmation/results using an authorized test recipient and design unknown-outcome reconciliation; cancellation remains open; request creation and real provider selection are implemented below.
+
+- [x] Replace native sample provider selector with real care-team data and wire reviewed request creation with authenticated transport and persistent duplicate protection; tests and iOS export pass.
+- [ ] Verify native request creation UI and authorized email receipt; add optional date range and uncertain-outcome reconciliation.
+- [ ] Implement server-backed cancellation with status migration, ownership/account checks, upload lock coordination and resend/upload refusal for cancelled requests.
+
+- [x] Implement candidate server-backed request cancellation and native confirmation; verify ownership, invalidated links, upload/resend refusal, banned owner, idempotency and RPC permissions in a rolled-back preview transaction.
+- [ ] Apply cancellation candidate to preview, deploy dependent record-request function, and complete concurrent-session plus HTTP/native UI cancellation acceptance before production rollout.
+
+- [x] Apply cancellation candidate and deploy record-request to preview; pass live HTTP ownership/retry/revocation checks and eight concurrent resend/cancel races with disposable fixtures.
+- [ ] Complete native cancellation UI acceptance and concurrent upload-finalization/cancellation tests before production rollout.
+
+- [x] Verify cancel-first/finalize-first and six concurrent upload-finalization/cancel races using synthetic preview storage; preserve committed records and reject late completion.
+- [x] Fix mobile cancelled/received/failed card labels and visible cancellation progress; iOS export passes.
+- [ ] Complete on-device cancellation confirmation, progress, success and failure acceptance (backend HTTP/race tests complete).
+
+- [x] Observe real native cancellation confirmation, Keep request, progress, success, reload persistence, refreshed counts and received-conflict refusal against disposable preview fixtures.
+- [x] Close stale request detail when cancellation error is acknowledged; restored-app iOS bundle validated.
+- [x] Verify injected offline/lost-response cancellation UI, error-acknowledgement navigation and full-shell Records layout on iPhone 16 Pro / iOS 18.6.
+
+- [x] Keep cancellation deadline active through response-body reading; stalled transport/body and committed-lost-reply retry tests pass.
+- [ ] Complete native Files-picker/upload interruption acceptance; implement the currently empty Connect Provider handler with a real supported flow.
+
+- [x] Replace mobile Connect Provider no-op with real directory search, reviewed portal launch, active connection reuse, server status verification and manual-request fallback.
+- [ ] Accept native provider OAuth return/restart and import-review flow on device; current callback is the existing web completion page.
+- [ ] Complete actual native Files-picker and interrupted-upload UI acceptance (transport regression tests pass).
+
+- [x] Observe actual iOS Files picker open/cancel, synthetic file selection, category selection, busy state and authentication-failure recovery; verify empty provider-search validation.
+- [ ] Complete combined authenticated native picker→save receipt→lost-response/retry acceptance and live provider authorization.
+
+- [x] Verify authenticated actual Files-picker upload, lost-response uncertainty and UI retry confirmation against preview; independent server reads prove same record ID/count=1.
+- [x] Replace internal upload retry wording and preserve confirmed-save feedback when list refresh fails.
+- [ ] Accept live provider OAuth return/import review and picker reselection after app restart.
+
+- [x] Recover pending native provider authorization from owner-scoped server state, add explicit restart and truthful inactive status; tests/iOS bundle pass.
+- [x] Add missing preview OAuth schema prerequisites with server-only state access; no provider enabled.
+- [ ] Harden OAuth callback redirects, atomic state consumption and active-account activation before live provider acceptance.
+- [ ] Configure preview sandbox provider/client and test real provider authorization return/import review.
+
+- [x] Restrict OAuth return paths, claim state before token exchange and guard final activation with account-erasure lock/active-account/pending checks; deploy and smoke-test preview.
+- [x] Pass rollback SQL activation/replay/permissions tests and return-URL unit tests; zero fixtures remain.
+- [ ] Complete configured sandbox provider authorization exchange, concurrent callback HTTP acceptance and native return/import review.
+
+- [x] Configure preview SMART sandbox and complete real browser authorization/code exchange; owner read confirms active and four consumed-state replays preserve connection.
+- [x] Replace signed-out callback false failure with sign-in/reverification flow; browser state and web build pass; disposable preview account/connection cleaned up.
+- [ ] Verify post-login web completion and native return/restart, then implement/accept provider import review using synthetic data.
+
+- [x] Automatically verify pending provider connection when mobile returns to foreground; preserve confirmed status if list refresh fails; transition tests/iOS export pass.
+- [x] Fix local fhir-sync false success on preview/token persistence failure; handler tests and Deno check pass.
+- [ ] Review import active-account/erasure safety, deploy preview persistence fixes, and accept actual native portal return plus reviewed import.
+
+- [x] Apply preview FHIR refresh/preview account-erasure interlock with owner/status/token checks; stop counting preview as completed sync; deploy fhir-sync and verify 401.
+- [x] Pass full-handler failure tests, Deno check and rolled-back SQL ownership/block/token/permissions tests; zero fixtures remain.
+- [ ] Exercise concurrent FHIR preview/erasure sessions and live native provider return/import review; add durable import confirmation before enabling native import.
+
+- [x] Pass preview block-first/write-first and 12 concurrent FHIR preview/refresh-versus-block races; authenticated blocked endpoint refuses access; fixtures cleaned.
+- [x] Remove web scaffold medical-data fallback and duplicate client preview insert; require live persisted FHIR result; client tests/web build pass.
+- [ ] Accept actual native portal return and implement durable reviewed clinical import with duplicate/partial-failure handling.
+
+- [x] Add preview atomic reviewed FHIR confirmation with durable receipt and exact-source duplicate protection; web uses selected preview indexes and server receipt.
+- [x] Pass SQL rollback/retry/dedup/block/permission checks, client tests, Deno check and web build; deploy preview endpoint and verify 401.
+- [ ] Complete authenticated concurrent/lost-response import confirmation tests, rendered web review and native review/portal-return acceptance before production rollout.
+
+- [x] Pass deployed authenticated FHIR import concurrency (six simultaneous requests), ignored-response retry, ownership/confirmation refusal, exact-source dedup and transactional failure checks; cleanup verified.
+- [ ] Complete rendered web confirmation/retry acceptance and native import review/portal-return flow.
+
+- [x] Keep exact import selection on Try Again; verify actual web review/error/retry/completion components with injected lost response and failing list refresh; fix invisible primary button styles.
+- [ ] Complete native import review and portal-return acceptance; combined live-browser import test remains separate from UI fault injection.
+
+- [x] Wire mobile provider import review, selection and explicit server confirmation; persist scoped retry request and refresh Records after saved receipt.
+- [x] Pass mobile import recovery/ownership/storage/receipt tests and final iOS export.
+- [ ] Observe native review, selection, cancel, confirmation, uncertain-response retry, app-restart recovery and provider portal return on device.
+
+- [x] Observe real native import selection/cancel, lost-response state, app-restart recovery and refresh-failure success preservation with synthetic adapters; restore normal entry and export iOS.
+- [ ] Complete combined native live provider authorization return and authenticated import acceptance; synthetic UI and live endpoint tests are separate evidence.
+
+- [x] Complete combined iOS native sandbox OAuth, foreground return, live preview and authenticated reviewed import; independently verify 16 clinical rows and one summary; remove disposable fixtures.
+- [x] Fix native provider portal launch losing the Linking receiver; provider connection/return/import checks pass.
+- [ ] Resolve generic medication labels from FHIR medication references; test mapping before production provider rollout.
+- [ ] Verify the complete Records-screen refresh and physical-device/Android provider flows; simulator component acceptance does not cover these.
+
+- [x] Trace generic medication labels to literal upstream sandbox placeholders; preserve source names without invention.
+- [x] Add shared FHIR contained/included/reference medication mapping and patient-scoped include; pass mapping isolation and preview-handler tests plus Deno check.
+- [x] Deploy mapping to preview and verify authenticated SMART sandbox preview persistence with real demo OAuth; remove all disposable fixtures and private credentials.
+
+- [x] Verify complete native Records-screen import refresh using synthetic services: filter resets to All, summary appears, count/last-sync update without restart; refresh failure preserves saved success.
+- [x] Prevent stale Records/statistics responses; include statistics in upload and pull refresh; pass deferred-response hook regressions.
+- [ ] Fix date-only service dates shifting back one day on mobile; check narrow Records header layout.
+- [ ] Repeat full-screen refresh with live services and perform physical-device/Android acceptance before release.
+
+- [x] Fix date-only Records display on web/native with shared formatter and five-timezone regression coverage; verify native card/detail date.
+- [x] Fix narrow Records header title/action layout and observe normal/320-point simulator containers.
+
+- [x] Complete full native Records flow with live preview services: sandbox OAuth, review/confirmation, automatic list/filter/count/last-sync refresh and independent persisted receipt verification; cleanup verified.
+- [ ] Perform physical-iPhone and Android acceptance; reconcile remaining release gates before production rollout.
+
+- [x] Improve native Records statistic visibility, provider field labeling, primary/secondary action hierarchy and singular success copy; verify simulator review/confirmation and regression tests.
+- [ ] Complete large-text/dark-theme and physical-device/Android acceptance before production release.
+
+- [x] Create `design.md` with shared SaaS/native/GPT component and style reference, actual implementation links and explicit consistency gaps; link from agent instructions.
+- [x] Share native Records action-button sizing, wrapping, hierarchy and busy semantics across upload/provider/import; regression and iOS export checks pass; normal-size simulator appearance checked.
+- [ ] Propagate native theme semantics into Records and verify large-text layouts; audit GPT import metadata/type-chip contrast in dark mode.
+
+- [x] Propagate shell dark mode into Records and child forms; centralize semantic palettes and explicit on-action foreground; verify dark Records/provider review in simulator and 16 contrast pairs.
+- [ ] Verify large OS text, remaining Records sheets/populated states and full-shell theme switching; physical-iPhone/Android acceptance remains open.
+
+- [x] Test actual maximum iOS Dynamic Type on Records/provider/detail; correct heading/close sizing and detail-tab layout; expose individual accessible modal controls and verify detail scrolling.
+- [ ] Finish maximum-text request/import form interactions and full-shell theme switching; physical device/Android and GPT contrast checks remain open.
+
+- [x] Centralize adaptive mobile typography and common control tokens; migrate main JS screen typography and core Records/Medical controls; document design.md rules.
+- [x] Run scoped accessibility review and synthetic maximum-text control interactions; fix shared contrast/semantics and document evidence/remaining findings.
+- [ ] Resolve Records placeholder actions and Medical nested control focus; complete VoiceOver/TalkBack, modal focus, keyboard, physical-device and cross-surface acceptance listed in design.md.
+
+- [x] Remove inactive Records insight/share buttons and unreachable demo banner; show truthful capability limits.
+- [x] Replace nested Medical row controls with token-based adaptive sibling controls; verify independent synthetic iOS selection/open/share callbacks.
+- [ ] Replace Medical demo persistence/sharing with real authorized flows; verify new form row at maximum text and with VoiceOver/TalkBack before release.
+
+- [x] Adopt supplied semantic ramps, rename HV Signal, preserve existing core palette; add generated source and contrast/drift checks.
+- [ ] Complete rendered semantic-color acceptance and migrate remaining SaaS/native/GPT feedback consumers; keep core colors unchanged.
+
+- [x] Add Option 1 chart palette, deterministic order/encoding/motion policy, export themes and reusable accessible trend chart to component library; preserve core brand/HV naming.
+- [x] Verify synthetic light/dark chart rendering and keyboard-accessible exact-value table.
+- [ ] Extend chart library with remaining base/signal/AI variants, textures, simulation and motion demos; validate mark contrast/narrow layout before patient-facing use.
+
+- [x] Replace native Medical demo forms/save/share/history with shared catalog/autofill and authenticated data paths; verify receipt/account/consent regression tests.
+- [ ] Add server-backed uncertain-send reconciliation/idempotency, native modal-focus acceptance and live sandbox Medical save/share/revoke testing before release.
+
+- [x] Implement owner-scoped form-share request claims/receipts and mobile read-only interrupted-send recovery; injected tests and synthetic save UI pass.
+- [ ] Apply/test recovery migration in preview, exercise real concurrent duplicate requests and email/receipt failure boundaries, then deploy backend before mobile release. Pending without a receipt still needs support reconciliation.
+- [x] Apply recovery migration and deploy share handler in preview; verify database claim arbitration, owner-only status receipts and revoked client access using synthetic accounts; clean fixtures.
+- [ ] Exercise concurrent HTTP share dispatch and email/receipt failure boundaries; complete native sandbox share/revoke and VoiceOver acceptance before production rollout. Database arbitration alone does not close this gate.
+- [x] Exercise actual share handler with isolated adapters for concurrent dispatch and email/storage/receipt failures; fix ambiguous transport outcomes, upload failure continuation and zero-row receipt confirmation; deploy fixes to preview.
+- [ ] Complete live cross-worker share concurrency and native sandbox share/revoke/VoiceOver acceptance. Isolated handler tests do not certify external provider behavior.
+- [x] Verify live preview concurrent pending/receipt replays, payload conflict, no duplicate share events, authenticated revocation and revoked-link denial; remove synthetic fixtures.
+- [ ] Verify first-send concurrency with an isolated email sink and complete interactive native sharing/revocation plus VoiceOver focus. Live seeded replays do not test a new dispatch.
+- [x] Exercise synthetic native consent/send/history/revoke interactions; replace editable post-send review with receipt view and clarify history delivery labels.
+- [ ] Verify VoiceOver speech/focus and maximum-text sharing/revocation on native devices; synthetic accessibility-tree inspection is not full screen-reader acceptance.
+- [x] Exercise synthetic sharing at maximum iOS accessibility text; add wrapping recipient summary and reset completed review scroll to receipt heading. Restore original simulator text settings.
+- [ ] Run physical-device VoiceOver focus, announcement and modal-dismissal acceptance (VoiceOver unavailable in this simulator's Vision settings); Android/TalkBack remains open.
+- [x] Require persisted owner-scoped revocation receipt; test missing rows/DB errors and repeated/unauthorized calls; deploy to preview.
+- [ ] Complete remaining scoped release gates in docs/medical-forms/RELEASE_ACCEPTANCE.md, including live acceptance of the final revoke update.
+- [x] Verify preview v51 revocation persistence live with synthetic fixture; clean account/profile/form/share/claim and credentials.
+- [x] Document conservative interrupted-send support triage and identify missing durable correlation/operator resolution tooling.
+
+- [x] Implement private request/share/provider correlation with pre-dispatch persistence checks and isolated failure tests (local; no deployment).
+- [x] Apply and verify correlation migration plus share handler in preview; SQL correlation gate and live no-email replay acceptance (v52; seeded pending/receipt, privacy, revoke, cleanup).
+
+- [x] Add native selectable interrupted-send support reference with owner checks, UUID validation and regression tests.
+- [ ] Verify support-reference long-press copy and VoiceOver on device before mobile release.
+
+- [x] Native local-fixture Care display/filter, recovery request/expired-link checks; fix calendar-date shift and remove inert Care share action.
+- [ ] User signs in to Supabase dashboard; verify recovery redirect/template settings and preview delivery. Browser OAuth attempt denied by automatic review; no settings changed.
+- [ ] Implement care-history sharing before claiming native sharing parity.
+
+- [x] Verify native recovery restart/cancel/rejected-token state and Care overlapping refresh/unmount behavior with actual-hook tests; distinguish filtered no-match copy.
+
+- [x] Replace web/native Vitals placeholders with shared owner-scoped saved measurement history, sources/units, loading/error/empty states and refresh; verify reader and overlapping-request behavior, SDK 51 iOS export.
+- [ ] Verify Vitals on device with large text and VoiceOver, plus signed-in hosted data. Current Vitals scope is read-only latest 100 measurements; entry, pagination and charts remain separate work.
+- [x] Remove unavailable native gallery/marketing menu destinations; add drawer roles, selected/checked state, modal escape, shared touch targets and recoverable sign-out failure handling. Component regression checks and SDK 51 bundle verified.
+- [ ] Verify native drawer focus entry/return and traversal with VoiceOver and large text on device; automated component checks are not accessibility certification.
+- [x] Simulator Vitals synthetic reading and drawer AX roles verified; largest text setting exposed avatar clipping and verbose controls, now corrected. Added floating-action clearance.
+- [ ] Verify end-of-list scrolling at largest text size and physical VoiceOver focus. Device Hub scroll/drag did not establish end-of-list reachability; do not mark this check passed.
+- [x] Share floating-action geometry between shell and Vitals/Records scroll clearance, including device safe area; bound Vitals list viewport explicitly. Adaptive geometry regression and SDK 51 export pass.
+- [x] Implement native drawer on-show focus, iOS dismissal return focus and underlying-screen accessibility isolation for drawer/assistant. Drawer regression and SDK 51 iOS export pass.
+- [ ] Validate focus transfer with physical iOS VoiceOver; implement/verify Android dismissal focus separately before Android release.
+- [x] Migrate native sign-in and insurance status/destructive feedback to shared semantic colors; improve recovery disabled appearance and sign-in/badge wrapping. Contrast/recovery/adaptive checks and SDK 51 export pass.
+- [x] Propagate shell light/dark theme into all native Care components, neutralize record-type badges, expose time-range state and improve filter/dropdown sizing. Actual style, data/date/refresh, semantic and adaptive checks plus final SDK 51 export pass.
+- [ ] Verify rendered Care dark mode and maximum-text dropdown/history interactions on device; physical VoiceOver remains open.
+- [x] Propagate native Insurance shell theme through cards/status/feedback/actions; improve action wrapping and dismiss target. Actual-theme, semantic contrast and adaptive checks plus SDK 51 export pass.
+- [ ] Fix native Insurance load failure currently falling through to empty-history presentation after a transient notice; retain a retryable error state, including session/race handling.
+- [ ] Verify native Insurance themed populated states and large-text actions interactively before release.
+- [x] Fix native Insurance persistent load-error/retry state, provider failure handling and stale responses on refresh/account-change/unmount; data/hook tests and SDK 51 export pass.
+- [ ] Remove unsupported native Insurance verification-success claims: current Refresh Verification only updates local DB status without a verification service. Audit corresponding SaaS behavior before claiming verification parity.
+
+### Insurance correctness batch — 2026-10-03
+- [x] Replace unsupported verification claims/actions with honest saved-state feedback across web/native/assistant.
+- [x] Add shared calendar-aware insurance dates and distinguish passed end dates.
+- [x] Make web insurance failures retryable; protect refresh/account changes from stale responses.
+- [x] Implement atomic owner-scoped primary selection and validate rollback/denial on synthetic preview data.
+- [x] Validate 17 focused suites, web build and SDK 51 iOS export.
+- [ ] Review/apply atomic-primary migration before dependent clients/functions; preflight duplicate primaries without silently resolving them.
+- [ ] Preview interactive coverage mutations, repeated taps, account-change during mutation, and physical accessibility acceptance.
+- [ ] Reconcile legacy member-ID hash/display conventions before claiming ID fidelity; do not treat stored workflow flags as insurer evidence.
+
+### Insurance action safety — 2026-10-04
+- [x] Share web/native mutation locking, fresh-account checks and persisted-receipt validation.
+- [x] Exclude old-account/unmounted action feedback and refresh; test pre/post-dispatch account changes.
+- [x] Show busy/disabled action state and clarify saved-state stop/resume/removal copy.
+- [ ] Validate physical-device progress announcements and real preview button flows after the RPC migration.
+
+### Legacy insurance identifiers — 2026-10-04
+- [x] Stop displaying ambiguous legacy hash suffixes as member-ID digits in web/native and assistant readers.
+- [x] Exclude uncertain member IDs from profile autofill and network/tool mappings.
+- [x] Add shared ID display tests and six read-path fixtures covering hash-like/plaintext-looking storage.
+- [x] Prepare read-only primary-selection rollout preflight; not run against production.
+- [ ] Replace mixed legacy identifier storage with explicit provenance and a recovery/re-entry path before claiming member-ID fidelity. Existing writers still require migration.
+
+### Explicit insurance ID storage — 2026-10-04
+- [x] Add explicit member_id storage without guessing or backfilling legacy values.
+- [x] Route three client writers through a shared explicit-ID payload; update readers/autofill/export.
+- [x] Remove insurance save payload/result logging and raw database errors from assistant UI.
+- [x] Validate owner read/write, cross-account denial and blank rejection in rollback-only preview SQL.
+- [ ] Apply reviewed member-ID migration before dependent clients, assistant and account-export functions.
+- [ ] Add/test authenticated re-entry for old records and interactive deployed writer acceptance. Historical IDs are not recovered by this additive migration.
+
+### Existing member-ID re-entry — 2026-10-04
+- [x] Implement inline Add/Update member ID on existing web/native coverage cards with explicit Save/Cancel.
+- [x] Reuse owner/account/duplicate-write guard; reject blank IDs and preserve legacy non-inference.
+- [x] Test actual web editor states and guarded update payload; retain scalable controls on stopped plans.
+- [ ] Accept keyboard/VoiceOver/TalkBack and real preview save flows after applying the explicit-ID migration.

@@ -97,7 +97,7 @@ export async function getUserCoverages(
     let query = supabase
       .from('insurance_coverages')
       .select(`
-        id, plan_name, member_id_hash, group_number, relationship,
+        id, plan_name, member_id, group_number, relationship,
         is_primary, verification_status, coverage_status,
         effective_start, effective_end,
         insurance_providers!inner (name)
@@ -119,7 +119,7 @@ export async function getUserCoverages(
       id: row.id,
       planName: row.plan_name,
       providerName: (row.insurance_providers as any)?.name || 'Unknown',
-      memberIdMasked: row.member_id_hash ? `****${row.member_id_hash.slice(-4)}` : '****',
+      memberIdMasked: row.member_id?.trim() ? `••••${row.member_id.trim().slice(-4)}` : 'Not available',
       groupNumber: row.group_number,
       relationship: row.relationship,
       isPrimary: row.is_primary,
@@ -147,7 +147,7 @@ export type SetPrimaryInsuranceInput = z.infer<typeof SetPrimaryInsuranceInputZ>
 
 export async function setPrimaryInsurance(
   input: SetPrimaryInsuranceInput,
-  userId: string
+  _userId: string
 ): Promise<ToolResult<{ coverageId: string; isPrimary: boolean }>> {
   try {
     const parsed = SetPrimaryInsuranceInputZ.safeParse(input);
@@ -159,24 +159,8 @@ export async function setPrimaryInsurance(
       return toolError('Setting primary insurance requires confirmation. Please confirm to proceed.');
     }
 
-    const { error: clearError } = await supabase
-      .from('insurance_coverages')
-      .update({ is_primary: false, updated_at: new Date().toISOString() })
-      .eq('user_id', userId);
-
-    if (clearError) {
-      return toolError(`Database error clearing primary: ${clearError.message}`);
-    }
-
-    const { error: setError } = await supabase
-      .from('insurance_coverages')
-      .update({ is_primary: true, updated_at: new Date().toISOString() })
-      .eq('id', parsed.data.coverageId)
-      .eq('user_id', userId);
-
-    if (setError) {
-      return toolError(`Database error setting primary: ${setError.message}`);
-    }
+    const { data, error } = await supabase.rpc('set_primary_insurance', { p_coverage_id: parsed.data.coverageId });
+    if (error || data !== parsed.data.coverageId) return toolError('Unable to update primary insurance.');
 
     return toolSuccess(
       { coverageId: parsed.data.coverageId, isPrimary: true },
@@ -194,49 +178,8 @@ export const VerifyInsuranceInputZ = z.object({
 export type VerifyInsuranceInput = z.infer<typeof VerifyInsuranceInputZ>;
 
 export async function verifyInsurance(
-  input: VerifyInsuranceInput,
-  userId: string
+  _input: VerifyInsuranceInput,
+  _userId: string
 ): Promise<ToolResult<{ coverageId: string; verificationStatus: string }>> {
-  try {
-    const parsed = VerifyInsuranceInputZ.safeParse(input);
-    if (!parsed.success) {
-      return toolError(`Invalid input: ${parsed.error.issues[0]?.message}`);
-    }
-
-    const { data: coverage, error: fetchError } = await supabase
-      .from('insurance_coverages')
-      .select('id, verification_status')
-      .eq('id', parsed.data.coverageId)
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (fetchError) {
-      return toolError(`Database error: ${fetchError.message}`);
-    }
-
-    if (!coverage) {
-      return toolError('Coverage not found or you do not have access.');
-    }
-
-    const { error: updateError } = await supabase
-      .from('insurance_coverages')
-      .update({
-        verification_status: 'verified',
-        last_verified_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', parsed.data.coverageId)
-      .eq('user_id', userId);
-
-    if (updateError) {
-      return toolError(`Database error: ${updateError.message}`);
-    }
-
-    return toolSuccess(
-      { coverageId: parsed.data.coverageId, verificationStatus: 'verified' },
-      'Insurance coverage marked as verified.'
-    );
-  } catch (err) {
-    return toolError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  return toolError('Insurer verification is not available. No coverage status was changed. Contact your insurer to confirm benefits and eligibility.');
 }

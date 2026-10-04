@@ -1,5 +1,6 @@
+import {insuranceMemberIdFields} from '../../../packages/api-client/src/insurance-status';
 import { useState, useCallback } from 'react';
-import { Coverage, CoverageZ, hashMemberId } from '../../schemas/insurance';
+import { Coverage, CoverageZ } from '../../schemas/insurance';
 import { InsuranceAnalytics } from './analytics';
 import { supabase } from '../supabase';
 
@@ -25,7 +26,6 @@ export function useInsuranceConnection(userId: string): UseInsuranceConnectionRe
       const validatedCoverage = CoverageZ.parse({
         ...coverageData,
         userId,
-        memberIdHash: coverageData.memberId ? hashMemberId(coverageData.memberId) : undefined,
       });
 
       const { data, error: insertError } = await supabase
@@ -34,7 +34,7 @@ export function useInsuranceConnection(userId: string): UseInsuranceConnectionRe
           user_id: validatedCoverage.userId,
           provider_id: validatedCoverage.providerId,
           plan_name: validatedCoverage.planName,
-          member_id_hash: validatedCoverage.memberIdHash,
+          ...insuranceMemberIdFields(validatedCoverage.memberId),
           group_number: validatedCoverage.groupNumber || null,
           bin: validatedCoverage.bin || null,
           pcn: validatedCoverage.pcn || null,
@@ -42,7 +42,7 @@ export function useInsuranceConnection(userId: string): UseInsuranceConnectionRe
           effective_start: validatedCoverage.effectiveStart,
           effective_end: validatedCoverage.effectiveEnd || null,
           is_primary: validatedCoverage.isPrimary,
-          verification_status: 'verifying',
+          verification_status: 'needs_attention',
           source: validatedCoverage.source,
           raw_fhir: validatedCoverage.rawFhir || null,
         })
@@ -50,20 +50,6 @@ export function useInsuranceConnection(userId: string): UseInsuranceConnectionRe
         .single();
 
       if (insertError) throw insertError;
-
-      setState('verifying');
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const { error: updateError } = await supabase
-        .from('insurance_coverages')
-        .update({
-          verification_status: 'connected',
-          last_verified_at: new Date().toISOString(),
-        })
-        .eq('id', data.id);
-
-      if (updateError) throw updateError;
 
       await supabase.from('audit_events').insert({
         user_id: userId,

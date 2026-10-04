@@ -1,7 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import {useInsuranceMutation} from '../../../../packages/api-client/src/useInsuranceMutation';
+import {displayInsuranceMemberId,insuranceStatus,insuranceVerificationNotice,coverageEndState,formatInsuranceDate} from '../../../../packages/api-client/src/insurance-status';
+import {useInsuranceData} from '../hooks/useInsuranceData';
+import {recordsColors} from '../theme/records';
+import {typeStyles,control,space,radius} from '../theme/layout';
+import {AppText as Text, AppTextInput} from '../components/ui/AppText';
+import React, { useCallback, useState, useMemo, createContext, useContext } from 'react';
 import {
   View,
-  Text,
+
   ScrollView,
   StyleSheet,
   ActivityIndicator,
@@ -13,122 +19,46 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 
-const STEEL = {
-  surface: '#FFFFFF',
-  border: '#E2E8F0',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#4F46E5',
-};
-
-function maskMemberId(value) {
-  const s = value == null ? '' : String(value);
-  if (s.length <= 4) return s || '—';
-  return '•'.repeat(Math.min(s.length - 4, 12)) + s.slice(-4);
+const InsuranceTheme = createContext(null);
+export default function InsuranceScreen({ darkMode = false, ...props }) {
+  const theme = useMemo(() => {
+    const STEEL = recordsColors(darkMode);
+    return { STEEL, styles: createStyles(STEEL) };
+  }, [darkMode]);
+  return <InsuranceTheme.Provider value={theme}><InsuranceContent {...props} /></InsuranceTheme.Provider>;
 }
-
-function pickEmbeddedProvider(c) {
-  const candidates = [c.provider, c.insurance_providers];
-  for (const raw of candidates) {
-    if (raw == null) continue;
-    const p = Array.isArray(raw) ? raw[0] : raw;
-    if (p && p.id) return p;
-  }
-  return null;
-}
-
-function normalizeVerificationStatus(raw) {
-  const s = (raw == null ? 'connected' : String(raw)).toLowerCase().replace(/\s+/g, '_');
-  if (s === 'needsattention') return 'needs_attention';
-  if (['connected', 'verifying', 'needs_attention', 'expiring'].includes(s)) return s;
-  return 'connected';
-}
-
-/** Merge raw coverage row with provider map (by provider_id). Never drops a row. */
-function mapCoverageRow(c, providerById) {
-  const embedded = pickEmbeddedProvider(c);
-  const fromMap = c.provider_id ? providerById.get(c.provider_id) : null;
-  const p = embedded || fromMap;
-  const fallbackName = p?.name || 'Insurance provider';
-  return {
-    id: c.id,
-    userId: c.user_id,
-    providerId: c.provider_id,
-    planName: c.plan_name || '—',
-    memberId: c.member_id || '',
-    memberIdHash: c.member_id_hash,
-    groupNumber: c.group_number,
-    bin: c.bin,
-    pcn: c.pcn,
-    relationship: c.relationship,
-    effectiveStart: c.effective_start,
-    effectiveEnd: c.effective_end,
-    isPrimary: c.is_primary,
-    verificationStatus: normalizeVerificationStatus(c.verification_status),
-    lastVerifiedAt: c.last_verified_at,
-    source: c.source,
-    coverageStatus: c.coverage_status || 'active',
-    stoppedAt: c.stopped_at,
-    provider: {
-      id: p?.id || c.provider_id,
-      name: fallbackName,
-      payerId: p?.payer_id,
-      logoUrl: p?.logo_url,
-      slug: p?.slug || 'unknown',
-      isPopular: p?.is_popular,
-    },
-  };
-}
-
-function displayMemberId(coverage) {
-  const raw = coverage.memberId || coverage.memberIdHash || '';
-  return maskMemberId(raw);
-}
-
-const STATUS_BADGE = {
-  connected: { label: 'Connected', bg: '#059669', icon: 'checkmark-circle' },
-  verifying: { label: 'Verifying', bg: '#3B82F6', icon: 'time-outline' },
-  needs_attention: { label: 'Needs Attention', bg: '#F59E0B', icon: 'alert-circle-outline' },
-  expiring: { label: 'Expiring Soon', bg: '#EA580C', icon: 'calendar-outline' },
-};
 
 function StatusBadge({ status }) {
-  const cfg = STATUS_BADGE[status] || STATUS_BADGE.needs_attention;
+  const { STEEL, styles } = useContext(InsuranceTheme);
+  const statusInfo = insuranceStatus(status);
+  const cfg = {label: statusInfo.label, bg: STEEL[statusInfo.tone+'Action'], icon: 'information-circle-outline'};
   return (
     <View style={[styles.statusBadge, { backgroundColor: cfg.bg }]}>
-      <Ionicons name={cfg.icon} size={14} color="#fff" />
-      <Text style={styles.statusBadgeText}>{cfg.label}</Text>
+      <Ionicons name={cfg.icon} size={14} color={STEEL.onAction} />
+      <Text variant="caption" style={styles.statusBadgeText}>{cfg.label}</Text>
     </View>
   );
 }
 
 function CoverageCardMobile({
   coverage,
+  busy = false,
+  onSaveMemberId,
   onSetPrimary,
-  onRefreshVerification,
   onStopCoverage,
   onResumeCoverage,
   onDelete,
 }) {
-  const effectiveEndDate = coverage.effectiveEnd ? new Date(coverage.effectiveEnd) : null;
-  const isExpiringSoon =
-    effectiveEndDate && !Number.isNaN(effectiveEndDate.getTime())
-      ? effectiveEndDate.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000
-      : false;
+  const { STEEL, styles } = useContext(InsuranceTheme);
+  const [editingMember, setEditingMember] = useState(false);
+  const [memberDraft, setMemberDraft] = useState('');
   const isStopped = coverage.coverageStatus === 'stopped';
-  const badgeStatus = isExpiringSoon ? 'expiring' : coverage.verificationStatus;
-
-  const startStr = coverage.effectiveStart
-    ? new Date(coverage.effectiveStart).toLocaleDateString()
-    : '—';
-  const endStr =
-    effectiveEndDate && !Number.isNaN(effectiveEndDate.getTime())
-      ? effectiveEndDate.toLocaleDateString()
-      : null;
+  const badgeStatus = coverageEndState(coverage.effectiveEnd) || coverage.verificationStatus;
+  const startStr = formatInsuranceDate(coverage.effectiveStart);
+  const endStr = coverage.effectiveEnd ? formatInsuranceDate(coverage.effectiveEnd) : null;
 
   return (
-    <View style={[styles.card, isStopped && styles.cardStopped]}>
+    <View style={styles.card}>
       <View style={styles.cardHeader}>
         <View style={styles.cardHeaderLeft}>
           {coverage.provider.logoUrl ? (
@@ -140,22 +70,22 @@ function CoverageCardMobile({
           )}
           <View style={styles.cardTitleBlock}>
             <View style={styles.nameRow}>
-              <Text style={styles.providerName} numberOfLines={2}>
+              <Text variant="section" style={styles.providerName} numberOfLines={2}>
                 {coverage.provider.name}
               </Text>
               {isStopped ? (
                 <View style={styles.pillStopped}>
-                  <Text style={styles.pillStoppedText}>Stopped</Text>
+                  <Text variant="caption" style={styles.pillStoppedText}>Stopped</Text>
                 </View>
               ) : null}
               {!isStopped && coverage.isPrimary ? (
                 <View style={styles.pillPrimary}>
-                  <Ionicons name="star" size={12} color="#fff" />
-                  <Text style={styles.pillPrimaryText}>Primary</Text>
+                  <Ionicons name="star" size={12} color={STEEL.onAction} />
+                  <Text variant="caption" style={styles.pillPrimaryText}>Primary</Text>
                 </View>
               ) : null}
             </View>
-            <Text style={styles.planName} numberOfLines={2}>
+            <Text variant="body" style={styles.planName} numberOfLines={2}>
               {coverage.planName}
             </Text>
           </View>
@@ -164,31 +94,48 @@ function CoverageCardMobile({
       </View>
 
       <View style={styles.fieldGrid}>
-        <View style={styles.fieldCell}>
-          <Text style={styles.fieldLabel}>Member ID</Text>
-          <Text style={styles.fieldValueMono}>{displayMemberId(coverage)}</Text>
+        <View style={[styles.fieldCell, editingMember && styles.memberEditing]}>
+          <Text variant="caption" style={styles.fieldLabel}>Member ID</Text>
+          <Text variant="body" style={styles.fieldValueMono}>{displayInsuranceMemberId(coverage.memberId)}</Text>
+          {onSaveMemberId ? (editingMember ? (
+            <View>
+              <Text variant="body" style={styles.fieldLabel}>Member ID from your insurance card</Text>
+              <AppTextInput accessibilityLabel="Member ID from your insurance card" value={memberDraft}
+                onChangeText={setMemberDraft} editable={!busy} autoCorrect={false} autoCapitalize="none"
+                style={[styles.memberInput, {color: STEEL.textPrimary, borderColor: STEEL.textMuted, backgroundColor: STEEL.surface}]} />
+              <View style={styles.actionsRow}>
+                <Pressable accessibilityRole="button" accessibilityState={{disabled: busy || !memberDraft.trim()}}
+                  disabled={busy || !memberDraft.trim()} style={styles.actionBtn} onPress={async () => {
+                    if (await onSaveMemberId(coverage, memberDraft)) {setEditingMember(false); setMemberDraft('');}
+                  }}><Text style={styles.actionBtnText}>Save ID</Text></Pressable>
+                <Pressable accessibilityRole="button" disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtn}
+                  onPress={() => {setEditingMember(false); setMemberDraft('');}}><Text style={styles.actionBtnText}>Cancel</Text></Pressable>
+              </View>
+            </View>
+          ) : <Pressable accessibilityRole="button" disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtn}
+            onPress={() => setEditingMember(true)}><Text style={styles.actionBtnText}>{coverage.memberId ? 'Update member ID' : 'Add member ID'}</Text></Pressable>) : null}
         </View>
         {coverage.groupNumber ? (
           <View style={styles.fieldCell}>
-            <Text style={styles.fieldLabel}>Group Number</Text>
-            <Text style={styles.fieldValueMono}>{coverage.groupNumber}</Text>
+            <Text variant="caption" style={styles.fieldLabel}>Group Number</Text>
+            <Text variant="body" style={styles.fieldValueMono}>{coverage.groupNumber}</Text>
           </View>
         ) : null}
         {coverage.bin ? (
           <View style={styles.fieldCell}>
-            <Text style={styles.fieldLabel}>BIN</Text>
-            <Text style={styles.fieldValueMono}>{coverage.bin}</Text>
+            <Text variant="caption" style={styles.fieldLabel}>BIN</Text>
+            <Text variant="body" style={styles.fieldValueMono}>{coverage.bin}</Text>
           </View>
         ) : null}
         {coverage.pcn ? (
           <View style={styles.fieldCell}>
-            <Text style={styles.fieldLabel}>PCN</Text>
-            <Text style={styles.fieldValueMono}>{coverage.pcn}</Text>
+            <Text variant="caption" style={styles.fieldLabel}>PCN</Text>
+            <Text variant="body" style={styles.fieldValueMono}>{coverage.pcn}</Text>
           </View>
         ) : null}
       </View>
 
-      <Text style={styles.effectiveLine}>
+      <Text variant="caption" style={styles.effectiveLine}>
         Effective: {startStr}
         {endStr ? ` - ${endStr}` : ''}
       </Text>
@@ -197,38 +144,28 @@ function CoverageCardMobile({
         {!isStopped ? (
           <>
             {!coverage.isPrimary && onSetPrimary ? (
-              <Pressable style={styles.actionBtn} onPress={() => onSetPrimary(coverage)} accessibilityRole="button">
+              <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtn} onPress={() => onSetPrimary(coverage)} accessibilityRole="button">
                 <Ionicons name="star-outline" size={18} color={STEEL.textPrimary} />
-                <Text style={styles.actionBtnText}>Set Primary</Text>
-              </Pressable>
-            ) : null}
-            {onRefreshVerification ? (
-              <Pressable
-                style={styles.actionBtn}
-                onPress={() => onRefreshVerification(coverage)}
-                accessibilityRole="button"
-              >
-                <Ionicons name="refresh-outline" size={18} color={STEEL.textPrimary} />
-                <Text style={styles.actionBtnText}>Verify</Text>
+                <Text variant="body" style={styles.actionBtnText}>Set Primary</Text>
               </Pressable>
             ) : null}
             {onStopCoverage ? (
-              <Pressable style={styles.actionBtnOrange} onPress={() => onStopCoverage(coverage)} accessibilityRole="button">
-                <Ionicons name="stop-circle-outline" size={18} color="#C2410C" />
-                <Text style={styles.actionBtnOrangeText}>Stop Coverage</Text>
+              <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnOrange} onPress={() => onStopCoverage(coverage)} accessibilityRole="button">
+                <Ionicons name="stop-circle-outline" size={18} color={STEEL.warning} />
+                <Text variant="body" style={styles.actionBtnOrangeText}>Mark Stopped</Text>
               </Pressable>
             ) : null}
           </>
         ) : onResumeCoverage ? (
-          <Pressable style={styles.actionBtnGreen} onPress={() => onResumeCoverage(coverage)} accessibilityRole="button">
-            <Ionicons name="play-circle-outline" size={18} color="#15803D" />
-            <Text style={styles.actionBtnGreenText}>Resume Coverage</Text>
+          <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnGreen} onPress={() => onResumeCoverage(coverage)} accessibilityRole="button">
+            <Ionicons name="play-circle-outline" size={18} color={STEEL.success} />
+            <Text variant="body" style={styles.actionBtnGreenText}>Mark Active</Text>
           </Pressable>
         ) : null}
         {onDelete ? (
-          <Pressable style={styles.actionBtnDelete} onPress={() => onDelete(coverage)} accessibilityRole="button">
-            <Ionicons name="trash-outline" size={18} color="#DC2626" />
-            <Text style={styles.actionBtnDeleteText}>Remove</Text>
+          <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnDelete} onPress={() => onDelete(coverage)} accessibilityRole="button">
+            <Ionicons name="trash-outline" size={18} color={STEEL.dangerAction} />
+            <Text variant="body" style={styles.actionBtnDeleteText}>Remove</Text>
           </Pressable>
         ) : null}
       </View>
@@ -236,10 +173,9 @@ function CoverageCardMobile({
   );
 }
 
-export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps = {} }) {
-  const [coverages, setCoverages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
+function InsuranceContent({ omitShellTitle = false, scrollFabProps = {} }) {
+  const { STEEL, styles } = useContext(InsuranceTheme);
+  const {coverages, loading, userId, error: loadError, refetch: loadCoverages} = useInsuranceData();
   const [toast, setToast] = useState(null);
 
   const showToast = useCallback((message, type = 'success') => {
@@ -248,159 +184,16 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
     setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 4000);
   }, []);
 
-  const loadCoverages = useCallback(
-    async (uid) => {
-      if (!uid) {
-        setCoverages([]);
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const { data: rows, error } = await supabase
-          .from('insurance_coverages')
-          .select('*')
-          .eq('user_id', uid)
-          .order('is_primary', { ascending: false })
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const list = rows || [];
-        const providerIds = [...new Set(list.map((r) => r.provider_id).filter(Boolean))];
-        const providerById = new Map();
-
-        if (providerIds.length > 0) {
-          const { data: providers, error: pErr } = await supabase
-            .from('insurance_providers')
-            .select('*')
-            .in('id', providerIds);
-          if (!pErr && providers) {
-            providers.forEach((p) => providerById.set(p.id, p));
-          }
-        }
-
-        setCoverages(list.map((r) => mapCoverageRow(r, providerById)));
-      } catch (e) {
-        console.error('Insurance load error', e);
-        showToast('Failed to load insurance coverages', 'error');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [showToast],
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const applySession = async (session) => {
-      const uid = session?.user?.id ?? null;
-      if (cancelled) return;
-      setUserId(uid);
-      if (uid) await loadCoverages(uid);
-      else {
-        setCoverages([]);
-        setLoading(false);
-      }
-    };
-
-    supabase.auth.getSession().then(({ data: { session } }) => applySession(session));
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      applySession(session);
-    });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, [loadCoverages]);
-
-  const handleSetPrimary = async (coverage) => {
-    try {
-      await supabase.from('insurance_coverages').update({ is_primary: false }).eq('user_id', userId);
-      const { error } = await supabase.from('insurance_coverages').update({ is_primary: true }).eq('id', coverage.id);
-      if (error) throw error;
-      showToast('Primary coverage updated', 'success');
-      await loadCoverages(userId);
-    } catch (e) {
-      showToast('Failed to update primary coverage', 'error');
-    }
-  };
-
-  const handleRefreshVerification = async (coverage) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          verification_status: 'connected',
-          last_verified_at: new Date().toISOString(),
-        })
-        .eq('id', coverage.id);
-      if (error) throw error;
-      showToast('Coverage verified successfully', 'success');
-      await loadCoverages(userId);
-    } catch (e) {
-      showToast('Failed to verify coverage', 'error');
-    }
-  };
-
-  const handleDelete = (coverage) => {
-    Alert.alert('Remove coverage', 'Are you sure you want to remove this coverage?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const { error } = await supabase.from('insurance_coverages').delete().eq('id', coverage.id);
-            if (error) throw error;
-            showToast('Coverage removed successfully', 'success');
-            await loadCoverages(userId);
-          } catch (e) {
-            showToast('Failed to remove coverage', 'error');
-          }
-        },
-      },
+  const {busy, run} = useInsuranceMutation(supabase, showToast, loadCoverages, () => setToast(null));
+  const handleSetPrimary = coverage => run(userId, coverage.id, 'primary');
+  const handleStopCoverage = coverage => run(userId, coverage.id, 'stop');
+  const handleResumeCoverage = coverage => run(userId, coverage.id, 'resume');
+  const handleDelete = coverage => {
+    if (busy) return;
+    Alert.alert('Remove saved coverage', 'Remove this saved coverage from Health Vault? This does not cancel your insurance.', [
+      {text: 'Cancel', style: 'cancel'},
+      {text: 'Remove', style: 'destructive', onPress: () => run(userId, coverage.id, 'remove')},
     ]);
-  };
-
-  const handleStopCoverage = async (coverage) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          coverage_status: 'stopped',
-          stopped_at: new Date().toISOString(),
-          is_primary: false,
-        })
-        .eq('id', coverage.id);
-      if (error) throw error;
-      showToast('Coverage stopped successfully', 'success');
-      await loadCoverages(userId);
-    } catch (e) {
-      showToast('Failed to stop coverage', 'error');
-    }
-  };
-
-  const handleResumeCoverage = async (coverage) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          coverage_status: 'active',
-          stopped_at: null,
-        })
-        .eq('id', coverage.id);
-      if (error) throw error;
-      showToast('Coverage resumed successfully', 'success');
-      await loadCoverages(userId);
-    } catch (e) {
-      showToast('Failed to resume coverage', 'error');
-    }
   };
 
   return (
@@ -410,6 +203,7 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
       showsVerticalScrollIndicator={false}
       {...scrollFabProps}
     >
+      {busy ? <Text variant="body" style={styles.emptyBody} accessibilityLiveRegion="polite">Updating saved coverage…</Text> : null}
       {toast ? (
         <View
           style={[
@@ -420,12 +214,12 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
           <Ionicons
             name={toast.type === 'error' ? 'warning-outline' : 'checkmark-circle-outline'}
             size={20}
-            color={toast.type === 'error' ? '#92400E' : '#166534'}
+            color={toast.type === 'error' ? STEEL.danger : STEEL.success}
           />
-          <Text style={[styles.toastText, toast.type === 'error' ? styles.toastTextError : styles.toastTextSuccess]}>
+          <Text variant="body" style={[styles.toastText, toast.type === 'error' ? styles.toastTextError : styles.toastTextSuccess]}>
             {toast.message}
           </Text>
-          <Pressable onPress={() => setToast(null)} hitSlop={12} accessibilityLabel="Dismiss">
+          <Pressable onPress={() => setToast(null)} style={{minWidth:control.minTarget,minHeight:control.minTarget,alignItems:'center',justifyContent:'center'}} accessibilityRole="button" accessibilityLabel="Dismiss message">
             <Ionicons name="close" size={20} color={STEEL.textSecondary} />
           </Pressable>
         </View>
@@ -436,32 +230,41 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
         {!omitShellTitle ? (
           <View style={styles.heroTitleRow}>
             <Ionicons name="shield-checkmark" size={28} color={STEEL.textPrimary} />
-            <Text style={styles.heroTitle}>Insurance</Text>
+            <Text variant="title" style={styles.heroTitle}>Insurance</Text>
           </View>
         ) : null}
-        <Text style={[styles.heroSub, omitShellTitle && styles.heroSubOnly]}>
-          Manage your insurance coverage and benefits
+        <Text variant="body" style={[styles.heroSub, omitShellTitle && styles.heroSubOnly]}>
+          Manage your saved insurance information
         </Text>
       </View>
 
+      <Text style={styles.heroSub}>{insuranceVerificationNotice}</Text>
       {loading ? (
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={STEEL.accent} />
+        </View>
+      ) : loadError ? (
+        <View style={styles.emptyCard}>
+          <Text variant="section" accessibilityRole="alert" style={styles.emptyTitle}>Unable to load insurance</Text>
+          <Text variant="body" style={styles.emptyBody}>{loadError}</Text>
+          <Pressable accessibilityRole="button" style={styles.actionBtn} onPress={() => loadCoverages()}>
+            <Text style={styles.actionBtnText}>Retry</Text>
+          </Pressable>
         </View>
       ) : coverages.length === 0 ? (
         <View style={styles.emptyCard}>
           <Ionicons name="shield-checkmark-outline" size={56} color={STEEL.textMuted} />
           {!userId ? (
             <>
-              <Text style={styles.emptyTitle}>Sign in to view insurance</Text>
-              <Text style={styles.emptyBody}>
+              <Text variant="section" style={styles.emptyTitle}>Sign in to view insurance</Text>
+              <Text variant="body" style={styles.emptyBody}>
                 Your saved coverages load here when you are signed in with the same account as the Health Vault web app.
               </Text>
             </>
           ) : (
             <>
-              <Text style={styles.emptyTitle}>No insurance coverage added</Text>
-              <Text style={styles.emptyBody}>Use the Vault Assistant to add your insurance information</Text>
+              <Text variant="section" style={styles.emptyTitle}>No insurance coverage added</Text>
+              <Text variant="body" style={styles.emptyBody}>Use the Vault Assistant to add your insurance information</Text>
             </>
           )}
         </View>
@@ -469,10 +272,11 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
         <View style={styles.list}>
           {coverages.map((c) => (
             <CoverageCardMobile
+              onSaveMemberId={(coverage, value) => run(userId, coverage.id, 'memberId', value)}
+              busy={busy}
               key={c.id}
               coverage={c}
               onSetPrimary={handleSetPrimary}
-              onRefreshVerification={handleRefreshVerification}
               onStopCoverage={handleStopCoverage}
               onResumeCoverage={handleResumeCoverage}
               onDelete={handleDelete}
@@ -484,13 +288,13 @@ export default function InsuranceScreen({ omitShellTitle = false, scrollFabProps
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (STEEL) => StyleSheet.create({
   scroll: { flex: 1, backgroundColor: 'transparent' },
   scrollContent: { paddingBottom: 120, paddingHorizontal: 20, paddingTop: 8 },
   hero: { marginBottom: 20 },
   heroTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  heroTitle: { fontSize: 24, fontWeight: '800', color: STEEL.textPrimary },
-  heroSub: { fontSize: 15, lineHeight: 22, color: STEEL.textSecondary },
+  heroTitle: { ...typeStyles.title, fontWeight: '800', color: STEEL.textPrimary },
+  heroSub: { ...typeStyles.body,  color: STEEL.textSecondary },
   heroSubOnly: { marginTop: 0 },
   toast: {
     flexDirection: 'row',
@@ -501,11 +305,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
   },
-  toastSuccess: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
-  toastError: { backgroundColor: '#FFFBEB', borderColor: '#FDE68A' },
-  toastText: { flex: 1, fontSize: 14, lineHeight: 20 },
-  toastTextSuccess: { color: '#166534' },
-  toastTextError: { color: '#92400E' },
+  toastSuccess: { backgroundColor: STEEL.successBg, borderColor: STEEL.successBorder },
+  toastError: { backgroundColor: STEEL.dangerBg, borderColor: STEEL.dangerBorder },
+  toastText: { flex: 1, ...typeStyles.body, },
+  toastTextSuccess: { color: STEEL.success },
+  toastTextError: { color: STEEL.danger },
   loadingWrap: { paddingVertical: 48, alignItems: 'center' },
   emptyCard: {
     backgroundColor: STEEL.surface,
@@ -515,8 +319,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: STEEL.border,
   },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: STEEL.textPrimary, marginTop: 16, marginBottom: 8, textAlign: 'center' },
-  emptyBody: { fontSize: 15, lineHeight: 22, color: STEEL.textSecondary, textAlign: 'center' },
+  emptyTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary, marginTop: 16, marginBottom: 8, textAlign: 'center' },
+  emptyBody: { ...typeStyles.body,  color: STEEL.textSecondary, textAlign: 'center' },
   list: { gap: 16 },
   card: {
     backgroundColor: STEEL.surface,
@@ -540,26 +344,26 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 10,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: STEEL.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardTitleBlock: { flex: 1, minWidth: 0 },
   nameRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 4 },
-  providerName: { fontSize: 17, fontWeight: '700', color: STEEL.textPrimary, flexShrink: 1 },
-  planName: { fontSize: 14, color: STEEL.textSecondary },
-  pillStopped: { backgroundColor: '#64748B', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  pillStoppedText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  providerName: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary, flexShrink: 1 },
+  planName: { ...typeStyles.body, color: STEEL.textSecondary },
+  pillStopped: { backgroundColor: STEEL.infoAction, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  pillStoppedText: { color: STEEL.onAction, ...typeStyles.caption, fontWeight: '700' },
   pillPrimary: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: STEEL.accent,
+    backgroundColor: STEEL.navy,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
   },
-  pillPrimaryText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  pillPrimaryText: { color: STEEL.onAction, ...typeStyles.caption, fontWeight: '700' },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -569,7 +373,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexShrink: 0,
   },
-  statusBadgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  statusBadgeText: { flexShrink: 1, color: STEEL.onAction, ...typeStyles.caption, fontWeight: '700' },
+  memberEditing: {width: '100%'},
+  memberInput: {borderWidth: control.border, borderRadius: radius.control, paddingHorizontal: space.md, minHeight: control.minTarget},
   fieldGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -578,9 +384,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   fieldCell: { width: '47%', minWidth: '42%' },
-  fieldLabel: { fontSize: 11, fontWeight: '600', color: STEEL.textSecondary, marginBottom: 4, textTransform: 'uppercase' },
-  fieldValueMono: { fontSize: 14, fontWeight: '600', color: STEEL.textPrimary, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
-  effectiveLine: { fontSize: 12, color: STEEL.textSecondary, paddingHorizontal: 16, paddingBottom: 12 },
+  fieldLabel: { ...typeStyles.caption, fontWeight: '600', color: STEEL.textSecondary, marginBottom: 4, textTransform: 'uppercase' },
+  fieldValueMono: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  effectiveLine: { ...typeStyles.caption, color: STEEL.textSecondary, paddingHorizontal: 16, paddingBottom: 12 },
   actionsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -592,36 +398,44 @@ const styles = StyleSheet.create({
     borderTopColor: STEEL.border,
   },
   actionBtn: {
+    minHeight: control.minTarget,
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: STEEL.surfaceMuted,
   },
-  actionBtnText: { fontSize: 14, fontWeight: '600', color: STEEL.textPrimary },
+  actionBtnText: { flexShrink: 1, ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary },
   actionBtnOrange: {
+    minHeight: control.minTarget,
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: STEEL.warningBg,
   },
-  actionBtnOrangeText: { fontSize: 14, fontWeight: '600', color: '#C2410C' },
+  actionBtnOrangeText: { flexShrink: 1, ...typeStyles.body, fontWeight: '600', color: STEEL.warning },
   actionBtnGreen: {
+    minHeight: control.minTarget,
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: '#F0FDF4',
+    backgroundColor: STEEL.successBg,
   },
-  actionBtnGreenText: { fontSize: 14, fontWeight: '600', color: '#15803D' },
+  actionBtnGreenText: { flexShrink: 1, ...typeStyles.body, fontWeight: '600', color: STEEL.success },
   actionBtnDelete: {
+    minHeight: control.minTarget,
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -630,5 +444,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 'auto',
   },
-  actionBtnDeleteText: { fontSize: 14, fontWeight: '600', color: '#DC2626' },
+  actionBtnDeleteText: { flexShrink: 1, ...typeStyles.body, fontWeight: '600', color: STEEL.dangerAction },
 });

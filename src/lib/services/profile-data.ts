@@ -105,7 +105,8 @@ export async function fetchUserProfileData(userId: string): Promise<UserProfileD
     if (insurance) {
       profileData.insuranceInfo = {
         provider: insurance.insurance_providers?.name,
-        memberId: insurance.member_id_hash,
+        // Only explicitly stored IDs may autofill forms.
+        memberId: insurance.member_id || undefined,
         groupNumber: insurance.group_number,
         planName: insurance.plan_name,
       };

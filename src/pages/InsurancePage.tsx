@@ -1,3 +1,6 @@
+import {useInsuranceMutation} from '../../packages/api-client/src/useInsuranceMutation';
+import {useInsuranceData} from '../lib/insurance/useInsuranceData';
+import {insuranceVerificationNotice} from '../../packages/api-client/src/insurance-status';
 import { useState, useEffect, MutableRefObject } from 'react';
 import { ShieldCheck, Plus, X } from 'lucide-react';
 import { CoverageCard } from '../components/insurance/CoverageCard';
@@ -15,21 +18,10 @@ interface InsurancePageProps {
 }
 
 export function InsurancePage({ darkMode = false, actionsRef }: InsurancePageProps) {
-  const [coverages, setCoverages] = useState<CoverageWithProvider[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {coverages, loading, error: loadError, userId, refetch: loadCoverages} = useInsuranceData();
   const [toast, setToast] = useState<{ id: string; message: string; type: 'success' | 'error' } | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [analytics] = useState(() => new InsuranceAnalytics());
   const [showAddHint, setShowAddHint] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const uid = session?.user?.id ?? null;
-      setUserId(uid);
-      if (uid) loadCoverages(uid);
-      else setLoading(false);
-    });
-  }, []);
 
   useEffect(() => {
     if (actionsRef) {
@@ -38,162 +30,21 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
         refreshData: loadCoverages
       };
     }
-  }, [actionsRef]);
+    return () => { if (actionsRef) actionsRef.current = {}; };
+  }, [actionsRef, loadCoverages]);
 
-  const loadCoverages = async (uid?: string) => {
-    const activeUserId = uid ?? userId;
-    if (!activeUserId) return;
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('insurance_coverages')
-        .select(`
-          *,
-          provider:insurance_providers(*)
-        `)
-        .eq('user_id', activeUserId)
-        .order('is_primary', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      const mapped: CoverageWithProvider[] = (data || []).map((c: any) => ({
-        id: c.id,
-        userId: c.user_id,
-        providerId: c.provider_id,
-        planName: c.plan_name,
-        memberId: c.member_id_hash || '',   // member_id_hash stores the display value
-        memberIdHash: c.member_id_hash,
-        groupNumber: c.group_number,
-        bin: c.bin,
-        pcn: c.pcn,
-        relationship: c.relationship,
-        effectiveStart: c.effective_start,
-        effectiveEnd: c.effective_end,
-        isPrimary: c.is_primary,
-        verificationStatus: c.verification_status,
-        lastVerifiedAt: c.last_verified_at,
-        source: c.source,
-        coverageStatus: c.coverage_status,
-        stoppedAt: c.stopped_at,
-        rawFhir: c.raw_fhir,
-        createdAt: c.created_at,
-        updatedAt: c.updated_at,
-        provider: {
-          id: c.provider.id,
-          name: c.provider.name,
-          payerId: c.provider.payer_id,
-          logoUrl: c.provider.logo_url,
-          slug: c.provider.slug,
-          isPopular: c.provider.is_popular,
-        },
-      }));
-
-      setCoverages(mapped);
-    } catch (error) {
-      console.error('Error loading coverages:', error);
-      setToast({ id: crypto.randomUUID(), message: 'Failed to load insurance coverages', type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const {busy, run} = useInsuranceMutation(supabase,
+    (message, type) => setToast({id: crypto.randomUUID(), message, type}),
+    loadCoverages, () => setToast(null));
   const handleSetPrimary = async (coverage: CoverageWithProvider) => {
-    try {
-      await supabase.from('insurance_coverages').update({ is_primary: false }).eq('user_id', userId);
-
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({ is_primary: true })
-        .eq('id', coverage.id);
-
-      if (error) throw error;
-
-      analytics.trackSetPrimary(coverage.id!);
-      setToast({ id: crypto.randomUUID(), message: 'Primary coverage updated', type: 'success' });
-      loadCoverages();
-    } catch (error) {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to update primary coverage', type: 'error' });
-    }
+    if (await run(userId, coverage.id, 'primary')) analytics.trackSetPrimary(coverage.id!);
   };
-
-  const handleRefreshVerification = async (coverage: CoverageWithProvider) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          verification_status: 'verified',
-          last_verified_at: new Date().toISOString(),
-        })
-        .eq('id', coverage.id);
-
-      if (error) throw error;
-
-      analytics.trackVerifyRefresh(coverage.id!);
-      setToast({ id: crypto.randomUUID(), message: 'Coverage verified successfully', type: 'success' });
-      loadCoverages();
-    } catch (error) {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to verify coverage', type: 'error' });
-    }
-  };
-
   const handleDelete = async (coverage: CoverageWithProvider) => {
-    if (!confirm('Are you sure you want to remove this coverage?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .delete()
-        .eq('id', coverage.id);
-
-      if (error) throw error;
-
-      analytics.trackDelete(coverage.id!);
-      setToast({ id: crypto.randomUUID(), message: 'Coverage removed successfully', type: 'success' });
-      loadCoverages();
-    } catch (error) {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to remove coverage', type: 'error' });
-    }
+    if (busy || !confirm('Remove this saved coverage from Health Vault? This does not cancel your insurance.')) return;
+    if (await run(userId, coverage.id, 'remove')) analytics.trackDelete(coverage.id!);
   };
-
-  const handleStopCoverage = async (coverage: CoverageWithProvider) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          coverage_status: 'stopped',
-          stopped_at: new Date().toISOString(),
-          is_primary: false,
-        })
-        .eq('id', coverage.id);
-
-      if (error) throw error;
-
-      setToast({ id: crypto.randomUUID(), message: 'Coverage stopped successfully', type: 'success' });
-      loadCoverages();
-    } catch (error) {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to stop coverage', type: 'error' });
-    }
-  };
-
-  const handleResumeCoverage = async (coverage: CoverageWithProvider) => {
-    try {
-      const { error } = await supabase
-        .from('insurance_coverages')
-        .update({
-          coverage_status: 'active',
-          stopped_at: null,
-        })
-        .eq('id', coverage.id);
-
-      if (error) throw error;
-
-      setToast({ id: crypto.randomUUID(), message: 'Coverage resumed successfully', type: 'success' });
-      loadCoverages();
-    } catch (error) {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to resume coverage', type: 'error' });
-    }
-  };
+  const handleStopCoverage = (coverage: CoverageWithProvider) => {void run(userId, coverage.id, 'stop');};
+  const handleResumeCoverage = (coverage: CoverageWithProvider) => {void run(userId, coverage.id, 'resume');};
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
@@ -204,7 +55,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
             Insurance
           </h1>
           <p className="text-content-secondary">
-            Manage your insurance coverage and benefits
+            Manage your saved insurance information
           </p>
         </div>
         <button
@@ -225,15 +76,23 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
               Open the AI Assistant panel on the right and say "Add my insurance" — it will walk you through adding a new plan.
             </p>
           </div>
-          <button onClick={() => setShowAddHint(false)} className="text-indigo-400 hover:text-indigo-600 flex-shrink-0">
+          <button aria-label="Dismiss insurance instructions" onClick={() => setShowAddHint(false)} className="text-indigo-400 hover:text-indigo-600 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
+      <p className="mb-6 text-content-secondary">{insuranceVerificationNotice}</p>
+      {busy && <p role="status" className="mb-4 text-content-secondary">Updating saved coverage…</p>}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-4 border-action-primary border-t-transparent rounded-full animate-spin" />
+          <span role="status" className="sr-only">Loading insurance</span>
+          <div aria-hidden="true" className="w-8 h-8 border-4 border-action-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="hv-surface-card p-6">
+          <p className="text-content-primary">{loadError}</p>
+          <button onClick={() => void loadCoverages()} className="mt-4 min-h-12 px-4 rounded-lg bg-action-primary text-white">Retry</button>
         </div>
       ) : coverages.length === 0 ? (
         <div className="text-center py-16 hv-surface-card">
@@ -252,10 +111,11 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
               key={coverage.id}
               coverage={coverage}
               darkMode={darkMode}
+              onSaveMemberId={(coverage, value) => run(userId, coverage.id, 'memberId', value)}
+              busy={busy}
               showActions
               onEdit={() => setShowAddHint(true)}
               onSetPrimary={handleSetPrimary}
-              onRefreshVerification={handleRefreshVerification}
               onStopCoverage={handleStopCoverage}
               onResumeCoverage={handleResumeCoverage}
               onDelete={handleDelete}

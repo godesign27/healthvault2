@@ -87,7 +87,7 @@ export async function fetchInsuranceContext(
   const { data, error } = await supabase
     .from('insurance_coverages')
     .select(`
-      id, plan_name, member_id_hash, group_number,
+      id, plan_name, member_id, group_number,
       is_primary, coverage_status, verification_status,
       insurance_providers!inner (id, name, logo_url)
     `)
@@ -103,7 +103,7 @@ export async function fetchInsuranceContext(
     providerName: row.insurance_providers?.name || 'Unknown',
     providerLogoUrl: row.insurance_providers?.logo_url || null,
     planName: row.plan_name,
-    memberId: row.member_id_hash,
+    memberId: row.member_id || '',
     isPrimary: row.is_primary,
     status: row.coverage_status,
     connectionStatus: row.coverage_status === 'active' ? 'connected' : 'inactive',
