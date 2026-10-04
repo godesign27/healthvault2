@@ -1,5 +1,5 @@
 import {useInsuranceMutation} from '../../../../packages/api-client/src/useInsuranceMutation';
-import {displayInsuranceMemberId,insuranceStatus,insuranceVerificationNotice,coverageEndState,formatInsuranceDate} from '../../../../packages/api-client/src/insurance-status';
+import {displayInsuranceMemberId,insuranceStatus,insuranceVerificationNotice,insuranceCoverageStatus,formatInsuranceDate} from '../../../../packages/api-client/src/insurance-status';
 import {useInsuranceData} from '../hooks/useInsuranceData';
 import {recordsColors} from '../theme/records';
 import {typeStyles,control,space,radius} from '../theme/layout';
@@ -53,7 +53,7 @@ function CoverageCardMobile({
   const [editingMember, setEditingMember] = useState(false);
   const [memberDraft, setMemberDraft] = useState('');
   const isStopped = coverage.coverageStatus === 'stopped';
-  const badgeStatus = coverageEndState(coverage.effectiveEnd) || coverage.verificationStatus;
+  const badgeStatus = insuranceCoverageStatus(coverage);
   const startStr = formatInsuranceDate(coverage.effectiveStart);
   const endStr = coverage.effectiveEnd ? formatInsuranceDate(coverage.effectiveEnd) : null;
 

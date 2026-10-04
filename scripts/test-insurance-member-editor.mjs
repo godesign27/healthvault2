@@ -7,7 +7,7 @@ const jsx=(type,props)=>({type,props});const exports={};
 const deps={
  'react':react,'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':{},'../../schemas/insurance':{},
  './StatusBadge':{StatusBadge:'Badge'},'../ui/Card':{Card:'Card'},
- '../../../packages/api-client/src/insurance-status':{coverageEndState:()=>null,formatInsuranceDate:()=>'',displayInsuranceMemberId:()=> 'Not available'},
+ '../../../packages/api-client/src/insurance-status':{insuranceCoverageStatus:()=> 'saved',formatInsuranceDate:()=>'',displayInsuranceMemberId:()=> 'Not available'},
 };
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/components/insurance/CoverageCard.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:name=>deps[name]});
 let accepted=false,busy=false;const saved=[];

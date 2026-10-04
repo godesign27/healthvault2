@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('packages/api-client/src/insurance-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports});
+const {insuranceCoverageStatus:status,insuranceStatus:label}=exports;
+const now=new Date('2026-10-04T12:00:00Z');
+assert.equal(label(status({memberId:'',verificationStatus:'verified'},now)).label,'Member ID needed');
+assert.equal(label(status({memberId:'   '},now)).label,'Member ID needed');
+assert.equal(label(status({memberId:'TEST-5677',verificationStatus:'unverified'},now)).label,'Saved');
+assert.equal(label(status({memberId:'TEST-5677',effectiveEnd:'2026-10-03'},now)).label,'End date passed');
+assert.equal(label(status({memberId:'TEST-5677',effectiveEnd:'2026-10-11'},now)).label,'Ending soon');
+for(const path of ['src/components/insurance/CoverageCard.tsx','apps/mobile/src/screens/InsuranceScreen.js'])assert.ok(fs.readFileSync(path,'utf8').includes('insuranceCoverageStatus(coverage)'));
+console.log('PASS saved ID clears missing-ID warning; legacy verified flags cannot hide missing IDs; end-date warnings remain; web/native share resolver');

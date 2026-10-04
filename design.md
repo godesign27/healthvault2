@@ -305,3 +305,5 @@ Existing coverage IDs can be re-entered inline, in a blank editor labeled **Memb
 
 ### Insurance save confirmations
 Keep mutation receipts above the coverage list, outside its loading/empty/error branches. Use a static, dismissible semantic Banner with a polite status announcement for success and alert for errors. Do not auto-dismiss a save receipt or animate it across the viewport. Keep it visible through list refresh; replace it on the next outcome, clear it on account changes/navigation, or let the user dismiss it with a labeled 48px control. Sticky positioning must leave clearance for the app header.
+
+Coverage-card badges derive from the explicit saved member ID and calendar end date through `insuranceCoverageStatus`. Missing/blank ID: **Member ID needed**; present ID: **Saved**. End-date warnings take precedence and do not disappear when an ID is saved. Legacy verification flags cannot imply insurer verification or leave an unexplained review warning after completing the field. Stopped remains a separate coverage-state label.

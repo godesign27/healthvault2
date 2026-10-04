@@ -1,5 +1,5 @@
 import {useId, useState} from 'react';
-import {displayInsuranceMemberId,coverageEndState,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
+import {displayInsuranceMemberId,insuranceCoverageStatus,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
 import { Edit2, Trash2, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
 import { CoverageWithProvider } from '../../schemas/insurance';
 import { StatusBadge } from './StatusBadge';
@@ -33,7 +33,7 @@ export function CoverageCard({
   const memberFieldId = useId();
   const [editingMember, setEditingMember] = useState(false);
   const [memberDraft, setMemberDraft] = useState('');
-  const endState = coverageEndState(coverage.effectiveEnd);
+  const badgeStatus = insuranceCoverageStatus(coverage);
   const isStopped = coverage.coverageStatus === 'stopped';
 
   return (
@@ -73,7 +73,7 @@ export function CoverageCard({
             }`}>{coverage.planName}</p>
           </div>
         </div>
-        <StatusBadge status={endState || coverage.verificationStatus} darkMode={darkMode} />
+        <StatusBadge status={badgeStatus} darkMode={darkMode} />
       </div>
       <div className={`grid grid-cols-2 gap-4 px-6 pb-4 ${
         darkMode ? 'text-content-primary' : 'text-content-primary'

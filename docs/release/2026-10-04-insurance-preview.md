@@ -43,3 +43,7 @@ Preview Worker `2959233c-e4e0-4be4-8a0d-38cfefb719e9` replaces the six-slot OTP 
 ## Persistent insurance feedback
 
 Preview Worker `0fdd894c-1dc1-4027-94dd-c524e549912a` uses a static persistent Banner above the insurance list. Regression covers loading/refetch stability and accessible manual dismissal; isolated build passes. Interactive preview save showed the confirmation after cards returned and beyond the old timeout; manual dismissal passed. Test primary selection was restored to its original plan. No production release.
+
+## Member-ID badge correction
+
+Worker `58de17f4-6c31-4ffa-bce2-fdfc2eb1d6a7` derives card status from explicit member-ID presence and end dates. Browser confirms the updated plan displays Saved, the missing-ID plan displays Member ID needed, and the ending-soon plan retains its warning. Three focused regressions and isolated build pass. Shared native source updated; no native or production deployment.

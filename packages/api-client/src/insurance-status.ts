@@ -1,7 +1,8 @@
 /** Stored workflow flags are not insurer eligibility evidence. */
 export function insuranceStatus(status: string | null | undefined) {
   switch (status) {
-    case 'connected': case 'verified': return { label: 'Saved', tone: 'info' } as const;
+    case 'saved': case 'connected': case 'verified': return { label: 'Saved', tone: 'info' } as const;
+    case 'missing_member_id': return { label: 'Member ID needed', tone: 'warning' } as const;
     case 'verifying': return { label: 'Not verified', tone: 'info' } as const;
     case 'expired': return { label: 'End date passed', tone: 'warning' } as const;
     case 'expiring': return { label: 'Ending soon', tone: 'warning' } as const;
@@ -40,4 +41,9 @@ export function displayInsuranceMemberId(value: string | null | undefined): stri
 /** New writes identify their storage field explicitly; never duplicate IDs into legacy storage. */
 export function insuranceMemberIdFields(value: string | null | undefined) {
   return {member_id: value?.trim() || null, member_id_hash: ''};
+}
+
+/** Card status describes stored fields, never legacy insurer-verification flags. */
+export function insuranceCoverageStatus(coverage: {memberId?: string | null; effectiveEnd?: string | null}, now = new Date()) {
+  return coverageEndState(coverage.effectiveEnd, now) || (coverage.memberId?.trim() ? 'saved' : 'missing_member_id');
 }
