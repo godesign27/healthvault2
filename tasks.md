@@ -892,3 +892,10 @@ _Last updated: 2026-08-29_
 - [x] Reuse owner/account/duplicate-write guard; reject blank IDs and preserve legacy non-inference.
 - [x] Test actual web editor states and guarded update payload; retain scalable controls on stopped plans.
 - [ ] Accept keyboard/VoiceOver/TalkBack and real preview save flows after applying the explicit-ID migration.
+
+### Insurance preview release — 2026-10-04
+- [x] Commit curated insurance release/dependencies (78cec7e), preserving unrelated working-tree changes.
+- [x] Apply both insurance migrations and deploy assistant/account-export to the existing preview backend.
+- [x] Deploy isolated web preview; verify backend isolation, hosted bundle integrity and unauthenticated denial.
+- [x] Re-run installed-schema rollback tests and confirm synthetic fixture cleanup.
+- [ ] Complete authenticated browser save acceptance and mobile physical interaction tests before production promotion.
