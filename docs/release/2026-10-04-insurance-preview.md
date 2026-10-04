@@ -35,3 +35,7 @@ Previous preview function versions: assistant 33 and account-export 3. Web previ
 ## Preview routing correction
 
 The initial HTTP/bundle checks missed a rendered Organization Not Found error. The exact preview hostname now uses main-app routing; production tenant routing and deliberate organization previews remain intact. Regression test and build passed. Redeployed Worker version `6df6236c-5fa1-4456-b76c-ecc0e60cde5f`; browser reload verified the landing page and Log In opening the sign-in form. Authenticated saves remain unverified.
+
+## Email verification unblock
+
+Preview Worker `2959233c-e4e0-4be4-8a0d-38cfefb719e9` replaces the six-slot OTP form with a full-code input and explicit submit. Component regression and isolated build pass; browser confirms the deployed labeled field and Verify email button. Account email can be re-entered when the verification step is reopened. Emailed-code acceptance remains pending user completion; no production auth configuration was changed.

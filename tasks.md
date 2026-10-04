@@ -900,3 +900,4 @@ _Last updated: 2026-08-29_
 - [x] Re-run installed-schema rollback tests and confirm synthetic fixture cleanup.
 - [ ] Complete authenticated browser save acceptance and mobile physical interaction tests before production promotion.
 - [x] Correct dedicated preview hostname being mistaken for an organization; add routing regression.
+- [x] Remove six-digit onboarding verification limit; preserve full emailed codes and add explicit accessible submit with duplicate guard (preview).

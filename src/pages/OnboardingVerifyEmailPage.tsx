@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
 import { OnboardingAssistantPanel, QuickAction } from '../components/OnboardingAssistantPanel';
+import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 
 interface OnboardingVerifyEmailPageProps {
@@ -12,12 +13,14 @@ interface OnboardingVerifyEmailPageProps {
 }
 
 export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onBack }: OnboardingVerifyEmailPageProps) {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [verificationEmail, setVerificationEmail] = useState(email);
+  const [code, setCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(60);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const requestPending = useRef(false);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -27,52 +30,19 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
   }, [resendTimer]);
 
   useEffect(() => {
-    inputRefs.current[0]?.focus();
+    inputRef.current?.focus();
   }, []);
 
-  const handleChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-
-    const newCode = [...code];
-    newCode[index] = value.slice(-1);
-    setCode(newCode);
-    setError('');
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    if (newCode.every(digit => digit !== '') && newCode.join('').length === 6) {
-      handleVerify(newCode.join(''));
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newCode = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
-    setCode(newCode);
-
-    if (pastedData.length === 6) {
-      handleVerify(pastedData);
-    } else if (pastedData.length > 0) {
-      inputRefs.current[Math.min(pastedData.length, 5)]?.focus();
-    }
-  };
-
-  const handleVerify = async (codeString: string) => {
+  const handleVerify = async () => {
+    const codeString = code.trim();
+    if (requestPending.current || !codeString || !verificationEmail.trim()) return;
+    requestPending.current = true;
     setIsVerifying(true);
     setError('');
 
     try {
       const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        email: email,
+        email: verificationEmail.trim(),
         token: codeString,
         type: 'signup'
       });
@@ -88,37 +58,35 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
 
       onNext();
     } catch (error: any) {
-      console.error('Verification failed:', error);
-      setError(error.message?.includes('expired')
-        ? 'Code expired. Please request a new code.'
-        : error.message?.includes('Invalid') || error.message?.includes('invalid')
-        ? 'Invalid code. Please check and try again.'
-        : 'Verification failed. Please try again.');
-      setCode(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
+      setError('The code could not be verified. Enter the complete latest code, or request a new one if it has expired.');
+      setCode('');
+      inputRef.current?.focus();
     } finally {
+      requestPending.current = false;
       setIsVerifying(false);
     }
   };
 
   const handleResend = async () => {
+    if (requestPending.current || resendTimer > 0 || !verificationEmail.trim()) return;
+    requestPending.current = true;
     setIsResending(true);
     setError('');
-    setCode(['', '', '', '', '', '']);
+    setCode('');
 
     try {
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
-        email: email
+        email: verificationEmail.trim()
       });
 
       if (resendError) throw resendError;
 
       setResendTimer(60);
     } catch (error: any) {
-      console.error('Failed to resend code:', error);
       setError('Failed to resend code. Please try again.');
     } finally {
+      requestPending.current = false;
       setIsResending(false);
     }
   };
@@ -133,13 +101,6 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
     "How long is the verification code valid?",
   ];
 
-  const inputClass = `w-10 h-12 text-center text-xl font-semibold rounded-lg border-2 ${
-    error
-      ? 'border-red-500 focus:ring-red-500'
-      : darkMode
-        ? 'bg-surface-sunken border-stroke-default text-white focus:border-emerald-500 focus:ring-emerald-500'
-        : 'bg-white border-stroke-default text-content-primary focus:border-emerald-500 focus:ring-emerald-500'
-  } focus:outline-none focus:ring-2 transition-colors`;
 
   return (
     <OnboardingLayout
@@ -150,7 +111,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         <OnboardingAssistantPanel
           step="1 of 5"
           title="Verify Your Email"
-          message="We've sent a 6-digit verification code to your email address. Please enter it below to continue."
+          message="Enter the complete verification code from your email, then select Verify email."
           quickActions={quickActions}
           suggestedQuestions={suggestedQuestions}
           darkMode={darkMode}
@@ -184,7 +145,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
           <p className={`text-sm ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
-            Enter the 6-digit code sent to
+            Enter the complete code sent to
           </p>
           <p className={`text-sm font-medium ${
             darkMode ? 'text-emerald-400' : 'text-emerald-600'
@@ -194,25 +155,40 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         </div>
 
         <div className="mb-6">
-          <div className="flex gap-2 justify-center mb-4" onPaste={handlePaste}>
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className={inputClass}
-                disabled={isVerifying}
-              />
-            ))}
-          </div>
+          <form onSubmit={(event) => { event.preventDefault(); void handleVerify(); }}>
+            {!email && (
+              <div className="mb-4">
+                <label htmlFor="verification-email" className="block text-sm font-medium text-content-primary mb-2">Account email</label>
+                <input id="verification-email" type="email" autoComplete="email" required value={verificationEmail}
+                  onChange={(event) => setVerificationEmail(event.target.value)} disabled={isVerifying || isResending}
+                  className="w-full min-h-12 px-4 py-3 rounded-lg border border-stroke-default bg-surface-raised text-content-primary text-base" />
+              </div>
+            )}
+            <label htmlFor="email-verification-code" className="block text-sm font-medium text-content-primary mb-2">
+              Verification code
+            </label>
+            <input
+              id="email-verification-code"
+              ref={inputRef}
+              type="text"
+              autoComplete="one-time-code"
+              autoCapitalize="none"
+              spellCheck={false}
+              value={code}
+              onChange={(event) => { setCode(event.target.value); setError(''); }}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'verification-code-error' : undefined}
+              className="w-full min-h-12 px-4 py-3 rounded-lg border border-stroke-default bg-surface-raised text-content-primary text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
+              disabled={isVerifying || isResending}
+              required
+            />
+            <Button type="submit" className="w-full min-h-12 mt-4" disabled={!code.trim() || isVerifying || isResending}>
+              {isVerifying ? 'Verifying…' : 'Verify email'}
+            </Button>
+          </form>
 
           {error && (
-            <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+            <p id="verification-code-error" role="alert" className="text-red-500 text-sm text-center mb-4">{error}</p>
           )}
 
           {isVerifying && (
@@ -227,7 +203,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         <div className="text-center">
           <button
             onClick={handleResend}
-            disabled={resendTimer > 0 || isResending}
+            disabled={resendTimer > 0 || isResending || isVerifying}
             className={`text-sm font-medium transition-colors ${
               resendTimer > 0 || isResending
                 ? darkMode
@@ -253,7 +229,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
           <p className={`text-sm ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
-            The verification code expires after 60 minutes. If you don't receive it within a few minutes, check your spam folder or request a new code.
+            Use the latest code you received. If you don't receive it within a few minutes, check your spam folder or request a new code.
           </p>
         </div>
       </div>
