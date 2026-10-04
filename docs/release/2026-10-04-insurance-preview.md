@@ -47,3 +47,7 @@ Preview Worker `0fdd894c-1dc1-4027-94dd-c524e549912a` uses a static persistent B
 ## Member-ID badge correction
 
 Worker `58de17f4-6c31-4ffa-bce2-fdfc2eb1d6a7` derives card status from explicit member-ID presence and end dates. Browser confirms the updated plan displays Saved, the missing-ID plan displays Member ID needed, and the ending-soon plan retains its warning. Three focused regressions and isolated build pass. Shared native source updated; no native or production deployment.
+
+## Responsive insurance layout
+
+Worker `46d3e27c-34b8-41ee-ba5c-14aad18de3fb` preserves header clearance at phone/tablet widths and stacks narrow card content. Browser checks at 375px and 768px: document width equals viewport width, heading begins at 80px under the 56px header, and measured coverage actions are 48px tall. Focused regressions/build pass. Native device accessibility remains a separate gate.

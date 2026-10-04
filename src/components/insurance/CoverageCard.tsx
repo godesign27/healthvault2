@@ -42,8 +42,8 @@ export function CoverageCard({
       className="h-full"
       state="default"
     >
-      <div className="mb-4 flex items-start justify-between p-6 pb-4">
-        <div className="flex items-start gap-4">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-4 sm:p-6 pb-4">
+        <div className="flex min-w-0 items-start gap-4">
           {coverage.provider.logoUrl && (
             <img
               src={coverage.provider.logoUrl}
@@ -52,7 +52,7 @@ export function CoverageCard({
             />
           )}
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
               <h3 className={`font-semibold text-lg ${
                 darkMode ? 'text-white' : 'text-content-primary'
               }`}>{coverage.provider.name}</h3>
@@ -75,14 +75,14 @@ export function CoverageCard({
         </div>
         <StatusBadge status={badgeStatus} darkMode={darkMode} />
       </div>
-      <div className={`grid grid-cols-2 gap-4 px-6 pb-4 ${
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 sm:px-6 pb-4 ${
         darkMode ? 'text-content-primary' : 'text-content-primary'
       }`}>
         <div className={editingMember ? "col-span-2" : undefined}>
           <p className={`text-xs mb-1 ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>Member ID</p>
-          <p className="font-mono text-sm">{displayInsuranceMemberId(coverage.memberId)}</p>
+          <p className="font-mono text-sm break-words">{displayInsuranceMemberId(coverage.memberId)}</p>
           {showActions && onSaveMemberId && (editingMember ? (
             <form className="mt-3 space-y-3" onSubmit={async event => {
               event.preventDefault();
@@ -106,7 +106,7 @@ export function CoverageCard({
             <p className={`text-xs mb-1 ${
               darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>Group Number</p>
-            <p className="font-mono text-sm">{coverage.groupNumber}</p>
+            <p className="font-mono text-sm break-words">{coverage.groupNumber}</p>
           </div>
         )}
         {coverage.bin && (
@@ -114,7 +114,7 @@ export function CoverageCard({
             <p className={`text-xs mb-1 ${
               darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>BIN</p>
-            <p className="font-mono text-sm">{coverage.bin}</p>
+            <p className="font-mono text-sm break-words">{coverage.bin}</p>
           </div>
         )}
         {coverage.pcn && (
@@ -122,7 +122,7 @@ export function CoverageCard({
             <p className={`text-xs mb-1 ${
               darkMode ? 'text-content-secondary' : 'text-content-secondary'
             }`}>PCN</p>
-            <p className="font-mono text-sm">{coverage.pcn}</p>
+            <p className="font-mono text-sm break-words">{coverage.pcn}</p>
           </div>
         )}
       </div>
@@ -139,7 +139,7 @@ export function CoverageCard({
               {onEdit && (
                 <button disabled={busy}
                   onClick={() => onEdit(coverage)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
                     darkMode
                       ? 'text-content-primary hover:bg-surface-sunken'
                       : 'text-content-primary hover:bg-surface-overlay'
@@ -152,7 +152,7 @@ export function CoverageCard({
               {!coverage.isPrimary && onSetPrimary && (
                 <button disabled={busy}
                   onClick={() => onSetPrimary(coverage)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
                     darkMode
                       ? 'text-content-primary hover:bg-surface-sunken'
                       : 'text-content-primary hover:bg-surface-overlay'
@@ -165,7 +165,7 @@ export function CoverageCard({
               {onStopCoverage && (
                 <button disabled={busy}
                   onClick={() => onStopCoverage(coverage)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
                     darkMode
                       ? 'text-orange-400 hover:bg-surface-sunken'
                       : 'text-orange-600 hover:bg-orange-50'
@@ -180,7 +180,7 @@ export function CoverageCard({
           {isStopped && onResumeCoverage && (
             <button disabled={busy}
               onClick={() => onResumeCoverage(coverage)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
                 darkMode
                   ? 'text-green-400 hover:bg-surface-sunken'
                   : 'text-green-600 hover:bg-green-50'
@@ -193,7 +193,7 @@ export function CoverageCard({
           {onDelete && (
             <button disabled={busy}
               onClick={() => onDelete(coverage)}
-              className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+              className="ml-auto flex min-h-12 items-center gap-1.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
               Remove

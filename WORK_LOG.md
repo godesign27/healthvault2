@@ -1720,3 +1720,6 @@ User reported a success banner moving past before it could be read. The previous
 
 ## 2026-10-04 — Insurance badge follows saved member ID
 Replaced legacy workflow-flag selection on web/native coverage cards with a shared completeness resolver. Missing ID now has actionable Member ID needed wording; persisted explicit ID yields Saved. End-date warnings retain precedence, and stopped remains separate. No verification flags or eligibility assertions are written. Completeness, member editor and identifier regressions pass; isolated preview build passes. Native source updated but no mobile release performed.
+
+## 2026-10-04 — Insurance mobile-width layout
+Fixed sm padding shorthand overriding mobile header clearance. Header action stacks on narrow screens; card badges and fields reflow without squeezing labels. Coverage actions now meet a 48px minimum height and expose keyboard focus. Member-editor and persistent-feedback regressions pass; isolated build passes. Deployed preview Worker 46d3e27c-34b8-41ee-ba5c-14aad18de3fb. Browser measurements at 375px and 768px confirm no document horizontal overflow and heading top 80px below the 56px mobile header; measured coverage actions are 48px high. Restored viewport after testing. These checks do not establish native screen-reader acceptance.

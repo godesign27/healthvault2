@@ -47,8 +47,8 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
   const handleResumeCoverage = (coverage: CoverageWithProvider) => {void run(userId, coverage.id, 'resume');};
 
   return (
-    <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
-      <div className="mb-8 flex items-start justify-between">
+    <div className="w-full px-4 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-12 lg:pt-12">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <ShieldCheck className="w-7 h-7" />
@@ -60,7 +60,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
         </div>
         <button
           onClick={() => setShowAddHint(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 ml-4"
+          className="flex min-h-12 items-center justify-center gap-2 px-4 py-2 bg-action-primary text-white text-sm font-medium rounded-lg transition-colors shrink-0 w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
         >
           <Plus className="w-4 h-4" />
           Add Coverage

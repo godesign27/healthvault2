@@ -904,3 +904,4 @@ _Last updated: 2026-08-29_
 - [x] Populate verified preview account with user-authorized one-time structured data copy; verify counts, ownership visibility and rendered insurance cards. Live account remains isolated.
 - [x] Keep insurance save feedback stable above the list through refresh; use persistent dismissible accessible banner instead of timed sliding toast.
 - [x] Derive insurance card badge from explicit member-ID completeness and end dates across web/native; clear missing-ID warning after confirmed save.
+- [x] Fix insurance header overlap below desktop; reflow narrow cards and ensure 48px coverage action targets.
