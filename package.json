@@ -21,7 +21,8 @@
     "postcss": "8.5.29",
     "@expo/plist": {
       "@xmldom/xmldom": "0.8.15"
-    }
+    },
+    "image-size": "2.0.4"
   },
   "scripts": {
     "dev": "vite",
@@ -29,7 +30,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "postinstall": "node scripts/patch-react-native-css-interop.cjs && node scripts/patch-expo-tar.cjs",
+    "postinstall": "node scripts/patch-react-native-css-interop.cjs && node scripts/patch-expo-tar.cjs && node scripts/patch-metro-image-size.cjs",
     "mobile": "npm run start -w @health-vault/mobile",
     "mobile:ios": "npm run ios -w @health-vault/mobile",
     "mobile:8083": "npm run start -w @health-vault/mobile -- --port 8083",

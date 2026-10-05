@@ -969,3 +969,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Remove XML parser advisory with scoped Expo plist override and actual plist compatibility checks.
 - [ ] Review image-size major-version compatibility; native binary/device validation remains open.
+
+- [x] Patch image-size and verify Metro asset parsing with fresh dependencies.
+- [ ] Prepare valid isolated native workspace/Pods and run binary/device validation; audit75 findings remain.

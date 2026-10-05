@@ -1774,3 +1774,6 @@ Pinned PostCSS8.5.29 (direct and override) and resolved compatible XML/YAML upda
 
 ## 2026-10-05 — Expo plist XML parser fix
 Scoped @expo/plist override to @xmldom/xmldom0.8.15; existing plist dependency retains0.9.12. Clean npm10 install, actual Expo plist round-trip/nested-value/XML text escaping tests, tar extraction tests,21 focused suites and build pass. Test initially used wrong default-export access; corrected harness before acceptance. Audit78 affected packages (46 high,29 moderate,3 low,0 critical); XML advisory absent. Image-size1 requires major-version compatibility review; not changed. No deployment/native binary build.12 marketing TypeScript diagnostics remain.
+
+## 2026-10-05 — Metro image parser compatibility
+Pinned image-size2.0.4 with version-guarded Metro0.80.12 named-export postinstall patch. Actual Metro PNG/SVG dimensions, non-image handling, empty/malformed input rejection pass. Clean npm10 install, plist/tar regressions,21 focused suites and web build pass. Audit75 affected packages/43 high/0 critical, image-size absent. Native candidate lacks Pods; Xcode workspace inspection failed with invalid workspace and unavailable CoreSimulator service, so native binary/device acceptance remains unverified. No deployment.12 marketing typecheck diagnostics remain.
