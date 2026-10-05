@@ -5,7 +5,7 @@ Other accumulated working-tree changes were excluded. No Git push or production 
 
 Web: https://healthvault2-insurance-preview.timothymcguire.workers.dev
 Cloudflare Worker: `healthvault2-insurance-preview`
-Current web version: `1f5a57ca-d569-4255-b873-4b7e0fbed836` (initial version: `56b544d0-8b75-4372-9f6e-bd01352f7546`).
+Current web version: `37b8ec81-2974-4118-859f-6f0adc6730f1` (initial version: `56b544d0-8b75-4372-9f6e-bd01352f7546`).
 Backend: `roeudwddxvniazwufdqf`, the existing preview branch of `sgwekxjlvadvdosyudgj`.
 
 ## Current promotion status
@@ -101,3 +101,9 @@ Next: review network validation/ownership types, remaining product consumers and
 Integrated reviewed network drawers/tabs and store create signatures. Provider/pharmacy creation derives ownership only from the signed-in session, ignoring even untyped caller-supplied IDs; absent sessions reject before insert. This checks create ownership only, not all network authorization paths. Forms use Zod issues and required Toast identifiers. Names now trim before minimum-length validation, preventing whitespace-only entries.
 
 Candidate validation: **85 TypeScript diagnostics remain**, down from 98. All **16 focused suites pass**; full typecheck is the sole failed check (16/17). New tests execute actual submit handlers with real schemas for invalid/valid names and actual store create functions with synthetic sessions. Vite compilation passes with existing chunk warning. No deployment credentials supplied to compilation; do not upload this local output. Production and hosted preview unchanged. Other network behavior such as duplicate submissions/account transitions remains outside this validation claim.
+
+## October 5 — Header-only preview hotfix deployed
+
+User refreshed and still saw the overlap because the broader candidate had not shipped. Separated the reversible visual fix from whole-app promotion: created `/tmp/hv-header-hotfix` from deployed baseline commit `22e96fa`, applied only `40a25b3` source/feedback-test patch, and built with explicit preview Supabase configuration. No component/network/service integration batches were included. Compared normalized TypeScript diagnostics: baseline 169, patched 169, no added/removed diagnostics. Full production gate remains failed; this is not a claim of a clean typecheck. Header structure, persistent feedback and member-editor checks passed. The header fixture omitted VitalsPage because that future page does not exist in this baseline.
+
+Deployed Worker `37b8ec81-2974-4118-859f-6f0adc6730f1` to insurance preview only. Bundle contains preview backend and no production backend URL. Browser reload verified Dashboard heading at 88px below header bottom 56px at 768px. Forms verified at scroll top: heading 80px at width375 and 88px at width768, header bottom56; document widths equal viewport widths. Captured `/tmp/hv-header-forms-fixed.png`; viewport reset. No account writes or production release. Current integration candidate remains separate at 85 TypeScript diagnostics; do not mistake its newer local code for hosted code.

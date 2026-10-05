@@ -933,3 +933,5 @@ This section supersedes older pending preview acceptance entries above; it does 
 - [x] Reject whitespace-only provider/pharmacy names; exercise real submit handlers and synthetic-session store create paths.
 - [x] Candidate: 85 TypeScript diagnostics remain, 16 focused suites pass, local build passes; not deployed.
 - [ ] Resolve remaining product/service/gallery diagnostics and independently install candidate dependencies before deployment.
+
+- [x] Ship isolated header-only preview fix and visually verify Dashboard/Forms clearance at narrow widths (Worker37b8ec81); broader integration release remains separate and blocked.
