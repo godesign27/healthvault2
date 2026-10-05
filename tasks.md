@@ -954,3 +954,6 @@ Completed: curated candidate preview deployment and local record-date/dashboard 
 
 ## 2026-10-05 — Clean dependency verification
 Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites and Vite build pass.12 marketing diagnostics remain. Audit reports89 affected packages including critical tar; dependency-path triage and compatible mobile upgrades remain open. See docs/release/2026-10-05-clean-install.md. No deployment or dependency changes.
+
+- [x] Trace critical tar path and reproduce tar7/Expo51 incompatibility; reject unsafe blanket override.
+- [ ] Resolve critical tooling advisory through a tested migration or compatibility patch.

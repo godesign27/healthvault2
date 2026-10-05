@@ -1759,3 +1759,6 @@ Removed unused five-file mock FHIR orchestration chain after reference search sh
 
 ## 2026-10-05 — Clean dependency verification
 Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites and Vite build pass.12 marketing diagnostics remain. Audit reports89 affected packages including critical tar; dependency-path triage and compatible mobile upgrades remain open. See docs/release/2026-10-05-clean-install.md. No deployment or dependency changes.
+
+## 2026-10-05 — Critical tar dependency triage
+Traced tar6.2.1 to Expo51 CLI0.18.31 and cacache18.0.4. Evaluated exact7.5.22 override only in disposable clean candidate. npm11 retained the old resolution; pinned npm10.9.2 resolved7.5.22. Runtime reproduction forcing Expo JS extraction fallback fails: tar7 sets __esModule with no default export, but Expo calls default.extract. Override rejected and original package/lock restored. Workspace dependencies and deployed app unchanged. This is a tooling dependency finding, not evidence of browser runtime exploitation. Critical advisory remains open pending tested tooling migration or maintained compatibility patch; do not mark audit passed.
