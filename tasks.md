@@ -951,3 +951,6 @@ Completed: curated candidate preview deployment and local record-date/dashboard 
 - [x] Verify deployed preview import contract and server-only RPC grants; remove unused mock import chain.
 - [x] Resolve product candidate TypeScript diagnostics;12 marketing diagnostics remain outside app scope.
 - [ ] Verify clean dependency installation, native accessibility, and final preview acceptance before promotion.
+
+## 2026-10-05 — Clean dependency verification
+Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites and Vite build pass.12 marketing diagnostics remain. Audit reports89 affected packages including critical tar; dependency-path triage and compatible mobile upgrades remain open. See docs/release/2026-10-05-clean-install.md. No deployment or dependency changes.

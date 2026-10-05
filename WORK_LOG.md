@@ -1756,3 +1756,6 @@ Reviewed provider preview, confirmation service and review flow together against
 
 ## 2026-10-05 — Legacy import cleanup and backend compatibility
 Removed unused five-file mock FHIR orchestration chain after reference search showed only internal references. Removed two unused product declarations through scoped patches, preserving unrelated upload/share work. Read-only preview checks verified active fhir-import v1 authenticates via getUser and active-account guard, invokes confirm_fhir_preview, and returns durable receipt; fhir-sync v7 returns real source and importJobId. Live RPC definition matches selected-index confirmation and receipt retry contract; execute grants: anon false, authenticated false, service_role true. No database changes or real imports performed. Candidate build passes;21 focused suites pass; remaining12 TypeScript diagnostics are marketing only. Dependency clean-install and native acceptance remain open. No deployment this batch.
+
+## 2026-10-05 — Clean dependency verification
+Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites and Vite build pass.12 marketing diagnostics remain. Audit reports89 affected packages including critical tar; dependency-path triage and compatible mobile upgrades remain open. See docs/release/2026-10-05-clean-install.md. No deployment or dependency changes.
