@@ -17,8 +17,10 @@
 - iOS export completed with 999 modules, 21 assets, and a 3.6 MB Hermes bundle.
 - Native Debug simulator build completed successfully with the diagnostic iOS 15 deployment-target override.
 - Focused regression tests and patch idempotence checks pass.
+- The isolated Debug app launches on the iOS 18.6 QA simulator and loads the preview Metro bundle through the sign-in screen.
 
 ### Remaining
 
-- Simulator runtime smoke tests, physical-device acceptance, VoiceOver, Dynamic Type, and Android validation.
+- Authenticated simulator flows, VoiceOver focus order, reduced motion, touch-target acceptance, physical-device acceptance, and Android validation.
+- Largest Dynamic Type scales the sign-in screen but clips Sign In; that layout is not accepted.
 - Final supported iOS minimum and toolchain decision before release promotion.

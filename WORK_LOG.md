@@ -1786,3 +1786,9 @@ Prepared isolated iOS Pods; original deployment-mode install failed on missing E
 The isolated iOS export found two issues beyond native compilation: Metro did not watch shared design tokens, and its file-based asset API passed a filename to image-size2, which accepts bytes. Added the design-token watch folder and adapted both filename and buffer inputs, including upgrades from the previous adapter. Expanded regression coverage to actual Metro getAssetData. Patch idempotence and buffer/file tests pass.
 
 With explicit preview Supabase configuration, Expo exported 999 modules,21 assets and a3.6MB Hermes bundle successfully to `/tmp/hv-ios-bundle`; log `/tmp/hv-ios-bundle.log`. Existing CSS interop configuration warning remains. This verifies packaging, not runtime flows or accessibility. No deployment.
+
+## 2026-10-05 — Isolated simulator sign-in launch
+
+Installed the unsigned Debug candidate on the iOS 18.6 QA simulator and loaded it from preview Metro (`roeudwddxvniazwufdqf` only). The sign-in screen appeared. Largest Dynamic Type scales the copy but clips Sign In and collides the password visibility icon. Increase Contrast stayed readable during that large-text state; no ratio was measured. Simulator text size and contrast were restored afterward.
+
+Authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver, reduced motion, and touch targets were not exercised. This Xcode has no Simulator.app, and HID injection did not change the UI. No preview account was created, no credentials were stored, and production was not used. Metro image-size patch idempotence and file-based asset regression passed again. Not runtime or accessibility acceptance.
