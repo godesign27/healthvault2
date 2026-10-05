@@ -26,3 +26,6 @@ Updated brace-expansion, browserslist, fast-uri, joi, js-yaml, nanoid and undici
 
 ## 2026-10-05 — PostCSS security compatibility batch
 Pinned PostCSS8.5.29 (direct and override) and resolved compatible XML/YAML updates in isolated candidate. Clean npm10 install, Expo tar tests,21 focused suites, Metro CSS transform and web build pass.12 marketing diagnostics remain. PostCSS advisory removed; audit80 affected packages/47 high/0 critical, with newly attributed NativeWind/CSS Interop transitive findings. Counts do not represent confirmed exploitable app paths. Workspace lock changes preserved. No deployment or native device acceptance.
+
+## 2026-10-05 — Expo plist XML parser fix
+Scoped @expo/plist override to @xmldom/xmldom0.8.15; existing plist dependency retains0.9.12. Clean npm10 install, actual Expo plist round-trip/nested-value/XML text escaping tests, tar extraction tests,21 focused suites and build pass. Test initially used wrong default-export access; corrected harness before acceptance. Audit78 affected packages (46 high,29 moderate,3 low,0 critical); XML advisory absent. Image-size1 requires major-version compatibility review; not changed. No deployment/native binary build.12 marketing TypeScript diagnostics remain.

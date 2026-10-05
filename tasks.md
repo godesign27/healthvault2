@@ -966,3 +966,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Validate patched PostCSS with Metro and Vite; retain native pins.
 - [ ] Continue XML/image parser and remaining dependency triage; native binary/device validation still open.
+
+- [x] Remove XML parser advisory with scoped Expo plist override and actual plist compatibility checks.
+- [ ] Review image-size major-version compatibility; native binary/device validation remains open.

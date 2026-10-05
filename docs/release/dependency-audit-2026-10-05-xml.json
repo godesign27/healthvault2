@@ -1,0 +1,1912 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@babel/core": {
+      "name": "@babel/core",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1123528,
+          "name": "@babel/core",
+          "dependency": "@babel/core",
+          "title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
+          "url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+          "severity": "low",
+          "cwe": [
+            "CWE-22",
+            "CWE-200"
+          ],
+          "cvss": {
+            "score": 3.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:L/I:N/A:N"
+          },
+          "range": "<=7.29.0"
+        }
+      ],
+      "effects": [],
+      "range": "<=7.29.0",
+      "nodes": [
+        "node_modules/@babel/core"
+      ],
+      "fixAvailable": true
+    },
+    "@expo/bunyan": {
+      "name": "@expo/bunyan",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "uuid"
+      ],
+      "effects": [
+        "@expo/rudder-sdk-node"
+      ],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@expo/bunyan"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/cli": {
+      "name": "@expo/cli",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@expo/code-signing-certificates",
+        "@expo/config",
+        "@expo/config-plugins",
+        "@expo/metro-config",
+        "@expo/prebuild-config",
+        "@expo/rudder-sdk-node",
+        "@react-native/dev-middleware",
+        "fast-glob",
+        "find-yarn-workspace-root",
+        "node-forge",
+        "send",
+        "tempy"
+      ],
+      "effects": [
+        "expo"
+      ],
+      "range": "<=0.0.0-canary-20231123-1b19f96-4 || >=0.0.1-canary-20231125-d600e44",
+      "nodes": [
+        "node_modules/@expo/cli"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/code-signing-certificates": {
+      "name": "@expo/code-signing-certificates",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "node-forge"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@expo/code-signing-certificates"
+      ],
+      "fixAvailable": true
+    },
+    "@expo/config": {
+      "name": "@expo/config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@expo/config-plugins"
+      ],
+      "effects": [
+        "@expo/metro-config",
+        "expo",
+        "expo-constants",
+        "expo-manifests"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || >=3.3.23-alpha.0",
+      "nodes": [
+        "node_modules/@expo/config"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/config-plugins": {
+      "name": "@expo/config-plugins",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "xcode"
+      ],
+      "effects": [
+        "@expo/config",
+        "@expo/prebuild-config",
+        "expo"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@expo/config-plugins"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/metro-config": {
+      "name": "@expo/metro-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@expo/config",
+        "find-yarn-workspace-root"
+      ],
+      "effects": [
+        "@expo/cli",
+        "expo"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || >=0.1.49-alpha.0",
+      "nodes": [
+        "node_modules/@expo/metro-config"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/prebuild-config": {
+      "name": "@expo/prebuild-config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@expo/config",
+        "@expo/config-plugins"
+      ],
+      "effects": [
+        "expo-splash-screen"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@expo/prebuild-config"
+      ],
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "57.0.24",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/rudder-sdk-node": {
+      "name": "@expo/rudder-sdk-node",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@expo/bunyan",
+        "uuid"
+      ],
+      "effects": [
+        "@expo/cli"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@expo/rudder-sdk-node"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@jest/environment": {
+      "name": "@jest/environment",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@jest/fake-timers"
+      ],
+      "effects": [],
+      "range": "<=30.2.0",
+      "nodes": [
+        "node_modules/@jest/environment"
+      ],
+      "fixAvailable": true
+    },
+    "@jest/fake-timers": {
+      "name": "@jest/fake-timers",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "jest-message-util"
+      ],
+      "effects": [
+        "@jest/environment",
+        "jest-environment-node"
+      ],
+      "range": "<=30.2.0",
+      "nodes": [
+        "node_modules/@jest/fake-timers"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native-community/cli": {
+      "name": "@react-native-community/cli",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native-community/cli-clean",
+        "@react-native-community/cli-config",
+        "@react-native-community/cli-doctor",
+        "@react-native-community/cli-hermes"
+      ],
+      "effects": [],
+      "range": ">=12.0.0-alpha.0",
+      "nodes": [
+        "node_modules/@react-native-community/cli"
+      ],
+      "fixAvailable": true
+    },
+    "@react-native-community/cli-clean": {
+      "name": "@react-native-community/cli-clean",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob"
+      ],
+      "effects": [],
+      "range": ">=13.5.2",
+      "nodes": [
+        "node_modules/@react-native-community/cli-clean"
+      ],
+      "fixAvailable": true
+    },
+    "@react-native-community/cli-config": {
+      "name": "@react-native-community/cli-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob"
+      ],
+      "effects": [
+        "@react-native-community/cli",
+        "@react-native-community/cli-doctor"
+      ],
+      "range": ">=13.5.2",
+      "nodes": [
+        "node_modules/@react-native-community/cli-config"
+      ],
+      "fixAvailable": true
+    },
+    "@react-native-community/cli-doctor": {
+      "name": "@react-native-community/cli-doctor",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native-community/cli-config",
+        "@react-native-community/cli-platform-android",
+        "@react-native-community/cli-platform-apple",
+        "@react-native-community/cli-platform-ios"
+      ],
+      "effects": [
+        "@react-native-community/cli"
+      ],
+      "range": ">=12.0.0-alpha.0",
+      "nodes": [
+        "node_modules/@react-native-community/cli-doctor"
+      ],
+      "fixAvailable": true
+    },
+    "@react-native-community/cli-hermes": {
+      "name": "@react-native-community/cli-hermes",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@react-native-community/cli-platform-android"
+      ],
+      "effects": [
+        "@react-native-community/cli"
+      ],
+      "range": ">=12.0.0-alpha.0",
+      "nodes": [
+        "node_modules/@react-native-community/cli-hermes"
+      ],
+      "fixAvailable": true
+    },
+    "@react-native-community/cli-platform-android": {
+      "name": "@react-native-community/cli-platform-android",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob",
+        "fast-xml-parser"
+      ],
+      "effects": [
+        "@react-native-community/cli-doctor",
+        "@react-native-community/cli-hermes",
+        "react-native"
+      ],
+      "range": "12.0.0-alpha.0 - 15.1.0",
+      "nodes": [
+        "node_modules/@react-native-community/cli-platform-android"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native-community/cli-platform-apple": {
+      "name": "@react-native-community/cli-platform-apple",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob",
+        "fast-xml-parser"
+      ],
+      "effects": [
+        "@react-native-community/cli-doctor",
+        "@react-native-community/cli-platform-ios"
+      ],
+      "range": "<=20.1.1",
+      "nodes": [
+        "node_modules/@react-native-community/cli-platform-apple"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native-community/cli-platform-ios": {
+      "name": "@react-native-community/cli-platform-ios",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@react-native-community/cli-platform-apple"
+      ],
+      "effects": [
+        "react-native"
+      ],
+      "range": "13.2.0 - 20.1.1",
+      "nodes": [
+        "node_modules/@react-native-community/cli-platform-ios"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/babel-plugin-codegen": {
+      "name": "@react-native/babel-plugin-codegen",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native/codegen"
+      ],
+      "effects": [
+        "@react-native/babel-preset"
+      ],
+      "range": "0.73.0-nightly-20230603-fd9e295be - 0.73.0-nightly-20231002-0371014a3 || 0.73.2 - 0.74.0-nightly-20240220-e9351f0f8 || 0.74.1 - 0.77.0-rc.7 || 0.88.0-nightly-20260709-24e4b2cae - 0.88.0-nightly-20260803-63e9c1544",
+      "nodes": [
+        "node_modules/@react-native/babel-plugin-codegen"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/babel-preset": {
+      "name": "@react-native/babel-preset",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native/babel-plugin-codegen"
+      ],
+      "effects": [
+        "@react-native/metro-babel-transformer",
+        "babel-preset-expo"
+      ],
+      "range": "<=0.73.0-nightly-20231002-0371014a3 || 0.73.19 - 0.74.0-nightly-20240220-e9351f0f8 || 0.74.1 - 0.77.0-rc.7",
+      "nodes": [
+        "node_modules/@react-native/babel-preset"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/codegen": {
+      "name": "@react-native/codegen",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "jscodeshift"
+      ],
+      "effects": [
+        "@react-native/babel-plugin-codegen",
+        "react-native"
+      ],
+      "range": "<=0.77.0-rc.7",
+      "nodes": [
+        "node_modules/@react-native/codegen"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/community-cli-plugin": {
+      "name": "@react-native/community-cli-plugin",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native/dev-middleware",
+        "@react-native/metro-babel-transformer",
+        "metro",
+        "metro-config"
+      ],
+      "effects": [
+        "react-native"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@react-native/community-cli-plugin"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/dev-middleware": {
+      "name": "@react-native/dev-middleware",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "selfsigned"
+      ],
+      "effects": [
+        "@expo/cli",
+        "@react-native/community-cli-plugin"
+      ],
+      "range": "0.74.0-nightly-20231003-5dedf277c - 0.74.0-nightly-20240220-e9351f0f8 || 0.74.1 - 0.79.0-rc.4",
+      "nodes": [
+        "node_modules/@react-native/community-cli-plugin/node_modules/@react-native/dev-middleware",
+        "node_modules/@react-native/dev-middleware"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-native/metro-babel-transformer": {
+      "name": "@react-native/metro-babel-transformer",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native/babel-preset"
+      ],
+      "effects": [
+        "@react-native/community-cli-plugin"
+      ],
+      "range": "<=0.73.0-nightly-20231002-0371014a3 || 0.73.13 - 0.74.0-nightly-20240220-e9351f0f8 || 0.74.1 - 0.77.0-rc.7",
+      "nodes": [
+        "node_modules/@react-native/metro-babel-transformer"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-navigation/bottom-tabs": {
+      "name": "@react-navigation/bottom-tabs",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@react-navigation/elements",
+        "@react-navigation/native"
+      ],
+      "effects": [],
+      "range": "<=7.0.0-rc.37",
+      "nodes": [
+        "node_modules/@react-navigation/bottom-tabs"
+      ],
+      "fixAvailable": true
+    },
+    "@react-navigation/core": {
+      "name": "@react-navigation/core",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "query-string"
+      ],
+      "effects": [
+        "@react-navigation/native"
+      ],
+      "range": "<=7.22.0 || 8.0.0-alpha.0 - 8.0.0-alpha.9",
+      "nodes": [
+        "node_modules/@react-navigation/core"
+      ],
+      "fixAvailable": {
+        "name": "@react-navigation/native",
+        "version": "7.5.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-navigation/elements": {
+      "name": "@react-navigation/elements",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@react-navigation/native"
+      ],
+      "effects": [
+        "@react-navigation/bottom-tabs",
+        "@react-navigation/native-stack"
+      ],
+      "range": "<=2.0.0-rc.26",
+      "nodes": [
+        "node_modules/@react-navigation/elements"
+      ],
+      "fixAvailable": true
+    },
+    "@react-navigation/native": {
+      "name": "@react-navigation/native",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@react-navigation/core"
+      ],
+      "effects": [
+        "@react-navigation/bottom-tabs",
+        "@react-navigation/elements",
+        "@react-navigation/native-stack",
+        "expo-router"
+      ],
+      "range": "<=3.0.0-alpha.12 || 3.0.1 - 3.6.5 || 4.0.0-alpha.0 - 6.1.18",
+      "nodes": [
+        "node_modules/@react-navigation/native"
+      ],
+      "fixAvailable": {
+        "name": "@react-navigation/native",
+        "version": "7.5.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@react-navigation/native-stack": {
+      "name": "@react-navigation/native-stack",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@react-navigation/elements",
+        "@react-navigation/native"
+      ],
+      "effects": [],
+      "range": "<=5.0.4 || 6.0.0-next.1 - 7.0.0-rc.30",
+      "nodes": [
+        "node_modules/@react-navigation/native-stack"
+      ],
+      "fixAvailable": true
+    },
+    "@remix-run/node": {
+      "name": "@remix-run/node",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@remix-run/server-runtime"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-nightly-feb25eb42-20240508 || >=2.9.0-pre.0",
+      "nodes": [
+        "node_modules/@remix-run/node"
+      ],
+      "fixAvailable": true
+    },
+    "@remix-run/server-runtime": {
+      "name": "@remix-run/server-runtime",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "turbo-stream"
+      ],
+      "effects": [
+        "@remix-run/node"
+      ],
+      "range": "<=0.0.0-nightly-feb25eb42-20240508 || >=2.9.0-pre.0",
+      "nodes": [
+        "node_modules/@remix-run/server-runtime"
+      ],
+      "fixAvailable": true
+    },
+    "ajv": {
+      "name": "ajv",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1113715,
+          "name": "ajv",
+          "dependency": "ajv",
+          "title": "ajv has ReDoS when using `$data` option",
+          "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400",
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=7.0.0-alpha.0 <8.18.0"
+        }
+      ],
+      "effects": [
+        "expo-dev-launcher"
+      ],
+      "range": "7.0.0-alpha.0 - 8.17.1",
+      "nodes": [
+        "node_modules/expo-dev-launcher/node_modules/ajv"
+      ],
+      "fixAvailable": {
+        "name": "expo-dev-client",
+        "version": "57.0.19",
+        "isSemVerMajor": true
+      }
+    },
+    "babel-preset-expo": {
+      "name": "babel-preset-expo",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@react-native/babel-preset"
+      ],
+      "effects": [
+        "expo"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 11.0.0 - 12.1.0-canary-20250221-ef26fed",
+      "nodes": [
+        "node_modules/babel-preset-expo"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "braces": {
+      "name": "braces",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1240992,
+          "name": "braces",
+          "dependency": "braces",
+          "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+          "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+          "severity": "high",
+          "cwe": [
+            "CWE-674"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=3.0.3"
+        }
+      ],
+      "effects": [
+        "chokidar",
+        "micromatch"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/braces"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.3",
+        "isSemVerMajor": true
+      }
+    },
+    "chokidar": {
+      "name": "chokidar",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "braces"
+      ],
+      "effects": [
+        "tailwindcss"
+      ],
+      "range": "2.0.0 - 3.6.0",
+      "nodes": [
+        "node_modules/chokidar"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.3",
+        "isSemVerMajor": true
+      }
+    },
+    "decode-uri-component": {
+      "name": "decode-uri-component",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1147955,
+          "name": "decode-uri-component",
+          "dependency": "decode-uri-component",
+          "title": "decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input",
+          "url": "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400",
+            "CWE-405",
+            "CWE-407",
+            "CWE-1176"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=0.4.2"
+        }
+      ],
+      "effects": [
+        "query-string"
+      ],
+      "range": "<=0.4.2",
+      "nodes": [
+        "node_modules/decode-uri-component"
+      ],
+      "fixAvailable": {
+        "name": "@react-navigation/native",
+        "version": "7.5.0",
+        "isSemVerMajor": true
+      }
+    },
+    "del": {
+      "name": "del",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "globby"
+      ],
+      "effects": [
+        "tempy"
+      ],
+      "range": ">=5.0.0",
+      "nodes": [
+        "node_modules/del"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "expo": {
+      "name": "expo",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@expo/cli",
+        "@expo/config",
+        "@expo/config-plugins",
+        "@expo/metro-config",
+        "babel-preset-expo",
+        "expo-asset",
+        "expo-modules-autolinking"
+      ],
+      "effects": [],
+      "range": ">=43.0.0-alpha.0",
+      "nodes": [
+        "node_modules/expo"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-asset": {
+      "name": "expo-asset",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "expo-constants"
+      ],
+      "effects": [
+        "expo"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 8.6.1 - 55.0.0-canary-20260223-05214f1 || 55.0.3-canary-20260128-67ce8d5 || 55.0.8-canary-20260424-7bedc9d - 55.0.8-canary-20260429-a5e59cf || 55.0.11-canary-20260327-0789fbc - 55.0.11-canary-20260402-9da566b || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-asset"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-constants": {
+      "name": "expo-constants",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@expo/config"
+      ],
+      "effects": [
+        "expo-asset",
+        "expo-linking"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 10.1.2 - 55.0.14 || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-constants"
+      ],
+      "fixAvailable": {
+        "name": "expo-constants",
+        "version": "57.0.20",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-dev-client": {
+      "name": "expo-dev-client",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "expo-dev-launcher",
+        "expo-manifests"
+      ],
+      "effects": [],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 3.1.0 - 55.0.0-canary-20260223-05214f1 || 55.0.4-canary-20260128-67ce8d5 || 55.0.10-canary-20260424-7bedc9d - 55.0.10-canary-20260429-a5e59cf || 55.0.20-canary-20260327-0789fbc - 55.0.20-canary-20260402-9da566b || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-dev-client"
+      ],
+      "fixAvailable": {
+        "name": "expo-dev-client",
+        "version": "57.0.19",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-dev-launcher": {
+      "name": "expo-dev-launcher",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ajv",
+        "expo-manifests"
+      ],
+      "effects": [
+        "expo-dev-client"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 3.1.0 - 55.0.0-canary-20260223-05214f1 || 55.0.5-canary-20260128-67ce8d5 || 55.0.11-canary-20260424-7bedc9d - 55.0.11-canary-20260429-a5e59cf || 55.0.21-canary-20260327-0789fbc - 55.0.21-canary-20260402-9da566b || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-dev-launcher"
+      ],
+      "fixAvailable": {
+        "name": "expo-dev-client",
+        "version": "57.0.19",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-linking": {
+      "name": "expo-linking",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "expo-constants"
+      ],
+      "effects": [],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 2.2.2 - 55.0.0-canary-20260223-05214f1 || 55.0.4-canary-20260128-67ce8d5 || 55.0.8-canary-20260424-7bedc9d - 55.0.8-canary-20260429-a5e59cf || 55.0.10-canary-20260327-0789fbc - 55.0.10-canary-20260402-9da566b || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-linking"
+      ],
+      "fixAvailable": {
+        "name": "expo-linking",
+        "version": "57.0.11",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-manifests": {
+      "name": "expo-manifests",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@expo/config"
+      ],
+      "effects": [
+        "expo-dev-client",
+        "expo-dev-launcher"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 0.9.0 - 55.0.15 || 56.0.0-canary-20260212-4f61309 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-manifests"
+      ],
+      "fixAvailable": {
+        "name": "expo-dev-client",
+        "version": "57.0.19",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-modules-autolinking": {
+      "name": "expo-modules-autolinking",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob"
+      ],
+      "effects": [
+        "expo"
+      ],
+      "range": "<=2.1.0-canary-20250221-ef26fed",
+      "nodes": [
+        "node_modules/expo-modules-autolinking"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-router": {
+      "name": "expo-router",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@react-navigation/bottom-tabs",
+        "@react-navigation/native",
+        "@react-navigation/native-stack",
+        "expo-splash-screen"
+      ],
+      "effects": [],
+      "range": "<=4.0.0-preview.14",
+      "nodes": [
+        "node_modules/expo-router"
+      ],
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "57.0.24",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-splash-screen": {
+      "name": "expo-splash-screen",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@expo/prebuild-config"
+      ],
+      "effects": [
+        "expo-router"
+      ],
+      "range": "<=0.0.1-canary-20240418-8d74597 || 0.11.0 - 56.0.0-canary-20260506-964f25d",
+      "nodes": [
+        "node_modules/expo-splash-screen"
+      ],
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "57.0.24",
+        "isSemVerMajor": true
+      }
+    },
+    "fast-glob": {
+      "name": "fast-glob",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "@expo/cli",
+        "@react-native-community/cli-clean",
+        "@react-native-community/cli-config",
+        "@react-native-community/cli-platform-android",
+        "@react-native-community/cli-platform-apple",
+        "expo-modules-autolinking",
+        "globby"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/fast-glob"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "fast-xml-parser": {
+      "name": "fast-xml-parser",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1117911,
+          "name": "fast-xml-parser",
+          "dependency": "fast-xml-parser",
+          "title": "fast-xml-parser XMLBuilder: XML Comment and CDATA Injection via Unescaped Delimiters",
+          "url": "https://github.com/advisories/GHSA-gh4j-gqv2-49f6",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-91"
+          ],
+          "cvss": {
+            "score": 6.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": "<5.7.0"
+        }
+      ],
+      "effects": [
+        "@react-native-community/cli-platform-android",
+        "@react-native-community/cli-platform-apple"
+      ],
+      "range": "<5.7.0",
+      "nodes": [
+        "node_modules/fast-xml-parser"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "find-yarn-workspace-root": {
+      "name": "find-yarn-workspace-root",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "@expo/cli",
+        "@expo/metro-config"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/find-yarn-workspace-root"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "globby": {
+      "name": "globby",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-glob"
+      ],
+      "effects": [
+        "del"
+      ],
+      "range": ">=8.0.0",
+      "nodes": [
+        "node_modules/globby"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "hono": {
+      "name": "hono",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1193729,
+          "name": "hono",
+          "dependency": "hono",
+          "title": "Hono: Incomplete fix for CVE-2026-39408: `toSSG()` still writes files outside the output directory",
+          "url": "https://github.com/advisories/GHSA-gqvv-2mrq-wpjv",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N"
+          },
+          "range": "<4.13.5"
+        },
+        {
+          "source": 1193730,
+          "name": "hono",
+          "dependency": "hono",
+          "title": "Hono: Unbounded dot-notation nesting in `parseBody()` can cause memory exhaustion",
+          "url": "https://github.com/advisories/GHSA-g6gw-c38x-mqfc",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<4.13.5"
+        },
+        {
+          "source": 1193731,
+          "name": "hono",
+          "dependency": "hono",
+          "title": "Hono: Query parser reads parameters after the URL fragment, causing cache-key and proxy interpretation differentials",
+          "url": "https://github.com/advisories/GHSA-crvj-82cr-hjcx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-444"
+          ],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<4.13.5"
+        },
+        {
+          "source": 1240640,
+          "name": "hono",
+          "dependency": "hono",
+          "title": "hono/jsx renders plain strings unescaped in boundary components, leading to XSS",
+          "url": "https://github.com/advisories/GHSA-hxh3-vqpv-xpqv",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 4.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": "<4.13.7"
+        }
+      ],
+      "effects": [],
+      "range": "<=4.13.6",
+      "nodes": [
+        "node_modules/hono"
+      ],
+      "fixAvailable": true
+    },
+    "image-size": {
+      "name": "image-size",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1239765,
+          "name": "image-size",
+          "dependency": "image-size",
+          "title": "image-size: JXL and HEIF parsers allow denial of service through infinite loops",
+          "url": "https://github.com/advisories/GHSA-5p2g-fcmc-qvqq",
+          "severity": "high",
+          "cwe": [
+            "CWE-835"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=1.2.0 <=2.0.2"
+        },
+        {
+          "source": 1239766,
+          "name": "image-size",
+          "dependency": "image-size",
+          "title": "image-size: ICNS parser allows denial of service through an infinite loop",
+          "url": "https://github.com/advisories/GHSA-w3rx-r6r6-pgpr",
+          "severity": "high",
+          "cwe": [
+            "CWE-835"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=0.6.3 <=2.0.2"
+        }
+      ],
+      "effects": [],
+      "range": "0.6.3 - 2.0.2",
+      "nodes": [
+        "node_modules/image-size"
+      ],
+      "fixAvailable": true
+    },
+    "ip-address": {
+      "name": "ip-address",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1239948,
+          "name": "ip-address",
+          "dependency": "ip-address",
+          "title": "ip-address: Address6.isLinkLocal() recognizes fe80::/64 rather than fe80::/10, allowing SSRF and trust-boundary bypass to on-link hosts",
+          "url": "https://github.com/advisories/GHSA-rpw4-54j3-4h4q",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-697",
+            "CWE-918"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=10.5.0"
+        },
+        {
+          "source": 1239949,
+          "name": "ip-address",
+          "dependency": "ip-address",
+          "title": "ip-address: no classifier recognizes the NAT64 local-use range 64:ff9b:1::/48, allowing SSRF and trust-boundary bypass",
+          "url": "https://github.com/advisories/GHSA-2vr4-cq9g-pvrc",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-918"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=10.2.0 <=10.5.0"
+        },
+        {
+          "source": 1240097,
+          "name": "ip-address",
+          "dependency": "ip-address",
+          "title": "ip-address: isInSubnet() and isHostInSubnet() compare addresses of different families as if they shared an address space, allowing an allowlist check to admit an address outside its range",
+          "url": "https://github.com/advisories/GHSA-j6r3-76f7-8jcv",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-697",
+            "CWE-843"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=10.7.0"
+        },
+        {
+          "source": 1240098,
+          "name": "ip-address",
+          "dependency": "ip-address",
+          "title": "ip-address: Address6 builds a parse diagnostic proportional to the input with no length bound, allowing a single long string to stall or crash the process",
+          "url": "https://github.com/advisories/GHSA-h3mg-xc3c-68pw",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400",
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=10.7.0"
+        }
+      ],
+      "effects": [],
+      "range": "<=10.7.0",
+      "nodes": [
+        "node_modules/ip-address"
+      ],
+      "fixAvailable": true
+    },
+    "jest-environment-node": {
+      "name": "jest-environment-node",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@jest/environment",
+        "@jest/fake-timers"
+      ],
+      "effects": [
+        "react-native"
+      ],
+      "range": "24.2.0-alpha.0 - 30.2.0",
+      "nodes": [
+        "node_modules/jest-environment-node"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "jest-message-util": {
+      "name": "jest-message-util",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "@jest/fake-timers"
+      ],
+      "range": "18.5.0-alpha.7da3df39 - 30.2.0",
+      "nodes": [
+        "node_modules/jest-message-util"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "js-yaml": {
+      "name": "js-yaml",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1193726,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-407"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=3.0.0 <3.15.2"
+        }
+      ],
+      "effects": [],
+      "range": "3.0.0 - 3.15.1",
+      "nodes": [
+        "node_modules/cosmiconfig/node_modules/js-yaml"
+      ],
+      "fixAvailable": true
+    },
+    "jscodeshift": {
+      "name": "jscodeshift",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "@react-native/codegen"
+      ],
+      "range": "0.3.20 - 17.3.0",
+      "nodes": [
+        "node_modules/jscodeshift"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "metro": {
+      "name": "metro",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "metro-config",
+        "metro-file-map",
+        "metro-transform-worker"
+      ],
+      "effects": [
+        "@react-native/community-cli-plugin",
+        "metro-config",
+        "metro-transform-worker"
+      ],
+      "range": ">=0.71.0",
+      "nodes": [
+        "node_modules/metro"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "metro-config": {
+      "name": "metro-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "metro"
+      ],
+      "effects": [
+        "@react-native/community-cli-plugin"
+      ],
+      "range": ">=0.71.0",
+      "nodes": [
+        "node_modules/metro-config"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "metro-file-map": {
+      "name": "metro-file-map",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "metro"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/metro-file-map"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "metro-transform-worker": {
+      "name": "metro-transform-worker",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "metro"
+      ],
+      "effects": [],
+      "range": ">=0.71.0",
+      "nodes": [
+        "node_modules/metro-transform-worker"
+      ],
+      "fixAvailable": true
+    },
+    "micromatch": {
+      "name": "micromatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "braces"
+      ],
+      "effects": [
+        "fast-glob",
+        "find-yarn-workspace-root",
+        "jest-message-util",
+        "jscodeshift",
+        "metro-file-map",
+        "tailwindcss"
+      ],
+      "range": ">=0.2.0",
+      "nodes": [
+        "node_modules/micromatch"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.3",
+        "isSemVerMajor": true
+      }
+    },
+    "nativewind": {
+      "name": "nativewind",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "react-native-css-interop"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-nightly.fcb5034 || 3.0.0-2978594.0 - 4.2.7",
+      "nodes": [
+        "node_modules/nativewind"
+      ],
+      "fixAvailable": {
+        "name": "nativewind",
+        "version": "2.0.11",
+        "isSemVerMajor": true
+      }
+    },
+    "node-forge": {
+      "name": "node-forge",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1240912,
+          "name": "node-forge",
+          "dependency": "node-forge",
+          "title": "node-forge RSA PKCS#1 v1.5 signature verification accepts extra nested DigestAlgorithm elements",
+          "url": "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+          "severity": "high",
+          "cwe": [
+            "CWE-347"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<=1.4.0"
+        }
+      ],
+      "effects": [
+        "@expo/cli",
+        "@expo/code-signing-certificates",
+        "selfsigned"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/node-forge"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "postcss-selector-parser": {
+      "name": "postcss-selector-parser",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1153170,
+          "name": "postcss-selector-parser",
+          "dependency": "postcss-selector-parser",
+          "title": "postcss-selector-parser allows denial of service through uncontrolled AST recursion",
+          "url": "https://github.com/advisories/GHSA-w9m9-85wc-3x92",
+          "severity": "low",
+          "cwe": [
+            "CWE-404"
+          ],
+          "cvss": {
+            "score": 4.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=6.1.0 <6.1.3"
+        }
+      ],
+      "effects": [],
+      "range": "6.1.0 - 6.1.2",
+      "nodes": [
+        "node_modules/postcss-selector-parser"
+      ],
+      "fixAvailable": true
+    },
+    "qs": {
+      "name": "qs",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1158506,
+          "name": "qs",
+          "dependency": "qs",
+          "title": "qs array-limit bypass via bracket-key comma parsing",
+          "url": "https://github.com/advisories/GHSA-x5fp-wj9c-mxmx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=6.14.2 <=6.15.3"
+        },
+        {
+          "source": 1158507,
+          "name": "qs",
+          "dependency": "qs",
+          "title": "qs: Denial of Service via Attacker Controlled isBuffer",
+          "url": "https://github.com/advisories/GHSA-4mjr-xmp4-gh2g",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-248",
+            "CWE-703"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=2.2.5 <6.16.0"
+        }
+      ],
+      "effects": [],
+      "range": "2.2.5 - 6.15.3",
+      "nodes": [
+        "node_modules/qs"
+      ],
+      "fixAvailable": true
+    },
+    "query-string": {
+      "name": "query-string",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "decode-uri-component"
+      ],
+      "effects": [
+        "@react-navigation/core"
+      ],
+      "range": "5.0.0 - 9.4.1",
+      "nodes": [
+        "node_modules/query-string"
+      ],
+      "fixAvailable": {
+        "name": "@react-navigation/native",
+        "version": "7.5.0",
+        "isSemVerMajor": true
+      }
+    },
+    "react-native": {
+      "name": "react-native",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@react-native-community/cli",
+        "@react-native-community/cli-platform-android",
+        "@react-native-community/cli-platform-ios",
+        "@react-native/codegen",
+        "@react-native/community-cli-plugin",
+        "jest-environment-node"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-ffdfbbec0 || 0.71.0-rc.0 - 0.85.0-rc.7 || >=0.88.0-nightly-20260709-24e4b2cae",
+      "nodes": [
+        "node_modules/react-native"
+      ],
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.87.1",
+        "isSemVerMajor": true
+      }
+    },
+    "react-native-css-interop": {
+      "name": "react-native-css-interop",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "tailwindcss"
+      ],
+      "effects": [
+        "nativewind"
+      ],
+      "range": "<=0.0.0-alpha.27 || >=0.0.1",
+      "nodes": [
+        "node_modules/nativewind/node_modules/react-native-css-interop",
+        "node_modules/react-native-css-interop"
+      ],
+      "fixAvailable": {
+        "name": "react-native-css-interop",
+        "version": "0.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "selfsigned": {
+      "name": "selfsigned",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "node-forge"
+      ],
+      "effects": [
+        "@react-native/dev-middleware"
+      ],
+      "range": "1.1.1 - 4.0.1",
+      "nodes": [
+        "node_modules/selfsigned"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "send": {
+      "name": "send",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109556,
+          "name": "send",
+          "dependency": "send",
+          "title": "send vulnerable to template injection that can lead to XSS",
+          "url": "https://github.com/advisories/GHSA-m6fv-jmcg-4jfg",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:L"
+          },
+          "range": "<0.19.0"
+        }
+      ],
+      "effects": [
+        "@expo/cli"
+      ],
+      "range": "<0.19.0",
+      "nodes": [
+        "node_modules/send"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "tailwindcss": {
+      "name": "tailwindcss",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "chokidar",
+        "fast-glob",
+        "micromatch"
+      ],
+      "effects": [
+        "react-native-css-interop"
+      ],
+      "range": "<=0.0.0-oxide-insiders.ff2c25f || 2.1.0-canary.1 - 3.4.19",
+      "nodes": [
+        "node_modules/tailwindcss"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.3",
+        "isSemVerMajor": true
+      }
+    },
+    "tempy": {
+      "name": "tempy",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "del"
+      ],
+      "effects": [
+        "@expo/cli"
+      ],
+      "range": "0.7.0 - 2.0.0",
+      "nodes": [
+        "node_modules/tempy"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "turbo-stream": {
+      "name": "turbo-stream",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1120080,
+          "name": "turbo-stream",
+          "dependency": "turbo-stream",
+          "title": "React Router vulnerable to Denial of Service via reflected user input in single-fetch",
+          "url": "https://github.com/advisories/GHSA-rxv8-25v2-qmq8",
+          "severity": "high",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<3.0.0"
+        }
+      ],
+      "effects": [
+        "@remix-run/server-runtime"
+      ],
+      "range": "<3.0.0",
+      "nodes": [
+        "node_modules/turbo-stream"
+      ],
+      "fixAvailable": true
+    },
+    "uuid": {
+      "name": "uuid",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1119441,
+          "name": "uuid",
+          "dependency": "uuid",
+          "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+          "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-787",
+            "CWE-1285"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<11.1.1"
+        }
+      ],
+      "effects": [
+        "@expo/bunyan",
+        "@expo/rudder-sdk-node",
+        "xcode"
+      ],
+      "range": "<11.1.1",
+      "nodes": [
+        "node_modules/uuid",
+        "node_modules/xcode/node_modules/uuid"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    },
+    "xcode": {
+      "name": "xcode",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "uuid"
+      ],
+      "effects": [
+        "@expo/config-plugins"
+      ],
+      "range": ">=0.9.2",
+      "nodes": [
+        "node_modules/xcode"
+      ],
+      "fixAvailable": {
+        "name": "expo",
+        "version": "57.0.26",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 3,
+      "moderate": 29,
+      "high": 46,
+      "critical": 0,
+      "total": 78
+    },
+    "dependencies": {
+      "prod": 1454,
+      "dev": 264,
+      "optional": 163,
+      "peer": 85,
+      "peerOptional": 0,
+      "total": 1833
+    }
+  }
+}
