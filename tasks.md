@@ -972,3 +972,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Patch image-size and verify Metro asset parsing with fresh dependencies.
 - [ ] Prepare valid isolated native workspace/Pods and run binary/device validation; audit75 findings remain.
+
+- [x] Prepare isolated Pods and pass unsigned iOS Simulator native build under Xcode27 with diagnostic iOS15 override.
+- [ ] Decide supported iOS minimum/toolchain, validate JavaScript bundle, and run simulator/device/accessibility acceptance.
