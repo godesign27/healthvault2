@@ -947,3 +947,7 @@ Completed: curated candidate preview deployment and local record-date/dashboard 
 
 - [x] Integrate provider preview/confirmation clients and receipt validation;21 focused suites pass,22 candidate diagnostics remain.
 - [ ] Verify backend deployment compatibility before shipping import batch; resolve legacy import dependencies and independent dependency installation.
+
+- [x] Verify deployed preview import contract and server-only RPC grants; remove unused mock import chain.
+- [x] Resolve product candidate TypeScript diagnostics;12 marketing diagnostics remain outside app scope.
+- [ ] Verify clean dependency installation, native accessibility, and final preview acceptance before promotion.

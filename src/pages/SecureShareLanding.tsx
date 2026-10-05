@@ -132,7 +132,6 @@ export default function SecureShareLanding() {
     load();
   }, []);
 
-  const isDisabled = data ? (data.status === 'revoked' || data.status === 'expired') : true;
   const hasMultipleForms = data && data.forms.length > 1;
   const healthSections = data?.healthData
     ? Object.entries(data.healthData.snapshot).filter(([, value]) => value != null)

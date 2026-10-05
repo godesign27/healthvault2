@@ -1,6 +1,6 @@
 import { uploadRecord, shareRecord, requestInsights, listRecords } from '../records/query';
 import { UploadInput, ShareInput, InsightInput } from '../records/zod';
-import { HealthRecord, RecordKind } from '../records/types';
+import { RecordKind } from '../records/types';
 
 export type CommandIntent =
   | "UPLOAD_RECORD"
