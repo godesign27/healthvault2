@@ -5,6 +5,7 @@ import { cn } from '../../lib/utils';
 interface AccordionItemProps {
   title: string;
   content?: ReactNode;
+  children?: ReactNode;
   isExpanded?: boolean;
   onToggle?: () => void;
   variant?: 'border' | 'borderless';
@@ -18,6 +19,7 @@ interface AccordionItemProps {
 export function AccordionItem({
   title,
   content,
+  children,
   isExpanded = false,
   onToggle,
   variant = 'border',
@@ -28,14 +30,21 @@ export function AccordionItem({
   className = '',
 }: AccordionItemProps) {
   const isDisabled = state === 'disabled';
+  const body = content ?? children;
   return (
     <div className={className}>
       <div
         role="button"
         tabIndex={isDisabled ? -1 : 0}
         aria-expanded={isExpanded}
+        aria-disabled={isDisabled}
         onClick={() => !isDisabled && onToggle?.()}
-        onKeyDown={(e) => e.key === 'Enter' && !isDisabled && onToggle?.()}
+        onKeyDown={(e) => {
+          if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            if (!isDisabled) onToggle?.();
+          }
+        }}
         className={cn(
           'flex items-center justify-between px-6 py-4 transition-colors',
           variant === 'border' && 'border-t border-b border-stroke-subtle',
@@ -62,8 +71,8 @@ export function AccordionItem({
           )}
         </div>
       </div>
-      {isExpanded && content && (
-        <div className={cn('px-6 py-4', variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken')}>{content}</div>
+      {isExpanded && body != null && (
+        <div className={cn('px-6 py-4', variant === 'border' && 'border-b border-stroke-subtle bg-surface-sunken')}>{body}</div>
       )}
     </div>
   );

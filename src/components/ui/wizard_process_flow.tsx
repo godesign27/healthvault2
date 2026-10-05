@@ -1,43 +1,50 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
+interface WizardStepProps {
+  number?: number;
+  label: string;
+  subtext?: string;
+  isActive?: boolean;
+  isCompleted?: boolean;
+  variant?: 'default' | 'success' | 'error' | 'warning' | 'info';
+  size?: 'default' | 'small' | 'large';
+  showIcon?: boolean;
+  iconType?: 'check' | 'error' | 'warning' | 'info';
+}
+
 // Base Wizard Step Component
-const WizardStep = ({ 
+export const WizardStep = ({
   number, 
-  label, 
+  label,
+  subtext,
   isActive = false, 
   isCompleted = false,
   variant = 'default',
   size = 'default',
   showIcon = false,
   iconType = 'check'
-}) => {
+}: WizardStepProps) => {
   const getVariantClasses = () => {
-    if (isCompleted) return 'text-white';
+    if (isCompleted) return 'bg-action-primary text-content-on-action';
     if (isActive) {
       switch(variant) {
-        case 'success': return 'bg-emerald-600 text-white';
-        case 'error': return 'bg-red-600 text-white';
-        case 'warning': return 'bg-amber-600 text-white';
-        case 'info': return 'bg-blue-600 text-white';
-        default: return 'bg-teal-700 text-white';
+        case 'success': return 'bg-surface-feedback-success text-content-primary';
+        case 'error': return 'bg-surface-feedback-error text-content-primary';
+        case 'warning': return 'bg-surface-feedback-warning text-content-primary';
+        case 'info': return 'bg-surface-feedback-info text-content-primary';
+        default: return 'bg-action-primary text-content-on-action';
       }
     }
-    return 'bg-gray-500 text-white';
+    return 'bg-surface-sunken text-content-secondary';
   };
   
-  const getCompletedStyle = () => {
-    if (isCompleted) {
-      return { backgroundColor: 'indigo-900' };
-    }
-    return {};
-  };
 
   const getSizeClasses = () => {
     switch(size) {
-      case 'small': return 'h-8 text-sm';
-      case 'large': return 'h-12 text-base';
-      default: return 'h-10 text-sm';
+      case 'small': return 'min-h-8 py-2 text-sm';
+      case 'large': return 'min-h-12 py-2 text-base';
+      default: return 'min-h-10 py-2 text-sm';
     }
   };
 
@@ -55,7 +62,7 @@ const WizardStep = ({
     <div className="relative flex items-center">
       <div 
         className={`flex items-center ${getVariantClasses()} ${getSizeClasses()} pl-6 pr-6 clip-path-chevron relative z-10`}
-        style={getCompletedStyle()}
+        aria-current={isActive ? 'step' : undefined}
       >
         {showIcon && (
           <span className="mr-2">{getIcon()}</span>
@@ -65,11 +72,11 @@ const WizardStep = ({
             {number}
           </span>
         )}
-        <span className="font-medium whitespace-nowrap">{label}</span>
+        <span className="font-medium">{label}{subtext && <span className="block font-normal text-sm">{subtext}</span>}</span>
       </div>
       <div 
         className={`absolute right-0 w-0 h-0 border-l-[20px] border-y-[20px] border-y-transparent z-20`}
-        style={isCompleted ? { borderLeftColor: 'indigo-900' } : {}}
+        style={isCompleted ? { borderLeftColor: 'var(--hv-color-action-primary-default)' } : {}}
       ></div>
     </div>
   );
@@ -224,7 +231,7 @@ const WizardDemo = () => {
       </div>
 
       {/* CSS for chevron shape */}
-      <style jsx>{`
+      <style>{`
         .clip-path-chevron {
           clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%);
         }

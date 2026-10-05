@@ -918,3 +918,9 @@ This section supersedes older pending preview acceptance entries above; it does 
 - [ ] Test ambiguous server-commit/client-response-loss recovery.
 - [ ] Complete native screen-reader, maximum text size and end-of-list action acceptance.
 - [ ] Run production insurance preflight and staged backend/web promotion; preview migrations alone do not satisfy production rollout.
+
+### Release integration batch 1 — 2026-10-05
+- [x] Review/integrate seven shared component/gallery fixes; correct duplicate segmented options and cover component behavior.
+- [x] Synchronize isolated candidate native insurance source with committed completeness behavior.
+- [x] Validate candidate: 98 TypeScript diagnostics remain (down from 169), 14 focused suites pass, local Vite compilation passes. Not deployed.
+- [ ] Review remaining network/product/service fixes; complete exact-source typecheck and reproducible dependency installation before deployment.

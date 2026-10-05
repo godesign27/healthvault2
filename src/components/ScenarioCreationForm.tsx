@@ -5,7 +5,6 @@ import { AccordionItem } from './ui/Accordion';
 import { Tag } from './ui/Tag';
 import { Button } from './ui/Button';
 import { Dropdown } from './ui/Dropdown';
-import { ActionField } from './ui/ActionField';
 import { Breadcrumb } from './ui/Breadcrumb';
 
 interface ScenarioDefinition {
@@ -128,7 +127,7 @@ export function ScenarioCreationForm({
         <div className="space-y-6">
           <AccordionItem
             title="Modeling framework"
-            isOpen={expandedAccordions.includes(0)}
+            isExpanded={expandedAccordions.includes(0)}
             onToggle={() => toggleAccordion(0)}
           >
             {scenarioDefinition ? (
@@ -195,7 +194,7 @@ export function ScenarioCreationForm({
 
           <AccordionItem
             title="Properties"
-            isOpen={expandedAccordions.includes(1)}
+            isExpanded={expandedAccordions.includes(1)}
             onToggle={() => toggleAccordion(1)}
           >
             {scenarioDefinition ? (
@@ -294,7 +293,7 @@ export function ScenarioCreationForm({
 
           <AccordionItem
             title="Filter the customer universe by adding conditions (Optional)"
-            isOpen={expandedAccordions.includes(2)}
+            isExpanded={expandedAccordions.includes(2)}
             onToggle={() => toggleAccordion(2)}
           >
             <div className="pt-4">
@@ -308,10 +307,10 @@ export function ScenarioCreationForm({
         <Button variant="outline" size="normal" onClick={onBack}>
           Cancel
         </Button>
-        <Button variant="secondary" size="normal">
+        <Button variant="outline" size="normal">
           Save and Close
         </Button>
-        <Button variant="primary" size="normal">
+        <Button variant="solid" size="normal">
           Continue
         </Button>
       </div>

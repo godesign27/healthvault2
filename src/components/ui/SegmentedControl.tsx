@@ -24,6 +24,7 @@ export function SegmentedControl({ options, value, onChange, size = 'normal', va
             key={option}
             type="button"
             disabled={disabled}
+            aria-pressed={isSelected}
             onClick={() => !disabled && onChange?.(option)}
             className={cn(
               padding, 'font-medium transition-colors',

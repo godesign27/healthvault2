@@ -1,5 +1,4 @@
-import * as Icons from 'lucide-react';
-import { type LucideIcon } from 'lucide-react';
+import { icons } from 'lucide-react';
 
 interface IconProps {
   name: string;
@@ -9,11 +8,8 @@ interface IconProps {
 }
 
 export function Icon({ name, size = 24, color, className = '' }: IconProps) {
-  const LucideIconComponent = (Icons as Record<string, LucideIcon>)[name];
-
-  if (!LucideIconComponent || typeof LucideIconComponent !== 'function') {
-    return null;
-  }
+  if (!Object.prototype.hasOwnProperty.call(icons, name)) return null;
+  const LucideIconComponent = icons[name as keyof typeof icons];
 
   return <LucideIconComponent size={size} color={color} className={className} />;
 }

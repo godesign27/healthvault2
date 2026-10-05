@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Home, Settings, Users, FileText, ChevronRight, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { Home, Settings, Users, FileText, ChevronRight, X } from 'lucide-react';
 
 // Inline CSS Variables
 const style = document.createElement('style');
@@ -30,8 +30,17 @@ if (!document.head.querySelector('#nav-colors')) {
   document.head.appendChild(style);
 }
 
+interface NavItemProps {
+  icon: typeof Home;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  hasSubmenu?: boolean;
+  theme?: string;
+}
+
 // Navigation Item Component
-const NavItem = ({ icon: Icon, label, isActive, onClick, hasSubmenu, theme = 'dark' }) => {
+const NavItem = ({ icon: Icon, label, isActive, onClick, theme = 'dark' }: NavItemProps) => {
   const getStyles = () => {
     if (theme === 'light') {
       return {
@@ -59,38 +68,11 @@ const NavItem = ({ icon: Icon, label, isActive, onClick, hasSubmenu, theme = 'da
   );
 };
 
-// Submenu Item Component
-const SubmenuItem = ({ label, isActive, onClick, hasChildren, theme = 'dark' }) => {
-  const getStyles = () => {
-    if (theme === 'light') {
-      return {
-        backgroundColor: isActive ? 'var(--zsgray-10)' : 'transparent',
-        color: isActive ? 'var(--zsteal-80)' : 'var(--zsgray-70)'
-      };
-    }
-    return {
-      backgroundColor: isActive ? 'var(--zsgray-80)' : 'transparent',
-      color: 'white'
-    };
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center justify-between px-4 py-3 transition-colors text-left"
-      style={getStyles()}
-    >
-      <span className="text-[14px] leading-[20px]">{label}</span>
-      {hasChildren && <ChevronRight size={16} />}
-    </button>
-  );
-};
-
 // Primary Navigation Component
 export const PrimaryNavigation = ({ theme = 'dark', drawerVariant = 'default' }) => {
   const [activeNav, setActiveNav] = useState('nav1');
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
   const getThemeStyles = () => {
     if (theme === 'light') {
@@ -143,7 +125,7 @@ export const PrimaryNavigation = ({ theme = 'dark', drawerVariant = 'default' })
     { id: 'nav4', icon: Settings, label: 'NAV 4', hasSubmenu: true },
   ];
 
-  const submenuItems = {
+  const submenuItems: Record<string, Array<{ id: string; label: string; hasChildren: boolean }>> = {
     nav1: [
       { id: 'item1', label: 'SUBMENU ITEM 1', hasChildren: true },
       { id: 'item2', label: 'SUBMENU ITEM 2', hasChildren: true },
@@ -161,10 +143,10 @@ export const PrimaryNavigation = ({ theme = 'dark', drawerVariant = 'default' })
     ],
   };
 
-  const handleNavClick = (navId) => {
+  const handleNavClick = (navId: string) => {
     setActiveNav(navId);
     const hasSubmenu = navigationItems.find(item => item.id === navId)?.hasSubmenu;
-    setIsSubmenuOpen(hasSubmenu);
+    setIsSubmenuOpen(hasSubmenu ?? false);
     setActiveSubmenu(null);
   };
 
@@ -328,7 +310,7 @@ const NavigationStatesDemo = () => {
 
               <div>
                 <h4 className="text-[12px] font-semibold mb-3 uppercase" style={{ color: 'var(--zsgray-60)' }}>FOCUSED</h4>
-                <div className="w-20 h-20 flex items-center justify-center ring-2 ring-offset-2" style={{ backgroundColor: 'var(--zsgray-90)', ringColor: 'var(--zsteal-80)' }}>
+                <div className="w-20 h-20 flex items-center justify-center outline outline-2 outline-offset-2" style={{ backgroundColor: 'var(--zsgray-90)', outlineColor: 'var(--hv-color-border-focus)' }}>
                   <div className="flex flex-col items-center gap-1 text-white">
                     <Home size={24} />
                     <span className="text-[10px] font-semibold">NAV 1</span>
@@ -373,7 +355,7 @@ const NavigationStatesDemo = () => {
 
               <div>
                 <h4 className="text-[12px] font-semibold mb-3 uppercase" style={{ color: 'var(--zsgray-60)' }}>FOCUSED</h4>
-                <div className="w-20 h-20 flex items-center justify-center ring-2 ring-offset-2 border" style={{ backgroundColor: 'white', borderColor: 'var(--zsgray-20)', ringColor: 'var(--zsteal-80)' }}>
+                <div className="w-20 h-20 flex items-center justify-center outline outline-2 outline-offset-2 border" style={{ backgroundColor: 'white', borderColor: 'var(--zsgray-20)', outlineColor: 'var(--hv-color-border-focus)' }}>
                   <div className="flex flex-col items-center gap-1" style={{ color: 'var(--zsgray-70)' }}>
                     <Home size={24} />
                     <span className="text-[10px] font-semibold">NAV 1</span>
@@ -424,7 +406,7 @@ const NavigationStatesDemo = () => {
               <div>
                 <h4 className="text-[12px] font-semibold mb-3 uppercase" style={{ color: 'var(--zsgray-60)' }}>FOCUSED</h4>
                 <div className="w-64" style={{ backgroundColor: 'var(--zsgray-90)' }}>
-                  <button className="w-full flex items-center justify-between px-4 py-3 text-white ring-2 ring-inset" style={{ ringColor: 'var(--zsteal-80)' }}>
+                  <button className="w-full flex items-center justify-between px-4 py-3 text-white outline outline-2 -outline-offset-2" style={{ outlineColor: 'var(--hv-color-border-focus)' }}>
                     <span className="text-[14px] leading-[20px]">SUBMENU ITEM 1</span>
                     <ChevronRight size={16} />
                   </button>
@@ -469,7 +451,7 @@ const NavigationStatesDemo = () => {
               <div>
                 <h4 className="text-[12px] font-semibold mb-3 uppercase" style={{ color: 'var(--zsgray-60)' }}>FOCUSED</h4>
                 <div className="w-64 border" style={{ backgroundColor: 'white', borderColor: 'var(--zsgray-20)' }}>
-                  <button className="w-full flex items-center justify-between px-4 py-3 ring-2 ring-inset" style={{ color: 'var(--zsgray-70)', ringColor: 'var(--zsteal-80)' }}>
+                  <button className="w-full flex items-center justify-between px-4 py-3 outline outline-2 -outline-offset-2" style={{ color: 'var(--zsgray-70)', outlineColor: 'var(--hv-color-border-focus)' }}>
                     <span className="text-[14px] leading-[20px]">SUBMENU ITEM 1</span>
                     <ChevronRight size={16} />
                   </button>

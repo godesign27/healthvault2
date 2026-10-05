@@ -13,14 +13,13 @@ export function SegmentedControlPage() {
 
         <div className="space-y-8">
           <section className="hv-surface-card p-8">
-            <h2 className="text-2xl font-bold text-content-primary mb-6">Left - Solid - Normal</h2>
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid — Normal</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
-                  position="left"
+                  options={['Day', 'Week', 'Month']}
                   variant="solid"
                   size="normal"
                 />
@@ -29,8 +28,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
-                  position="left"
+                  options={['Day', 'Week', 'Month']}
                   variant="solid"
                   size="normal"
                 />
@@ -39,19 +37,17 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
-                  position="left"
+                  options={['Day', 'Week', 'Month']}
                   variant="solid"
                   size="normal"
-                  value="Label"
+                  value="Week"
                 />
               </div>
 
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
-                  position="left"
+                  options={['Day', 'Week', 'Month']}
                   variant="solid"
                   size="normal"
                   disabled
@@ -61,14 +57,13 @@ export function SegmentedControlPage() {
           </section>
 
           <section className="hv-surface-card p-8">
-            <h2 className="text-2xl font-bold text-content-primary mb-6">Middle - Solid - Normal</h2>
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid — Selection states</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="middle"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                 />
@@ -77,8 +72,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="middle"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                 />
@@ -87,19 +81,17 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="middle"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
-                  value="Label"
+                  value="Week"
                 />
               </div>
 
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="middle"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                   disabled
@@ -109,14 +101,13 @@ export function SegmentedControlPage() {
           </section>
 
           <section className="hv-surface-card p-8">
-            <h2 className="text-2xl font-bold text-content-primary mb-6">Right - Solid - Normal</h2>
+            <h2 className="text-2xl font-bold text-content-primary mb-6">Solid — Disabled states</h2>
 
             <div className="space-y-6">
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="right"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                 />
@@ -125,8 +116,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="right"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                 />
@@ -135,19 +125,17 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="right"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
-                  value="Label"
+                  value="Week"
                 />
               </div>
 
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
-                  position="right"
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="normal"
                   disabled
@@ -163,7 +151,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="normal"
                 />
@@ -172,7 +160,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="normal"
                 />
@@ -181,17 +169,17 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="normal"
-                  value="Label"
+                  value="Week"
                 />
               </div>
 
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Disabled</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="normal"
                   disabled
@@ -207,7 +195,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="small"
                 />
@@ -216,7 +204,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="small"
                 />
@@ -225,10 +213,10 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="small"
-                  value="Label"
+                  value="Week"
                 />
               </div>
             </div>
@@ -241,7 +229,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="small"
                 />
@@ -250,7 +238,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="small"
                 />
@@ -259,10 +247,10 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="small"
-                  value="Label"
+                  value="Week"
                 />
               </div>
             </div>
@@ -275,7 +263,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="x-small"
                 />
@@ -284,7 +272,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="x-small"
                 />
@@ -293,10 +281,10 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month', 'Year']}
                   variant="solid"
                   size="x-small"
-                  value="Label"
+                  value="Week"
                 />
               </div>
             </div>
@@ -309,7 +297,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Default</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="x-small"
                 />
@@ -318,7 +306,7 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Hover</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="x-small"
                 />
@@ -327,10 +315,10 @@ export function SegmentedControlPage() {
               <div>
                 <div className="text-sm font-medium text-content-secondary mb-3">Pressed</div>
                 <SegmentedControl
-                  options={['Label', 'Label', 'Label']}
+                  options={['Day', 'Week', 'Month']}
                   variant="outline"
                   size="x-small"
-                  value="Label"
+                  value="Week"
                 />
               </div>
             </div>

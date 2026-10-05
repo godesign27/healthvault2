@@ -85,3 +85,13 @@ Worker `1f5a57ca-d569-4255-b873-4b7e0fbed836` provides initials on every coverag
 ## Browser failure recovery acceptance
 
 Local isolated fixture: real insurance card/hook sends same-origin HTTP requests. A 503 retains the draft, shows an error, re-enables controls and never claims success. Retrying with 200 saves once, closes editor and shows Saved/Member ID saved; two requests total. No real account data touched. Native theme/data/refresh suites pass. VoiceOver and ambiguous network outcomes remain unverified; this result is not production approval.
+
+## October 5 — Shared component integration candidate (not deployed)
+
+This update supersedes the original audit counts for the local candidate; the hosted Worker is unchanged.
+
+Reviewed seven component/gallery fixes: Accordion child content and keyboard activation, icon registry lookup, segmented selection semantics/examples, typed wizard steps, typed legacy navigation, and current scenario component props. Corrected duplicate gallery option labels so selected examples have matching unique values. Added component-contract and icon-rendering regressions to the release runner. Synchronized the candidate native InsuranceScreen with already-committed source, clearing the stale completeness assertion.
+
+TypeScript diagnostics fell from **169 to 98**. All 12 insurance/routing suites and both component regressions pass. Full typecheck still fails. Local Vite compilation passes with the existing large-chunk warning. This compilation did not supply deployment environment variables and must not be uploaded; deployment requires a fresh build with explicit preview backend configuration. Dependencies remain shared via symlink; independent lockfile installation and native device acceptance remain open.
+
+Next: review network validation/ownership types, remaining product consumers and legacy service errors. Preserve marketing scope and unrelated working-tree changes.
