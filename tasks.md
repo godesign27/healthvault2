@@ -8,7 +8,7 @@ by a later verified entry. They are not a fresh release certification.
 ### Latest follow-up
 
 - [x] Validate the iOS JavaScript/Hermes export with preview configuration; fix Metro shared-token resolution and file-based image parsing. Export completed with 999 modules and 21 assets. Runtime and accessibility acceptance remain open.
-- [~] Launch the isolated Debug candidate on the iOS 18.6 QA simulator against preview Metro. The sign-in screen loads. Largest Dynamic Type scales text but clips Sign In and collides the password icon. Authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver, reduced motion, and touch-target acceptance remain unverified.
+- [~] Launch the isolated Debug candidate on the iOS 18.6 QA simulator against preview Metro. The sign-in screen loads, empty-password validation is visible, and the default-size Sign In control measures about 51 by 305 points. Largest Dynamic Type scales text but clips Sign In. Authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver, and reduced motion remain unverified.
 - [x] Prepare isolated SDK 52 candidate, matching modules and native lockfiles; web/iOS JS export, pod install and targeted tests pass.
 - [x] Resolve candidate fmt/Xcode 27 native compile failure using a guarded upstream backport; format validation and unsigned arm64 Debug simulator build pass.
 - [x] Install/launch SDK 52 candidate in clean simulator; local-fixture sign-in, session reload and Records/Forms navigation/error checks pass.

@@ -1792,3 +1792,7 @@ With explicit preview Supabase configuration, Expo exported 999 modules,21 asset
 Installed the unsigned Debug candidate on the iOS 18.6 QA simulator and loaded it from preview Metro (`roeudwddxvniazwufdqf` only). The sign-in screen appeared. Largest Dynamic Type scales the copy but clips Sign In and collides the password visibility icon. Increase Contrast stayed readable during that large-text state; no ratio was measured. Simulator text size and contrast were restored afterward.
 
 Authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver, reduced motion, and touch targets were not exercised. This Xcode has no Simulator.app, and HID injection did not change the UI. No preview account was created, no credentials were stored, and production was not used. Metro image-size patch idempotence and file-based asset regression passed again. Not runtime or accessibility acceptance.
+
+## 2026-10-05 — Simulator sign-in interaction
+
+After the Device Hub window was visible, clicks and typing reached the preview sign-in screen. An empty password shows “Please enter your email and password.” The default-size Sign In control measures about 51 by 305 points. Authenticated screens, VoiceOver, and reduced motion remain unverified. No account was created and no credentials were recorded.

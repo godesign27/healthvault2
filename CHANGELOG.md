@@ -18,6 +18,7 @@
 - Native Debug simulator build completed successfully with the diagnostic iOS 15 deployment-target override.
 - Focused regression tests and patch idempotence checks pass.
 - The isolated Debug app launches on the iOS 18.6 QA simulator and loads the preview Metro bundle through the sign-in screen.
+- Sign-in with an empty password shows “Please enter your email and password.” The default-size Sign In control measures about 51 by 305 points.
 
 ### Remaining
 

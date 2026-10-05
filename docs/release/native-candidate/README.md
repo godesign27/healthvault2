@@ -20,4 +20,6 @@ A system “Open in Health Vault?” dialog blocked the first URL open. This Xco
 
 Largest text size (`accessibility-extra-extra-extra-large`) scales and wraps the sign-in copy. The Sign In control is clipped at the bottom of the screen, Forgot password wraps onto two lines, and the password placeholder collides with the visibility icon. Increase Contrast was enabled during that large-text state; the screen stayed readable, and no contrast ratio was measured. Content size was restored to `large` and Increase Contrast was turned back off.
 
-Not verified: authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver focus order, reduced motion, and touch-target behavior. No preview account was created and no credentials were recorded. This is not runtime or accessibility acceptance.
+With the simulator window visible, clicks and typing reach the sign-in screen. Submitting with an empty password shows “Please enter your email and password.” At the default text size, the Sign In control measures about 51 points tall and 305 points wide.
+
+Not verified: authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medical Profile, sign-out, VoiceOver focus order, and reduced motion. No preview account was created and no credentials were recorded. This is not runtime or accessibility acceptance.
