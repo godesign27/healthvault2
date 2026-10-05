@@ -47,7 +47,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
   const handleResumeCoverage = (coverage: CoverageWithProvider) => {void run(userId, coverage.id, 'resume');};
 
   return (
-    <div className="w-full px-4 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-12 lg:pt-12">
+    <div className="w-full px-4 pb-8 pt-6 sm:px-8 lg:px-12 lg:pb-12 lg:pt-12">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
@@ -84,7 +84,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
       <p className="mb-6 text-content-secondary">{insuranceVerificationNotice}</p>
       {toast && (
-        <div className="sticky top-20 z-30 mb-4">
+        <div className="sticky top-4 z-30 mb-4">
           <Banner key={toast.id} message={toast.message} variant={toast.type} style="light" onClose={() => setToast(null)} />
         </div>
       )}

@@ -305,7 +305,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
 
     if (currentPage === 'vitals') {
       return (
-        <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12">
+        <div className="w-full p-6 sm:p-8 lg:p-12">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-content-primary">Vitals</h1>
             <p className="mt-1 text-content-secondary">Track your vital signs and health metrics</p>
@@ -325,7 +325,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
     }
 
     return (
-      <div className="w-full p-6 sm:p-8 lg:p-12 pt-20 lg:pt-12 relative">
+      <div className="w-full p-6 sm:p-8 lg:p-12 relative">
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
             <Home className="w-7 h-7" />
@@ -566,10 +566,9 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
         profileRefreshKey={profileRefreshKey}
       />
 
-      <div className="flex-1 flex overflow-hidden min-w-0 relative">
-        <main data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 relative bg-surface-page">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0 min-h-0 relative">
           {/* Mobile top bar — hamburger + centered logo */}
-          <div className="lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-3 h-14 border-b border-stroke-subtle backdrop-blur-sm bg-surface-overlay/95">
+          <div className="lg:hidden relative shrink-0 z-30 flex items-center px-3 h-14 border-b border-stroke-subtle backdrop-blur-sm bg-surface-overlay/95">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="p-2.5 rounded-xl transition-all active:scale-95 text-content-primary hover:bg-action-secondary"
@@ -586,6 +585,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             </div>
           </div>
 
+        <main data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 min-h-0 relative bg-surface-page">
           {renderMainContent()}
         </main>
 

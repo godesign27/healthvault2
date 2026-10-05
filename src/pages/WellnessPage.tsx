@@ -223,7 +223,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
   };
 
   return (
-    <div className="w-full p-6 pt-20 sm:p-8 lg:p-12 lg:pt-12">
+    <div className="w-full p-6 sm:p-8 lg:p-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>

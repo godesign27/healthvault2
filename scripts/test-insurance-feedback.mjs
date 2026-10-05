@@ -11,7 +11,7 @@ const page=module('src/pages/InsurancePage.tsx',deps);
 const nodes=t=>!t||typeof t!=='object'?[]:Array.isArray(t)?t.flatMap(nodes):[t,...nodes(t.props?.children)];
 const render=()=>{cursor=0;return nodes(page.InsurancePage({}))};
 render();feedback('Member ID saved','success');
-for(const state of [false,true,false]){loading=state;const tree=render();const banner=tree.find(n=>n.type==='Banner');assert.equal(banner.props.message,'Member ID saved');assert.ok(tree.some(n=>n.props.className?.includes('sticky top-20')));assert.ok(tree.indexOf(banner)<tree.findIndex(n=>state?n.props.role==='status':n.type==='Card'));}
+for(const state of [false,true,false]){loading=state;const tree=render();const banner=tree.find(n=>n.type==='Banner');assert.equal(banner.props.message,'Member ID saved');assert.ok(tree.some(n=>n.props.className?.includes('sticky top-4')));assert.ok(tree.indexOf(banner)<tree.findIndex(n=>state?n.props.role==='status':n.type==='Card'));}
 render().find(n=>n.type==='Banner').props.onClose();assert.equal(render().some(n=>n.type==='Banner'),false);
 const b=module('src/components/ui/Banner.tsx',{'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':{},'../../lib/utils':{cn:(...a)=>a.filter(Boolean).join(' ')}});
 let closed=false;const tree=nodes(b.Banner({message:'Saved',variant:'success',style:'light',onClose:()=>closed=true}));assert.equal(tree[0].props.role,'status');const dismiss=tree.find(n=>n.type==='button');assert.equal(dismiss.props['aria-label'],'Dismiss notification');dismiss.props.onClick();assert.ok(closed);

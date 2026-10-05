@@ -924,3 +924,6 @@ This section supersedes older pending preview acceptance entries above; it does 
 - [x] Synchronize isolated candidate native insurance source with committed completeness behavior.
 - [x] Validate candidate: 98 TypeScript diagnostics remain (down from 169), 14 focused suites pass, local Vite compilation passes. Not deployed.
 - [ ] Review remaining network/product/service fixes; complete exact-source typecheck and reproducible dependency installation before deployment.
+
+- [x] Fix shared narrow-screen top-bar clearance across dashboard pages; reserve header space in shell, remove per-page offsets, test layout structure/feedback.
+- [ ] Deploy and visually accept shared header fix after release validation; hosted preview still runs previous layout.
