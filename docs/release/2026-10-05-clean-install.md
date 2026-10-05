@@ -23,3 +23,6 @@ Pinned tar7.5.22 with a version-guarded Expo CLI0.18.31 named-export patch for b
 
 ## 2026-10-05 — Compatible dependency patch batch
 Updated brace-expansion, browserslist, fast-uri, joi, js-yaml, nanoid and undici within existing ranges using npm10.9.2; Expo/RN pins unchanged. Isolated npm ci/postinstall, Expo archive regression,21 focused suites, web build and public Expo config pass. Full typecheck remains12 marketing diagnostics. Audit79 affected packages (46 high,30 moderate,3 low,0 critical), down85/52 high. Preserved unrelated dirty lock entries; advanced existing nanoid3.3.19 workspace entry to tested3.3.20. No deployment or native binary build performed.
+
+## 2026-10-05 — PostCSS security compatibility batch
+Pinned PostCSS8.5.29 (direct and override) and resolved compatible XML/YAML updates in isolated candidate. Clean npm10 install, Expo tar tests,21 focused suites, Metro CSS transform and web build pass.12 marketing diagnostics remain. PostCSS advisory removed; audit80 affected packages/47 high/0 critical, with newly attributed NativeWind/CSS Interop transitive findings. Counts do not represent confirmed exploitable app paths. Workspace lock changes preserved. No deployment or native device acceptance.

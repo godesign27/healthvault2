@@ -963,3 +963,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Test and integrate compatible dependency updates; audit79 remaining/46 high/0 critical.
 - [ ] Review remaining major-version dependency fixes and native binary/device acceptance.
+
+- [x] Validate patched PostCSS with Metro and Vite; retain native pins.
+- [ ] Continue XML/image parser and remaining dependency triage; native binary/device validation still open.
