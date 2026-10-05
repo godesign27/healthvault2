@@ -957,3 +957,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Trace critical tar path and reproduce tar7/Expo51 incompatibility; reject unsafe blanket override.
 - [ ] Resolve critical tooling advisory through a tested migration or compatibility patch.
+
+- [x] Resolve critical tar finding with pinned tar7.5.22 and tested Expo51 postinstall compatibility patch.
+- [ ] Review remaining85 audit findings and perform native build/device acceptance.
