@@ -1,5 +1,5 @@
 import { Button } from '../components/ui/Button';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 
 export function ButtonsPage() {
   return (

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, SearchWithButton, SearchWithDropdown, SearchStacked, SearchIconOnly } from '../components/ui/Search';
 
 export default function SearchPage() {

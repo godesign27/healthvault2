@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Calendar, ChevronDown, Edit3, Search, SlidersHorizontal, Globe } from 'lucide-react';
-import { cn } from '../../lib/utils';
 
 interface HeaderProps {
   title?: string;

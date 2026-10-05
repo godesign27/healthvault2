@@ -20,7 +20,7 @@ interface SegmentationNavProps {
   onSegmentationClick?: () => void;
 }
 
-export function SegmentationNav({ activeProduct = 'Segmentation', onSegmentationClick }: SegmentationNavProps) {
+export function SegmentationNav({ onSegmentationClick }: SegmentationNavProps) {
   const [activeNav, setActiveNav]         = useState('segmentation');
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);

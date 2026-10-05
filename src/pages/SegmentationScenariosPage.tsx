@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Trash2, ChevronRight, X, ChevronLeft } from 'lucide-react';
+import { Search, Trash2, X, ChevronLeft } from 'lucide-react';
 import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { TableBadge } from '../components/ui/Table';
 import { PrimaryNavigation } from '../components/ui/PrimaryNavigation';
@@ -41,8 +41,6 @@ export function SegmentationScenariosPage({
   onBack,
   onBackToProjects,
   projectName,
-  sidebarCollapsed,
-  onToggleSidebar,
   onCreateScenario,
   onOpenScenario,
   projectId,

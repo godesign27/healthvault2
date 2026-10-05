@@ -52,8 +52,8 @@ export function ShareFormsDrawer({
     method: 'SecureLink',
   });
   const [message, setMessage] = useState('');
-  const [includeCcMe, setIncludeCcMe] = useState(true);
-  const [includeCcPatient, setIncludeCcPatient] = useState(false);
+  const includeCcMe = true;
+  const includeCcPatient = false;
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ack, setAck] = useState<string | null>(null);
@@ -109,10 +109,6 @@ export function ShareFormsDrawer({
       setIsSending(false);
     }
   }
-
-  const handleMethodChange = (method: RecipientMethod) => {
-    setRecipient({ ...recipient, method });
-  };
 
   return (
     <Drawer

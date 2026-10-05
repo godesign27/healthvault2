@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Volume2, X, RotateCcw, MessageCircle, Loader2 } from 'lucide-react';
+import { Volume2, X, MessageCircle, Loader2 } from 'lucide-react';
 
 interface VoiceInteractionProps {
   message: string;
@@ -30,8 +30,7 @@ const stopGlobalAudio = () => {
 export function VoiceInteraction({
   message,
   onClose,
-  onOpenChat,
-  darkMode = false
+  onOpenChat
 }: VoiceInteractionProps) {
   const [state, setState] = useState<VoiceState>('loading');
   const [progress, setProgress] = useState(0);

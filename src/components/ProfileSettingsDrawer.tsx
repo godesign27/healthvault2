@@ -66,7 +66,7 @@ export function ProfileSettingsDrawer({
       const filePath = `avatars/${fileName}`;
 
       // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('profile-images')
         .upload(filePath, file, {
           cacheControl: '3600',

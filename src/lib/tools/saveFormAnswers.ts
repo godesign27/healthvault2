@@ -21,10 +21,16 @@ export async function saveFormAnswers(input: unknown) {
     const supabase = createSupabaseServerClient();
     const { userId, formId, values, markComplete } = parsed.data;
 
+    const { data: patient, error: patientError } = await supabase
+      .from("patient_profiles").select("id").eq("user_id", userId).maybeSingle();
+    if (patientError) return { success: false, error: patientError.message };
+    if (!patient) return { success: false, error: "Patient profile not found" };
+
     const { data: existing, error: fetchErr } = await supabase
       .from("form_responses")
       .select("answers_json, template_id")
       .eq("id", formId)
+      .eq("patient_id", patient.id)
       .maybeSingle();
 
     if (fetchErr) {
@@ -42,21 +48,23 @@ export async function saveFormAnswers(input: unknown) {
     const updatePayload: Record<string, unknown> = {
       answers_json: mergedAnswers,
       status,
+      signed_at: signedAt,
       updated_at: new Date().toISOString(),
     };
 
-    if (signedAt) {
-      updatePayload.signed_at = signedAt;
-    }
-
-    const { error: updateErr } = await supabase
+    const { data: saved, error: updateErr } = await supabase
       .from("form_responses")
       .update(updatePayload)
-      .eq("id", formId);
+      .eq("id", formId)
+      .eq("patient_id", patient.id)
+      .select("id")
+      .maybeSingle();
 
     if (updateErr) {
       return { success: false, error: updateErr.message };
     }
+
+    if (!saved || saved.id !== formId) return { success: false, error: "Form save could not be confirmed" };
 
     return {
       success: true,

@@ -1,4 +1,4 @@
-import { Home, Calendar, Search, Palette, Maximize2, ChevronDown } from 'lucide-react';
+import { Home, Calendar, Search, Palette, Maximize2 } from 'lucide-react';
 import { Toolbar, defaultToolbarActions } from '../components/ui/Toolbar';
 
 export function ToolbarsPage() {

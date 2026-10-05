@@ -226,6 +226,7 @@ export async function saveFormAnswers(
       .eq('user_id', userId)
       .maybeSingle();
 
+    if (patientResult.error) return toolError(`Database error: ${patientResult.error.message}`);
     const patientId = patientResult.data?.id;
     if (!patientId) {
       return toolError('Patient profile not found. Cannot save form answers without a patient profile.');
@@ -236,6 +237,7 @@ export async function saveFormAnswers(
         .from('form_responses')
         .select('answers_json')
         .eq('id', formId)
+        .eq('patient_id', patientId)
         .maybeSingle();
 
       if (fetchErr) return toolError(`Database error: ${fetchErr.message}`);
@@ -243,7 +245,7 @@ export async function saveFormAnswers(
 
       const mergedAnswers = { ...(existing.answers_json || {}), ...answers };
 
-      const { error: updateErr } = await supabase
+      const { data: saved, error: updateErr } = await supabase
         .from('form_responses')
         .update({
           answers_json: mergedAnswers,
@@ -251,9 +253,13 @@ export async function saveFormAnswers(
           signed_at: signedAt,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', formId);
+        .eq('id', formId)
+        .eq('patient_id', patientId)
+        .select('id')
+        .maybeSingle();
 
       if (updateErr) return toolError(`Save failed: ${updateErr.message}`);
+      if (!saved || saved.id !== formId) return toolError('Form save could not be confirmed.');
 
       return toolSuccess(
         { formId, status, savedFields: Object.keys(mergedAnswers).length },

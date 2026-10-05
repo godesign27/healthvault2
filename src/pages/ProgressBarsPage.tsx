@@ -47,10 +47,10 @@ export function ProgressBarsPage() {
               <div>
                 <h3 className="text-lg font-semibold text-content-secondary mb-4">Progress (With Text)</h3>
                 <div className="grid grid-cols-9 gap-4">
-                  {percentages.map((pct, idx) => (
+                  {sizes.map((size, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                       <div className="w-full">
-                        <ProgressBar value={100} variant="progress" size={sizes[idx]} showText />
+                        <ProgressBar value={100} variant="progress" size={size} showText />
                       </div>
                     </div>
                   ))}
@@ -73,10 +73,10 @@ export function ProgressBarsPage() {
               <div>
                 <h3 className="text-lg font-semibold text-content-secondary mb-4">Error (With Text)</h3>
                 <div className="grid grid-cols-9 gap-4">
-                  {percentages.map((pct, idx) => (
+                  {sizes.map((size, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                       <div className="w-full">
-                        <ProgressBar value={100} variant="error" size={sizes[idx]} showText />
+                        <ProgressBar value={100} variant="error" size={size} showText />
                       </div>
                     </div>
                   ))}
@@ -99,10 +99,10 @@ export function ProgressBarsPage() {
               <div>
                 <h3 className="text-lg font-semibold text-content-secondary mb-4">Success (With Text)</h3>
                 <div className="grid grid-cols-9 gap-4">
-                  {percentages.map((pct, idx) => (
+                  {sizes.map((size, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                       <div className="w-full">
-                        <ProgressBar value={100} variant="success" size={sizes[idx]} showText />
+                        <ProgressBar value={100} variant="success" size={size} showText />
                       </div>
                     </div>
                   ))}
@@ -125,10 +125,10 @@ export function ProgressBarsPage() {
               <div>
                 <h3 className="text-lg font-semibold text-content-secondary mb-4">Warning (With Text)</h3>
                 <div className="grid grid-cols-9 gap-4">
-                  {percentages.map((pct, idx) => (
+                  {sizes.map((size, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                       <div className="w-full">
-                        <ProgressBar value={100} variant="warning" size={sizes[idx]} showText />
+                        <ProgressBar value={100} variant="warning" size={size} showText />
                       </div>
                     </div>
                   ))}
@@ -157,10 +157,10 @@ export function ProgressBarsPage() {
               <div>
                 <h3 className="text-lg font-semibold text-content-secondary mb-4">Background (With Text)</h3>
                 <div className="grid grid-cols-9 gap-4">
-                  {percentages.map((pct, idx) => (
+                  {sizes.map((size, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                       <div className="w-full">
-                        <ProgressBar value={100} variant="progress" size={sizes[idx]} showText showTrack={false} />
+                        <ProgressBar value={100} variant="progress" size={size} showText showTrack={false} />
                       </div>
                     </div>
                   ))}

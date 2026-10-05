@@ -43,7 +43,16 @@ export async function getCareTimeline(input: unknown) {
       ? [filter]
       : ["record", "record_request", "form", "share", "appointment", "encounter"];
 
-    const queries: Promise<void>[] = [];
+    // Resolve the patient identity before starting concurrent queries.
+    let patientId: string | undefined;
+    if (types.includes("form")) {
+      const { data: patient, error } = await supabase
+        .from("patient_profiles").select("id").eq("user_id", userId).maybeSingle();
+      if (error) throw error;
+      patientId = patient?.id;
+    }
+
+    const queries: PromiseLike<void>[] = [];
 
     if (types.includes("record")) {
       queries.push(
@@ -53,7 +62,8 @@ export async function getCareTimeline(input: unknown) {
           .eq("user_id", userId)
           .order("service_date", { ascending: false, nullsFirst: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const r of data || []) {
               items.push({
                 id: r.id,
@@ -77,7 +87,8 @@ export async function getCareTimeline(input: unknown) {
           .eq("user_id", userId)
           .order("created_at", { ascending: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const q of (data || []) as any[]) {
               const parts = [`Status: ${q.status}`];
               if (q.opened_at) parts.push("Provider opened link");
@@ -97,14 +108,15 @@ export async function getCareTimeline(input: unknown) {
     }
 
     if (types.includes("form")) {
-      queries.push(
+      if (patientId) queries.push(
         supabase
           .from("form_responses")
           .select("id, status, updated_at, form_templates!inner(title, category)")
-          .eq("patient_id", userId)
+          .eq("patient_id", patientId)
           .order("updated_at", { ascending: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const f of (data || []) as any[]) {
               items.push({
                 id: f.id,
@@ -128,7 +140,8 @@ export async function getCareTimeline(input: unknown) {
           .eq("patient_id", userId)
           .order("sent_at", { ascending: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const s of (data || []) as any[]) {
               const recipientName =
                 typeof s.recipient === "object"
@@ -156,7 +169,8 @@ export async function getCareTimeline(input: unknown) {
           .eq("user_id", userId)
           .order("scheduled_at", { ascending: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const a of data || []) {
               items.push({
                 id: a.id,
@@ -182,7 +196,8 @@ export async function getCareTimeline(input: unknown) {
           .eq("user_id", userId)
           .order("encounter_date", { ascending: false })
           .limit(limit)
-          .then(({ data }) => {
+          .then(({ data, error }) => {
+            if (error) throw error;
             for (const e of data || []) {
               items.push({
                 id: e.id,

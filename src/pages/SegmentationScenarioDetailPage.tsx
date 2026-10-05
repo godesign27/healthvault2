@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Search, ChevronRight, ChevronLeft, X, Calendar, Home, Package, Grid3x3, Phone, Settings, Database, Bell } from 'lucide-react';
+import { Search, ChevronRight, Calendar } from 'lucide-react';
 import { Wizard } from '../components/ui/Wizard';
 import { AccordionItem } from '../components/ui/Accordion';
 import { Tag } from '../components/ui/Tag';
 import { Button } from '../components/ui/Button';
 import { Dropdown } from '../components/ui/Dropdown';
 import { ActionField } from '../components/ui/ActionField';
-import { Breadcrumb, BreadcrumbItem } from '../components/ui/Breadcrumb';
+import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { PrimaryNavigation } from '../components/ui/PrimaryNavigation';
 import { AIAgentPanel } from '../components/AIAgentPanel';
 import { supabase } from '../lib/supabase';
@@ -34,17 +34,13 @@ export function SegmentationScenarioDetailPage({
   projectName,
   segmentationName,
   businessUnit,
-  sidebarCollapsed,
-  onToggleSidebar,
   onContinue,
   projectId,
   scenarioId,
-  initialStep = 1,
-  onSave
+  initialStep = 1
 }: SegmentationScenarioDetailPageProps) {
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
   const [expandedAccordions, setExpandedAccordions] = useState<number[]>([0, 1]);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [scenarioName, setScenarioName] = useState('Beh_Lexorin');
   const [segmentationType, setSegmentationType] = useState('behavioral');
   const [customerType, setCustomerType] = useState('hcp');
@@ -220,13 +216,10 @@ export function SegmentationScenarioDetailPage({
                 <Tag variant="info" size="medium" style="filled">
                   DRAFT
                 </Tag>
-                <button
-                  onClick={() => setIsDatePickerOpen(true)}
-                  className="flex items-center gap-2 text-gray-900 hover:text-[indigo-600] transition-colors"
-                >
+                <div className="flex items-center gap-2 text-content-primary">
                   <Calendar className="w-5 h-5" />
                   <span className="font-medium">{segmentationName} - {businessUnit} - {timePeriod}</span>
-                </button>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">

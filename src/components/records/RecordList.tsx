@@ -9,7 +9,7 @@ interface RecordListProps {
   onRecordClick?: (record: HealthRecord) => void;
 }
 
-export function RecordList({ records, darkMode = false, currentFilter, onRecordClick }: RecordListProps) {
+export function RecordList({ records, darkMode = false, onRecordClick }: RecordListProps) {
   if (records.length === 0) {
     return (
       <div className={`flex flex-col items-center justify-center py-16 px-4 text-center ${

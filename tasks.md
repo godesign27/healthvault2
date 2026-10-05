@@ -935,3 +935,9 @@ This section supersedes older pending preview acceptance entries above; it does 
 - [ ] Resolve remaining product/service/gallery diagnostics and independently install candidate dependencies before deployment.
 
 - [x] Ship isolated header-only preview fix and visually verify Dashboard/Forms clearance at narrow widths (Worker37b8ec81); broader integration release remains separate and blocked.
+
+### Release integration batch 3 — 2026-10-05
+- [x] Integrate reviewed product/gallery consumer cleanup and compatible provider-workspace label formatting.
+- [x] Correct timeline patient identity/error propagation and require patient-scoped matching form save receipts; run synthetic regressions.
+- [x] Candidate: 31 TypeScript diagnostics (12 marketing, 19 product/legacy), 18 focused suites pass, build passes. Not deployed.
+- [ ] Review remaining legacy import dependencies and dashboard props; preserve marketing scope and independent-install gate.

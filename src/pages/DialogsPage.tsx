@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
-import { Dialog, DialogIconButton } from '../components/ui/Dialog';
-import { ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Dialog } from '../components/ui/Dialog';
 
 export default function DialogsPage() {
   const [headerDialog, setHeaderDialog] = useState(false);
-  const [headerRecordDialog, setHeaderRecordDialog] = useState(false);
   const [darkHeaderDialog, setDarkHeaderDialog] = useState(false);
-  const [darkHeaderRecordDialog, setDarkHeaderRecordDialog] = useState(false);
   const [warningDialog, setWarningDialog] = useState(false);
   const [centerDialog, setCenterDialog] = useState(false);
   const [mediumDialog, setMediumDialog] = useState(false);
   const [tallDialog, setTallDialog] = useState(false);
-  const [fullDialog, setFullDialog] = useState(false);
 
   return (
     <div className="w-full min-h-0">

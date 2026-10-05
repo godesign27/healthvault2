@@ -79,7 +79,7 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
     }
   };
 
-  const handleDuplicateProject = async (project: Project) => {
+  const handleDuplicateProject = async (project: Omit<Project, 'user_id'>) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const dupUserId = session?.user?.id || 'demo-user';
@@ -115,7 +115,7 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
           has_scenario: seg.has_scenario
         }));
 
-        const { data: createdSegmentations, error: insertSegError } = await supabase
+        const { error: insertSegError } = await supabase
           .from('segmentations')
           .insert(newSegmentations)
           .select();

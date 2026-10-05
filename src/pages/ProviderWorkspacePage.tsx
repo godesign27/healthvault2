@@ -18,7 +18,7 @@ interface Workspace {
   membership: { id: string; roles: string[]; permissions: string[]; status: string };
 }
 
-function readable(value: string) { return value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+function readable(value: string) { return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 
 export function ProviderWorkspacePage() {
   const [loading, setLoading] = useState(true);
