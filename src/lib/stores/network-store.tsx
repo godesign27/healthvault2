@@ -7,10 +7,10 @@ interface NetworkStore {
   pharmacies: Pharmacy[];
   insurance: InsuranceContext;
   loading: boolean;
-  addProvider: (provider: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Provider>;
+  addProvider: (provider: Omit<Provider, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<Provider>;
   updateProvider: (id: string, updates: Partial<Provider>) => Promise<void>;
   removeProvider: (id: string) => Promise<void>;
-  addPharmacy: (pharmacy: Omit<Pharmacy, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Pharmacy>;
+  addPharmacy: (pharmacy: Omit<Pharmacy, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<Pharmacy>;
   updatePharmacy: (id: string, updates: Partial<Pharmacy>) => Promise<void>;
   removePharmacy: (id: string) => Promise<void>;
   loadData: () => Promise<void>;
@@ -94,7 +94,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     loadData();
   }, [loadData]);
 
-  const addProvider = useCallback(async (provider: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addProvider = useCallback(async (provider: Omit<Provider, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
     const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id;
     if (!userId) throw new Error('Not authenticated');
@@ -102,7 +102,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase
       .from('providers')
       .insert({
-        user_id: provider.userId || userId,
+        user_id: userId,
         npi: provider.npi,
         name: provider.name,
         specialty: provider.specialty,
@@ -169,7 +169,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     setProviders(prev => prev.filter(p => p.id !== id));
   }, []);
 
-  const addPharmacy = useCallback(async (pharmacy: Omit<Pharmacy, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addPharmacy = useCallback(async (pharmacy: Omit<Pharmacy, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
     const { data: { session } } = await supabase.auth.getSession();
     const pharmacyUserId = session?.user?.id;
     if (!pharmacyUserId) throw new Error('Not authenticated');
@@ -177,7 +177,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase
       .from('pharmacies')
       .insert({
-        user_id: pharmacy.userId || pharmacyUserId,
+        user_id: pharmacyUserId,
         name: pharmacy.name,
         chain: pharmacy.chain,
         phone: pharmacy.phone,

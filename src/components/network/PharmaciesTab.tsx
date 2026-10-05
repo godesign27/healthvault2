@@ -1,23 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-  MapPin, Phone, Clock, Star, Navigation, Check, Package,
-  ExternalLink, CheckCircle, XCircle, Pill, Plus, Home,
-  Building2, Pencil, Trash2, Radio,
-} from 'lucide-react';
+import { MapPin, Phone, Clock, Star, Navigation, Check, Package, ExternalLink, CheckCircle, XCircle, Pill, Plus, Home, Building2, Pencil, Trash2, Radio } from 'lucide-react';
 import { useNetworkStore } from '../../lib/stores/network-store';
 import { NearbyPharmacyResult, getNearbyPharmacies as getMockNearbyPharmacies } from '../../lib/network-directory';
-import {
-  fetchNearbyPharmacies,
-  setPreferredPharmacyApi,
-  fetchUserAddresses,
-  saveUserAddress,
-  setActiveAddress,
-  deleteUserAddress,
-  getActiveAddressContext,
-  type AddressContext,
-  type UserAddress,
-  type UserAddressInput,
-} from '../../lib/network/api';
+import { setPreferredPharmacyApi, fetchUserAddresses, saveUserAddress, setActiveAddress, deleteUserAddress, getActiveAddressContext, type AddressContext, type UserAddress, type UserAddressInput } from '../../lib/network/api';
 import { AddAddressDrawer } from './AddAddressDrawer';
 import { PharmacyCard } from './PharmacyCard';
 import { Pharmacy } from '../../types/network';
@@ -61,7 +46,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [ctx, mockData] = await Promise.all([
+      const [, mockData] = await Promise.all([
         loadAddresses(),
         getMockNearbyPharmacies(),
       ]);

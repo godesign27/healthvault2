@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Home, Building2, MapPin, Check } from 'lucide-react';
-import {
-  type AddressType,
-  type UserAddress,
-  type UserAddressInput,
-} from '../../lib/network/api';
+import { X, Home, Building2, Check } from 'lucide-react';
+import { type AddressType, type UserAddress, type UserAddressInput } from '../../lib/network/api';
 
 interface AddAddressDrawerProps {
   isOpen: boolean;

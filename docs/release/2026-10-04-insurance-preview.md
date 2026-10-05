@@ -95,3 +95,9 @@ Reviewed seven component/gallery fixes: Accordion child content and keyboard act
 TypeScript diagnostics fell from **169 to 98**. All 12 insurance/routing suites and both component regressions pass. Full typecheck still fails. Local Vite compilation passes with the existing large-chunk warning. This compilation did not supply deployment environment variables and must not be uploaded; deployment requires a fresh build with explicit preview backend configuration. Dependencies remain shared via symlink; independent lockfile installation and native device acceptance remain open.
 
 Next: review network validation/ownership types, remaining product consumers and legacy service errors. Preserve marketing scope and unrelated working-tree changes.
+
+## October 5 — Network validation integration candidate (not deployed)
+
+Integrated reviewed network drawers/tabs and store create signatures. Provider/pharmacy creation derives ownership only from the signed-in session, ignoring even untyped caller-supplied IDs; absent sessions reject before insert. This checks create ownership only, not all network authorization paths. Forms use Zod issues and required Toast identifiers. Names now trim before minimum-length validation, preventing whitespace-only entries.
+
+Candidate validation: **85 TypeScript diagnostics remain**, down from 98. All **16 focused suites pass**; full typecheck is the sole failed check (16/17). New tests execute actual submit handlers with real schemas for invalid/valid names and actual store create functions with synthetic sessions. Vite compilation passes with existing chunk warning. No deployment credentials supplied to compilation; do not upload this local output. Production and hosted preview unchanged. Other network behavior such as duplicate submissions/account transitions remains outside this validation claim.

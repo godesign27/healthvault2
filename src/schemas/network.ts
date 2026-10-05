@@ -6,7 +6,7 @@ export const DeliveryOptionZ = z.enum(['Pickup', 'Delivery', 'Mail']);
 
 export const AddProviderInputZ = z.object({
   npi: z.string().optional(),
-  name: z.string().min(1, 'Provider name is required').trim(),
+  name: z.string().trim().min(1, 'Provider name is required'),
   specialty: z.string().optional().transform(val => val?.trim()),
   clinic: z.string().optional().transform(val => val?.trim()),
   phone: z.string().optional().transform(val => val?.trim().replace(/[^\d]/g, '')),
@@ -24,7 +24,7 @@ export const UpdateProviderInputZ = AddProviderInputZ.extend({
 });
 
 export const AddPharmacyInputZ = z.object({
-  name: z.string().min(1, 'Pharmacy name is required').trim(),
+  name: z.string().trim().min(1, 'Pharmacy name is required'),
   chain: z.string().optional().transform(val => val?.trim()),
   phone: z.string().optional().transform(val => val?.trim().replace(/[^\d]/g, '')),
   address: z.string().optional().transform(val => val?.trim()),

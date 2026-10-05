@@ -927,3 +927,9 @@ This section supersedes older pending preview acceptance entries above; it does 
 
 - [x] Fix shared narrow-screen top-bar clearance across dashboard pages; reserve header space in shell, remove per-page offsets, test layout structure/feedback.
 - [ ] Deploy and visually accept shared header fix after release validation; hosted preview still runs previous layout.
+
+### Release integration batch 2 — 2026-10-05
+- [x] Integrate network form Zod/Toast compatibility and session-derived create ownership.
+- [x] Reject whitespace-only provider/pharmacy names; exercise real submit handlers and synthetic-session store create paths.
+- [x] Candidate: 85 TypeScript diagnostics remain, 16 focused suites pass, local build passes; not deployed.
+- [ ] Resolve remaining product/service/gallery diagnostics and independently install candidate dependencies before deployment.

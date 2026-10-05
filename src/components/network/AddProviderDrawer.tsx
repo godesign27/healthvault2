@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Search, User, Info } from 'lucide-react';
+import { X, Search, Info } from 'lucide-react';
 import { Provider, ProviderRelationship } from '../../types/network';
 import { AddProviderInputZ, AddProviderInput } from '../../schemas/network';
 import { searchInNetworkProviders, searchPublicProviders } from '../../lib/clinical-connectors';
@@ -88,7 +88,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
 
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach(err => {
+      validation.error.issues.forEach(err => {
         if (err.path[0]) {
           fieldErrors[err.path[0].toString()] = err.message;
         }
@@ -432,6 +432,7 @@ export function AddProviderDrawer({ isOpen, onClose, darkMode = false, specialis
 
       {toast && (
         <Toast
+          id="network-form-feedback"
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}

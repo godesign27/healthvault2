@@ -151,7 +151,7 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
 
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach(err => {
+      validation.error.issues.forEach(err => {
         if (err.path[0]) {
           fieldErrors[err.path[0].toString()] = err.message;
         }
@@ -506,6 +506,7 @@ export function AddPharmacyDrawer({ isOpen, onClose, darkMode = false }: AddPhar
 
       {toast && (
         <Toast
+          id="network-form-feedback"
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
