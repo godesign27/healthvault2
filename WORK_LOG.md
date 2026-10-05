@@ -1780,3 +1780,9 @@ Pinned image-size2.0.4 with version-guarded Metro0.80.12 named-export postinstal
 
 ## 2026-10-05 — Native simulator compilation
 Prepared isolated iOS Pods; original deployment-mode install failed on missing EXSplashScreen and hoisted dependency paths. Regenerated candidate lock and confirmed pod install --deployment passes. Xcode27 rejects saved iOS13.4 target. Diagnostic unsigned Debug simulator build with invocation-only IPHONEOS_DEPLOYMENT_TARGET=15.0 succeeded (both arm64/x86_64). An intermediate run overlapped Pods re-verification and reported missing glog headers; uncontested final run succeeded. No saved OS target change, signing, device install or deployment. Debug native compilation is not JS runtime/device/accessibility acceptance. Candidate lock saved under docs/release/native-candidate; existing dirty workspace Podfile.lock preserved.
+
+## 2026-10-05 — iOS JavaScript export validation
+
+The isolated iOS export found two issues beyond native compilation: Metro did not watch shared design tokens, and its file-based asset API passed a filename to image-size2, which accepts bytes. Added the design-token watch folder and adapted both filename and buffer inputs, including upgrades from the previous adapter. Expanded regression coverage to actual Metro getAssetData. Patch idempotence and buffer/file tests pass.
+
+With explicit preview Supabase configuration, Expo exported 999 modules,21 assets and a3.6MB Hermes bundle successfully to `/tmp/hv-ios-bundle`; log `/tmp/hv-ios-bundle.log`. Existing CSS interop configuration warning remains. This verifies packaging, not runtime flows or accessibility. No deployment.

@@ -12,6 +12,7 @@ const config = withNativeWind(getDefaultConfig(projectRoot), { input: './global.
 config.watchFolders = [
   projectRoot,
   path.join(monorepoRoot, 'packages', 'types'),
+  path.join(monorepoRoot, 'packages', 'design-tokens'),
   path.join(monorepoRoot, 'packages', 'api-client'),
 ];
 

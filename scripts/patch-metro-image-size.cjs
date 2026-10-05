@@ -8,8 +8,9 @@ const version = JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).ver
 if (version !== '0.80.12') throw Error(`Review image-size compatibility for Metro ${version}`);
 const file = path.join(root, 'src/Assets.js');
 const before = 'const getImageSize = require("image-size");';
-const after = 'const { imageSize: getImageSize } = require("image-size");';
-const source = fs.readFileSync(file, 'utf8');
+const previous = 'const { imageSize: getImageSize } = require("image-size");';
+const after = 'const getImageSize = input => require("image-size").imageSize(typeof input === "string" ? fs.readFileSync(input) : input);';
+const source = fs.readFileSync(file, 'utf8').replace(previous, before);
 if (!source.includes(after)) {
   if (source.split(before).length !== 2) throw Error('Unexpected Metro image-size import');
   fs.writeFileSync(file, source.replace(before, after));

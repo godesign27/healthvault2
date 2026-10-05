@@ -975,3 +975,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Prepare isolated Pods and pass unsigned iOS Simulator native build under Xcode27 with diagnostic iOS15 override.
 - [ ] Decide supported iOS minimum/toolchain, validate JavaScript bundle, and run simulator/device/accessibility acceptance.
+
+- [x] Pass isolated iOS JavaScript/Hermes export with preview configuration; fix shared-token resolution and file-based asset parsing.
+- [ ] Run simulator/device runtime and accessibility acceptance; resolve minimum-iOS/toolchain policy before release.

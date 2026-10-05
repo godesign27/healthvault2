@@ -9,3 +9,5 @@ Xcode27 rejects the committed iOS13.4 minimum. A diagnostic simulator build uses
 Native device accessibility and runtime acceptance remain separate checks.
 
 Result: **BUILD SUCCEEDED** for unsigned Debug iOS Simulator (arm64 and x86_64), using invocation-only iOS15 target. Build artifact: `/tmp/hv-native-derived/Build/Products/Debug-iphonesimulator/HealthVault.app`. This does not prove JavaScript bundling, runtime flows or accessibility.
+
+JavaScript follow-up: preview-configured `expo export --platform ios` now passes after shared-token watch-folder and image parser file-input fixes:999 modules,21 assets,3.6MB Hermes bundle. Output `/tmp/hv-ios-bundle`, log `/tmp/hv-ios-bundle.log`. Simulator launch, user flows and accessibility remain unverified.

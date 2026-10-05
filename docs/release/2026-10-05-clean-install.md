@@ -35,3 +35,7 @@ Pinned image-size2.0.4 with version-guarded Metro0.80.12 named-export postinstal
 
 ## 2026-10-05 — Native simulator compilation
 Prepared isolated iOS Pods; original deployment-mode install failed on missing EXSplashScreen and hoisted dependency paths. Regenerated candidate lock and confirmed pod install --deployment passes. Xcode27 rejects saved iOS13.4 target. Diagnostic unsigned Debug simulator build with invocation-only IPHONEOS_DEPLOYMENT_TARGET=15.0 succeeded (both arm64/x86_64). An intermediate run overlapped Pods re-verification and reported missing glog headers; uncontested final run succeeded. No saved OS target change, signing, device install or deployment. Debug native compilation is not JS runtime/device/accessibility acceptance. Candidate lock saved under docs/release/native-candidate; existing dirty workspace Podfile.lock preserved.
+
+## iOS bundle follow-up
+
+Full export exposed missing design-token watchFolder and file-path input incompatibility in the Metro image-size adapter. Both are fixed; idempotence plus buffer and actual getAssetData tests pass. Preview-configured iOS export succeeded:999 modules,21 assets,3.6MB Hermes bundle. Output `/tmp/hv-ios-bundle`, log `/tmp/hv-ios-bundle.log`. Package versions and audit counts unchanged. No deployment or runtime/accessibility acceptance claimed.
