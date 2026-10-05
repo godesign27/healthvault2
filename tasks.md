@@ -960,3 +960,6 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Resolve critical tar finding with pinned tar7.5.22 and tested Expo51 postinstall compatibility patch.
 - [ ] Review remaining85 audit findings and perform native build/device acceptance.
+
+- [x] Test and integrate compatible dependency updates; audit79 remaining/46 high/0 critical.
+- [ ] Review remaining major-version dependency fixes and native binary/device acceptance.
