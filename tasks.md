@@ -941,3 +941,6 @@ This section supersedes older pending preview acceptance entries above; it does 
 - [x] Correct timeline patient identity/error propagation and require patient-scoped matching form save receipts; run synthetic regressions.
 - [x] Candidate: 31 TypeScript diagnostics (12 marketing, 19 product/legacy), 18 focused suites pass, build passes. Not deployed.
 - [ ] Review remaining legacy import dependencies and dashboard props; preserve marketing scope and independent-install gate.
+
+## 2026-10-05 — Preview deployment and next batch
+Completed: curated candidate preview deployment and local record-date/dashboard prop batch. Next: review import client/server contracts together; resolve remaining26 candidate diagnostics, verify clean dependency install and native acceptance before production.

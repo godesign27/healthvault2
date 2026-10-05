@@ -1747,3 +1747,6 @@ Separated header-only fix from broad integration candidate after user reported n
 
 ## 2026-10-05 — Product consumers, timeline and form-save release batch
 Reviewed existing small product/gallery cleanup changes and integrated bounded files into isolated candidate, preserving unrelated record/import/vitals work. Integrated care timeline patient-profile lookup and query error propagation, PromiseLike typing, and patient-scoped form read/update helpers. Strengthened save receipt validation to reject another row ID; added mismatch test to existing missing/error/merge/signature cases. Added timeline and both-helper suites to release runner. Exact candidate: 31 TypeScript diagnostics (down85), 18 focused suites pass, build passes with existing chunk warning. No deployment, real data writes, backend changes or marketing edits. Hosted header hotfix remains current.
+
+## 2026-10-05 — Preview deployment and next batch
+Curated preview deployed as b3965421-cdb6-474c-b7af-decf2a1d622b; authenticated dashboard browser check passed. Follow-up record-date formatter preserves calendar dates across timezones; four obsolete dashboard props removed from candidate. Build passes; diagnostics31 to26. Follow-up is local only; production unchanged.

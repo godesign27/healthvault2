@@ -406,7 +406,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               }
               iconBgColor="bg-indigo-50"
               iconColor="text-indigo-600"
-              darkMode={darkMode}
             />
           </div>
 
@@ -418,7 +417,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               subtitle={formsCount ? `${formsCount} completed` : 'None completed yet'}
               iconBgColor="bg-emerald-50"
               iconColor="text-emerald-600"
-              darkMode={darkMode}
             />
           </div>
 
@@ -430,7 +428,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               subtitle={dashboardStats.appointments === 0 ? 'None scheduled' : 'Upcoming'}
               iconBgColor="bg-amber-50"
               iconColor="text-amber-600"
-              darkMode={darkMode}
             />
           </div>
 
@@ -442,7 +439,6 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               subtitle={dashboardStats.medications === 0 ? 'None on file' : 'On file'}
               iconBgColor="bg-rose-50"
               iconColor="text-rose-600"
-              darkMode={darkMode}
             />
           </div>
 

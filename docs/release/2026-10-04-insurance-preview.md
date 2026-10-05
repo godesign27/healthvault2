@@ -5,7 +5,7 @@ Other accumulated working-tree changes were excluded. No Git push or production 
 
 Web: https://healthvault2-insurance-preview.timothymcguire.workers.dev
 Cloudflare Worker: `healthvault2-insurance-preview`
-Current web version: `37b8ec81-2974-4118-859f-6f0adc6730f1` (initial version: `56b544d0-8b75-4372-9f6e-bd01352f7546`).
+Current web version: `b3965421-cdb6-474c-b7af-decf2a1d622b` (initial version: `56b544d0-8b75-4372-9f6e-bd01352f7546`).
 Backend: `roeudwddxvniazwufdqf`, the existing preview branch of `sgwekxjlvadvdosyudgj`.
 
 ## Current promotion status
@@ -113,3 +113,9 @@ Deployed Worker `37b8ec81-2974-4118-859f-6f0adc6730f1` to insurance preview only
 Reviewed/integrated bounded unused-symbol and component-consumer corrections plus care timeline and both form save helpers. Timeline resolves patient_profiles.id for form responses, awaits PromiseLike queries correctly, and propagates query errors instead of reporting empty success. Form saves scope reads/updates to the patient profile and require a matching saved row ID before success; tests cover missing profiles/forms, failed/missing/mismatched receipts, answer merge and completion signatures. Existing user-scoped Supabase client/RLS remains in place; no backend migrations or live data writes.
 
 Candidate now reports **31 TypeScript diagnostics** (previous85): 12 marketing diagnostics outside current app-edit scope and 19 remaining product/legacy diagnostics. All **18 focused suites pass** (18/19 overall; full typecheck fails). Vite compilation passes with existing large-chunk warning. Local compile did not supply deployment environment and is not for upload. Hosted header hotfix remains unchanged. Next: legacy provider import dependencies, remaining dashboard props/unused consumers, then independent lockfile installation and final release checks.
+
+## October 5 — Curated candidate deployed; date batch prepared
+
+Deployed integration through 30374ef plus shared header correction to the existing preview. Explicit preview backend build passed, 18 focused suites passed, full typecheck retained 31 known diagnostics. Browser dashboard loaded authenticated preview data after reload. Production and backend unchanged.
+
+Following deployment, integrated calendar-only record date formatting and removed four obsolete dashboard card props. Date tests cover five timezones, DST, leap dates, reduced precision and malformed input. Candidate build passes; full typecheck now has 26 diagnostics. This following batch is not yet deployed. Remaining import integration, clean dependency installation and native acceptance are still open.

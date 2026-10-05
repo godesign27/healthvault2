@@ -17,7 +17,7 @@ const suites = [
   'test-mobile-insurance-refresh', 'test-preview-subdomain',
   'test-component-contracts', 'test-icon-rendering',
   'test-network-ownership', 'test-network-form-validation',
-  'test-care-timeline', 'test-form-save-ownership',
+  'test-care-timeline', 'test-form-save-ownership', 'test-record-date',
 ];
 const checks = [
   ['Full web TypeScript check', 'npm', ['run', 'typecheck']],

@@ -1,4 +1,5 @@
-import { FileText, Image, FlaskConical, Stethoscope, File, Link2, Upload, Database } from 'lucide-react';
+import { formatRecordDate } from '../../../packages/api-client/src/record-date';
+import { FileText, Image, FlaskConical, Stethoscope, Link2, Upload, Database } from 'lucide-react';
 import { HealthRecord, RecordKind, RecordSource } from '../../lib/records/types';
 
 interface RecordCardProps {
@@ -79,7 +80,7 @@ export function RecordCard({ record, darkMode = false, onClick }: RecordCardProp
             {record.serviceDate && (
               <>
                 <span>•</span>
-                <span>{new Date(record.serviceDate).toLocaleDateString()}</span>
+                <span>{formatRecordDate(record.serviceDate)}</span>
               </>
             )}
           </div>
