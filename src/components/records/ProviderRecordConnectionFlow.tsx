@@ -1,9 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Search, ArrowLeft, CheckCircle, Link2, Globe, FileText, Loader2,
-  Building2, ChevronRight, Shield, RefreshCw, AlertCircle, MapPin,
-  Zap, X,
-} from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Search, ArrowLeft, CheckCircle, Link2, Globe, FileText, Loader2, Building2, ChevronRight, Shield, RefreshCw, AlertCircle, MapPin, Zap, X } from 'lucide-react';
 import { searchProviderOrganizations } from '../../lib/tools/searchProviderOrganizations';
 import { resolveProviderRecordConnection } from '../../lib/tools/resolveProviderRecordConnection';
 import { startProviderConnection } from '../../lib/tools/startProviderConnection';
@@ -51,6 +47,7 @@ interface ImportResults {
   medications: number;
   allergies: number;
   immunizations: number;
+  duplicates?: number;
 }
 
 interface ProviderRecordConnectionFlowProps {
@@ -77,8 +74,11 @@ export function ProviderRecordConnectionFlow({
   const [selectedOrg, setSelectedOrg] = useState<OrgResult | null>(null);
   const [resolution, setResolution] = useState<Resolution | null>(null);
   const [importData, setImportData] = useState<any>(null);
+  const [importJobId, setImportJobId] = useState<string | null>(null);
   const [importResults, setImportResults] = useState<ImportResults | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const pendingConfirmation = useRef<any>(null);
+  const confirmationBusy = useRef(false);
   const [progressStage, setProgressStage] = useState(0);
 
   const getUserId = useCallback(async () => {
@@ -262,7 +262,8 @@ export function ProviderRecordConnectionFlow({
       clearTimeout(stageTimer1);
       clearTimeout(stageTimer2);
 
-      if (result.success && result.data?.itemsByType) {
+      if (result.success && result.data?.itemsByType && result.data.importJobId) {
+        setImportJobId(result.data.importJobId);
         const transformed = transformPreviewToImportData(result.data.itemsByType);
         setImportData(transformed);
         setStep('review');
@@ -279,17 +280,25 @@ export function ProviderRecordConnectionFlow({
   };
 
   const handleImportConfirm = async (selectedData: any) => {
+    if (confirmationBusy.current) return;
+    confirmationBusy.current = true;
+    const request = pendingConfirmation.current || { ...selectedData, importJobId };
+    pendingConfirmation.current = request;
     setStep('importing');
     try {
-      const providerName = selectedOrg?.name || resolution?.providerOrganization?.name || initialProviderName;
-      const results = await importMedicalRecords({ ...selectedData, providerName });
+      const results = await importMedicalRecords(request);
+      pendingConfirmation.current = null;
       setImportResults(results);
       setStep('complete');
-      if (onRefreshData) await onRefreshData();
-      if (onImportComplete) onImportComplete(selectedData);
+      try {
+        if (onRefreshData) await onRefreshData();
+        if (onImportComplete) onImportComplete(selectedData);
+      } catch { /* The import receipt remains valid even if refreshing the list fails. */ }
     } catch {
-      setErrorMessage('Import failed. Please try again.');
+      setErrorMessage('Import status could not be verified. Try again to check the same selection. Completed imports will not be duplicated.');
       setStep('error');
+    } finally {
+      confirmationBusy.current = false;
     }
   };
 
@@ -302,6 +311,7 @@ export function ProviderRecordConnectionFlow({
 
   const handleBack = () => {
     if (step === 'resolved' || step === 'manual' || step === 'error') {
+      pendingConfirmation.current = null;
       setStep('search');
       setResolution(null);
       setSelectedOrg(null);
@@ -373,7 +383,10 @@ export function ProviderRecordConnectionFlow({
         {step === 'error' && (
           <ErrorStep
             message={errorMessage}
-            onRetry={() => { setStep('search'); setResolution(null); }}
+            onRetry={() => {
+              if (pendingConfirmation.current) void handleImportConfirm(pendingConfirmation.current);
+              else { setStep('search'); setResolution(null); }
+            }}
             onManual={handleManualRequest}
             hasManualHandler={!!onOpenManualRequest}
           />
@@ -443,7 +456,6 @@ function SearchStep({
   searching,
   onSelect,
   onManual,
-  darkMode,
 }: {
   query: string;
   onQueryChange: (q: string) => void;
@@ -659,7 +671,7 @@ function ResolvedStep({
 
         <button
           onClick={config.action}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all hover:shadow-lg active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-all hover:shadow-lg active:scale-[0.98]"
         >
           {config.actionLabel}
           <ChevronRight className="w-4 h-4" />
@@ -770,7 +782,8 @@ function CompleteStep({
         <div>
           <h4 className="text-lg font-semibold text-content-primary">Records Imported</h4>
           <p className="text-sm text-content-secondary mt-1">
-            {total} {total === 1 ? 'record' : 'records'} from {orgName}
+            {total} new {total === 1 ? 'record' : 'records'} from {orgName}
+            {!!results.duplicates && ` · ${results.duplicates} already imported`}
           </p>
         </div>
       </div>
@@ -795,7 +808,7 @@ function CompleteStep({
 
       <button
         onClick={onDone}
-        className="w-full px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
+        className="w-full px-5 py-3 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-all"
       >
         Done
       </button>
@@ -833,7 +846,7 @@ function ManualStep({
           {hasManualHandler && (
             <button
               onClick={onManualRequest}
-              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-all"
             >
               <FileText className="w-4 h-4" />
               Send Record Request
@@ -880,7 +893,7 @@ function ErrorStep({
       <div className="space-y-3">
         <button
           onClick={onRetry}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-surface-raised text-white rounded-xl font-medium hover:bg-surface-sunken transition-all"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-all"
         >
           <RefreshCw className="w-4 h-4" />
           Try Again
@@ -903,8 +916,8 @@ function transformPreviewToImportData(itemsByType: Record<string, any[]>) {
     if (!items) return { unique: [], duplicates: [], invalid: [] };
     const unique: any[] = [];
     const duplicates: any[] = [];
-    for (const item of items) {
-      const mapped = mapPreviewItem(item, type);
+    for (const [previewIndex, item] of items.entries()) {
+      const mapped = { ...mapPreviewItem(item, type), previewIndex };
       if (item.isDuplicate) {
         duplicates.push(mapped);
       } else {

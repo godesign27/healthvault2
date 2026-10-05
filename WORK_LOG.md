@@ -1750,3 +1750,6 @@ Reviewed existing small product/gallery cleanup changes and integrated bounded f
 
 ## 2026-10-05 — Preview deployment and next batch
 Curated preview deployed as b3965421-cdb6-474c-b7af-decf2a1d622b; authenticated dashboard browser check passed. Follow-up record-date formatter preserves calendar dates across timezones; four obsolete dashboard props removed from candidate. Build passes; diagnostics31 to26. Follow-up is local only; production unchanged.
+
+## 2026-10-05 — Provider import client integration
+Reviewed provider preview, confirmation service and review flow together against the saved-preview RPC contract. Candidate now uses owner-scoped real previews, selected indexes and stable retry requests; rejects incomplete/wrong-job/invalid-count receipts. Added selected-count reconciliation and empty-selection validation, with negative receipt tests. All21 focused suites pass; build passes (local compile only), full candidate typecheck now22 diagnostics (12 marketing,10 legacy/product). No remote writes or deployment this batch; backend rollout/acceptance must be verified before promotion.

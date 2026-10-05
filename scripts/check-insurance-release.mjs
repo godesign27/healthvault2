@@ -18,6 +18,7 @@ const suites = [
   'test-component-contracts', 'test-icon-rendering',
   'test-network-ownership', 'test-network-form-validation',
   'test-care-timeline', 'test-form-save-ownership', 'test-record-date',
+  'test-medical-import-client', 'test-provider-preview-client',
 ];
 const checks = [
   ['Full web TypeScript check', 'npm', ['run', 'typecheck']],

@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+import {z} from 'zod';
+let user={id:'owner'},status='active',syncCalls=0,fail=false;
+let result={source:'fhir',importJobId:'server-job',itemsByType:{},counts:{total:0}};
+const filters=[];
+const sb={auth:{getUser:async()=>({data:{user},error:null})},from(table){assert.equal(table,'provider_connections','Client must not insert a second job');return {select(){return this;},eq(k,v){filters.push([k,v]);return this;},maybeSingle:async()=>({data:status?{id:'connection',status}:null,error:null})};}};
+const exports={};
+vm.runInNewContext(ts.transpileModule(readFileSync('src/lib/tools/fetchProviderRecordPreview.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require(name){
+ if(name==='zod')return {z};
+ if(name.includes('supabase/server'))return {createSupabaseServerClient:()=>sb};
+ if(name.includes('fhir-oauth-api'))return {syncFhirConnection:async()=>{syncCalls++;if(fail)throw Error('private failure');return result;}};
+ throw Error(name);
+}});
+const call=()=>exports.fetchProviderRecordPreview({userId:'owner',providerConnectionId:'connection'});
+user=null;assert.equal((await call()).success,false);user={id:'other'};assert.equal((await call()).success,false);user={id:'owner'};
+assert.equal((await exports.fetchProviderRecordPreview({userId:'owner',providerOrganizationId:'org'})).success,false);
+status='pending';assert.equal((await call()).success,false);assert.equal(syncCalls,0);status='active';
+fail=true;let response=await call();assert.equal(response.success,false);assert.equal(response.data,undefined);fail=false;
+result={...result,importJobId:null};assert.equal((await call()).success,false);
+result={...result,importJobId:'server-job',source:'scaffold'};assert.equal((await call()).success,false);
+result={...result,source:'fhir'};response=await call();assert.equal(response.success,true);assert.equal(response.data.importJobId,'server-job');assert.deepEqual(response.data.itemsByType,{});assert(filters.some(([k,v])=>k==='user_id'&&v==='owner'));
+console.log('PASS provider preview client: auth/owner/status gating, no synthetic fallback, server receipt reuse, real empty preview');

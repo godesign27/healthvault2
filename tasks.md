@@ -944,3 +944,6 @@ This section supersedes older pending preview acceptance entries above; it does 
 
 ## 2026-10-05 — Preview deployment and next batch
 Completed: curated candidate preview deployment and local record-date/dashboard prop batch. Next: review import client/server contracts together; resolve remaining26 candidate diagnostics, verify clean dependency install and native acceptance before production.
+
+- [x] Integrate provider preview/confirmation clients and receipt validation;21 focused suites pass,22 candidate diagnostics remain.
+- [ ] Verify backend deployment compatibility before shipping import batch; resolve legacy import dependencies and independent dependency installation.
