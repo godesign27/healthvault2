@@ -1,3 +1,11 @@
+export const recoveryRedirect = 'https://healthvault.me';
+
+export function normalizeRecoveryEmail(email: string): string {
+  const normalized = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error('Enter a valid email address.');
+  return normalized;
+}
+
 export function isPasswordRecoveryUrl(value: string): boolean {
   let url: URL;
   try {

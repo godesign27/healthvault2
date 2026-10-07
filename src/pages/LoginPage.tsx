@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { normalizeRecoveryEmail, recoveryRedirect } from '../lib/password-recovery';
 import { LogIn } from 'lucide-react';
 
 interface LoginPageProps {
@@ -27,14 +28,24 @@ export function LoginPage({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sentNotice, setSentNotice] = useState('');
   const [isSignup, setIsSignup] = useState(false);
+  const [requestMode, setRequestMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSentNotice('');
 
     try {
+      if (requestMode) {
+        const normalized = normalizeRecoveryEmail(email);
+        const { error } = await supabase.auth.resetPasswordForEmail(normalized, { redirectTo: recoveryRedirect });
+        if (error) throw error;
+        setSentNotice('If an account exists for this email, you will receive a recovery link.');
+        return;
+      }
       if (isSignup) {
         // Route to the full onboarding flow instead of bypassing email verification
         onCreateAccount?.();
@@ -77,12 +88,12 @@ export function LoginPage({
           <h2 className={`text-2xl font-bold text-center mb-2 ${
             darkMode ? 'text-white' : 'text-content-primary'
           }`}>
-            {title || (isSignup ? 'Create Account' : 'Sign In')}
+            {title || (requestMode ? 'Reset password' : isSignup ? 'Create Account' : 'Sign In')}
           </h2>
           <p className={`text-center mb-8 ${
             darkMode ? 'text-content-secondary' : 'text-content-secondary'
           }`}>
-            {description || (isSignup ? 'Create your Health Vault account' : 'Sign in to your Health Vault')}
+            {description || (requestMode ? 'We will email a recovery link if an account exists.' : isSignup ? 'Create your Health Vault account' : 'Sign in to your Health Vault')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -107,7 +118,7 @@ export function LoginPage({
               />
             </div>
 
-            <div>
+            {!requestMode && <div>
               <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
                 darkMode ? 'text-content-primary' : 'text-content-primary'
               }`}>
@@ -126,9 +137,17 @@ export function LoginPage({
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
                 placeholder="Enter your password"
               />
-            </div>
+            </div>}
 
-            {notice ? <p className="text-sm text-content-secondary">{notice}</p> : null}
+            {!isSignup && <button
+              type="button"
+              onClick={() => { setRequestMode(!requestMode); setError(''); setSentNotice(''); setPassword(''); }}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            >
+              {requestMode ? 'Back to sign in' : 'Forgot password?'}
+            </button>}
+
+            {notice || sentNotice ? <p className="text-sm text-content-secondary">{sentNotice || notice}</p> : null}
             {error && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200">
                 <p className="text-sm text-red-600">{error}</p>
@@ -154,7 +173,7 @@ export function LoginPage({
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors disabled:opacity-50"
               >
                 <LogIn className="w-4 h-4" />
-                {loading ? (isSignup ? 'Creating account...' : 'Signing in...') : (isSignup ? 'Create Account' : 'Sign In')}
+                {loading ? (requestMode ? 'Sending link...' : isSignup ? 'Creating account...' : 'Signing in...') : (requestMode ? 'Send recovery link' : isSignup ? 'Create Account' : 'Sign In')}
               </button>
             </div>
           </form>
