@@ -1796,3 +1796,77 @@ Authentication, session reload, Dashboard, Records, Forms, Care, Insurance, Medi
 ## 2026-10-05 — Simulator sign-in interaction
 
 After the Device Hub window was visible, clicks and typing reached the preview sign-in screen. An empty password shows “Please enter your email and password.” The default-size Sign In control measures about 51 by 305 points. Authenticated screens, VoiceOver, and reduced motion remain unverified. No account was created and no credentials were recorded.
+
+## 2026-10-05 — Preview signed-in screen pass
+
+The preview Gmail account reached Dashboard after sign-out and sign-in. On the same QA simulator, Records, Vitals, Care, Insurance, and Medical Profile then loaded saved preview data: 12 health records, 74 vital measurements, Care medications 13, and a Medical Profile for Timothy McGuire. Insurance showed saved Aetna coverage and a UnitedHealthcare card that still needs a member ID. All preview vital and health-record rows belong to this account.
+
+The running candidate still renders Medical Forms from `mockStats` (4 of 18, 15 recipients) and hardcodes Dashboard Appointments and Medications at 0. The assistant button covers content on the live screens. VoiceOver, reduced motion, cold relaunch, physical device, and Android remain open. No production use, deployment, or merge.
+
+## 2026-10-05 — Dashboard profile lookup and sign-in scroll
+
+The dashboard Medical ID card queried `user_profiles.id`, which is a random profile key, so a saved name and date of birth rendered as placeholders. It now queries `user_id`, reads allergy names from `allergies` in newest-first order, and formats the date as a calendar day. The card shows the first three allergy names plus a remainder count. Sign-in content is top-aligned inside its scroll view, and the password field can shrink beside the visibility control. `node scripts/test-mobile-profile-lookup.mjs` covers the lookup and the October 12 date. After copying the hook into the running candidate, the simulator dashboard showed Timothy McGuire, October 12, 1967, and “Not on File, STRAWBERRY EXTRACT, PENICILLIN G +7”. That candidate still has its older login screen, sample Medical Forms, and hardcoded appointment and medication zeros.
+
+The current mobile screens were then loaded in that same simulator session. Dashboard Appointments and Medications now show a dash and “View in Care” instead of a fake zero. Medical Forms shows this account’s saved forms: 2 of 18, with Patient Registration and Medical History complete and Medical ID Information incomplete. The installed binary does not include expo-crypto or expo-file-system, so this simulator session uses local stand-ins for those two modules. Opening an upload or a share digest on this binary is not a test of the real native modules.
+
+Signed out and set the simulator to the largest content size. The current sign-in screen starts with Email cut off at the bottom, and scrolling reveals the password field, Forgot password on two lines, and a complete Sign In button. The password placeholder wraps beneath the visibility icon. The footer reads “Your personal health vault.” Content size was restored to large. The session is signed out.
+
+Moved the Vault Assistant control into the top bar as the rightmost button and shifted the profile avatar to its left. Removed the floating button and the extra list space reserved for it. On the signed-in simulator dashboard, the sparkles button opens Vault Assistant and the medication card is no longer covered.
+
+Cold-relaunched the signed-in QA simulator app. The dashboard came back with Timothy McGuire, October 12, 1967, Health Records 12, and the top-bar assistant. VoiceOver is absent from this simulator’s Vision accessibility list, so focus order was not tested. With Reduce Motion enabled, the menu still faded in. Reduce Motion was turned back off, and the app is on the dashboard again.
+
+Measured touch targets on the signed-in dashboard. At content size large, the menu, avatar, and assistant buttons are each 48 by 48 points. The selected menu row is 49 points tall and the other rows are about 53 points apart. At the largest text size those three buttons stay 48 by 48, the menu rows grow, and the list still scrolls to Insurance and Records. The dashboard title truncates, the Dashboard label wraps mid-word, the menu profile name and email truncate, and the allergy line is clipped. Content size was restored to large.
+
+Requested a password reset from the simulator for the preview Gmail account. The app showed the account-neutral notice, and Gmail received “Reset Your Password” from noreply@mail.app.supabase.io on the preview project. The running bundle asks for `healthvault://auth/recovery`, but the message link redirects to `https://healthvault27.com`. The recovery token was not opened and the password was not changed. The simulator is signed out on the reset form.
+
+Changed the mobile recovery redirect to `https://healthvault.me`. The preview Auth site URL was still the setting that replaced the previous link with `https://healthvault27.com`.
+
+Updated only preview project `roeudwddxvniazwufdqf`. Its Auth site URL is now `https://healthvault.me`. The redirect allow list dropped `https://healthvault27.com/**`, kept `https://chatgpt.com/connector/oauth/**`, and added `https://healthvault.me` and `https://healthvault.me/**`. A second read returned the same values. Checked email settings were unchanged. No new recovery message was sent, the earlier link was not opened, and the password was not changed. Production project `sgwekxjlvadvdosyudgj` was not modified.
+
+Checked for a physical iPhone before device acceptance. USB has no iPhone, `devicectl` and `xctrace` show only simulators, and `xcdevice` lists this Mac as the only physical device. The unsigned Debug app was not installed on a phone. Android tooling is also absent: `adb` is not installed and no emulator is connected. Physical and Android acceptance did not start.
+
+The iPhone 16e on iOS 18.4.1 is now paired and has been unlocked since boot. Developer Mode is disabled, so CoreDevice reports no developer disk image and a development build cannot be installed. A valid Apple Development identity for godesigngo@gmail.com is present. No app was installed and no device flow was exercised.
+
+Developer Mode was then enabled. A signed Debug install for this team cannot use `com.healthvault.app`, so the device build uses `com.timothymcguire.healthvault.deviceqa` without changing the project file. The app installed. Launch was denied until the phone trusts the developer certificate. No screen was verified.
+
+After the certificate was trusted, the app opened on the phone. iOS showed “Allow Health Vault to find devices on local networks?” over a development-server error. Metro on the Mac was still responding locally. Sign-in was not reached.
+
+Local network permission was allowed and the app was launched again. The phone connected to Metro and showed the sign-in screen: logo, “AI Medical Assistant,” email, password, Forgot password, and Sign In. No password was entered. Signed-in screens and VoiceOver were not tested on the phone.
+
+The user signed in on the phone. The dashboard shows Timothy McGuire, October 12, 1967, allergies beginning “Not on File, STRAWBERRY E...”, and Health Records 12 with no connected provider. The menu, avatar, and assistant are in the top bar, with the avatar immediately left of the assistant. The title is truncated to “Dashbo...”. VoiceOver and the cards below Health Records were not checked.
+
+Moved screen names out of the top bar and back into the page. On the phone, the top bar now has the menu, avatar, and assistant, and the page shows the full word “Dashboard” plus the welcome line. The allergy value is still cut at “STRAWBERRY E...”.
+
+The Health Vault mark now sits in the center of the phone’s top bar. Truncated allergy, condition, and emergency-contact values stay clipped until tapped, then the full text is shown. The tap itself was not exercised on the phone.
+
+Tapping the top-bar mark now sets the route to the dashboard. The 48-point hit target is centered on the mark. The phone bundle was updated, but the navigation was not observed because the phone was already on the dashboard.
+
+VoiceOver is on in the QA simulator. After sign-in, the cursor was shown on the menu, the Health Vault mark, the profile avatar, the assistant button, the Dashboard heading, and the welcome sentence, which was heard. A pass through the page ended with the cursor on “Open Records” and the page scrolled to Quick Actions. VoiceOver played the end-of-screen boundary sound. Synthetic clicks still do not move the cursor.
+
+The supported iOS minimum is now 15.0 in the Xcode project, the Podfile, and the Expo config. Every pod target is 15.0. An unsigned Debug simulator build on Xcode 27 succeeded without a command-line override, and the built app’s minimum OS is 15.0.
+
+The Android 14 emulator is signed in. The dashboard shows Timothy McGuire, October 12, 1967, Health Records 12, and “0 connected · Last sync Never.” Opening Records and tapping the Health Vault mark returns to the dashboard. The allergy line is still visually cut at “SHELLFISH-DERIVED...”. TalkBack is not installed on this emulator image.
+
+With Reduce Motion on, the menu and assistant now use no modal animation. On the signed-in QA simulator the menu opens in one frame: a 30fps capture of the backdrop goes from full brightness to the final dim overlay between two frames. Reduce Motion was turned back off. The assistant sheet was not opened in this pass.
+
+At the largest text size, shared rows now stack. The dashboard title and the menu label “Dashboard” each stay one word. The menu profile name stays whole, and the email wraps with the full address visible. Allergies sit under their label; the value still previews two lines. Health Records and Medical Forms use the full card width. Content size was restored to large.
+
+Requested a new preview password reset for the preview Gmail account. Gmail received “Reset Your Password” from noreply@mail.app.supabase.io. The message redirect is `https://healthvault.me` and does not use `healthvault27.com`. The link was not opened and the password was not changed. Production was not used.
+
+On the unlocked iPhone 16e, Health Vault opened on the signed-in dashboard. After Records was opened, tapping the Health Vault mark returned to the dashboard. The capture shows the full word “Dashboard,” Timothy McGuire, and October 12, 1967. The allergy line still ends at “PENICILLIN G, S...”. The first tap did nothing because the press handler was attached only after a truncation check that never succeeded. The limited value is now always pressable, and the user confirmed a later tap on the phone expands it.
+
+On the Android 14 emulator, tapping the same allergy line expanded it. The value area grew from 116 pixels tall to 290, and the full list is visible through “Penicillin, Penicillin.” TalkBack is still not installed on this image.
+
+Android Accessibility Suite was then installed from the Play Store and TalkBack was turned on. The dashboard speech caption read “Open menu, Button,” and the allergy value is exposed as a button with the full list. TalkBack’s speech was not captured on that allergy line. The emulator restarted onto its lock screen, and TalkBack was turned off so the screen can be unlocked.
+
+After the emulator was unlocked, TalkBack was turned on again. Focusing the allergy line spoke “collapsed,” the full list through “Penicillin, Penicillin,” “Button,” and “Shows the full text.” The visible value stayed collapsed at “SHELLFISH-DERIVE...”. The temporary on-screen speech caption was turned back off.
+
+With Reduce Motion on, opening Vault Assistant on the QA simulator cut straight to the sheet. A 30fps capture shows the dashboard in one frame and the full “Vault Assistant” sheet in the next, with no sliding frame between. Reduce Motion was turned back off.
+
+VoiceOver on the QA simulator: opening the menu moves the cursor onto Close menu, and closing the menu returns it to the menu button. Opening Vault Assistant does not place the cursor on Close assistant, the title, or the suggestions, and the cursor leaves the menu button.
+
+Vault Assistant now moves VoiceOver focus the same way the menu does. On the signed-in QA simulator, opening the sheet places the black cursor on Close assistant. Closing the sheet places it back on the assistant button. The spoken words were not captured. Physical-phone announcement and the recovery link remain open.
+
+On the unlocked iPhone 16e, VoiceOver was on and the cursor was the black ring around the menu button. The user heard the announcements and confirmed they work. The spoken words were not shown on screen. The recovery link was not opened and the password was not changed.
+
+The website now treats a recovery address as its own state. On the local site, `#type=recovery` shows Set new password. Submitting a short password shows “Use at least 12 characters.” Submitting mismatched passwords shows “The passwords do not match.” The plain home page remains the marketing site. No live recovery link was opened, no password was changed, and the hosted site was not deployed.

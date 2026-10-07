@@ -10,6 +10,7 @@ interface LoginPageProps {
   title?: string;
   description?: string;
   allowSignup?: boolean;
+  notice?: string;
 }
 
 export function LoginPage({
@@ -20,6 +21,7 @@ export function LoginPage({
   title,
   description,
   allowSignup = true,
+  notice = '',
 }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -126,6 +128,7 @@ export function LoginPage({
               />
             </div>
 
+            {notice ? <p className="text-sm text-content-secondary">{notice}</p> : null}
             {error && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200">
                 <p className="text-sm text-red-600">{error}</p>

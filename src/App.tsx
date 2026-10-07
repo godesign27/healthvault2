@@ -45,6 +45,8 @@ import SecureShareLanding from './pages/SecureShareLanding';
 import ProviderRecordSubmitPage from './pages/ProviderRecordSubmitPage';
 import { FhirConnectCompletePage } from './pages/FhirConnectCompletePage';
 import { LoginPage } from './pages/LoginPage';
+import { PasswordRecoveryPage } from './pages/PasswordRecoveryPage';
+import { clearAuthRecoveryUrl, isPasswordRecoveryUrl, validateNewPassword } from './lib/password-recovery';
 import { OnboardingStartPage } from './pages/OnboardingStartPage';
 import { OnboardingAccountPage } from './pages/OnboardingAccountPage';
 import { OnboardingVerifyEmailPage } from './pages/OnboardingVerifyEmailPage';
@@ -171,6 +173,8 @@ function App() {
     onboardingComplete: IS_DEMO_MODE,
     onboardingChecked: IS_DEMO_MODE
   }));
+  const [passwordRecovery, setPasswordRecovery] = useState(() => isPasswordRecoveryUrl(window.location.href));
+  const [signInNotice, setSignInNotice] = useState('');
 
   const initializingRef = useRef(false);
   const authSubscriptionRef = useRef<any>(null);
@@ -210,6 +214,7 @@ function App() {
   }, [authState.authChecked, authState.isAuthenticated, currentView, onboardingStep]);
 
   useEffect(() => {
+    if (passwordRecovery) return;
     if (
       authState.authChecked &&
       authState.onboardingChecked &&
@@ -222,7 +227,7 @@ function App() {
       setCurrentView('health-vault');
       window.history.replaceState({}, '', '/dashboard');
     }
-  }, [authState, currentView]);
+  }, [authState, currentView, passwordRecovery]);
 
   useEffect(() => {
     if (initializingRef.current) return;
@@ -259,11 +264,13 @@ function App() {
 
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (sessionStorage.getItem(SESSION_DEMO_KEY) === 'true') return;
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true);
       const authenticated = !!session;
 
       if (!authenticated) {
+        if (!isPasswordRecoveryUrl(window.location.href)) setPasswordRecovery(false);
         setAuthState({
           isAuthenticated: false,
           authChecked: true,
@@ -420,6 +427,28 @@ function App() {
     }
   };
 
+  const leavePasswordRecovery = async () => {
+    clearAuthRecoveryUrl();
+    setPasswordRecovery(false);
+    await supabase.auth.signOut();
+    setAuthState({
+      isAuthenticated: false,
+      authChecked: true,
+      onboardingComplete: false,
+      onboardingChecked: true
+    });
+    setCurrentView('login');
+  };
+
+  const handleRecoverySave = async (password: string, confirmation: string) => {
+    const problem = validateNewPassword(password, confirmation);
+    if (problem) throw new Error(problem);
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    setSignInNotice('Password updated. Sign in with your new password.');
+    await leavePasswordRecovery();
+  };
+
   const handleProjectOpen = (projectId: string) => {
     setCurrentProjectId(projectId);
   };
@@ -431,6 +460,7 @@ function App() {
   const renderPage = () => {
     if (currentView === 'login') {
       return <LoginPage
+        notice={signInNotice}
         onLoginSuccess={handleLoginSuccess}
         onCancel={handleLoginCancel}
         onCreateAccount={() => {
@@ -598,6 +628,10 @@ function App() {
 
     return <DesignSystemDemoShell>{designSystemContent}</DesignSystemDemoShell>;
   };
+
+  if (passwordRecovery) {
+    return <PasswordRecoveryPage onSave={handleRecoverySave} onCancel={leavePasswordRecovery} />;
+  }
 
   const policyPath = window.location.pathname.replace(/\/$/, '');
   if (policyPath === '/privacy' || policyPath === '/terms' || policyPath === '/support') {
