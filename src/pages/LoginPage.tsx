@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { normalizeRecoveryEmail, recoveryRedirect } from '../lib/password-recovery';
+import { PasswordField } from '../components/auth/PasswordField';
 import { LogIn } from 'lucide-react';
 
 interface LoginPageProps {
@@ -118,26 +119,22 @@ export function LoginPage({
               />
             </div>
 
-            {!requestMode && <div>
-              <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
-                darkMode ? 'text-content-primary' : 'text-content-primary'
-              }`}>
-                Password
-              </label>
-              <input
+            {!requestMode && (
+              <PasswordField
                 id="password"
-                type="password"
+                label="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={setPassword}
+                autoComplete="current-password"
                 required
-                className={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
+                placeholder="Enter your password"
+                inputClassName={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
                   darkMode
                     ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-indigo-500'
                     : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
-                placeholder="Enter your password"
               />
-            </div>}
+            )}
 
             {!isSignup && <button
               type="button"

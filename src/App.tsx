@@ -46,7 +46,7 @@ import ProviderRecordSubmitPage from './pages/ProviderRecordSubmitPage';
 import { FhirConnectCompletePage } from './pages/FhirConnectCompletePage';
 import { LoginPage } from './pages/LoginPage';
 import { PasswordRecoveryPage } from './pages/PasswordRecoveryPage';
-import { clearAuthRecoveryUrl, isPasswordRecoveryUrl, validateNewPassword } from './lib/password-recovery';
+import { clearAuthRecoveryUrl, isPasswordRecoveryUrl, recoveryNeedsAuthenticator, validateNewPassword } from './lib/password-recovery';
 import { OnboardingStartPage } from './pages/OnboardingStartPage';
 import { OnboardingAccountPage } from './pages/OnboardingAccountPage';
 import { OnboardingVerifyEmailPage } from './pages/OnboardingVerifyEmailPage';
@@ -174,6 +174,7 @@ function App() {
     onboardingChecked: IS_DEMO_MODE
   }));
   const [passwordRecovery, setPasswordRecovery] = useState(() => isPasswordRecoveryUrl(window.location.href));
+  const [recoveryNeedsCode, setRecoveryNeedsCode] = useState(false);
   const [signInNotice, setSignInNotice] = useState('');
 
   const initializingRef = useRef(false);
@@ -228,6 +229,21 @@ function App() {
       window.history.replaceState({}, '', '/dashboard');
     }
   }, [authState, currentView, passwordRecovery]);
+
+  useEffect(() => {
+    if (!passwordRecovery) {
+      setRecoveryNeedsCode(false);
+      return;
+    }
+    let active = true;
+    void supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
+      if (!active || !data) return;
+      setRecoveryNeedsCode(recoveryNeedsAuthenticator(data.currentLevel, data.nextLevel));
+    });
+    return () => {
+      active = false;
+    };
+  }, [passwordRecovery]);
 
   useEffect(() => {
     if (initializingRef.current) return;
@@ -440,11 +456,32 @@ function App() {
     setCurrentView('login');
   };
 
-  const handleRecoverySave = async (password: string, confirmation: string) => {
+  const handleRecoverySave = async (password: string, confirmation: string, authenticatorCode: string) => {
     const problem = validateNewPassword(password, confirmation);
     if (problem) throw new Error(problem);
+    const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (assuranceError) throw assuranceError;
+    if (assurance && recoveryNeedsAuthenticator(assurance.currentLevel, assurance.nextLevel)) {
+      const code = authenticatorCode.trim();
+      if (!/^\d{6}$/.test(code)) throw new Error('Enter the 6-digit code from your authenticator app.');
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+      if (factorsError) throw factorsError;
+      const factor = [...factors.totp, ...factors.phone].find((item) => item.status === 'verified');
+      if (!factor) throw new Error('No authenticator is enrolled for this account.');
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: factor.id });
+      if (challengeError) throw challengeError;
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: factor.id,
+        challengeId: challenge.id,
+        code,
+      });
+      if (verifyError) throw verifyError;
+    }
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw error;
+    if (error) {
+      if (error.message.includes('AAL2')) setRecoveryNeedsCode(true);
+      throw error;
+    }
     setSignInNotice('Password updated. Sign in with your new password.');
     await leavePasswordRecovery();
   };
@@ -630,7 +667,7 @@ function App() {
   };
 
   if (passwordRecovery) {
-    return <PasswordRecoveryPage onSave={handleRecoverySave} onCancel={leavePasswordRecovery} />;
+    return <PasswordRecoveryPage onSave={handleRecoverySave} onCancel={leavePasswordRecovery} authenticatorRequired={recoveryNeedsCode} />;
   }
 
   const policyPath = window.location.pathname.replace(/\/$/, '');

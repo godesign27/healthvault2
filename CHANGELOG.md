@@ -38,6 +38,7 @@
 - Physical iPhone VoiceOver. VoiceOver was on and the cursor was on the menu button. The user heard the announcements and confirmed they work. The spoken words were not captured on screen.
 - Web password recovery. A local `type=recovery` address shows Set new password instead of the vault. A short password shows “Use at least 12 characters.” Mismatched passwords show “The passwords do not match.” Opening the plain home page shows the marketing site. The live recovery email was not opened and the password was not changed.
 - Sign In includes Forgot password. It asks for an email and sends the recovery link to https://healthvault.me.
+- Set new password shows the Health Vault mark. A password field shows an eye after text is entered. The recovery email template is branded for Health Vault.
 
 ### Remaining
 

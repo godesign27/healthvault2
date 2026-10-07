@@ -17,6 +17,15 @@ export function isPasswordRecoveryUrl(value: string): boolean {
   return hash.get('type') === 'recovery' || url.searchParams.get('type') === 'recovery';
 }
 
+export function recoveryNeedsAuthenticator(currentLevel: string | null, nextLevel: string | null): boolean {
+  return nextLevel === 'aal2' && currentLevel !== 'aal2';
+}
+
+export function friendlyRecoveryError(message: string): string {
+  if (message.includes('AAL2')) return 'Enter the 6-digit code from your authenticator app.';
+  return message;
+}
+
 export function validateNewPassword(password: string, confirmation: string): string | null {
   if (password.length < 12) return 'Use at least 12 characters.';
   if (password !== confirmation) return 'The passwords do not match.';
