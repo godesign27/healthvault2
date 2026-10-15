@@ -2,7 +2,7 @@ import 'react-native-url-polyfill/auto';
 import 'react-native-gesture-handler';
 import {typeStyles, control, adaptiveLayout} from './src/theme/layout';
 import {recordsColors} from './src/theme/records';
-import {NoticeBanner} from './src/components/ui/NoticeBanner';
+import {NoticeBanner, useNotice} from './src/components/ui/NoticeBanner';
 import {AppText as Text,AppTextInput as TextInput,RevealText} from './src/components/ui/AppText';
 import { AppRegistry } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -165,7 +165,7 @@ function AppTopBar({ darkShell, onMenuPress, onLogoPress, userProfile, onAvatarP
         onPress={onAvatarPress}
         accessibilityRole="button"
         accessibilityLabel="Open profile settings"
-        style={styles.topBarAvatarWrap}
+        style={[styles.topBarAvatarWrap, { borderColor: colors.border }]}
         disabled={!onAvatarPress}
       >
             {userProfile?.avatarUri ? (
@@ -175,8 +175,8 @@ function AppTopBar({ darkShell, onMenuPress, onLogoPress, userProfile, onAvatarP
                 accessibilityLabel={userProfile?.name || userProfile?.email}
               />
             ) : (
-              <View style={[styles.topBarAvatarImg, styles.topBarAvatarInitials]}>
-                <Text variant="caption" maxFontSizeMultiplier={1.2} style={styles.topBarAvatarInitialsText}>
+              <View style={[styles.topBarAvatarImg, styles.topBarAvatarInitials, { backgroundColor: colors.surfaceMuted }]}>
+                <Text variant="caption" maxFontSizeMultiplier={1.2} style={[styles.topBarAvatarInitialsText, { color: colors.textPrimary }]}>
                   {shellUserInitials(userProfile)}
                 </Text>
               </View>
@@ -221,13 +221,13 @@ function AppDrawer({
   const stroke = colors.border;
   const [signingOut, setSigningOut] = useState(false);
   const signingOutRef = useRef(false);
-  const [signOutError, setSignOutError] = useState(null);
+  const {notice: signOutNotice, showNotice, dismissNotice} = useNotice();
   const handleSignOut = async () => {
     if (signingOutRef.current) return;
     signingOutRef.current = true;
-    setSigningOut(true); setSignOutError(null);
+    setSigningOut(true); dismissNotice();
     try { await signOut(); onClose(); }
-    catch { setSignOutError('Unable to sign out. Please try again.'); }
+    catch { showNotice('Unable to sign out. Please try again.', 'error'); }
     finally { signingOutRef.current = false; setSigningOut(false); }
   };
 
@@ -309,7 +309,7 @@ function AppDrawer({
                 <Text variant="body" style={[styles.drawerRowLabel, { color: colors.dangerAction, flex: 1 }]}>{signingOut ? 'Signing out…' : 'Sign Out'}</Text>
               </Pressable>
             ) : null}
-            {signOutError && <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" style={{ color: colors.danger }}>{signOutError}</Text>}
+            {signOutNotice ? <NoticeBanner message={signOutNotice.message} tone={signOutNotice.tone} colors={colors} onDismiss={dismissNotice} /> : null}
           </ScrollView>
 
           <View style={[styles.drawerFooter, { paddingBottom: insets.bottom + 12, borderTopColor: stroke }]}>
@@ -334,8 +334,8 @@ function AppDrawer({
                   accessibilityLabel={userProfile?.name || userProfile?.email}
                 />
               ) : (
-                <View style={[styles.drawerProfilePhoto, styles.drawerProfileInitials]}>
-                  <Text variant="body" maxFontSizeMultiplier={1.2} style={styles.drawerProfileInitialsText}>
+                <View style={[styles.drawerProfilePhoto, styles.drawerProfileInitials, { backgroundColor: colors.surfaceMuted }]}>
+                  <Text variant="body" maxFontSizeMultiplier={1.2} style={[styles.drawerProfileInitialsText, { color: colors.textPrimary }]}>
                     {shellUserInitials(userProfile)}
                   </Text>
                 </View>
