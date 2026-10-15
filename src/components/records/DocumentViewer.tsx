@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 import { formatRecordDate } from '../../../packages/api-client/src/record-date';
 import { useState, useEffect } from 'react';
 import { X, FileText, Share2, Sparkles, ExternalLink, Loader2 } from 'lucide-react';
@@ -15,12 +16,12 @@ interface DocumentViewerProps {
 }
 
 export function DocumentViewer({ record, darkMode = false, onClose, onRequestInsight }: DocumentViewerProps) {
+  const { notify, feedback } = useActionFeedback();
   const [activeTab, setActiveTab] = useState<'summary' | 'document' | 'insights'>('summary');
   const [showShareFlow, setShowShareFlow] = useState(false);
   const [shareEmail, setShareEmail] = useState('');
   const [shareMessage, setShareMessage] = useState('');
   const [shareHours, setShareHours] = useState(72);
-  const [shareSuccess, setShareSuccess] = useState(false);
   const [insightLoading, setInsightLoading] = useState(false);
   const [insightResult, setInsightResult] = useState<string | null>(null);
   const [insightError, setInsightError] = useState<string | null>(null);
@@ -42,17 +43,17 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
       if (event === 'SIGNED_OUT' || changedUser) {
         controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl);
         setFilePreview(null); setFileLoading(false);
-        setFileError('Your session changed. Close and reopen this document.');
+        setFileError('unavailable'); notify('Your session changed. Close and reopen this document.', 'error');
       }
     });
     loadRecordFile(record.id, controller.signal).then(blob => {
       if (controller.signal.aborted) return;
       objectUrl = URL.createObjectURL(blob); setFilePreview({ id: record.id, url: objectUrl });
     }).catch(error => {
-      if (!controller.signal.aborted) setFileError(error instanceof Error ? error.message : 'Unable to open this file.');
+      if (!controller.signal.aborted) { setFileError('unavailable'); notify(error instanceof Error ? error.message : 'Unable to open this file.', 'error'); }
     }).finally(() => { if (!controller.signal.aborted) setFileLoading(false); });
     return () => { controller.abort(); subscription.unsubscribe(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [record?.id, record?.fileAccess, activeTab]);
+  }, [record?.id, record?.fileAccess, activeTab, notify]);
 
   useEffect(() => {
     if (isOpen) {
@@ -109,14 +110,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
       expiresInHours: shareHours
     };
 
-    await shareRecord(input);
-    setShareSuccess(true);
-    setTimeout(() => {
-      setShareSuccess(false);
-      setShareEmail('');
-      setShareMessage('');
-      setShowShareFlow(false);
-    }, 3000);
+    try { await shareRecord(input); }
+    catch (error) { notify(error instanceof Error ? error.message : 'Record sharing is unavailable in this flow. Nothing was sent.', 'error'); }
   };
 
   const handleShareClick = () => {
@@ -126,6 +121,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
   return (
     <>
+      {feedback}
       <div
         className="fixed inset-0 bg-black/50 transition-opacity duration-300 z-40"
         onClick={onClose}
@@ -133,12 +129,12 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
       <div className={`fixed top-0 right-0 h-full w-full max-w-2xl shadow-2xl transition-transform duration-300 ease-in-out z-50 flex flex-col ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      } ${darkMode ? 'bg-surface-raised' : 'bg-white'}`}>
+      } ${darkMode ? 'bg-surface-raised' : 'bg-surface-raised'}`}>
         <div className={`flex items-center justify-between p-6 border-b ${
           darkMode ? 'border-stroke-default' : 'border-stroke-subtle'
         }`}>
           <h2 className={`text-lg font-semibold ${
-            darkMode ? 'text-white' : 'text-content-primary'
+            'text-content-primary'
           }`}>
             {record.title}
           </h2>
@@ -167,8 +163,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
               className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors capitalize ${
                 activeTab === tab
                   ? darkMode
-                    ? 'border-emerald-500 text-emerald-400'
-                    : 'border-emerald-600 text-emerald-600'
+                    ? 'border-stroke-default text-content-feedback-success'
+                    : 'border-stroke-default text-content-feedback-success'
                   : darkMode
                     ? 'border-transparent text-content-secondary hover:text-content-primary'
                     : 'border-transparent text-content-secondary hover:text-content-primary'
@@ -210,12 +206,12 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
               {record.aiSummary && (
                 <div className={`p-4 rounded-lg border ${
                   darkMode
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-content-primary'
-                    : 'bg-emerald-50 border-emerald-200 text-content-primary'
+                    ? 'bg-surface-feedback-success border-stroke-default text-content-primary'
+                    : 'bg-surface-feedback-success border-stroke-default text-content-primary'
                 }`}>
                   <div className="flex items-start gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-emerald-500 mt-0.5" />
-                    <span className="font-medium text-emerald-600">AI Summary</span>
+                    <Sparkles className="w-4 h-4 text-content-feedback-success mt-0.5" />
+                    <span className="font-medium text-content-feedback-success">AI Summary</span>
                   </div>
                   <p>{record.aiSummary}</p>
                 </div>
@@ -225,12 +221,13 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
           {activeTab === 'document' && (
             <div>
+              {record.fileType === 'dicom' && <div className="py-4 text-content-secondary"><p>DICOM viewing is not yet supported in-browser.</p><p className="mt-2 text-sm">Download the file and open it with a DICOM viewer such as <strong>OsiriX</strong>, <strong>RadiAnt</strong>, or <strong>3D Slicer</strong>.</p></div>}
               {fileLoading ? (
                 <div role="status" className="flex items-center justify-center gap-2 py-12 text-content-secondary">
                   <Loader2 className="w-5 h-5 animate-spin" /> Opening your file…
                 </div>
               ) : fileError ? (
-                <p role="alert" className="py-8 text-content-secondary">{fileError}</p>
+                null
               ) : previewUrl ? (
                 <div className="space-y-3">
                   {['jpg', 'png'].includes(record.fileType) ? (
@@ -258,7 +255,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                         rel="noopener noreferrer"
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                           darkMode
-                            ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
+                            ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
                             : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
                         }`}
                       >
@@ -290,15 +287,13 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                   <FileText className="w-16 h-16 mb-4" />
                   {record.fileType === 'dicom' ? (
                     <>
-                      <p className="text-center mb-2">DICOM viewing is not yet supported in-browser.</p>
-                      <p className="text-sm text-center mb-4">Download the file and open it with a DICOM viewer such as <strong>OsiriX</strong>, <strong>RadiAnt</strong>, or <strong>3D Slicer</strong>.</p>
                       {previewUrl && (
                         <a
                           href={previewUrl}
                           download
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                             darkMode
-                              ? 'bg-surface-sunken hover:bg-surface-sunken text-white'
+                              ? 'bg-surface-sunken hover:bg-surface-sunken text-content-primary'
                               : 'bg-surface-sunken hover:bg-surface-overlay text-content-primary'
                           }`}
                         >
@@ -326,8 +321,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                 disabled={insightLoading}
                 className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-60 ${
                   darkMode
-                    ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400'
-                    : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
+                    ? 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-feedback-success'
+                    : 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-feedback-success'
                 }`}
               >
                 {insightLoading ? (
@@ -345,7 +340,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
               {insightError && (
                 <div className={`p-4 rounded-lg text-sm ${
-                  darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-700'
+                  darkMode ? 'bg-surface-feedback-error text-content-feedback-error' : 'bg-surface-feedback-error text-content-feedback-error'
                 }`}>
                   {insightError}
                 </div>
@@ -354,12 +349,12 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
               {insightResult ? (
                 <div className={`p-4 rounded-lg border ${
                   darkMode
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-content-primary'
-                    : 'bg-emerald-50 border-emerald-200 text-content-primary'
+                    ? 'bg-surface-feedback-success border-stroke-default text-content-primary'
+                    : 'bg-surface-feedback-success border-stroke-default text-content-primary'
                 }`}>
                   <div className="flex items-start gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-emerald-500 mt-0.5" />
-                    <span className="font-medium text-emerald-600">AI Insight</span>
+                    <Sparkles className="w-4 h-4 text-content-feedback-success mt-0.5" />
+                    <span className="font-medium text-content-feedback-success">AI Insight</span>
                   </div>
                   <p className="text-sm leading-relaxed">{insightResult}</p>
                   <p className={`text-xs mt-3 ${darkMode ? 'text-content-tertiary' : 'text-content-tertiary'}`}>
@@ -382,15 +377,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
           {showShareFlow && (
             <div className="space-y-4 mt-6">
-              {shareSuccess ? (
-                <div className={`p-4 rounded-lg text-center ${
-                  darkMode
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : 'bg-emerald-50 text-emerald-700'
-                }`}>
-                  ✓ Shared securely. The link expires in {shareHours} hours.
-                </div>
-              ) : (
+              <p className="text-sm text-content-secondary">Record sharing is unavailable in this flow. No link will be created and nothing will be sent.</p>
                 <>
                   <div>
                     <label className={`block text-sm font-medium mb-2 ${
@@ -405,8 +392,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       placeholder="doctor@example.com"
                       className={`w-full px-4 py-2 rounded-lg border ${
                         darkMode
-                          ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                          : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                          ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                          : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                       }`}
                     />
                   </div>
@@ -424,8 +411,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       rows={3}
                       className={`w-full px-4 py-2 rounded-lg border resize-none ${
                         darkMode
-                          ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                          : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                          ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                          : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                       }`}
                     />
                   </div>
@@ -441,8 +428,8 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       onChange={(e) => setShareHours(Number(e.target.value))}
                       className={`w-full px-4 py-2 rounded-lg border ${
                         darkMode
-                          ? 'bg-surface-sunken border-stroke-default text-white'
-                          : 'bg-white border-stroke-default text-content-primary'
+                          ? 'bg-surface-sunken border-stroke-default text-content-primary'
+                          : 'bg-surface-raised border-stroke-default text-content-primary'
                       }`}
                     >
                       <option value={24}>24 hours</option>
@@ -461,28 +448,27 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                           ? 'bg-surface-sunken text-content-secondary cursor-not-allowed'
                           : 'bg-surface-sunken text-content-secondary cursor-not-allowed'
                         : darkMode
-                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          ? 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-on-action'
+                          : 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-on-action'
                     }`}
                   >
                     <Share2 className="w-5 h-5" />
-                    Create Secure Share Link
+                    Share record
                   </button>
                 </>
-              )}
             </div>
           )}
         </div>
 
         <div className={`absolute bottom-0 left-0 right-0 p-6 border-t ${
-          darkMode ? 'bg-surface-raised border-stroke-default' : 'bg-white border-stroke-subtle'
+          darkMode ? 'bg-surface-raised border-stroke-default' : 'bg-surface-raised border-stroke-subtle'
         }`}>
           <button
             onClick={handleShareClick}
             className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
               darkMode
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                ? 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-on-action'
+                : 'bg-surface-feedback-success hover:bg-surface-feedback-success text-content-on-action'
             }`}
           >
             <Share2 className="w-5 h-5" />

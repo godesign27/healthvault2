@@ -459,12 +459,14 @@ export function ProfileSettingsDrawer({
                 <p className={`text-sm font-medium ${
                   'text-content-primary'
                 }`}>{userEmail}</p>
+                {isEmailVerified && (
                 <span className={`text-xs flex items-center gap-1 ${
                   darkMode ? 'text-emerald-400' : 'text-emerald-600'
                 }`}>
                   <Shield className="w-3 h-3" />
                   Verified
                 </span>
+                )}
               </div>
             </div>
 

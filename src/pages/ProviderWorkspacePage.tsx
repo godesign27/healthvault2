@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { Building2, FileJson, KeyRound, Loader2, LockKeyhole, LogOut, ShieldCheck, Stethoscope, UserCog, UsersRound } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -21,6 +22,7 @@ interface Workspace {
 function readable(value: string) { return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 
 export function ProviderWorkspacePage() {
+  const { notify, feedback } = useActionFeedback();
   const [loading, setLoading] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
   const [signedInEmail, setSignedInEmail] = useState('');
@@ -83,20 +85,28 @@ export function ProviderWorkspacePage() {
   useEffect(() => { void loadSecurityState(); }, [loadSecurityState]);
 
   async function startEnrollment() {
+    if (busy) return;
     setBusy(true); setError('');
-    const { data, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Health Vault Provider Portal' });
-    if (enrollError) setError(enrollError.message);
-    else setEnrollment({ factorId: data.id, qrCode: data.totp.qr_code, secret: data.totp.secret });
-    setBusy(false);
+    try {
+      const { data, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Health Vault Provider Portal' });
+      if (enrollError) throw enrollError;
+      setEnrollment({ factorId: data.id, qrCode: data.totp.qr_code, secret: data.totp.secret });
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Unable to set up an authenticator.', 'error');
+    } finally { setBusy(false); }
   }
 
   async function verifyCode(factorId: string) {
+    if (busy) return;
     if (!/^\d{6}$/.test(code)) { setError('Enter the six-digit code from your authenticator app.'); return; }
     setBusy(true); setError('');
-    const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
-    if (verifyError) setError(verifyError.message);
-    else { setCode(''); setEnrollment(null); await loadSecurityState(); }
-    setBusy(false);
+    try {
+      const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
+      if (verifyError) throw verifyError;
+      setCode(''); setEnrollment(null); await loadSecurityState();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Unable to verify the authenticator code.', 'error');
+    } finally { setBusy(false); }
   }
 
   async function switchProviderAccount() {
@@ -108,6 +118,7 @@ export function ProviderWorkspacePage() {
 
   if (step !== 'ready') return (
     <main className="min-h-screen bg-surface-page px-4 py-12">
+      {feedback}
       <section className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-stroke-subtle bg-surface-raised shadow-lg">
         <header className="border-b border-stroke-subtle px-7 py-6"><ShieldCheck className="mb-4 text-indigo-600" /><p className="text-xs font-semibold uppercase tracking-wider text-content-tertiary">Health Vault Provider Portal</p><h1 className="mt-1 text-2xl font-bold text-content-primary">Secure workspace access</h1></header>
         <div className="px-7 py-7">

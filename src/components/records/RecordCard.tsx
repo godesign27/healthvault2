@@ -25,10 +25,10 @@ function getKindIcon(kind: RecordKind) {
 
 function getKindColor(kind: RecordKind, darkMode: boolean) {
   const colors = {
-    [RecordKind.Lab]: darkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600',
-    [RecordKind.Imaging]: darkMode ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600',
-    [RecordKind.Pathology]: darkMode ? 'bg-orange-500/10 text-orange-400' : 'bg-orange-50 text-orange-600',
-    [RecordKind.SpecialistReport]: darkMode ? 'bg-teal-500/10 text-teal-400' : 'bg-teal-50 text-teal-600',
+    [RecordKind.Lab]: darkMode ? 'bg-surface-feedback-info text-content-feedback-info' : 'bg-surface-feedback-info text-content-feedback-info',
+    [RecordKind.Imaging]: darkMode ? 'bg-surface-feedback-info text-content-feedback-info' : 'bg-surface-feedback-info text-content-feedback-info',
+    [RecordKind.Pathology]: darkMode ? 'bg-surface-feedback-warning text-content-feedback-warning' : 'bg-surface-feedback-warning text-content-feedback-warning',
+    [RecordKind.SpecialistReport]: darkMode ? 'bg-surface-feedback-info text-content-feedback-info' : 'bg-surface-feedback-info text-content-feedback-info',
     [RecordKind.Other]: darkMode ? 'bg-surface-sunken/10 text-content-secondary' : 'bg-surface-sunken text-content-secondary',
   };
   return colors[kind];
@@ -36,9 +36,9 @@ function getKindColor(kind: RecordKind, darkMode: boolean) {
 
 function getSourceBadge(source: RecordSource) {
   const badges = {
-    [RecordSource.Connected]: { icon: Database, label: 'Connected', color: 'bg-emerald-100 text-emerald-700' },
-    [RecordSource.Uploaded]: { icon: Upload, label: 'Uploaded', color: 'bg-blue-100 text-blue-700' },
-    [RecordSource.Shared]: { icon: Link2, label: 'Shared', color: 'bg-amber-100 text-amber-700' },
+    [RecordSource.Connected]: { icon: Database, label: 'Connected', color: 'bg-surface-feedback-success text-content-feedback-success' },
+    [RecordSource.Uploaded]: { icon: Upload, label: 'Uploaded', color: 'bg-surface-feedback-info text-content-feedback-info' },
+    [RecordSource.Shared]: { icon: Link2, label: 'Shared', color: 'bg-surface-feedback-warning text-content-feedback-warning' },
   };
   return badges[source];
 }
@@ -61,7 +61,7 @@ export function RecordCard({ record, darkMode = false, onClick }: RecordCardProp
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3 className={`font-semibold truncate ${
-              darkMode ? 'text-white' : 'text-content-primary'
+              'text-content-primary'
             }`}>
               {record.title}
             </h3>
@@ -92,7 +92,7 @@ export function RecordCard({ record, darkMode = false, onClick }: RecordCardProp
               }`}
             >
               <div className="flex items-start gap-1.5">
-                <span className="text-xs font-medium text-emerald-500 mt-0.5">AI</span>
+                <span className="text-xs font-medium text-content-feedback-success mt-0.5">AI</span>
                 <p className="flex-1 line-clamp-2">{record.aiSummary}</p>
               </div>
             </div>

@@ -45,7 +45,7 @@ interface ClaimRow {
   service_date: string;
   provider_name?: string;
   description?: string;
-  amount_billed?: number;
+  amount_billed?: number | string | null;
   status?: string;
 }
 
@@ -112,10 +112,10 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
   const labRecords = encounters.filter(e => e.encounter_type?.toLowerCase() === 'lab');
 
   const statsCards = [
-    { title: 'Lab Results', count: labRecords.length, icon: BeakerIcon, bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-    { title: 'Encounters', count: encounters.length, icon: Heart, bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-    { title: 'Medications', count: medications.length, icon: Pill, bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-    { title: 'Claims', count: claims.length, icon: FileText, bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600' }
+    { title: 'Lab Results', count: labRecords.length, icon: BeakerIcon, bgColor: 'bg-surface-sunken', iconColor: 'text-content-secondary' },
+    { title: 'Encounters', count: encounters.length, icon: Heart, bgColor: 'bg-surface-sunken', iconColor: 'text-content-secondary' },
+    { title: 'Medications', count: medications.length, icon: Pill, bgColor: 'bg-surface-sunken', iconColor: 'text-content-secondary' },
+    { title: 'Claims', count: claims.length, icon: FileText, bgColor: 'bg-surface-sunken', iconColor: 'text-content-secondary' }
   ];
 
   const careHistory = [
@@ -131,7 +131,8 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
       type: 'Claim',
       date: new Date(c.service_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       title: c.description || 'Insurance Claim',
-      description: c.amount_billed ? `Billed: $${c.amount_billed.toFixed(2)}` : '',
+      description: c.amount_billed != null && c.amount_billed !== '' && Number.isFinite(Number(c.amount_billed))
+        ? `Billed: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(c.amount_billed))}` : '',
       location: c.provider_name || '',
       rawDate: c.service_date,
     })),
@@ -178,17 +179,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
     );
   });
 
-  const getTypeStyles = (type: string) => {
-    if (darkMode) {
-      if (type === 'ER Visit') return 'bg-red-900/50 text-red-400';
-      if (type === 'Claim') return 'bg-amber-900/50 text-amber-400';
-      return 'bg-indigo-900/50 text-indigo-400';
-    } else {
-      if (type === 'ER Visit') return 'bg-red-50 text-red-700';
-      if (type === 'Claim') return 'bg-amber-50 text-amber-700';
-      return 'bg-indigo-50 text-indigo-700';
-    }
-  };
+  const getTypeStyles = () => 'bg-surface-sunken text-content-secondary';
 
   const EmptyState = ({ icon: Icon, title, description }: { icon: any; title: string; description: string }) => (
     <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -220,7 +211,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-sm font-medium text-content-secondary">{card.title}</h3>
                   <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : card.bgColor}`}>
-                    <Icon className={`w-5 h-5 ${darkMode ? 'text-indigo-400' : card.iconColor}`} />
+                    <Icon className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : card.iconColor}`} />
                   </div>
                 </div>
                 <p className="text-3xl font-bold text-content-primary">{isLoading ? '—' : card.count}</p>
@@ -255,7 +246,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                       <p className="text-sm text-content-secondary">{apt.appointment_type}{apt.location ? ` · ${apt.location}` : ''}</p>
                     </div>
                     <span className="text-sm font-medium text-content-primary">
-                      {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {new Date(apt.scheduled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                     </span>
                   </div>
                 </div>
@@ -293,7 +284,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         rx.status === 'discontinued'
                           ? 'bg-surface-overlay text-content-secondary'
-                          : 'bg-emerald-100 text-emerald-700'
+                          : 'bg-surface-sunken text-content-secondary'
                       }`}>
                         {rx.status === 'discontinued' ? 'Discontinued' : 'Active'}
                       </span>
@@ -397,7 +388,7 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
             </div>
 
             <button
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-action-primary text-content-on-action text-sm font-medium rounded-lg hover:bg-action-primary-hover transition-colors flex items-center gap-2"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href).catch(() => {});
               }}
@@ -454,14 +445,14 @@ export function CarePage({ darkMode = false, actionsRef }: CarePageProps) {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getTypeStyles(record.type)}`}>
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getTypeStyles()}`}>
                           {record.type}
                         </span>
                         <span className="text-sm font-medium text-content-primary">{record.date}</span>
                       </div>
                       <h3 className="font-semibold mb-2 text-content-primary">{record.title}</h3>
                       {record.description && (
-                        <p className="text-sm mb-2 text-content-secondary">{record.description}</p>
+                        <p className="text-sm mb-2 whitespace-pre-wrap text-content-secondary">{record.description}</p>
                       )}
                     </div>
                     {record.location && (

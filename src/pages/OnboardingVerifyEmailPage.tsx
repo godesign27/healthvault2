@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
@@ -13,6 +14,7 @@ interface OnboardingVerifyEmailPageProps {
 }
 
 export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onBack }: OnboardingVerifyEmailPageProps) {
+  const { notify, feedback } = useActionFeedback();
   const [verificationEmail, setVerificationEmail] = useState(email);
   const [code, setCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -84,7 +86,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
 
       setResendTimer(60);
     } catch (error: any) {
-      setError('Failed to resend code. Please try again.');
+      notify('Failed to resend code. Please try again.', 'error');
     } finally {
       requestPending.current = false;
       setIsResending(false);
@@ -118,6 +120,7 @@ export function OnboardingVerifyEmailPage({ darkMode = false, email, onNext, onB
         />
       }
     >
+      {feedback}
       <div className="hv-surface-card hv-surface-card--flat p-8">
         <button
           onClick={onBack}

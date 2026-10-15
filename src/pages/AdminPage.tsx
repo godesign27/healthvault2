@@ -1,8 +1,10 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import { supabase, type DesignToken, type Component, type ComponentVariant } from '../lib/supabase';
 
 export function AdminPage() {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const [activeTab, setActiveTab] = useState<'tokens' | 'components'>('tokens');
   const [tokens, setTokens] = useState<DesignToken[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
@@ -71,14 +73,18 @@ export function AdminPage() {
   };
 
   const handleDeleteToken = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this token?')) return;
+    return runConfirmed('Are you sure you want to delete this token?', async () => {
 
-    try {
-      await supabase.from('design_tokens').delete().eq('id', id);
-      await loadData();
-    } catch (error) {
-      console.error('Error deleting token:', error);
-    }
+      try {
+        const { error } = await supabase.from('design_tokens').delete().eq('id', id);
+        if (error) throw error;
+        notify('Token deleted.');
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting token:', error);
+        notify('Failed to delete token.', 'error');
+      }
+    });
   };
 
   const handleSaveComponent = async () => {
@@ -114,14 +120,18 @@ export function AdminPage() {
   };
 
   const handleDeleteComponent = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this component?')) return;
+    return runConfirmed('Are you sure you want to delete this component?', async () => {
 
-    try {
-      await supabase.from('components').delete().eq('id', id);
-      await loadData();
-    } catch (error) {
-      console.error('Error deleting component:', error);
-    }
+      try {
+        const { error } = await supabase.from('components').delete().eq('id', id);
+        if (error) throw error;
+        notify('Component deleted.');
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting component:', error);
+        notify('Failed to delete component.', 'error');
+      }
+    });
   };
 
   const groupedTokens = tokens.reduce((acc, token) => {
@@ -150,6 +160,7 @@ export function AdminPage() {
 
   return (
     <div className="w-full min-h-0">
+      {feedback}
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-content-primary mb-2">Admin Panel</h1>

@@ -14,6 +14,7 @@ interface MenuItem {
 interface PopupMenuProps {
   items: MenuItem[];
   size?: 'normal' | 'small' | 'xsmall';
+  align?: 'start' | 'end';
   showScrollbar?: boolean;
   maxHeight?: string;
   trigger?: ReactNode;
@@ -45,7 +46,7 @@ function SubMenuItem({ item, itemClass }: { item: MenuItem; itemClass: string })
   );
 }
 
-export function PopupMenu({ items, size = 'normal', showScrollbar = false, maxHeight = '300px', trigger, open, onOpenChange }: PopupMenuProps) {
+export function PopupMenu({ items, size = 'normal', align = 'start', showScrollbar = false, maxHeight = '300px', trigger, open, onOpenChange }: PopupMenuProps) {
   const itemClass = sizeClasses[size];
   const [internalOpen, setInternalOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -76,7 +77,7 @@ export function PopupMenu({ items, size = 'normal', showScrollbar = false, maxHe
       <div ref={ref} className="relative inline-block">
         <div onClick={() => setOpen(!isOpen)}>{trigger}</div>
         {isOpen && (
-          <div className={cn('absolute z-50 top-full left-0 mt-1 bg-surface-overlay border border-stroke-default rounded shadow-lg py-1', widthClasses[size], showScrollbar && 'overflow-y-auto')} style={{ maxHeight: showScrollbar ? maxHeight : undefined }}>
+          <div className={cn('absolute z-50 top-full mt-1 max-w-[calc(100vw-2rem)] bg-surface-overlay border border-stroke-default rounded shadow-lg py-1', align === 'end' ? 'right-0' : 'left-0', widthClasses[size], showScrollbar && 'overflow-y-auto')} style={{ maxHeight: showScrollbar ? maxHeight : undefined }}>
             {items.map(renderItem)}
           </div>
         )}

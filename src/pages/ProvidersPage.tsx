@@ -13,7 +13,6 @@ import {
   Clock,
   Zap,
   Heart,
-  Search,
   ChevronDown
 } from 'lucide-react';
 import { useState } from 'react';
@@ -24,7 +23,7 @@ interface ProvidersPageProps {
   onNavigate?: (page: string) => void;
 }
 
-export function ProvidersPage({ darkMode = false, onNavigate }: ProvidersPageProps) {
+export function ProvidersPage({ darkMode = false }: ProvidersPageProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleCTAClick = (analyticsId: string, label: string) => {

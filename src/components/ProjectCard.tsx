@@ -94,9 +94,7 @@ export function ProjectCard({ project, onOpen, onDuplicate, onDelete, onRename }
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm('Are you sure you want to delete this project?')) {
-                        onDelete(project.id);
-                      }
+                      onDelete(project.id);
                       setShowMenu(false);
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"

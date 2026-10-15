@@ -1,3 +1,4 @@
+import { useResultToast } from '../hooks/useResultToast';
 import { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
@@ -11,6 +12,7 @@ interface OnboardingAccountPageProps {
 }
 
 export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: OnboardingAccountPageProps) {
+  const { notify, feedback } = useResultToast();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -66,7 +68,7 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
       if (error.message?.includes('already registered') || error.message?.includes('User already registered')) {
         setErrors({ email: 'This email is already registered. Please log in instead.' });
       } else {
-        alert(error.message || 'Failed to create account. Please try again.');
+        notify(error.message || 'Failed to create account. Please try again.', 'error');
       }
     } finally {
       setIsSubmitting(false);
@@ -260,6 +262,7 @@ export function OnboardingAccountPage({ darkMode = false, onNext, onBack }: Onbo
           </div>
         </form>
       </div>
+      {feedback}
     </OnboardingLayout>
   );
 }

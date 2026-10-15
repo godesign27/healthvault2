@@ -1,4 +1,5 @@
-import { X, CreditCard as Edit, Share2, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { useActionFeedback } from '../hooks/useActionFeedback';
+import { X, CreditCard as Edit, Share2, CheckCircle2, Clock, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { FormTemplateDef } from '../lib/forms/catalog';
 import { FormResponseRow, isResponseComplete, saveFormResponse } from '../lib/forms/responses';
@@ -42,10 +43,10 @@ export function FormDrawer({
   onSaved,
   onShareClick,
 }: FormDrawerProps) {
+  const { notify, feedback } = useActionFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   const complete = isResponseComplete(response);
 
@@ -54,17 +55,15 @@ export function FormDrawer({
     if (isOpen) {
       setFormData(mergedAnswers(template, response, autofillContext));
       setIsEditing(false);
-      setSaveError(null);
     }
   }, [isOpen, response, template, autofillContext]);
 
   const handleSave = async () => {
     if (!patientProfileId) {
-      setSaveError('Could not resolve your patient profile. Please refresh and try again.');
+      notify('Could not resolve your patient profile. Please refresh and try again.', 'error');
       return;
     }
     setSaving(true);
-    setSaveError(null);
     try {
       await saveFormResponse({
         patientProfileId,
@@ -73,9 +72,10 @@ export function FormDrawer({
       });
       setIsEditing(false);
       if (onSaved) await onSaved();
+      notify('Form saved.');
     } catch (err: any) {
       console.error('Failed to save form:', err);
-      setSaveError(err?.message || 'Failed to save. Please try again.');
+      notify(err instanceof Error ? err.message : 'Failed to save. Please try again.', 'error');
     } finally {
       setSaving(false);
     }
@@ -84,13 +84,13 @@ export function FormDrawer({
   const handleCancel = () => {
     setIsEditing(false);
     setFormData(mergedAnswers(template, response, autofillContext));
-    setSaveError(null);
   };
 
   if (!isOpen) return null;
 
   return (
     <>
+      {feedback}
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
 
       <div
@@ -99,7 +99,7 @@ export function FormDrawer({
         aria-label={template.title}
         className="fixed top-0 right-0 h-full w-full max-w-2xl z-50 shadow-2xl transform transition-transform"
         style={{
-          backgroundColor: darkMode ? '#15191c' : '#f8fafc',
+          backgroundColor: 'var(--hv-color-surface-raised)',
           isolation: 'isolate',
         }}
       >
@@ -109,12 +109,12 @@ export function FormDrawer({
               <div className="flex items-center gap-3 mb-2">
                 <h2 className="text-xl font-semibold text-content-primary">{template.title}</h2>
                 {complete ? (
-                  <span className="px-3 py-1 bg-emerald-600 text-white text-xs font-medium rounded-lg flex items-center gap-1.5">
+                  <span className="px-3 py-1 bg-surface-feedback-success text-content-on-action text-xs font-medium rounded-lg flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Complete
                   </span>
                 ) : (
-                  <span className="px-3 py-1 bg-amber-500 text-white text-xs font-medium rounded-lg flex items-center gap-1.5">
+                  <span className="px-3 py-1 bg-surface-feedback-warning text-content-on-action text-xs font-medium rounded-lg flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" />
                     Incomplete
                   </span>
@@ -159,8 +159,8 @@ export function FormDrawer({
                           rows={3}
                           className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                             darkMode
-                              ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-secondary'
-                              : 'bg-white border-stroke-default text-content-primary placeholder:text-content-secondary'
+                              ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-secondary'
+                              : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-secondary'
                           }`}
                         />
                       ) : field.type === 'select' ? (
@@ -169,8 +169,8 @@ export function FormDrawer({
                           onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
                           className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                             darkMode
-                              ? 'bg-surface-sunken border-stroke-default text-white'
-                              : 'bg-white border-stroke-default text-content-primary'
+                              ? 'bg-surface-sunken border-stroke-default text-content-primary'
+                              : 'bg-surface-raised border-stroke-default text-content-primary'
                           }`}
                         >
                           <option value="">Select...</option>
@@ -186,8 +186,8 @@ export function FormDrawer({
                           placeholder={field.placeholder}
                           className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
                             darkMode
-                              ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-secondary'
-                              : 'bg-white border-stroke-default text-content-primary placeholder:text-content-secondary'
+                              ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-secondary'
+                              : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-secondary'
                           }`}
                         />
                       )
@@ -202,12 +202,7 @@ export function FormDrawer({
             </div>
           </div>
 
-          {saveError && (
-            <div className="mx-6 mb-2 flex items-start gap-2 p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{saveError}</span>
-            </div>
-          )}
+
 
           <div className="px-6 py-4 border-t flex items-center justify-between border-stroke-subtle">
             {isEditing ? (
@@ -222,7 +217,7 @@ export function FormDrawer({
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-60"
+                  className="px-6 py-2.5 bg-action-primary text-content-on-action rounded-lg text-sm font-medium hover:bg-action-primary transition-colors flex items-center gap-2 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   {saving ? 'Saving…' : 'Save'}
@@ -239,7 +234,7 @@ export function FormDrawer({
                 {complete && onShareClick && (
                   <button
                     onClick={onShareClick}
-                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                    className="px-6 py-2.5 bg-action-primary text-content-on-action rounded-lg text-sm font-medium hover:bg-action-primary transition-colors flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4" />
                     Share

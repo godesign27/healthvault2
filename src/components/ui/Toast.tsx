@@ -63,6 +63,8 @@ export function Toast({ message, variant = 'info', style = 'inline', onClose }: 
       <span className="flex-1 text-sm font-medium">{message}</span>
       {onClose && (
         <button
+          type="button"
+          aria-label="Dismiss notification"
           onClick={onClose}
           className="shrink-0 p-1 rounded hover:bg-black/10 transition-colors text-content-secondary"
         >

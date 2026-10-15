@@ -1,4 +1,4 @@
-import { Menu, X, Eye, Globe, Moon, Sun, LogIn, LogOut, User } from 'lucide-react';
+import { Menu, X, Eye, Globe, Moon, Sun, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface MarketingHeaderProps {

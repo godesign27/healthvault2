@@ -58,7 +58,7 @@ export function HorizontalMedicalIDCard({ darkMode = false }: HorizontalMedicalI
 
   return (
     <div className={`rounded-lg border p-4 ${
-      darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-white border-stroke-subtle'
+      darkMode ? 'bg-surface-sunken border-stroke-default' : 'bg-surface-raised border-stroke-subtle'
     }`}>
       <div className={`text-xs font-semibold uppercase tracking-wide mb-3 ${
         darkMode ? 'text-content-secondary' : 'text-content-secondary'
@@ -78,7 +78,7 @@ export function HorizontalMedicalIDCard({ darkMode = false }: HorizontalMedicalI
         <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
           <div>
             <div className={`font-bold mb-2 ${
-              darkMode ? 'text-white' : 'text-content-primary'
+              'text-content-primary'
             }`}>{data?.name || '—'}</div>
             <div className="flex justify-between">
               <span className={darkMode ? 'text-content-secondary' : 'text-content-secondary'}>DOB:</span>

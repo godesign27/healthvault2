@@ -1,3 +1,4 @@
+import { hasMedicationEnded } from '../lib/medicationStatus';
 import { useState, useEffect, MutableRefObject } from 'react';
 import { Stethoscope, Pill, AlertTriangle, Syringe, CalendarCheck, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -219,7 +220,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
 
   const activeConditions = conditions.filter(c => c.status === 'Active' || !c.status);
   const today = new Date();
-  const activeMedications = medications.filter(m => !m.endDate || new Date(m.endDate) >= today);
+  const activeMedications = medications.filter(m => !hasMedicationEnded(m.endDate, today));
   const immunizationsDue = immunizations.filter(i => i.nextDose && new Date(i.nextDose) <= today).length;
   const immunizationSubtitle = immunizations.length === 0
     ? 'None recorded'
@@ -426,6 +427,7 @@ export function MedicalProfilePage({ darkMode = false, actionsRef }: MedicalProf
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-content-primary">{med.name}</h3>
+                        {hasMedicationEnded(med.endDate, today) && <p className="text-sm text-content-secondary">Ended · {med.endDate}</p>}
                         {med.dosage && (
                           <p className="text-sm text-content-secondary">
                             {med.dosage}

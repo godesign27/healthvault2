@@ -1,9 +1,11 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { useEffect, useState } from 'react';
 import { CheckCircle, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { LoginPage } from './LoginPage';
 
 export function FhirConnectCompletePage() {
+  const { notify, feedback } = useActionFeedback();
   const [status, setStatus] = useState<'loading' | 'signin' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [orgName, setOrgName] = useState<string | null>(null);
@@ -64,6 +66,10 @@ export function FhirConnectCompletePage() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (message && message !== 'Missing connection id.' && (status === 'success' || status === 'error')) notify(message, status === 'success' ? 'success' : 'error');
+  }, [message, status, notify]);
+
   const goToApp = () => {
     window.location.href = '/';
   };
@@ -82,6 +88,7 @@ export function FhirConnectCompletePage() {
 
   return (
     <div className="min-h-screen bg-surface-page flex items-center justify-center p-6">
+      {feedback}
       <div className="max-w-md w-full rounded-2xl border border-stroke-subtle bg-surface-raised p-8 text-center shadow-sm">
         {status === 'loading' && (
           <>
@@ -94,7 +101,7 @@ export function FhirConnectCompletePage() {
           <>
             <CheckCircle className="w-10 h-10 mx-auto mb-4 text-emerald-600" />
             <h1 className="text-lg font-semibold text-content-primary mb-2">Connected to {orgName}</h1>
-            <p className="text-sm text-content-secondary mb-6">{message}</p>
+
             <button
               type="button"
               onClick={goToApp}
@@ -110,7 +117,8 @@ export function FhirConnectCompletePage() {
           <>
             <AlertCircle className="w-10 h-10 mx-auto mb-4 text-red-600" />
             <h1 className="text-lg font-semibold text-content-primary mb-2">Connection failed</h1>
-            <p className="text-sm text-content-secondary mb-6">{message}</p>
+            {message === 'Missing connection id.' && <p className="mb-6 text-sm text-content-secondary">{message}</p>}
+
             <button
               type="button"
               onClick={goToApp}

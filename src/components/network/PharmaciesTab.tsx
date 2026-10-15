@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 import { useState, useEffect } from 'react';
 import { MapPin, Phone, Clock, Star, Navigation, Check, Package, ExternalLink, CheckCircle, XCircle, Pill, Plus, Home, Building2, Pencil, Trash2, Radio } from 'lucide-react';
 import { useNetworkStore } from '../../lib/stores/network-store';
@@ -14,6 +15,7 @@ interface PharmaciesTabProps {
 }
 
 export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: PharmaciesTabProps) {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const { pharmacies, addPharmacy, updatePharmacy, loadData, insurance } = useNetworkStore();
   const [nearbyPharmacies, setNearbyPharmacies] = useState<NearbyPharmacyResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,9 +74,15 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
   };
 
   const handleDeleteAddress = async (addr: UserAddress) => {
-    if (!confirm(`Remove your ${addr.label} address?`)) return;
-    await deleteUserAddress(undefined, addr.id);
-    await loadAddresses();
+    return runConfirmed(`Remove your ${addr.label} address?`, async () => {
+      try {
+        await deleteUserAddress(undefined, addr.id);
+        await loadAddresses();
+        notify('Address removed.');
+      } catch (error) {
+        notify(error instanceof Error ? error.message : 'Unable to remove address.', 'error');
+      }
+    });
   };
 
   const preferredPharmacy = pharmacies.find(p => p.preferred);
@@ -131,6 +139,7 @@ export function PharmaciesTab({ darkMode, onRemovePharmacy, onOpenManualAdd }: P
 
   return (
     <div className="space-y-8">
+      {feedback}
       <section>
         <div className="flex items-center justify-between mb-4">
           <div>

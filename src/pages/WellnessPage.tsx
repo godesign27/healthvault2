@@ -1,3 +1,5 @@
+import { useResultToast } from '../hooks/useResultToast';
+import { PopupMenu } from '../components/ui/PopupMenu';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
@@ -6,6 +8,7 @@ import {
   ChevronRight,
   Droplets,
   MessageCircle,
+  MoreHorizontal,
   Pencil,
   Plus,
   RefreshCw,
@@ -59,7 +62,7 @@ type EditForm = {
 };
 
 const mealFilters: MealFilter[] = ['all', 'breakfast', 'lunch', 'dinner', 'snack', 'drink', 'other'];
-const DAY_MS = 86_400_000;
+
 
 function localDateKey(iso: string) {
   const date = new Date(iso);
@@ -69,7 +72,9 @@ function localDateKey(iso: string) {
 function dateLabel(key: string) {
   const date = new Date(`${key}T12:00:00`);
   const today = localDateKey(new Date().toISOString());
-  const yesterday = localDateKey(new Date(Date.now() - DAY_MS).toISOString());
+  const previousDay = new Date();
+  previousDay.setDate(previousDay.getDate() - 1);
+  const yesterday = localDateKey(previousDay.toISOString());
   if (key === today) return 'Today';
   if (key === yesterday) return 'Yesterday';
   return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -116,6 +121,7 @@ interface WellnessPageProps {
 }
 
 export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
+  const { notify, feedback } = useResultToast();
   const [tab, setTab] = useState<WellnessTab>('diet');
   const [mealFilter, setMealFilter] = useState<MealFilter>('all');
   const [dietEntries, setDietEntries] = useState<DietEntry[]>([]);
@@ -203,13 +209,16 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
       return { name: name.trim(), amount: amount?.trim() || null, notes: null };
     });
     if (!items.length) {
-      setError('Add at least one food or drink before saving.');
+      notify('Add at least one food or drink before saving.', 'error');
       return;
     }
+    const consumedAt = new Date(editForm.consumedAt);
+    if (!Number.isFinite(consumedAt.getTime())) { notify('Choose a valid meal date and time.', 'error'); return; }
     setSaving(true);
+    try {
     const { error: updateError } = await supabase.from('diet_log_entries').update({
       meal_type: editForm.mealType,
-      consumed_at: new Date(editForm.consumedAt).toISOString(),
+      consumed_at: consumedAt.toISOString(),
       items,
       water_ml: editForm.waterMl ? Number(editForm.waterMl) : null,
       notes: editForm.notes.trim() || null,
@@ -217,30 +226,36 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
     }).eq('id', editing.id);
     setSaving(false);
     if (updateError) {
-      setError(updateError.message);
+      notify('Could not save the meal. Please try again.', 'error');
       return;
     }
+    notify('Meal saved.');
     setEditing(null);
     setEditForm(null);
     await loadWellness();
+    } catch { notify('Could not save the meal. Please try again.', 'error'); } finally { setSaving(false); }
   };
 
   const confirmDelete = async () => {
     if (!deleting) return;
     setSaving(true);
+    try {
     const { error: deleteError } = await supabase.from('diet_log_entries').delete().eq('id', deleting.id);
     setSaving(false);
     if (deleteError) {
-      setError(deleteError.message);
+      notify('Could not remove the meal. Please try again.', 'error');
       return;
     }
+    notify('Meal removed.');
     setDeleting(null);
     await loadWellness();
+    } catch { notify('Could not remove the meal. Please try again.', 'error'); } finally { setSaving(false); }
   };
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12">
       <div className="mx-auto max-w-6xl">
+        {feedback}
         <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-action-primary">Personal patterns</p>
@@ -281,9 +296,9 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         </div>
 
         {error && (
-          <div role="alert" className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div role="alert" className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-stroke-default bg-surface-sunken px-4 py-3 text-sm text-content-primary">
             <span>{error}</span>
-            <button onClick={() => setError('')} className="font-semibold text-blue-700 hover:text-blue-900">Dismiss</button>
+            <button onClick={() => setError('')} className="font-semibold text-action-primary hover:text-action-primary-hover">Dismiss</button>
           </div>
         )}
 
@@ -316,7 +331,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Utensils className="h-5 w-5 text-action-primary" /></div>
                 <h2 className="text-lg font-semibold text-content-primary">{showingCurrent ? 'No meals logged yet' : 'No meals in these 7 days'}</h2>
                 <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">{showingCurrent ? 'Tell the Health Vault assistant what you ate or drank. You will review the details before anything is saved.' : 'Use the arrows to look at another week.'}</p>
-                {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Log your first meal</button> : null}
+                {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-action-primary hover:text-action-primary-hover"><MessageCircle className="h-4 w-4" /> Log your first meal</button> : null}
               </div>
             ) : (
               <div className="space-y-8">
@@ -346,10 +361,8 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
                                 <span className="capitalize">{entry.confirmation_status ?? 'confirmed'}</span>
                               </div>
                             </div>
-                            <div className="flex shrink-0 items-center gap-1">
-                              <button onClick={() => openEdit(entry)} className="rounded-lg p-2 text-blue-700 transition-colors hover:bg-blue-50 hover:text-blue-900" aria-label={`Edit ${entry.meal_type} entry`}><Pencil className="h-4 w-4" /></button>
-                              <button onClick={() => setDeleting(entry)} className="rounded-lg p-2 text-content-tertiary transition-colors hover:bg-red-50 hover:text-red-700" aria-label={`Delete ${entry.meal_type} entry`}><Trash2 className="h-4 w-4" /></button>
-                            </div>
+                            <PopupMenu align="end" trigger={<button type="button" className="min-h-12 rounded-lg px-3 text-sm text-content-secondary hover:bg-surface-sunken" aria-label={`More options for ${entry.meal_type} entry`}><MoreHorizontal className="h-5 w-5" aria-hidden="true" /></button>}
+                              items={[{ label: 'Edit meal', icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(entry) }, { label: 'Remove meal', icon: <Trash2 className="h-4 w-4" />, onClick: () => setDeleting(entry) }]} />
                           </div>
                         </article>
                       ))}
@@ -375,7 +388,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Activity className="h-5 w-5 text-action-primary" /></div>
             <h2 className="text-lg font-semibold text-content-primary">{showingCurrent ? 'No Life Signals yet' : 'No Life Signals in these 7 days'}</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">{showingCurrent ? 'A short daily check-in records energy, sleep, mood, stress, and pain on a 1–5 scale.' : 'Use the arrows to look at another week.'}</p>
-            {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Start your first check-in</button> : null}
+            {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-action-primary hover:text-action-primary-hover"><MessageCircle className="h-4 w-4" /> Start your first check-in</button> : null}
           </div>
         ) : (
           <div className="space-y-4">
@@ -455,7 +468,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         footerContent={(
           <>
             <button onClick={() => setDeleting(null)} className="rounded-hv-button border border-stroke-default px-4 py-2 text-sm font-semibold text-content-secondary hover:bg-action-secondary">Cancel</button>
-            <button onClick={() => void confirmDelete()} disabled={saving} className="rounded-hv-button bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">{saving ? 'Deleting…' : 'Delete entry'}</button>
+            <button onClick={() => void confirmDelete()} disabled={saving} className="rounded-hv-button bg-action-primary px-4 py-2 text-sm font-semibold text-content-on-action hover:bg-action-primary-hover disabled:opacity-50">{saving ? 'Deleting…' : 'Delete entry'}</button>
           </>
         )}
       >

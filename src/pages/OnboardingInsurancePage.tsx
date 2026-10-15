@@ -1,3 +1,4 @@
+import { useResultToast } from '../hooks/useResultToast';
 import {insuranceMemberIdFields} from '../../packages/api-client/src/insurance-status';
 import { useState } from 'react';
 import { ArrowLeft, Upload, X } from 'lucide-react';
@@ -13,6 +14,7 @@ interface OnboardingInsurancePageProps {
 }
 
 export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSkip }: OnboardingInsurancePageProps) {
+  const { notify, feedback } = useResultToast();
   const [formData, setFormData] = useState({
     carrierName: '',
     memberId: '',
@@ -137,7 +139,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
       onNext();
     } catch (error) {
       console.error('Failed to save insurance:', error);
-      alert('Failed to save. Please try again.');
+      notify('Failed to save. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -409,6 +411,7 @@ export function OnboardingInsurancePage({ darkMode = false, onNext, onBack, onSk
           </div>
         </form>
       </div>
+      {feedback}
     </OnboardingLayout>
   );
 }

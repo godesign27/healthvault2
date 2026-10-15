@@ -1,3 +1,4 @@
+import { useResultToast } from '../../hooks/useResultToast';
 import { CheckCircle2, FileUp, Loader2, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -34,6 +35,7 @@ async function sha256(value: string) {
 }
 
 export function RosterImportPanel({ providerAccountId, onRosterChanged, embedded = false }: { providerAccountId: string; onRosterChanged: () => Promise<void>; embedded?: boolean }) {
+  const { notify, feedback } = useResultToast();
   const [jobs, setJobs] = useState<ImportJob[]>([]);
   const [fileName, setFileName] = useState('');
   const [fileText, setFileText] = useState('');
@@ -41,7 +43,7 @@ export function RosterImportPanel({ providerAccountId, onRosterChanged, embedded
   const [validationErrors, setValidationErrors] = useState<RosterValidationError[]>([]);
   const [synthetic, setSynthetic] = useState(true);
   const [busy, setBusy] = useState('');
-  const [message, setMessage] = useState('');
+
   const [error, setError] = useState('');
 
   const loadImports = useCallback(async () => {
@@ -54,7 +56,7 @@ export function RosterImportPanel({ providerAccountId, onRosterChanged, embedded
   useEffect(() => { void loadImports(); }, [loadImports]);
 
   async function selectFile(file?: File) {
-    setError(''); setMessage(''); setRows([]); setValidationErrors([]);
+    setError('');  setRows([]); setValidationErrors([]);
     if (!file) { setFileName(''); setFileText(''); return; }
     if (file.size > 2 * 1024 * 1024) { setError('Choose a CSV file smaller than 2 MB.'); return; }
     const text = await file.text();
@@ -64,31 +66,31 @@ export function RosterImportPanel({ providerAccountId, onRosterChanged, embedded
 
   async function stageImport() {
     if (!fileName || !fileText || !rows.length || validationErrors.length) return;
-    setBusy('stage'); setError(''); setMessage('');
+    setBusy('stage'); setError('');
     try {
       const data = await invoke({
         action: 'stage-roster-import', providerAccountId, rows, sourceDisplayName: fileName,
         contentSha256: await sha256(fileText), synthetic,
       });
-      setMessage(data?.duplicate ? 'This exact file was already staged.' : `${rows.length} rows staged and validated. Review the job below before committing.`);
+      notify(data?.duplicate ? 'This exact file was already staged.' : `${rows.length} rows staged and validated. Review the job below before committing.`);
       await loadImports();
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Unable to stage import.'); }
+    } catch (caught) { notify(caught instanceof Error ? caught.message : 'Unable to stage import.', 'error'); }
     finally { setBusy(''); }
   }
 
   async function changeJob(job: ImportJob, action: 'commit-roster-import' | 'rollback-roster-import') {
-    setBusy(job.id); setError(''); setMessage('');
+    setBusy(job.id); setError('');
     try {
       await invoke({ action, providerAccountId, importJobId: job.id });
-      setMessage(action.startsWith('commit') ? 'Import committed to the provider roster.' : 'Import rolled back from the provider roster.');
+      notify(action.startsWith('commit') ? 'Import committed to the provider roster.' : 'Import rolled back from the provider roster.');
       await Promise.all([loadImports(), onRosterChanged()]);
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Unable to update import.'); }
+    } catch (caught) { notify(caught instanceof Error ? caught.message : 'Unable to update import.', 'error'); }
     finally { setBusy(''); }
   }
 
   const template = `${HEALTH_VAULT_ROSTER_CSV_V1_HEADERS.join(',')}\ndemo-001,MRN-001,Ada,Lovelace,1980-12-10,female,ada@example.test,555-0100,1 Demo Way,,Denver,CO,80202,US\n`;
 
-  return <div>
+  return <div>{feedback}
     {!embedded && <><p className="text-sm font-semibold text-indigo-600">Roster CSV v1</p><h1 className="mt-1 text-3xl font-bold">Roster imports</h1><p className="mt-2 text-content-secondary">Validate demographics locally, stage them behind provider authorization, then explicitly commit them.</p></>}
     {embedded && <p className="text-sm text-content-secondary">Upload patient demographics, validate them locally, and explicitly commit the roster after review.</p>}
 
@@ -107,7 +109,7 @@ export function RosterImportPanel({ providerAccountId, onRosterChanged, embedded
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={synthetic} onChange={(event) => setSynthetic(event.target.checked)} />This file contains synthetic/demo data</label><button disabled={!rows.length || validationErrors.length > 0 || busy === 'stage'} onClick={() => void stageImport()} className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy === 'stage' ? 'Staging…' : 'Stage validated import'}</button></div>
     </div>
 
-    {(message || error) && <div role="status" className={`mt-4 rounded-lg border p-3 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div>}
+    {error && <div role="status" className={`mt-4 rounded-lg border p-3 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error}</div>}
 
     <div className="mt-6 overflow-hidden rounded-xl border border-stroke-subtle bg-surface-raised"><div className="border-b border-stroke-subtle px-5 py-4"><h2 className="font-semibold">Import history</h2></div>{jobs.length === 0 ? <p className="p-6 text-sm text-content-secondary">No imports have been recorded.</p> : <div className="divide-y divide-stroke-subtle">{jobs.map((job) => <div key={job.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex items-center gap-2"><strong>{job.provider_import_sources?.display_name ?? 'Roster import'}</strong><span className="rounded-full bg-surface-sunken px-2 py-0.5 text-xs font-semibold">{job.status.replace('_', ' ')}</span>{job.provider_import_sources?.synthetic && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">Synthetic</span>}</div><p className="mt-1 text-sm text-content-secondary">{job.valid_row_count} validated rows · {new Date(job.created_at).toLocaleString()}</p></div><div>{job.status === 'validated' && <button disabled={busy === job.id} onClick={() => void changeJob(job, 'commit-roster-import')} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white"><CheckCircle2 className="h-4 w-4" />{busy === job.id ? 'Committing…' : 'Commit import'}</button>}{job.status === 'committed' && <button disabled={busy === job.id} onClick={() => void changeJob(job, 'rollback-roster-import')} className="flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"><RotateCcw className="h-4 w-4" />{busy === job.id ? 'Rolling back…' : 'Roll back'}</button>}{busy === job.id && <Loader2 className="ml-2 inline h-4 w-4 animate-spin" />}</div></div>)}</div>}</div>
   </div>;

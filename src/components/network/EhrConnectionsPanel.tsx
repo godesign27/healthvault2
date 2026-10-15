@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 import { useCallback, useEffect, useState } from 'react';
 import { Building2, Link2, Loader2, RefreshCw, Unplug } from 'lucide-react';
 import {
@@ -36,6 +37,7 @@ function statusLabel(status: string): string {
 }
 
 export function EhrConnectionsPanel({ onConnect, onConnectionChange }: EhrConnectionsPanelProps) {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const [connections, setConnections] = useState<EhrConnection[]>([]);
   const [syncStatus, setSyncStatus] = useState<SyncStatusResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,21 +81,24 @@ export function EhrConnectionsPanel({ onConnect, onConnectionChange }: EhrConnec
   };
 
   const handleDisconnect = async (connectionId: string) => {
-    if (!confirm('Disconnect this provider? You can reconnect later.')) return;
-    setDisconnectingId(connectionId);
-    try {
-      await disconnectEhrConnection(connectionId);
-      await load();
-      onConnectionChange?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to disconnect');
-    } finally {
-      setDisconnectingId(null);
-    }
+    return runConfirmed('Disconnect this provider? You can reconnect later.', async () => {
+      setDisconnectingId(connectionId);
+      try {
+        await disconnectEhrConnection(connectionId);
+        notify('Provider disconnected.');
+        await load();
+        onConnectionChange?.();
+      } catch (err) {
+        notify(err instanceof Error ? err.message : 'Failed to disconnect', 'error');
+      } finally {
+        setDisconnectingId(null);
+      }
+    });
   };
 
   return (
     <section className="mb-8 rounded-2xl border border-stroke-subtle bg-surface-raised p-5">
+      {feedback}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h2 className="text-lg font-semibold text-content-primary flex items-center gap-2">

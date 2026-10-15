@@ -1,8 +1,9 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { useState, useMemo } from 'react';
 import { Drawer } from './ui/Drawer';
 import { Button } from './ui/Button';
 import { Checkbox } from './ui/Checkbox';
-import { FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { HorizontalMedicalIDCard } from './HorizontalMedicalIDCard';
 import { supabase } from '../lib/supabase';
 
@@ -47,6 +48,7 @@ export function ShareFormsDrawer({
   onShared?: (shareEventId: string) => void;
   darkMode?: boolean;
 }) {
+  const { notify, feedback } = useActionFeedback();
   const [recipient, setRecipient] = useState<Recipient>({
     displayName: '',
     method: 'SecureLink',
@@ -55,8 +57,7 @@ export function ShareFormsDrawer({
   const includeCcMe = true;
   const includeCcPatient = false;
   const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [ack, setAck] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [agree, setAgree] = useState(false);
 
   const canSend = useMemo(() => {
@@ -68,8 +69,8 @@ export function ShareFormsDrawer({
 
   async function handleSend() {
     setIsSending(true);
-    setError(null);
-    setAck(null);
+    if (isSending) return;
+    setShareUrl(null);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error('Please sign in again before sharing forms.');
@@ -101,10 +102,11 @@ export function ShareFormsDrawer({
       if (!res.ok) throw new Error(data.error || `Share failed: ${res.status}`);
       const providerStatus = data.emailSent ? 'sent' : `failed${data.emailError ? ` (${data.emailError})` : ''}`;
       const receiptStatus = data.patientReceiptSent ? 'sent' : `failed${data.patientReceiptError ? ` (${data.patientReceiptError})` : ''}`;
-      setAck(`Secure share created. Provider email: ${providerStatus}. Patient receipt: ${receiptStatus}. Share link: ${data.shareUrl}`);
+      setShareUrl(data.shareUrl || null);
+      notify(`Secure share created. Provider email: ${providerStatus}. Patient receipt: ${receiptStatus}.`, data.emailSent && data.patientReceiptSent ? 'success' : 'info');
       onShared?.(data?.id ?? '');
-    } catch (e: any) {
-      setError(e.message || 'Something went wrong.');
+    } catch (e: unknown) {
+      notify(e instanceof Error ? e.message : 'Something went wrong.', 'error');
     } finally {
       setIsSending(false);
     }
@@ -117,8 +119,9 @@ export function ShareFormsDrawer({
       position="right"
       size="large"
       title="Share selected forms"
-      className={`${darkMode ? '!bg-surface-overlay' : '!bg-surface-overlay'} !max-w-2xl !w-full ${darkMode ? '[&_.border-gray-200]:!border-stroke-subtle' : ''} ${darkMode ? '[&_h2]:!text-content-primary' : ''} ${darkMode ? '[&>div>div:first-child]:!border-stroke-subtle' : ''} [&>div>div:first-child_button]:${darkMode ? '!text-content-secondary hover:!text-content-primary hover:!bg-surface-sunken' : ''} [&>div>div:nth-child(2)]:!border-l-0`}
+      className={`${darkMode ? '!bg-surface-overlay' : '!bg-surface-overlay'} !max-w-2xl !w-full ${darkMode ? '[&_.border-stroke-default]:!border-stroke-subtle' : ''} ${darkMode ? '[&_h2]:!text-content-primary' : ''} ${darkMode ? '[&>div>div:first-child]:!border-stroke-subtle' : ''} [&>div>div:first-child_button]:${darkMode ? '!text-content-secondary hover:!text-content-primary hover:!bg-surface-sunken' : ''} [&>div>div:nth-child(2)]:!border-l-0`}
     >
+      {feedback}
       <div className={`flex-1 overflow-y-auto p-4 ${'bg-surface-raised'}`}>
         <div className="space-y-6">
             <div className={`text-sm font-bold ${'text-content-primary'}`}>
@@ -140,7 +143,7 @@ export function ShareFormsDrawer({
                     className={`flex items-center justify-between rounded-lg border p-3 ${
                       darkMode
                         ? 'border-stroke-default bg-surface-sunken'
-                        : 'border-stroke-subtle bg-white'
+                        : 'border-stroke-subtle bg-surface-raised'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -193,8 +196,8 @@ export function ShareFormsDrawer({
                     }
                     className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                       darkMode
-                        ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                        : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                        ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                        : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                     }`}
                   />
                 </div>
@@ -212,8 +215,8 @@ export function ShareFormsDrawer({
                     }
                     className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                       darkMode
-                        ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                        : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                        ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                        : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                     }`}
                   />
                 </div>
@@ -233,8 +236,8 @@ export function ShareFormsDrawer({
                   }
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     darkMode
-                      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                      ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                      : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                   }`}
                 />
               </div>
@@ -251,8 +254,8 @@ export function ShareFormsDrawer({
                   rows={3}
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     darkMode
-                      ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder'
-                      : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                      ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder'
+                      : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder'
                   }`}
                 />
                 <p className={`text-xs mt-1 ${'text-content-secondary'}`}>
@@ -272,26 +275,8 @@ export function ShareFormsDrawer({
                 className={darkMode ? 'text-content-secondary' : ''}
               />
 
-              {(error || ack) && (
-                <div
-                  className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
-                    error
-                      ? darkMode
-                        ? 'bg-red-900/20 text-red-400 border border-red-800'
-                        : 'bg-red-50 text-red-800 border border-red-200'
-                      : darkMode
-                      ? 'bg-emerald-900/20 text-emerald-400 border border-emerald-800'
-                      : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  }`}
-                >
-                  {error ? (
-                    <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  )}
-                  <span>{error || ack}</span>
-                </div>
-              )}
+              {shareUrl && <p className="break-all text-sm text-content-secondary">Share link: <a className="underline" href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a></p>}
+
             </section>
         </div>
       </div>

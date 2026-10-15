@@ -1,3 +1,4 @@
+import { useTheme } from '../providers/ThemeProvider';
 import { useState, useEffect } from 'react';
 import { Users, Calendar, FileText, Settings, Activity, TrendingUp, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -23,20 +24,21 @@ interface Patient {
 
 interface Stats {
   total_patients: number;
-  appointments_today: number;
-  pending_forms: number;
-  active_staff: number;
+  appointments_today: number | null;
+  pending_forms: number | null;
+  active_staff: number | null;
 }
 
 export default function ProviderAdminPage() {
-  const [darkMode] = useState(false);
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [stats, setStats] = useState<Stats>({
     total_patients: 0,
-    appointments_today: 0,
-    pending_forms: 0,
-    active_staff: 2,
+    appointments_today: null,
+    pending_forms: null,
+    active_staff: null,
   });
   const [loading, setLoading] = useState(true);
   const organizationSlug = getOrganizationFromSubdomain();
@@ -64,9 +66,9 @@ export default function ProviderAdminPage() {
 
       setOrganization(orgData);
 
-      const { data: patientsData, error: patientsError } = await supabase
+      const { data: patientsData, count: patientsCount, error: patientsError } = await supabase
         .from('organization_patients')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('organization_id', orgData.id)
         .order('assigned_at', { ascending: false });
 
@@ -74,10 +76,10 @@ export default function ProviderAdminPage() {
       setPatients(patientsData || []);
 
       setStats({
-        total_patients: patientsData?.length || 0,
-        appointments_today: 5,
-        pending_forms: 12,
-        active_staff: 8,
+        total_patients: patientsCount ?? patientsData?.length ?? 0,
+        appointments_today: null,
+        pending_forms: null,
+        active_staff: null,
       });
     } catch (error) {
       console.error('Error loading organization:', error);
@@ -115,7 +117,7 @@ export default function ProviderAdminPage() {
         className="border-b"
         style={{
           backgroundColor: organization.primary_color,
-          borderBottomColor: darkMode ? '#292524' : '#e7e5e4',
+          borderBottomColor: 'var(--hv-color-border-default)',
         }}
       >
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -142,8 +144,8 @@ export default function ProviderAdminPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6 mb-8">
           <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Users className="w-5 h-5 text-indigo-600" />
+              <div className="p-2 rounded-lg bg-surface-sunken">
+                <Users className="w-5 h-5 text-content-secondary" />
               </div>
               <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Total Patients</h3>
             </div>
@@ -151,52 +153,52 @@ export default function ProviderAdminPage() {
               {stats.total_patients}
             </p>
             <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
-              Active patients
+              Saved patients
             </p>
           </div>
 
           <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-emerald-50">
-                <Calendar className="w-5 h-5 text-emerald-600" />
+              <div className="p-2 rounded-lg bg-surface-sunken">
+                <Calendar className="w-5 h-5 text-content-secondary" />
               </div>
               <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Appointments Today</h3>
             </div>
             <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
-              {stats.appointments_today}
+              {stats.appointments_today ?? 'Not available'}
             </p>
             <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
-              Scheduled for today
+              Appointment totals are not available
             </p>
           </div>
 
           <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-amber-50">
-                <FileText className="w-5 h-5 text-amber-600" />
+              <div className="p-2 rounded-lg bg-surface-sunken">
+                <FileText className="w-5 h-5 text-content-secondary" />
               </div>
               <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Pending Forms</h3>
             </div>
             <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
-              {stats.pending_forms}
+              {stats.pending_forms ?? 'Not available'}
             </p>
             <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
-              Awaiting completion
+              Form totals are not available
             </p>
           </div>
 
           <div className="hv-surface-card hv-surface-card--flat p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-rose-50">
-                <Activity className="w-5 h-5 text-rose-600" />
+              <div className="p-2 rounded-lg bg-surface-sunken">
+                <Activity className="w-5 h-5 text-content-secondary" />
               </div>
               <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>Active Staff</h3>
             </div>
             <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-content-primary'}`}>
-              {stats.active_staff}
+              {stats.active_staff ?? 'Not available'}
             </p>
             <p className={`text-sm mt-1 ${darkMode ? 'text-content-secondary' : 'text-content-secondary'}`}>
-              Online now
+              Staff totals are not available
             </p>
           </div>
         </div>
@@ -213,7 +215,7 @@ export default function ProviderAdminPage() {
                     Patients assigned to your organization
                   </p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 bg-action-primary text-content-on-action rounded-lg text-sm font-medium hover:bg-action-primary-hover transition-colors">
                   <UserPlus className="w-4 h-4" />
                   Add Patient
                 </button>
@@ -234,8 +236,8 @@ export default function ProviderAdminPage() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <Users className="w-5 h-5 text-indigo-600" />
+                        <div className="w-10 h-10 rounded-full bg-surface-sunken flex items-center justify-center">
+                          <Users className="w-5 h-5 text-content-secondary" />
                         </div>
                         <div>
                           <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
@@ -246,7 +248,7 @@ export default function ProviderAdminPage() {
                           </div>
                         </div>
                       </div>
-                      <button className={`text-sm font-medium ${darkMode ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700'}`}>
+                      <button className={`text-sm font-medium ${darkMode ? 'text-indigo-400 hover:text-indigo-300' : 'text-content-secondary hover:text-indigo-700'}`}>
                         View
                       </button>
                     </div>
@@ -267,7 +269,7 @@ export default function ProviderAdminPage() {
             </div>
             <div className="p-6 space-y-3">
               <button className="w-full flex items-center gap-3 p-4 rounded-lg border border-stroke-subtle hover:bg-surface-sunken transition-colors text-left">
-                <Calendar className="w-5 h-5 text-indigo-600" />
+                <Calendar className="w-5 h-5 text-content-secondary" />
                 <div>
                   <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     Manage Appointments
@@ -279,7 +281,7 @@ export default function ProviderAdminPage() {
               </button>
 
               <button className="w-full flex items-center gap-3 p-4 rounded-lg border border-stroke-subtle hover:bg-surface-sunken transition-colors text-left">
-                <FileText className="w-5 h-5 text-emerald-600" />
+                <FileText className="w-5 h-5 text-content-secondary" />
                 <div>
                   <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     Medical Forms
@@ -291,7 +293,7 @@ export default function ProviderAdminPage() {
               </button>
 
               <button className="w-full flex items-center gap-3 p-4 rounded-lg border border-stroke-subtle hover:bg-surface-sunken transition-colors text-left">
-                <TrendingUp className="w-5 h-5 text-amber-600" />
+                <TrendingUp className="w-5 h-5 text-content-secondary" />
                 <div>
                   <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     Analytics & Reports
@@ -303,7 +305,7 @@ export default function ProviderAdminPage() {
               </button>
 
               <button className="w-full flex items-center gap-3 p-4 rounded-lg border border-stroke-subtle hover:bg-surface-sunken transition-colors text-left">
-                <Users className="w-5 h-5 text-rose-600" />
+                <Users className="w-5 h-5 text-content-secondary" />
                 <div>
                   <div className={`font-medium ${darkMode ? 'text-white' : 'text-content-primary'}`}>
                     Staff Management

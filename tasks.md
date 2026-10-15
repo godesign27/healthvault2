@@ -995,3 +995,13 @@ Clean npm ci passed in isolated candidate; lockfile unchanged,21 focused suites 
 
 - [x] Pass isolated iOS JavaScript/Hermes export with preview configuration; fix shared-token resolution and file-based asset parsing.
 - [ ] Run physical VoiceOver acceptance. The iOS minimum is 15.0 and the unsigned simulator build passes on Xcode 27.
+
+### Isolated website results/data batch — 2026-10-15
+- [x] Requested project/network/provider/Admin confirmations use existing Dialog; action results use existing Toast.
+- [x] Requested forms/share/upload/connection/auth service results use Toast; inline hints, access errors, loading/empty states and DICOM notice retained.
+- [x] Saved medication end status/count aligned; Care date/time, notes and billed amount shown.
+- [x] Existing policy link destinations audited; light/dark mark contrast recorded without brand changes.
+- [x] Local build and synthetic-only tests; known 12 baseline marketing diagnostics remain in this isolated branch.
+- [ ] Owner review/integration of this uncommitted batch with earlier website worktrees. No deployment performed.
+
+- [x] Clear the twelve baseline marketing/public-site unused TypeScript diagnostics on codex/website-dialogs-results-data; typecheck and local build pass.

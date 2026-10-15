@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 import { ExternalLink, KeyRound, RefreshCw, ShieldCheck, UserPlus, UsersRound } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -25,6 +26,7 @@ function practitionerReviewUrl(email: string) {
 }
 
 export function ProviderMembersPanel({ providerAccountId, onAddPractitioners }: { providerAccountId: string; onAddPractitioners: () => void }) {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const [members, setMembers] = useState<Member[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [code, setCode] = useState('');
@@ -76,11 +78,13 @@ export function ProviderMembersPanel({ providerAccountId, onAddPractitioners }: 
   }
 
   async function cancelInvitations(input: { invitationIds?: string[]; sourceImportBatchId?: string }, label: string) {
-    if (!window.confirm(`Cancel ${label}? Only pending invitations will be affected.`)) return;
-    setBusy(`cancel:${label}`); setError(''); setMessage('');
-    try { const data = await invoke({ action: 'cancel-practitioner-invitations', providerAccountId, ...input }); setMessage(`${data.cancelledCount} pending practitioner invitation${data.cancelledCount === 1 ? '' : 's'} cancelled.`); await load(); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : 'Unable to cancel invitations.'); }
-    finally { setBusy(''); }
+    if (busy) return;
+    return runConfirmed(`Cancel ${label}? Only pending invitations will be affected.`, async () => {
+      setBusy(`cancel:${label}`); setError(''); setMessage('');
+      try { const data = await invoke({ action: 'cancel-practitioner-invitations', providerAccountId, ...input }); notify(`${data.cancelledCount} pending practitioner invitation${data.cancelledCount === 1 ? '' : 's'} cancelled.`); await load(); }
+      catch (caught) { notify(caught instanceof Error ? caught.message : 'Unable to cancel invitations.', 'error'); }
+      finally { setBusy(''); }
+    });
   }
 
   async function changeMemberStatus(member: Member, status: 'active' | 'suspended' | 'removed') {
@@ -105,7 +109,7 @@ export function ProviderMembersPanel({ providerAccountId, onAddPractitioners }: 
     finally { setBusy(''); }
   }
 
-  return <div><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-sm font-semibold text-indigo-600">Provider access</p><h1 className="mt-1 text-3xl font-bold">Members and invitations</h1><p className="mt-2 text-content-secondary">Invite and manage practitioners at organizational scale. Acceptance requires verified email, authenticator enrollment, and AAL2.</p></div><button type="button" onClick={onAddPractitioners} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white"><UserPlus className="h-4 w-4" />Add practitioners</button></div>
+  return <div>{feedback}<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-sm font-semibold text-indigo-600">Provider access</p><h1 className="mt-1 text-3xl font-bold">Members and invitations</h1><p className="mt-2 text-content-secondary">Invite and manage practitioners at organizational scale. Acceptance requires verified email, authenticator enrollment, and AAL2.</p></div><button type="button" onClick={onAddPractitioners} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white"><UserPlus className="h-4 w-4" />Add practitioners</button></div>
     <section className="mt-6 rounded-xl border border-stroke-subtle bg-surface-raised p-5"><div className="flex items-center gap-2"><KeyRound className="h-5 w-5 text-indigo-600" /><h2 className="font-semibold">Re-verify protected actions</h2></div><p className="mt-2 text-sm text-content-secondary">Invitation and access mutations require a fresh authenticator check every 24 hours.</p><form className="mt-4 flex max-w-3xl gap-2" onSubmit={(event) => { event.preventDefault(); void verifyRecentMfa(); }}><input aria-label="Six-digit authenticator code" inputMode="numeric" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))} className="min-w-0 flex-1 rounded-lg border border-stroke-default px-3 py-2.5 text-center tracking-[0.25em]" placeholder="000000" /><button disabled={busy === 'mfa'} className="rounded-lg border border-stroke-default px-4 py-2.5 text-sm font-semibold">Verify</button></form></section>
     {(error || message) && <div role={error ? 'alert' : 'status'} className={`mt-4 rounded-lg border p-3 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div>}
     <div className="mt-6 grid gap-3 sm:grid-cols-3"><Metric label="Pending invitations" value={String(invitations.length)} /><Metric label="Active members" value={String(members.filter((item) => item.status === 'active').length)} /><Metric label="Delivery attention" value={String(invitations.filter((item) => item.delivery_status === 'failed').length)} /></div>

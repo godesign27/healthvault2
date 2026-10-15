@@ -20,32 +20,34 @@ export function Toast({ id, type, message, duration = 5000, onClose }: ToastProp
   }, [id, duration, onClose]);
 
   const icons = {
-    success: <CheckCircle className="w-5 h-5 text-emerald-600" />,
-    error: <XCircle className="w-5 h-5 text-red-600" />,
-    info: <AlertCircle className="w-5 h-5 text-blue-600" />
+    success: <CheckCircle className="shrink-0 w-5 h-5 text-content-feedback-success" />,
+    error: <XCircle className="shrink-0 w-5 h-5 text-content-feedback-error" />,
+    info: <AlertCircle className="shrink-0 w-5 h-5 text-content-feedback-info" />
   };
 
   const backgrounds = {
-    success: 'bg-emerald-50 border-emerald-200',
-    error: 'bg-red-50 border-red-200',
-    info: 'bg-blue-50 border-blue-200'
+    success: 'bg-surface-feedback-success border-stroke-default',
+    error: 'bg-surface-feedback-error border-stroke-default',
+    info: 'bg-surface-feedback-info border-stroke-default'
   };
 
   const textColors = {
-    success: 'text-emerald-900',
-    error: 'text-red-900',
-    info: 'text-blue-900'
+    success: 'text-content-primary',
+    error: 'text-content-primary',
+    info: 'text-content-primary'
   };
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${backgrounds[type]} animate-slide-in`}>
+    <div className={`flex items-center gap-3 max-w-full px-4 py-3 rounded-lg border shadow-lg ${backgrounds[type]} animate-slide-in`}>
       {icons[type]}
-      <p className={`text-sm font-medium flex-1 ${textColors[type]}`}>{message}</p>
+      <p className={`min-w-0 break-words text-sm font-medium flex-1 ${textColors[type]}`}>{message}</p>
       <button
+        type="button"
+        aria-label="Dismiss notification"
         onClick={() => onClose(id)}
         className={`p-1 rounded hover:bg-white/50 transition-colors ${textColors[type]}`}
       >
-        <X className="w-4 h-4" />
+        <X className="shrink-0 w-4 h-4" />
       </button>
     </div>
   );

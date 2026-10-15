@@ -46,15 +46,15 @@ export function SharedWithDrawer({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'sent':
-        return darkMode ? 'text-blue-400' : 'text-blue-600';
+        return darkMode ? 'text-content-feedback-info' : 'text-content-feedback-info';
       case 'delivered':
-        return darkMode ? 'text-indigo-400' : 'text-indigo-600';
+        return darkMode ? 'text-action-primary' : 'text-action-primary';
       case 'opened':
-        return darkMode ? 'text-emerald-400' : 'text-emerald-600';
+        return darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success';
       case 'revoked':
-        return darkMode ? 'text-red-400' : 'text-red-600';
+        return darkMode ? 'text-content-feedback-error' : 'text-content-feedback-error';
       case 'expired':
-        return darkMode ? 'text-amber-400' : 'text-amber-600';
+        return darkMode ? 'text-content-feedback-warning' : 'text-content-feedback-warning';
       default:
         return 'text-content-secondary';
     }
@@ -98,8 +98,8 @@ export function SharedWithDrawer({
               <div
                 className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
                   darkMode
-                    ? 'bg-red-900/20 text-red-400 border border-red-800'
-                    : 'bg-red-50 text-red-800 border border-red-200'
+                    ? 'bg-surface-feedback-error text-content-feedback-error border border-stroke-default'
+                    : 'bg-surface-feedback-error text-content-feedback-error border border-stroke-default'
                 }`}
               >
                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -114,7 +114,7 @@ export function SharedWithDrawer({
                   className={`rounded-lg border p-4 ${
                     darkMode
                       ? 'border-stroke-default bg-surface-sunken'
-                      : 'border-stroke-subtle bg-white'
+                      : 'border-stroke-subtle bg-surface-raised'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">

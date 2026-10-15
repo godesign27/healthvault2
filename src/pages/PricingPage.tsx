@@ -7,7 +7,6 @@ import {
   Brain,
   Activity,
   FileText,
-  BarChart3,
   Eye,
   Share2,
   ChevronDown
@@ -23,7 +22,7 @@ interface PricingPageProps {
   onStartOnboarding?: () => void;
 }
 
-export function PricingPage({ darkMode = false, onNavigate, onStartOnboarding }: PricingPageProps) {
+export function PricingPage({ darkMode = false, onStartOnboarding }: PricingPageProps) {
   const [activeTab, setActiveTab] = useState<'individual' | 'business'>('individual');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 

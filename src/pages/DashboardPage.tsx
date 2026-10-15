@@ -1,3 +1,4 @@
+import { medicationEndDateCutoff } from '../lib/medicationStatus';
 import { FileText, Activity, Calendar, Pill, ArrowRight, Sparkles, X, Home, Menu, CheckCircle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../providers/ThemeProvider';
@@ -143,7 +144,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       const [profileRes, recordsRes, medsRes, apptRes, patientRes] = await Promise.all([
         supabase.from('user_profiles').select('first_name').eq('user_id', userId).maybeSingle(),
         supabase.from('health_records').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-        supabase.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+        supabase.from('medications').select('id', { count: 'exact', head: true }).eq('user_id', userId).or(`end_date.is.null,end_date.gte.${medicationEndDateCutoff()}`),
         supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'scheduled'),
         supabase.from('patient_profiles').select('id').eq('user_id', userId).maybeSingle(),
       ]);
@@ -318,27 +319,27 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           </p>
         </div>
 
-        {providerConnectionNotice && <div className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${darkMode ? 'border-indigo-800 bg-indigo-950/30' : 'border-indigo-200 bg-indigo-50'}`} role="status"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${darkMode ? 'bg-indigo-900' : 'bg-indigo-100'}`}><CheckCircle className={`h-5 w-5 ${darkMode ? 'text-indigo-300' : 'text-indigo-700'}`} /></div><div className="min-w-0 flex-1"><p className={`font-semibold ${darkMode ? 'text-indigo-200' : 'text-indigo-950'}`}>{providerConnectionNotice.providerDisplayName} is now connected</p><p className={`mt-1 text-sm ${darkMode ? 'text-indigo-300/80' : 'text-indigo-800'}`}>{providerConnectionNotice.dataSummary ? `${providerConnectionNotice.dataSummary.profileDetails} profile details added to your patient-controlled connection. Clinical records will appear as your provider imports them.` : 'Your patient-controlled provider connection is ready.'}</p></div><button className={`text-xs font-semibold ${darkMode ? 'text-indigo-300' : 'text-indigo-700'}`} onClick={() => setProviderConnectionNotice(null)}>Dismiss</button></div>}
+        {providerConnectionNotice && <div className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${darkMode ? 'border-stroke-default bg-action-primary-subtle' : 'border-stroke-default bg-action-primary-subtle'}`} role="status"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${darkMode ? 'bg-action-primary-subtle' : 'bg-action-primary-subtle'}`}><CheckCircle className={`h-5 w-5 ${darkMode ? 'text-action-primary' : 'text-action-primary'}`} /></div><div className="min-w-0 flex-1"><p className={`font-semibold ${darkMode ? 'text-action-primary' : 'text-action-primary'}`}>{providerConnectionNotice.providerDisplayName} is now connected</p><p className={`mt-1 text-sm ${darkMode ? 'text-action-primary' : 'text-action-primary'}`}>{providerConnectionNotice.dataSummary ? `${providerConnectionNotice.dataSummary.profileDetails} profile details added to your patient-controlled connection. Clinical records will appear as your provider imports them.` : 'Your patient-controlled provider connection is ready.'}</p></div><button className={`text-xs font-semibold ${darkMode ? 'text-action-primary' : 'text-action-primary'}`} onClick={() => setProviderConnectionNotice(null)}>Dismiss</button></div>}
 
         {receivedRequests.filter(r => !dismissedDashboardBanners.has(r.id)).map(req => (
           <div
             key={req.id}
             className={`mb-4 flex items-center gap-4 p-4 rounded-xl border transition-all ${
               darkMode
-                ? 'bg-emerald-950/20 border-emerald-800/50'
-                : 'bg-emerald-50 border-emerald-200'
+                ? 'bg-surface-feedback-success border-stroke-default'
+                : 'bg-surface-feedback-success border-stroke-default'
             }`}
           >
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-              darkMode ? 'bg-emerald-900/40' : 'bg-emerald-100'
+              darkMode ? 'bg-surface-feedback-success' : 'bg-surface-feedback-success'
             }`}>
-              <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+              <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-semibold truncate ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
+              <p className={`text-sm font-semibold truncate ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`}>
                 Records received from {req.doctor_name || req.provider_name}
               </p>
-              <p className={`text-xs mt-0.5 hidden sm:block ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
+              <p className={`text-xs mt-0.5 hidden sm:block ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`}>
                 Your requested health records are now available.
               </p>
             </div>
@@ -346,8 +347,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               onClick={() => { setCurrentPage('health-records'); setDismissedDashboardBanners(prev => new Set(prev).add(req.id)); }}
               className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 darkMode
-                  ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60'
-                  : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                  ? 'bg-surface-feedback-success text-content-feedback-success hover:bg-surface-feedback-success'
+                  : 'bg-surface-feedback-success text-content-feedback-success hover:bg-surface-feedback-success'
               }`}
             >
               View Records
@@ -356,7 +357,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             <button
               onClick={() => setDismissedDashboardBanners(prev => new Set(prev).add(req.id))}
               className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-                darkMode ? 'text-emerald-500 hover:bg-emerald-900/40' : 'text-emerald-400 hover:bg-emerald-100'
+                darkMode ? 'text-content-feedback-success hover:bg-surface-feedback-success' : 'text-content-feedback-success hover:bg-surface-feedback-success'
               }`}
             >
               <X className="w-4 h-4" />
@@ -386,8 +387,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
                     ? `Last synced ${relativeTime(vaultStats.lastSyncedAt)}`
                     : dashboardStats.records === 0 ? 'No records yet' : `${dashboardStats.records} total`
               }
-              iconBgColor="bg-indigo-50"
-              iconColor="text-indigo-600"
+              iconBgColor="bg-action-primary-subtle"
+              iconColor="text-action-primary"
             />
           </div>
 
@@ -397,8 +398,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               title="Medical Forms"
               value={formsCount === null ? '—' : String(formsCount)}
               subtitle={formsCount ? `${formsCount} completed` : 'None completed yet'}
-              iconBgColor="bg-emerald-50"
-              iconColor="text-emerald-600"
+              iconBgColor="bg-surface-feedback-success"
+              iconColor="text-content-feedback-success"
             />
           </div>
 
@@ -408,8 +409,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               title="Appointments"
               value={String(dashboardStats.appointments)}
               subtitle={dashboardStats.appointments === 0 ? 'None scheduled' : 'Upcoming'}
-              iconBgColor="bg-amber-50"
-              iconColor="text-amber-600"
+              iconBgColor="bg-surface-feedback-warning"
+              iconColor="text-content-feedback-warning"
             />
           </div>
 
@@ -427,8 +428,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           {/* Quick Actions - Takes full width on mobile, balanced on larger screens */}
           <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
             <div className="mb-3 flex items-center gap-2">
-              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
-                <Sparkles className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
+              <div className="rounded-lg bg-action-primary-subtle p-2 dark:bg-action-primary-subtle/30">
+                <Sparkles className="h-5 w-5 text-action-primary dark:text-action-primary" />
               </div>
               <h2 className="text-lg font-semibold text-content-primary">Quick Actions</h2>
             </div>
@@ -468,8 +469,8 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
           {/* Recent Activity - Balanced layout */}
           <div className="md:col-span-6 lg:col-span-6 flex h-full flex-col hv-surface-card p-6">
             <div className="mb-3 flex items-center gap-2">
-              <div className="rounded-lg bg-indigo-50 p-2 dark:bg-action-primary-subtle/30">
-                <Activity className="h-5 w-5 text-indigo-600 dark:text-action-primary" />
+              <div className="rounded-lg bg-action-primary-subtle p-2 dark:bg-action-primary-subtle/30">
+                <Activity className="h-5 w-5 text-action-primary dark:text-action-primary" />
               </div>
               <h2 className="text-lg font-semibold text-content-primary">Recent Activity</h2>
             </div>
@@ -487,10 +488,10 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
               ) : (
                 recentActivity.map(item => {
                   const cfg = item.kind === 'request'
-                    ? { icon: <CheckCircle className="w-5 h-5" />, bg: 'bg-emerald-50', color: 'text-emerald-600' }
+                    ? { icon: <CheckCircle className="w-5 h-5" />, bg: 'bg-surface-feedback-success', color: 'text-content-feedback-success' }
                     : item.kind === 'medication'
                       ? { icon: <Pill className="w-5 h-5" />, bg: 'bg-rose-50', color: 'text-rose-600' }
-                      : { icon: <FileText className="w-5 h-5" />, bg: 'bg-indigo-50', color: 'text-indigo-600' };
+                      : { icon: <FileText className="w-5 h-5" />, bg: 'bg-action-primary-subtle', color: 'text-action-primary' };
                   return (
                     <RecentActivityItem
                       key={item.id}

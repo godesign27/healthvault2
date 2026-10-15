@@ -1,3 +1,4 @@
+import { useResultToast } from '../hooks/useResultToast';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -5,9 +6,9 @@ type DeletionRequest = { id: string; status: string; requested_at: string; resol
 const requestColumns = 'id,status,requested_at,resolved_at,user_message';
 
 export function AccountDataControls({ client = supabase }: { client?: typeof supabase } = {}) {
+  const { notify, feedback } = useResultToast();
   const [busy, setBusy] = useState<'export' | 'delete' | null>(null);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
   const [request, setRequest] = useState<DeletionRequest | null>(null);
   const [loadingRequest, setLoadingRequest] = useState(true);
   const [showReview, setShowReview] = useState(false);
@@ -32,7 +33,7 @@ export function AccountDataControls({ client = supabase }: { client?: typeof sup
 
   async function download() {
     if (locked.current) return;
-    locked.current = true; setBusy('export'); setError(''); setNotice('');
+    locked.current = true; setBusy('export');
     try {
       const { data, error: exportError } = await client.functions.invoke('account-export', { body: {} });
       if (exportError) {
@@ -53,14 +54,14 @@ export function AccountDataControls({ client = supabase }: { client?: typeof sup
       link.download = `health-vault-data-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      setNotice('Your download is ready. Check your browser downloads. Keep this file private—it contains your health information.');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Unable to download your data.'); }
+      notify('Your download is ready. Check your browser downloads. Keep this file private—it contains your health information.');
+    } catch (e) { notify(e instanceof Error ? e.message : 'Unable to download your data.', 'error'); }
     finally { locked.current = false; setBusy(null); }
   }
 
   async function requestDeletion() {
     if (locked.current || confirmation !== 'DELETE' || loadingRequest) return;
-    locked.current = true; setBusy('delete'); setError(''); setNotice('');
+    locked.current = true; setBusy('delete');
     try {
       const { data: { user }, error: authError } = await client.auth.getUser();
       if (authError || !user) throw new Error('Sign in again before requesting deletion.');
@@ -70,8 +71,8 @@ export function AccountDataControls({ client = supabase }: { client?: typeof sup
         .select(requestColumns).eq('user_id', user.id).in('status', ['requested', 'reviewing']).single();
       if (readError || !data) throw new Error('Your request may have been received. Reopen Settings to check its status before submitting again.');
       setRequest(data); setShowReview(false); setConfirmation('');
-      setNotice('Deletion request received. Your account remains active while the request is reviewed.');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Unable to confirm your request.'); }
+      notify('Deletion request received. Your account remains active while the request is reviewed.');
+    } catch (e) { notify(e instanceof Error ? e.message : 'Unable to confirm your request.', 'error'); }
     finally { locked.current = false; setBusy(null); }
   }
   const pending = request && ['requested', 'reviewing'].includes(request.status);
@@ -81,7 +82,7 @@ export function AccountDataControls({ client = supabase }: { client?: typeof sup
       {busy === 'export' ? 'Preparing download…' : 'Download My Data'}
     </button>
     <p className="text-xs text-content-secondary">Downloads your personal structured Vault data as JSON, including saved form answers and wellness entries. Original files, images and PDFs must be downloaded separately from their records. Credentials and internal administrative records are excluded.</p>
-    <button type="button" className={button} disabled={!!busy || !!pending || loadingRequest} onClick={() => { setShowReview(true); setError(''); setNotice(''); }}>
+    <button type="button" className={button} disabled={!!busy || !!pending || loadingRequest} onClick={() => { setShowReview(true); }}>
       {loadingRequest ? 'Checking deletion requests…' : pending ? 'Deletion request pending' : 'Request Account Deletion'}
     </button>
     {request && <div className="text-sm text-content-secondary space-y-1" role="status">
@@ -103,7 +104,7 @@ export function AccountDataControls({ client = supabase }: { client?: typeof sup
       </div>
     </div>}
     {error && <p role="alert" className="text-sm text-content-primary">{error}</p>}
-    {notice && <p role="status" className="text-sm text-content-primary">{notice}</p>}
+    {feedback}
     <nav aria-label="Account policies" className="flex gap-4 text-sm underline text-content-primary"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></nav>
   </section>;
 }

@@ -1,7 +1,8 @@
+import { useResultToast } from '../hooks/useResultToast';
 import { useState, type FormEvent } from 'react';
 import { KeyRound } from 'lucide-react';
 import { PasswordField } from '../components/auth/PasswordField';
-import { friendlyRecoveryError } from '../lib/password-recovery';
+import { friendlyRecoveryError, validateNewPassword } from '../lib/password-recovery';
 
 interface PasswordRecoveryPageProps {
   onSave: (password: string, confirmation: string, authenticatorCode: string) => Promise<void>;
@@ -9,30 +10,32 @@ interface PasswordRecoveryPageProps {
   authenticatorRequired?: boolean;
 }
 
-const inputClassName = 'w-full rounded-lg border border-stroke-default px-4 py-2.5 text-content-primary focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20';
+const inputClassName = 'w-full bg-surface-raised rounded-lg border border-stroke-default px-4 py-2.5 text-content-primary focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20';
 
 export function PasswordRecoveryPage({ onSave, onCancel, authenticatorRequired = false }: PasswordRecoveryPageProps) {
+  const { notify, feedback } = useResultToast();
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [authenticatorCode, setAuthenticatorCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (loading) return;
-    setLoading(true);
     setError('');
-    setNotice('');
+    const validation = validateNewPassword(password, confirmation);
+    if (validation) { setError(validation); return; }
+    if (authenticatorRequired && !/^\d{6}$/.test(authenticatorCode.trim())) { setError('Enter the 6-digit code from your authenticator app.'); return; }
+    setLoading(true);
     try {
       await onSave(password, confirmation, authenticatorCode);
       setPassword('');
       setConfirmation('');
       setAuthenticatorCode('');
-      setNotice('Password updated. Sign in with your new password.');
+      notify('Password updated. Sign in with your new password.');
     } catch (err) {
-      setError(friendlyRecoveryError(err instanceof Error ? err.message : 'Unable to update your password. Request a new link.'));
+      notify(friendlyRecoveryError(err instanceof Error ? err.message : 'Unable to update your password. Request a new link.'), 'error');
     } finally {
       setLoading(false);
     }
@@ -45,7 +48,7 @@ export function PasswordRecoveryPage({ onSave, onCancel, authenticatorRequired =
     try {
       await onCancel();
     } catch {
-      setError('Unable to sign out. Please try again.');
+      notify('Unable to sign out. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -53,7 +56,8 @@ export function PasswordRecoveryPage({ onSave, onCancel, authenticatorRequired =
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-sunken p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+      {feedback}
+      <div className="w-full max-w-md rounded-xl bg-surface-raised p-8 shadow-lg">
         <div className="mb-6 flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl">
             <img src="/hv_logo-light.png" alt="Health Vault" className="h-full w-full object-contain" />
@@ -101,7 +105,6 @@ export function PasswordRecoveryPage({ onSave, onCancel, authenticatorRequired =
               <p className="text-sm text-red-600">{error}</p>
             </div>
           ) : null}
-          {notice ? <p className="text-sm text-content-secondary">{notice}</p> : null}
           <button
             type="button"
             onClick={() => { void handleCancel(); }}

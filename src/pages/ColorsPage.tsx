@@ -1,5 +1,4 @@
-import {TrendChart} from '../components/charts/TrendChart';
-import {chartOrder,chartSeed} from '../components/charts/chartPolicy';
+import {ChartVariantsDemo} from '../components/charts/ChartVariantsDemo';
 import { useEffect, useState } from 'react';
 import { supabase, type DesignToken } from '../lib/supabase';
 
@@ -76,6 +75,23 @@ export function ColorsPage() {
           <h1 className="text-4xl font-bold text-content-primary mb-2">Color System</h1>
           <p className="text-content-secondary">Comprehensive color palette for the Health Vault design system</p>
         </div>
+
+        <section className="hv-surface-card p-8 mb-12" aria-labelledby="mark-contrast-heading">
+          <h2 id="mark-contrast-heading" className="text-2xl font-bold text-content-primary mb-6">Health Vault mark contrast</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-lg bg-[#FFFFFF] p-6 text-[#180B3A]">
+              <img src="/hv_logo-light.png" alt="Health Vault mark on a light surface" className="w-20 h-20 mb-4" />
+              <p>White surface (#FFFFFF): violet mark 18.30:1; red heart 4.38:1.</p>
+              <p className="mt-2 text-sm">Page surface (#F8FAFC): violet 17.49:1; red 4.19:1.</p>
+            </div>
+            <div className="rounded-lg bg-[#0F172A] p-6 text-white">
+              <img src="/hv_logo-dark.png" alt="Health Vault mark on a dark surface" className="w-20 h-20 mb-4" />
+              <p>Dark surface (#0F172A): white mark 17.85:1; red heart 4.07:1.</p>
+              <p className="mt-2 text-sm">Raised surface (#1C2938): white 14.75:1; red 3.37:1.</p>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-content-secondary">Ratios use the solid interior colors of the existing PNG assets; translucent edge pixels are excluded. Logos are exempt from WCAG text contrast requirements. These measurements do not certify surrounding text or controls.</p>
+        </section>
 
         <div className="space-y-12">
           {Object.entries(groupedTokens).map(([category, categoryTokens]) => {
@@ -236,7 +252,7 @@ export function ColorsPage() {
     <section aria-label="Data Viz Option 1" className="space-y-6 mt-8">
         <h2 className="text-xl font-semibold">Data Viz Option 1</h2>
         <p>Health Vault categorical palette. Synthetic reference data only.</p>
-        {(['light','dark'] as const).map(mode=><TrendChart key={mode} mode={mode} title={`Reference trends — ${mode}`} labels={Array.from({length:8},(_,i)=>`Period ${i+1}`)} series={chartOrder.slice(0,6).map(key=>({key,label:key,values:chartSeed[chartOrder.indexOf(key)]}))}/>)}
+        <ChartVariantsDemo />
       </section>
       </div>
   );

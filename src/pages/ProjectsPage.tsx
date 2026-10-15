@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { Image, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ProjectCard } from '../components/ProjectCard';
@@ -18,10 +19,12 @@ interface ProjectsPageProps {
 }
 
 export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [nameError, setNameError] = useState('');
   const [newProjectDescription, setNewProjectDescription] = useState('');
   const [newProjectImage, setNewProjectImage] = useState<string | null>(null);
 
@@ -47,7 +50,7 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
 
   const handleCreateProject = async () => {
     if (!newProjectName.trim()) {
-      alert('Please enter a project name');
+      notify('Please enter a project name', 'error');
       return;
     }
 
@@ -73,9 +76,10 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
       setNewProjectName('');
       setNewProjectDescription('');
       setNewProjectImage(null);
+      notify('Project created.');
     } catch (error) {
       console.error('Error creating project:', error);
-      alert('Failed to create project. Please try again.');
+      notify('Failed to create project. Please try again.', 'error');
     }
   };
 
@@ -157,26 +161,30 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
       }
 
       setProjects([newProject, ...projects]);
+      notify('Project duplicated.');
     } catch (error) {
       console.error('Error duplicating project:', error);
-      alert('Failed to duplicate project. Please try again.');
+      notify('Failed to duplicate project. Please try again.', 'error');
     }
   };
 
   const handleDeleteProject = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
+    return runConfirmed('Delete this project? This cannot be undone.', async () => {
+      try {
+        const { error } = await supabase
+          .from('projects')
+          .delete()
+          .eq('id', id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setProjects(projects.filter(p => p.id !== id));
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      alert('Failed to delete project. Please try again.');
-    }
+        setProjects(projects.filter(p => p.id !== id));
+        notify('Project deleted.');
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        notify('Failed to delete project. Please try again.', 'error');
+      }
+    });
   };
 
   const handleRenameProject = async (id: string, newName: string) => {
@@ -189,9 +197,10 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
       if (error) throw error;
 
       setProjects(projects.map(p => p.id === id ? { ...p, name: newName } : p));
+      notify('Project renamed.');
     } catch (error) {
       console.error('Error renaming project:', error);
-      alert('Failed to rename project. Please try again.');
+      notify('Failed to rename project. Please try again.', 'error');
     }
   };
 
@@ -205,6 +214,7 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50">
+      {feedback}
       <div className="max-w-7xl mx-auto p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -268,11 +278,14 @@ export function ProjectsPage({ onProjectOpen }: ProjectsPageProps) {
                     id="projectName"
                     type="text"
                     value={newProjectName}
-                    onChange={(e) => setNewProjectName(e.target.value)}
+                    onChange={(e) => { setNewProjectName(e.target.value); setNameError(''); }}
+                    aria-invalid={Boolean(nameError)}
+                    aria-describedby={nameError ? 'project-name-error' : undefined}
                     placeholder="Enter project name"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[indigo-600] focus:border-transparent"
                     autoFocus
                   />
+                  {nameError && <p id="project-name-error" className="mt-1 text-sm text-content-feedback-error">{nameError}</p>}
                 </div>
 
                 <div>

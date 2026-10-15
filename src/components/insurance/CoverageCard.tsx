@@ -1,6 +1,8 @@
+import { PopupMenu } from '../ui/PopupMenu';
+import { Dialog } from '../ui/Dialog';
 import {useId, useRef, useState} from 'react';
 import {insuranceProviderInitials,displayInsuranceMemberId,insuranceCoverageStatus,formatInsuranceDate} from '../../../packages/api-client/src/insurance-status';
-import { Edit2, Trash2, Star, StarOff, StopCircle, PlayCircle } from 'lucide-react';
+import { MoreHorizontal, Star } from 'lucide-react';
 import { CoverageWithProvider } from '../../schemas/insurance';
 import { StatusBadge } from './StatusBadge';
 import { Card } from '../ui/Card';
@@ -30,6 +32,7 @@ export function CoverageCard({
   onStopCoverage,
   onResumeCoverage,
 }: CoverageCardProps) {
+  const [confirmRemoval, setConfirmRemoval] = useState(false);
   const memberFieldId = useId();
   const [editingMember, setEditingMember] = useState(false);
   const [memberDraft, setMemberDraft] = useState('');
@@ -55,12 +58,12 @@ export function CoverageCard({
                 darkMode ? 'text-white' : 'text-content-primary'
               }`}>{coverage.provider.name}</h3>
               {isStopped && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-overlay text-white text-xs font-medium rounded">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-overlay text-content-primary text-xs font-medium rounded">
                   Stopped
                 </span>
               )}
               {coverage.isPrimary && !isStopped && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-600 text-white text-xs font-medium rounded">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-action-primary text-content-on-action text-xs font-medium rounded">
                   <Star className="w-3 h-3 fill-current" />
                   Primary
                 </span>
@@ -130,75 +133,19 @@ export function CoverageCard({
         Effective: {formatInsuranceDate(coverage.effectiveStart)}
         {coverage.effectiveEnd && ` - ${formatInsuranceDate(coverage.effectiveEnd)}`}
       </div>
-      {showActions && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-stroke-default px-6 pb-2 pt-4">
-          {!isStopped && (
-            <>
-              {onEdit && (
-                <button disabled={busy}
-                  onClick={() => onEdit(coverage)}
-                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
-                    darkMode
-                      ? 'text-content-primary hover:bg-surface-sunken'
-                      : 'text-content-primary hover:bg-surface-overlay'
-                  }`}
-                >
-                  <Edit2 className="w-4 h-4" />
-                  Edit
-                </button>
-              )}
-              {!coverage.isPrimary && onSetPrimary && (
-                <button disabled={busy}
-                  onClick={() => onSetPrimary(coverage)}
-                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
-                    darkMode
-                      ? 'text-content-primary hover:bg-surface-sunken'
-                      : 'text-content-primary hover:bg-surface-overlay'
-                  }`}
-                >
-                  <StarOff className="w-4 h-4" />
-                  Set Primary
-                </button>
-              )}
-              {onStopCoverage && (
-                <button disabled={busy}
-                  onClick={() => onStopCoverage(coverage)}
-                  className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
-                    darkMode
-                      ? 'text-orange-400 hover:bg-surface-sunken'
-                      : 'text-orange-600 hover:bg-orange-50'
-                  }`}
-                >
-                  <StopCircle className="w-4 h-4" />
-                  Mark Stopped
-                </button>
-              )}
-            </>
-          )}
-          {isStopped && onResumeCoverage && (
-            <button disabled={busy}
-              onClick={() => onResumeCoverage(coverage)}
-              className={`flex min-h-12 items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ${
-                darkMode
-                  ? 'text-green-400 hover:bg-surface-sunken'
-                  : 'text-green-600 hover:bg-green-50'
-              }`}
-            >
-              <PlayCircle className="w-4 h-4" />
-              Mark Active
-            </button>
-          )}
-          {onDelete && (
-            <button disabled={busy}
-              onClick={() => onDelete(coverage)}
-              className="ml-auto flex min-h-12 items-center gap-1.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
-            >
-              <Trash2 className="w-4 h-4" />
-              Remove
-            </button>
-          )}
-        </div>
-      )}
+      {showActions && <div className="border-t border-stroke-default px-6 py-3">
+        <PopupMenu align="start" trigger={<button type="button" disabled={busy} className="min-h-12 rounded-lg px-3 text-sm text-content-secondary hover:bg-surface-sunken" aria-label={`More options for ${coverage.provider.name}`}><MoreHorizontal className="h-5 w-5" aria-hidden="true" /></button>} items={[
+          ...(!isStopped && onEdit ? [{label:'Edit coverage',onClick:() => onEdit(coverage),disabled:busy}] : []),
+          ...(!isStopped && !coverage.isPrimary && onSetPrimary ? [{label:'Set primary',onClick:() => onSetPrimary(coverage),disabled:busy}] : []),
+          ...(!isStopped && onStopCoverage ? [{label:'Stop coverage',onClick:() => onStopCoverage(coverage),disabled:busy}] : []),
+          ...(isStopped && onResumeCoverage ? [{label:'Resume coverage',onClick:() => onResumeCoverage(coverage),disabled:busy}] : []),
+          ...(onDelete ? [{label:'Remove coverage',onClick:() => setConfirmRemoval(true),disabled:busy}] : []),
+        ]} />
+      </div>}
+      {confirmRemoval && <Dialog isOpen onClose={() => { if (!busy) setConfirmRemoval(false); }} title="Remove saved coverage?" footerContent={<>
+        <button type="button" disabled={busy} className="min-h-12 px-4 text-content-primary" onClick={() => setConfirmRemoval(false)}>Keep coverage</button>
+        <button type="button" disabled={busy} className="min-h-12 rounded-lg bg-action-primary px-4 text-content-on-action" onClick={() => { setConfirmRemoval(false); onDelete?.(coverage); }}>Remove coverage</button>
+      </>}><p className="text-content-secondary">Remove this saved coverage from Health Vault? This does not cancel your insurance.</p></Dialog>}
     </Card>
   );
 }

@@ -7,7 +7,7 @@ import { CoverageCard } from '../components/insurance/CoverageCard';
 import { CoverageWithProvider } from '../schemas/insurance';
 import { InsuranceAnalytics } from '../lib/insurance/analytics';
 import { supabase } from '../lib/supabase';
-import { Banner } from '../components/ui/Banner';
+import { Toast } from '../components/Toast';
 
 interface InsurancePageProps {
   darkMode?: boolean;
@@ -40,7 +40,7 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
     if (await run(userId, coverage.id, 'primary')) analytics.trackSetPrimary(coverage.id!);
   };
   const handleDelete = async (coverage: CoverageWithProvider) => {
-    if (busy || !confirm('Remove this saved coverage from Health Vault? This does not cancel your insurance.')) return;
+    if (busy) return;
     if (await run(userId, coverage.id, 'remove')) analytics.trackDelete(coverage.id!);
   };
   const handleStopCoverage = (coverage: CoverageWithProvider) => {void run(userId, coverage.id, 'stop');};
@@ -84,8 +84,8 @@ export function InsurancePage({ darkMode = false, actionsRef }: InsurancePagePro
 
       <p className="mb-6 text-content-secondary">{insuranceVerificationNotice}</p>
       {toast && (
-        <div className="sticky top-4 z-30 mb-4">
-          <Banner key={toast.id} message={toast.message} variant={toast.type} style="light" onClose={() => setToast(null)} />
+        <div className="fixed right-4 top-4 z-[100] max-w-[calc(100vw-2rem)]" role={toast.type === 'error' ? 'alert' : 'status'}>
+          <Toast key={toast.id} {...toast} onClose={() => setToast(null)} />
         </div>
       )}
       {busy && <p role="status" className="mb-4 text-content-secondary">Updating saved coverage…</p>}

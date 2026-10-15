@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { ArrowLeft, Building2, CalendarClock, Loader2, ShieldCheck, ShieldX } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
@@ -23,6 +24,7 @@ const readable = (value: string) => value.replace(/[._]/g, ' ');
 const formatDate = (value: string | null) => value ? new Date(value).toLocaleString() : 'Not recorded';
 
 export function ConnectedProvidersPage() {
+  const { notify, runConfirmed, feedback } = useActionFeedback();
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [connections, setConnections] = useState<ProviderConnection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,18 +45,23 @@ export function ConnectedProvidersPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function withdraw(connection: ProviderConnection) {
-    const confirmed = window.confirm(`Withdraw ${connection.providerDisplayName}'s access? Your Health Vault profile remains yours, but this provider will no longer be able to use this connection.`);
-    if (!confirmed) return;
-    setBusyId(connection.providerPatientIdentityId); setError('');
-    const { data, error: invokeError } = await supabase.functions.invoke('patient-provider-access-api', { body: { action: 'withdraw', providerPatientIdentityId: connection.providerPatientIdentityId, reason: 'Withdrawn by patient from Connected providers' } });
-    if (invokeError || !data?.withdrawal) setError(data?.error ?? invokeError?.message ?? 'Unable to withdraw provider access.');
-    else await load();
-    setBusyId('');
+    if (busyId) return;
+    return runConfirmed(`Withdraw ${connection.providerDisplayName}'s access? Your Health Vault profile remains yours, but this provider will no longer be able to use this connection.`, async () => {
+      setBusyId(connection.providerPatientIdentityId); setError('');
+      try {
+        const { data, error: invokeError } = await supabase.functions.invoke('patient-provider-access-api', { body: { action: 'withdraw', providerPatientIdentityId: connection.providerPatientIdentityId, reason: 'Withdrawn by patient from Connected providers' } });
+        if (invokeError || !data?.withdrawal) throw new Error(data?.error ?? invokeError?.message ?? 'Unable to withdraw provider access.');
+        notify('Provider access withdrawn.');
+        await load();
+      } catch (error) {
+        notify(error instanceof Error ? error.message : 'Unable to withdraw provider access.', 'error');
+      } finally { setBusyId(''); }
+    });
   }
 
   if (signedIn === false) return <LoginPage title="Connected providers" description="Sign in to review and manage provider access to your Health Vault." allowSignup={false} onLoginSuccess={() => void load()} onCancel={() => { window.location.href = '/'; }} />;
 
-  return <main className="min-h-screen bg-surface-page px-4 py-8 sm:px-6 sm:py-12"><div className="mx-auto max-w-6xl">
+  return <main className="min-h-screen bg-surface-page px-4 py-8 sm:px-6 sm:py-12">{feedback}<div className="mx-auto max-w-6xl">
     <button onClick={() => { window.location.href = '/'; }} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-content-secondary hover:text-content-primary"><ArrowLeft className="h-4 w-4" />Back to Health Vault</button>
     <header className="mb-7"><div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white"><ShieldCheck /></div><p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">Patient-controlled access</p><h1 className="mt-1 text-3xl font-bold text-content-primary">Connected providers</h1><p className="mt-2 max-w-3xl text-content-secondary">Review the organizations connected to your Health Vault identity. Providers cannot take ownership of or revoke your profile. You can withdraw their access here at any time.</p></header>
     {error && <div role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}

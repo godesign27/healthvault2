@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Shield, Target, Lightbulb, Lock, Users, Database, FileText, TrendingUp, BarChart3, PieChart, Heart, Code, Package, Zap, CheckCircle2, ExternalLink, Eye, Key, Wallet, Coins, ArrowRightLeft, AlertCircle } from 'lucide-react';
-import { MarketingSidebar } from '../components/MarketingSidebar';
+import { Shield, Lightbulb, Lock, Users, Database, TrendingUp, BarChart3, Heart, Code, Package, Zap, CheckCircle2, ExternalLink, Eye, Key, Wallet, Coins, ArrowRightLeft, AlertCircle } from 'lucide-react';
 import { MarketingHeader } from '../components/MarketingHeader';
 import { MarketingFooter } from '../components/MarketingFooter';
 import { MarketingHomePage } from './MarketingHomePage';
@@ -19,7 +18,6 @@ interface MarketingSitePageProps {
 
 export function MarketingSitePage({ onViewChange, onLoginClick, onLogoutClick, onStartOnboarding, onDirectHealthVaultAccess, isAuthenticated = false }: MarketingSitePageProps) {
   const [currentPage, setCurrentPage] = useState('home');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 

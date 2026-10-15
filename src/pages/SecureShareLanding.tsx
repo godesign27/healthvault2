@@ -1,3 +1,5 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
+import { downloadSharedFile } from '../lib/downloadSharedFile';
 /**
  * Secure Share Landing Page
  *
@@ -99,8 +101,9 @@ function StatusBadge({ status }: { status: ShareStatus }) {
 }
 
 export default function SecureShareLanding() {
+  const { notify, feedback } = useActionFeedback();
+  const [downloading, setDownloading] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LandingSharePayload | null>(null);
   const [accessLoggedAt, setAccessLoggedAt] = useState<string | null>(null);
 
@@ -112,7 +115,6 @@ export default function SecureShareLanding() {
 
     async function load() {
       setLoading(true);
-      setError(null);
       try {
         const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/share/${id}?token=${encodeURIComponent(token || '')}`;
         const res = await fetch(apiUrl);
@@ -139,16 +141,24 @@ export default function SecureShareLanding() {
             if (!response.ok) throw new Error('Unable to record share access');
             setAccessLoggedAt(new Date().toLocaleString());
           })
-          .catch(() => {});
-      } catch (e: any) {
-        setError(e.message || 'Something went wrong.');
+          .catch(() => { notify('Unable to record share access. The shared information remains available.', 'error'); });
+      } catch (e: unknown) {
+        notify(e instanceof Error ? e.message : 'Something went wrong.', 'error');
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, []);
+  }, [notify]);
+
+  const handleDownload = async (url: string | undefined, filename: string) => {
+    if (!url || downloading) return;
+    setDownloading(true);
+    try { await downloadSharedFile(url, filename); }
+    catch (error) { notify(error instanceof Error ? error.message : 'Unable to download this file.', 'error'); }
+    finally { setDownloading(false); }
+  };
 
   const hasMultipleForms = data && data.forms.length > 1;
   const healthSections = data?.healthData
@@ -157,6 +167,7 @@ export default function SecureShareLanding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {feedback}
       {/* Full Width Header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -201,17 +212,7 @@ export default function SecureShareLanding() {
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-semibold text-red-900 mb-1">Cannot open shared forms</h3>
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {!loading && data && (
           <>
@@ -317,6 +318,8 @@ export default function SecureShareLanding() {
                     {hasMultipleForms && data.files.pdfUrl && (
                       <a
                         href={data.files.pdfUrl}
+                        aria-disabled={downloading}
+                        onClick={(event) => { event.preventDefault(); void handleDownload(data.files.pdfUrl, 'health-vault-forms.pdf'); }}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
@@ -368,6 +371,8 @@ export default function SecureShareLanding() {
                       <div className="grid sm:grid-cols-2 gap-4">
                         <a
                           href={data.files.pdfUrl}
+                        aria-disabled={downloading}
+                        onClick={(event) => { event.preventDefault(); void handleDownload(data.files.pdfUrl, 'health-vault-forms.pdf'); }}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors"
@@ -384,7 +389,8 @@ export default function SecureShareLanding() {
                               ? 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                               : 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'
                           }`}
-                          onClick={(e) => !data.files.bundleUrl && e.preventDefault()}
+                          aria-disabled={!data.files.bundleUrl || downloading}
+                          onClick={(event) => { event.preventDefault(); void handleDownload(data.files.bundleUrl, 'health-vault-bundle.json'); }}
                         >
                           <Download className="w-4 h-4" />
                           Download FHIR Bundle (JSON)

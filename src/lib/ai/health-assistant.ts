@@ -117,7 +117,7 @@ async function handleSummarizeRecord(params: { recordIds: string[] }): Promise<C
   } catch (error) {
     return {
       success: false,
-      message: "Failed to generate summary. Please try again."
+      message: error instanceof Error ? error.message : 'AI record summarization is unavailable in this flow.'
     };
   }
 }
@@ -145,7 +145,7 @@ async function handleCompareRecords(params: { recordIds: string[] }): Promise<Co
   } catch (error) {
     return {
       success: false,
-      message: "Failed to compare records. Please try again."
+      message: error instanceof Error ? error.message : 'AI record comparison is unavailable in this flow.'
     };
   }
 }
@@ -161,7 +161,7 @@ async function handleShareRecord(input: ShareInput): Promise<CommandResult> {
   } catch (error) {
     return {
       success: false,
-      message: "Failed to create share link. Please try again."
+      message: error instanceof Error ? error.message : 'Record sharing is unavailable in this flow. Nothing was sent.'
     };
   }
 }
@@ -185,24 +185,11 @@ async function handleFilterByKind(params: { kind: RecordKind }): Promise<Command
 
 async function handleFilterByDate(params: { from?: string; to?: string }): Promise<CommandResult> {
   try {
-    const insight = await requestInsights({
-      intent: "FIND_DATE_RANGE",
-      filters: {
-        from: params.from,
-        to: params.to
-      }
-    } as InsightInput);
-
-    return {
-      success: true,
-      message: insight.result,
-      data: insight
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: "Date filter failed. Please try again."
-    };
+    const records = (await listRecords()).filter(record => record.serviceDate &&
+      (!params.from || record.serviceDate >= params.from) && (!params.to || record.serviceDate <= params.to));
+    return { success: true, message: `Found ${records.length} records in date range.`, data: records, action: 'UPDATE_LIST' };
+  } catch {
+    return { success: false, message: 'Date filter failed. Please try again.' };
   }
 }
 
@@ -222,7 +209,7 @@ async function handleExplainRecord(params: { recordId: string }): Promise<Comman
   } catch (error) {
     return {
       success: false,
-      message: "Failed to generate explanation. Please try again."
+      message: error instanceof Error ? error.message : 'AI record explanation is unavailable in this flow.'
     };
   }
 }

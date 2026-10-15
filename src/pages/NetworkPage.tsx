@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { useState, useEffect, MutableRefObject } from 'react';
 import { Users, Stethoscope, Pill } from 'lucide-react';
 import { NetworkProvider, useNetworkStore } from '../lib/stores/network-store';
@@ -22,6 +23,7 @@ interface NetworkPageProps {
 type TabId = 'providers' | 'pharmacies';
 
 function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) {
+  const { runConfirmed, feedback } = useActionFeedback();
   const { insurance, loading, removeProvider, removePharmacy, loadData } = useNetworkStore();
   const [activeTab, setActiveTab] = useState<TabId>('providers');
   const [showAddProvider, setShowAddProvider] = useState(false);
@@ -61,27 +63,30 @@ function NetworkPageContent({ darkMode = false, actionsRef }: NetworkPageProps) 
   }
 
   const handleRemoveProvider = async (provider: Provider) => {
-    if (!confirm(`Remove ${provider.name} from your network?`)) return;
-    try {
-      await removeProvider(provider.id);
-      setToast({ id: crypto.randomUUID(), message: 'Provider removed successfully', type: 'success' });
-    } catch {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to remove provider', type: 'error' });
-    }
+    return runConfirmed(`Remove ${provider.name} from your network?`, async () => {
+      try {
+        await removeProvider(provider.id);
+        setToast({ id: crypto.randomUUID(), message: 'Provider removed successfully', type: 'success' });
+      } catch {
+        setToast({ id: crypto.randomUUID(), message: 'Failed to remove provider', type: 'error' });
+      }
+    });
   };
 
   const handleRemovePharmacy = async (pharmacy: Pharmacy) => {
-    if (!confirm(`Remove ${pharmacy.name} from your network?`)) return;
-    try {
-      await removePharmacy(pharmacy.id);
-      setToast({ id: crypto.randomUUID(), message: 'Pharmacy removed successfully', type: 'success' });
-    } catch {
-      setToast({ id: crypto.randomUUID(), message: 'Failed to remove pharmacy', type: 'error' });
-    }
+    return runConfirmed(`Remove ${pharmacy.name} from your network?`, async () => {
+      try {
+        await removePharmacy(pharmacy.id);
+        setToast({ id: crypto.randomUUID(), message: 'Pharmacy removed successfully', type: 'success' });
+      } catch {
+        setToast({ id: crypto.randomUUID(), message: 'Failed to remove pharmacy', type: 'error' });
+      }
+    });
   };
 
   return (
     <>
+      {feedback}
       <div className="w-full p-6 sm:p-8 lg:p-12">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">

@@ -1,3 +1,4 @@
+import { useResultToast } from '../hooks/useResultToast';
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
@@ -11,6 +12,7 @@ interface OnboardingIdentityPageProps {
 }
 
 export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: OnboardingIdentityPageProps) {
+  const { notify, feedback } = useResultToast();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -78,7 +80,6 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
           postal_code: formData.postalCode,
           country: formData.country,
           last4_ssn: formData.last4Ssn || null,
-          identity_verified: true,
           onboarding_complete: false,
           email: session.user.email || ''
         }, {
@@ -93,7 +94,7 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
       onNext();
     } catch (error: any) {
       console.error('Failed to save identity:', error);
-      alert(error.message || 'Failed to save identity. Please try again.');
+      notify(error.message || 'Failed to save identity. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -352,6 +353,7 @@ export function OnboardingIdentityPage({ darkMode = false, onNext, onBack }: Onb
           </div>
         </form>
       </div>
+      {feedback}
     </OnboardingLayout>
   );
 }

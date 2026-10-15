@@ -1,3 +1,4 @@
+import { useResultToast } from '../hooks/useResultToast';
 import { useState } from 'react';
 import { ArrowLeft, TestTube, FileText, Users, Heart } from 'lucide-react';
 import { OnboardingLayout } from '../components/OnboardingLayout';
@@ -12,6 +13,7 @@ interface OnboardingPreferencesPageProps {
 }
 
 export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, onSkip }: OnboardingPreferencesPageProps) {
+  const { notify, feedback } = useResultToast();
   const [preferences, setPreferences] = useState({
     helpWithLabs: false,
     helpWithForms: false,
@@ -49,7 +51,7 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
       onNext();
     } catch (error) {
       console.error('Failed to save preferences:', error);
-      alert('Failed to save. Please try again.');
+      notify('Failed to save. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -268,6 +270,7 @@ export function OnboardingPreferencesPage({ darkMode = false, onNext, onBack, on
           </div>
         </form>
       </div>
+      {feedback}
     </OnboardingLayout>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useResultToast } from '../hooks/useResultToast';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { normalizeRecoveryEmail, recoveryRedirect } from '../lib/password-recovery';
 import { PasswordField } from '../components/auth/PasswordField';
@@ -25,26 +26,31 @@ export function LoginPage({
   allowSignup = true,
   notice = '',
 }: LoginPageProps) {
+  const { notify, feedback } = useResultToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [sentNotice, setSentNotice] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [requestMode, setRequestMode] = useState(false);
 
+  useEffect(() => { if (notice) notify(notice); }, [notice, notify]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (loading) return;
     setError('');
-    setSentNotice('');
+    if (requestMode) {
+      try { normalizeRecoveryEmail(email); } catch (error) { setError(error instanceof Error ? error.message : 'Enter a valid email address.'); return; }
+    }
+    setLoading(true);
 
     try {
       if (requestMode) {
         const normalized = normalizeRecoveryEmail(email);
         const { error } = await supabase.auth.resetPasswordForEmail(normalized, { redirectTo: recoveryRedirect });
         if (error) throw error;
-        setSentNotice('If an account exists for this email, you will receive a recovery link.');
+        notify('If an account exists for this email, you will receive a recovery link.');
         return;
       }
       if (isSignup) {
@@ -62,7 +68,7 @@ export function LoginPage({
         onLoginSuccess();
       }
     } catch (err: any) {
-      setError(err.message || `Failed to ${isSignup ? 'sign up' : 'login'}`);
+      notify(err instanceof Error ? err.message : `Failed to ${isSignup ? 'sign up' : 'login'}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -72,8 +78,9 @@ export function LoginPage({
     <div className={`min-h-screen flex items-center justify-center p-4 ${
       darkMode ? 'bg-surface-raised' : 'bg-surface-sunken'
     }`}>
+      {feedback}
       <div className={`w-full max-w-md rounded-xl shadow-lg overflow-hidden ${
-        darkMode ? 'bg-surface-sunken' : 'bg-white'
+        darkMode ? 'bg-surface-sunken' : 'bg-surface-raised'
       }`}>
         <div className="p-8">
           <div className="flex justify-center mb-6">
@@ -87,7 +94,7 @@ export function LoginPage({
           </div>
 
           <h2 className={`text-2xl font-bold text-center mb-2 ${
-            darkMode ? 'text-white' : 'text-content-primary'
+            'text-content-primary'
           }`}>
             {title || (requestMode ? 'Reset password' : isSignup ? 'Create Account' : 'Sign In')}
           </h2>
@@ -112,8 +119,8 @@ export function LoginPage({
                 required
                 className={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
                   darkMode
-                    ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-indigo-500'
-                    : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
+                    ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
+                    : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
                 placeholder="admin@example.com"
               />
@@ -130,21 +137,20 @@ export function LoginPage({
                 placeholder="Enter your password"
                 inputClassName={`w-full px-4 py-2.5 rounded-lg border transition-colors ${
                   darkMode
-                    ? 'bg-surface-sunken border-stroke-default text-white placeholder:text-content-placeholder focus:border-indigo-500'
-                    : 'bg-white border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
+                    ? 'bg-surface-sunken border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
+                    : 'bg-surface-raised border-stroke-default text-content-primary placeholder:text-content-placeholder focus:border-indigo-500'
                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
               />
             )}
 
             {!isSignup && <button
               type="button"
-              onClick={() => { setRequestMode(!requestMode); setError(''); setSentNotice(''); setPassword(''); }}
+              onClick={() => { setRequestMode(!requestMode); setError(''); setPassword(''); }}
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
             >
               {requestMode ? 'Back to sign in' : 'Forgot password?'}
             </button>}
 
-            {notice || sentNotice ? <p className="text-sm text-content-secondary">{sentNotice || notice}</p> : null}
             {error && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200">
                 <p className="text-sm text-red-600">{error}</p>

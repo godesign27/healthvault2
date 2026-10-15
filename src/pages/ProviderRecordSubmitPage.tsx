@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { uploadNeedsReview } from '../lib/records/upload-result';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -39,6 +40,7 @@ const KIND_CONFIG: Record<string, { label: string; icon: typeof FileText }> = {
 };
 
 export default function ProviderRecordSubmitPage() {
+  const { notify, feedback } = useActionFeedback();
   const [state, setState] = useState<'loading' | 'form' | 'submitting' | 'success' | 'error' | 'expired' | 'already_submitted'>('loading');
   const [retryBlocked, setRetryBlocked] = useState(false);
   const [request, setRequest] = useState<RequestDetails | null>(null);
@@ -154,7 +156,7 @@ export default function ProviderRecordSubmitPage() {
 
       const payload = JSON.stringify({ token, files: filePayloads, providerNotes: globalNotes });
       if (new TextEncoder().encode(payload).byteLength > 40 * 1024 * 1024) {
-        setErrorMessage('The combined upload is too large. Choose a smaller batch or shorten the notes. Nothing was sent.');
+        notify('The combined upload is too large. Choose a smaller batch or shorten the notes. Nothing was sent.', 'error');
         setState('form');
         return;
       }
@@ -177,11 +179,11 @@ export default function ProviderRecordSubmitPage() {
         setFiles(previous => previous.filter((_, index) => !savedIndices.has(index)));
         const uncertain = uploadNeedsReview(res.status, body);
         setRetryBlocked(uncertain);
-        setErrorMessage(uncertain
+        notify(uncertain
           ? 'The upload needs review before retrying. Do not submit these files again until their status is checked. Contact Health Vault support.'
           : savedIndices.size
             ? `${savedIndices.size} file${savedIndices.size === 1 ? '' : 's'} saved. The remaining files were not saved. Review them before retrying.`
-            : body.error || 'No files were saved. Review the files before retrying.');
+            : body.error || 'No files were saved. Review the files before retrying.', 'error');
         setState('form');
         return;
       }
@@ -189,7 +191,7 @@ export default function ProviderRecordSubmitPage() {
       setState('success');
     } catch (err: any) {
       setRetryBlocked(true);
-      setErrorMessage('We could not confirm the upload result. Reload to check the request status or contact support before retrying.');
+      notify('We could not confirm the upload result. Reload to check the request status or contact support before retrying.', 'error');
       setState('form');
     }
   };
@@ -287,6 +289,7 @@ export default function ProviderRecordSubmitPage() {
 
   return (
     <PageShell>
+      {feedback}
       <div className="max-w-2xl mx-auto">
         <div className="hv-surface-card hv-surface-card--flat overflow-hidden">
           <div className="p-6 sm:p-8 border-b border-stroke-subtle">

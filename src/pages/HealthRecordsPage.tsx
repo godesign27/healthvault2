@@ -237,7 +237,7 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
             onClick={() => setCurrentFilter(filter.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               currentFilter === filter.value
-                ? 'bg-emerald-600 text-content-on-action'
+                ? 'bg-surface-feedback-success text-content-on-action'
                 : 'bg-surface-sunken text-content-secondary hover:bg-action-secondary'
             }`}
           >
@@ -302,7 +302,7 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
     case 'sent':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
-          darkMode ? 'bg-blue-900/40 text-blue-300 border border-blue-800' : 'bg-blue-50 text-blue-700 border border-blue-200'
+          darkMode ? 'bg-surface-feedback-info text-content-feedback-info border border-stroke-default' : 'bg-surface-feedback-info text-content-feedback-info border border-stroke-default'
         }`}>
           <Mail className="w-3 h-3" />
           Sent
@@ -311,7 +311,7 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
     case 'pending':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
-          darkMode ? 'bg-amber-900/40 text-amber-300 border border-amber-800' : 'bg-amber-50 text-amber-700 border border-amber-200'
+          darkMode ? 'bg-surface-feedback-warning text-content-feedback-warning border border-stroke-default' : 'bg-surface-feedback-warning text-content-feedback-warning border border-stroke-default'
         }`}>
           <Clock className="w-3 h-3" />
           Pending
@@ -320,7 +320,7 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
     case 'received':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
-          darkMode ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-800' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+          darkMode ? 'bg-surface-feedback-success text-content-feedback-success border border-stroke-default' : 'bg-surface-feedback-success text-content-feedback-success border border-stroke-default'
         }`}>
           <CheckCircle className="w-3 h-3" />
           Received
@@ -329,7 +329,7 @@ function StatusBadge({ status, darkMode }: { status: string; darkMode: boolean }
     case 'failed':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
-          darkMode ? 'bg-red-900/40 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-200'
+          darkMode ? 'bg-surface-feedback-error text-content-feedback-error border border-stroke-default' : 'bg-surface-feedback-error text-content-feedback-error border border-stroke-default'
         }`}>
           <AlertCircle className="w-3 h-3" />
           Failed
@@ -360,8 +360,8 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
             className={`p-4 text-left transition-all cursor-pointer ${
               req.status === 'received'
                 ? darkMode
-                  ? 'rounded-xl border border-emerald-800/50 bg-emerald-950/10 hover:border-emerald-700'
-                  : 'rounded-xl border border-emerald-200 bg-emerald-50/30 hover:border-emerald-300 hover:shadow-sm'
+                  ? 'rounded-xl border border-stroke-default bg-surface-feedback-success hover:border-stroke-default'
+                  : 'rounded-xl border border-stroke-default bg-surface-feedback-success hover:border-stroke-default hover:shadow-sm'
                 : 'hv-surface-card hv-surface-card--interactive hover:shadow-sm'
             }`}
           >
@@ -369,9 +369,9 @@ function PendingRequestsSection({ requests, darkMode, onRequestClick }: { reques
               <div className="flex items-center gap-2 min-w-0">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                   req.status === 'received'
-                    ? 'bg-emerald-100 text-emerald-600'
+                    ? 'bg-surface-feedback-success text-content-feedback-success'
                     : req.status === 'sent'
-                      ? darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'
+                      ? darkMode ? 'bg-surface-feedback-info text-content-feedback-info' : 'bg-surface-feedback-info text-content-feedback-info'
                       : 'bg-surface-sunken text-content-tertiary'
                 }`}>
                   <Building2 className="w-4 h-4" />
@@ -429,20 +429,20 @@ function ReceivedRecordsBanner({ requests, darkMode, onDismiss, onViewRecord }: 
           key={req.id}
           className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
             darkMode
-              ? 'bg-emerald-950/20 border-emerald-800/50'
-              : 'bg-emerald-50 border-emerald-200'
+              ? 'bg-surface-feedback-success border-stroke-default'
+              : 'bg-surface-feedback-success border-stroke-default'
           }`}
         >
           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            darkMode ? 'bg-emerald-900/40' : 'bg-emerald-100'
+            darkMode ? 'bg-surface-feedback-success' : 'bg-surface-feedback-success'
           }`}>
-            <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+            <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
+            <p className={`text-sm font-semibold ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`}>
               Records received from {req.doctor_name || req.provider_name}
             </p>
-            <p className={`text-xs mt-0.5 ${darkMode ? 'text-emerald-400/70' : 'text-emerald-600'}`}>
+            <p className={`text-xs mt-0.5 ${darkMode ? 'text-content-feedback-success' : 'text-content-feedback-success'}`}>
               {req.record_types?.map(t => KIND_LABELS[t] || t).join(', ')} -- now available in your records
             </p>
           </div>
@@ -450,8 +450,8 @@ function ReceivedRecordsBanner({ requests, darkMode, onDismiss, onViewRecord }: 
             onClick={() => onViewRecord(req)}
             className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               darkMode
-                ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60'
-                : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                ? 'bg-surface-feedback-success text-content-feedback-success hover:bg-surface-feedback-success'
+                : 'bg-surface-feedback-success text-content-feedback-success hover:bg-surface-feedback-success'
             }`}
           >
             View
@@ -460,7 +460,7 @@ function ReceivedRecordsBanner({ requests, darkMode, onDismiss, onViewRecord }: 
           <button
             onClick={() => onDismiss(req.id)}
             className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-              darkMode ? 'text-emerald-500 hover:bg-emerald-900/40' : 'text-emerald-400 hover:bg-emerald-100'
+              darkMode ? 'text-content-feedback-success hover:bg-surface-feedback-success' : 'text-content-feedback-success hover:bg-surface-feedback-success'
             }`}
           >
             <X className="w-4 h-4" />

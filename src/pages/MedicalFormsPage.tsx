@@ -1,3 +1,4 @@
+import { useActionFeedback } from '../hooks/useActionFeedback';
 import { CheckCircle2, Clock, FileText, Share2, Users, ClipboardList, Upload, X } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { FormDrawer } from '../components/FormDrawer';
@@ -26,6 +27,7 @@ interface MedicalFormsPageProps {
 }
 
 export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
+  const { notify, feedback } = useActionFeedback();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<FormTemplateDef | null>(null);
   const [shareDrawerOpen, setShareDrawerOpen] = useState(false);
@@ -142,12 +144,12 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
         await supabase.storage.from('medical-form-uploads').remove([storagePath]);
         throw rowError;
       }
-      setUploadMessage({ type: 'success', text: 'Provider form uploaded securely. It is ready for review in Health Vault.' });
+      notify('Provider form uploaded securely. It is ready for review in Health Vault.');
       setUploadFile(null);
       setUploadTitle('');
       setUploadNotes('');
     } catch (error) {
-      setUploadMessage({ type: 'error', text: error instanceof Error ? error.message : 'Unable to upload the form.' });
+      notify(error instanceof Error ? error.message : 'Unable to upload the form.', 'error');
     } finally {
       setUploading(false);
     }
@@ -253,6 +255,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
 
   return (
     <div className="w-full p-6 sm:p-8 lg:p-12">
+      {feedback}
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2 text-content-primary">
@@ -264,7 +267,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setUploadOpen(true)}
-            className="px-6 py-3 font-medium rounded-lg border border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center gap-2"
+            className="px-6 py-3 font-medium rounded-lg border border-stroke-default text-action-primary hover:bg-action-primary-subtle transition-colors flex items-center gap-2"
           >
             <Upload className="w-5 h-5" />
             Upload provider form
@@ -275,7 +278,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
             className={`px-6 py-3 font-medium rounded-lg transition-colors flex items-center gap-2 ${
             completedSelectedCount === 0
               ? 'bg-action-primary-disabled text-content-on-action cursor-not-allowed'
-              : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              : 'bg-action-primary text-content-on-action hover:bg-action-primary'
             }`}
           >
             <Share2 className="w-5 h-5" />
@@ -323,8 +326,8 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
         >
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-sm font-medium text-content-secondary">Shared With</h3>
-            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-indigo-50'}`}>
-              <Users className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-indigo-600'}`} />
+            <div className={`p-2.5 rounded-lg ${darkMode ? 'bg-surface-sunken' : 'bg-action-primary-subtle'}`}>
+              <Users className={`w-5 h-5 ${darkMode ? 'text-content-secondary' : 'text-action-primary'}`} />
             </div>
           </div>
           <p className="text-3xl font-bold mb-1 text-content-primary">
@@ -349,7 +352,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                 <div className="text-right">
                   <div className="w-48 rounded-full h-2 mb-2 bg-surface-sunken">
                     <div
-                      className="bg-indigo-600 h-2 rounded-full transition-all"
+                      className="bg-action-primary h-2 rounded-full transition-all"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -380,11 +383,11 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                         onChange={() => toggleSelect(template.id)}
                         onClick={(e) => e.stopPropagation()}
                         title={complete ? 'Select to share' : 'Complete this form to share it'}
-                        className="w-5 h-5 rounded border-stroke-default text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="w-5 h-5 rounded border-stroke-default text-action-primary focus:ring-indigo-600 focus:ring-offset-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                       />
 
-                      <div className={`p-3 rounded-lg shrink-0 ${darkMode ? 'bg-surface-sunken' : 'bg-indigo-50'}`}>
-                        <FileText className={`w-5 h-5 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
+                      <div className={`p-3 rounded-lg shrink-0 ${darkMode ? 'bg-surface-sunken' : 'bg-action-primary-subtle'}`}>
+                        <FileText className={`w-5 h-5 ${darkMode ? 'text-action-primary' : 'text-action-primary'}`} />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -394,12 +397,12 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
 
                       <div className="flex items-center gap-2">
                         {complete ? (
-                          <span className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg flex items-center gap-1.5 shrink-0">
+                          <span className="px-4 py-2 bg-surface-feedback-success text-content-on-action text-sm font-medium rounded-lg flex items-center gap-1.5 shrink-0">
                             <CheckCircle2 className="w-4 h-4" />
                             Complete
                           </span>
                         ) : (
-                          <span className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg flex items-center gap-1.5 shrink-0">
+                          <span className="px-4 py-2 bg-surface-feedback-warning text-content-on-action text-sm font-medium rounded-lg flex items-center gap-1.5 shrink-0">
                             <Clock className="w-4 h-4" />
                             Incomplete
                           </span>
@@ -410,7 +413,7 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
                               e.stopPropagation();
                               handleShareSingle(template.id);
                             }}
-                            className="p-2.5 text-indigo-600 hover:bg-surface-sunken rounded-lg transition-colors"
+                            className="p-2.5 text-action-primary hover:bg-surface-sunken rounded-lg transition-colors"
                             title="Share this form"
                           >
                             <Share2 className="w-5 h-5" />
@@ -503,8 +506,8 @@ export function MedicalFormsPage({ darkMode = false }: MedicalFormsPageProps) {
               <label className="block text-sm font-medium text-content-primary">Notes <span className="font-normal text-content-secondary">(optional)</span>
                 <textarea value={uploadNotes} onChange={(event) => setUploadNotes(event.target.value)} maxLength={1000} rows={3} placeholder="Office, appointment, or deadline" className="mt-2 block w-full rounded-lg border border-stroke-default bg-surface-primary p-3 text-content-primary" />
               </label>
-              {uploadMessage && <p className={`rounded-lg p-3 text-sm ${uploadMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800'}`}>{uploadMessage.text}</p>}
-              <button onClick={handleUpload} disabled={!uploadFile || uploading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+              {uploadMessage && <p className={`rounded-lg p-3 text-sm ${uploadMessage.type === 'success' ? 'bg-surface-feedback-success text-content-feedback-success' : 'bg-surface-feedback-error text-content-feedback-error'}`}>{uploadMessage.text}</p>}
+              <button onClick={handleUpload} disabled={!uploadFile || uploading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-action-primary px-5 py-3 font-semibold text-content-on-action hover:bg-action-primary disabled:cursor-not-allowed disabled:opacity-50">
                 <Upload className="h-5 w-5" />
                 {uploading ? 'Uploading securely…' : 'Upload securely'}
               </button>
