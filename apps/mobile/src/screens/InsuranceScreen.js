@@ -4,6 +4,7 @@ import {useInsuranceData} from '../hooks/useInsuranceData';
 import {recordsColors} from '../theme/records';
 import {typeStyles,control,space,radius} from '../theme/layout';
 import {AppText as Text, AppTextInput} from '../components/ui/AppText';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
 import React, { useCallback, useState, useMemo, createContext, useContext } from 'react';
 import {
   View,
@@ -85,7 +86,14 @@ function CoverageCardMobile({
             </Text>
           </View>
         </View>
-        <StatusBadge status={badgeStatus} />
+        <View style={styles.cardHeaderActions}>
+          <StatusBadge status={badgeStatus} />
+          {(onSetPrimary || onStopCoverage || onResumeCoverage || onDelete) ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${coverage.provider.name}`} disabled={busy} accessibilityState={{disabled: busy}} onPress={() => openCoverageMenu()} style={styles.more}>
+              <Ionicons name="ellipsis-horizontal" size={control.icon} color={STEEL.textPrimary} />
+            </Pressable>
+          ) : null}
+        </View>
       </View>
 
       <View style={styles.fieldGrid}>
@@ -134,52 +142,29 @@ function CoverageCardMobile({
         Effective: {startStr}
         {endStr ? ` - ${endStr}` : ''}
       </Text>
-
-      <View style={styles.actionsRow}>
-        {!isStopped ? (
-          <>
-            {!coverage.isPrimary && onSetPrimary ? (
-              <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtn} onPress={() => onSetPrimary(coverage)} accessibilityRole="button">
-                <Ionicons name="star-outline" size={18} color={STEEL.textPrimary} />
-                <Text variant="body" style={styles.actionBtnText}>Set Primary</Text>
-              </Pressable>
-            ) : null}
-            {onStopCoverage ? (
-              <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnOrange} onPress={() => onStopCoverage(coverage)} accessibilityRole="button">
-                <Ionicons name="stop-circle-outline" size={18} color={STEEL.warning} />
-                <Text variant="body" style={styles.actionBtnOrangeText}>Mark Stopped</Text>
-              </Pressable>
-            ) : null}
-          </>
-        ) : onResumeCoverage ? (
-          <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnGreen} onPress={() => onResumeCoverage(coverage)} accessibilityRole="button">
-            <Ionicons name="play-circle-outline" size={18} color={STEEL.success} />
-            <Text variant="body" style={styles.actionBtnGreenText}>Mark Active</Text>
-          </Pressable>
-        ) : null}
-        {onDelete ? (
-          <Pressable disabled={busy} accessibilityState={{disabled: busy}} style={styles.actionBtnDelete} onPress={() => onDelete(coverage)} accessibilityRole="button">
-            <Ionicons name="trash-outline" size={18} color={STEEL.dangerAction} />
-            <Text variant="body" style={styles.actionBtnDeleteText}>Remove</Text>
-          </Pressable>
-        ) : null}
-      </View>
     </View>
   );
+
+  function openCoverageMenu() {
+    const actions = [];
+    if (!isStopped && !coverage.isPrimary && onSetPrimary) actions.push({text: 'Set primary', onPress: () => onSetPrimary(coverage)});
+    if (!isStopped && onStopCoverage) actions.push({text: 'Stop coverage', onPress: () => onStopCoverage(coverage)});
+    if (isStopped && onResumeCoverage) actions.push({text: 'Resume coverage', onPress: () => onResumeCoverage(coverage)});
+    if (onDelete) actions.push({text: 'Remove', style: 'destructive', onPress: () => onDelete(coverage)});
+    actions.push({text: 'Cancel', style: 'cancel'});
+    Alert.alert(coverage.provider.name, undefined, actions);
+  }
 }
 
 function InsuranceContent({ omitShellTitle = false, scrollFabProps = {} }) {
   const { STEEL, styles } = useContext(InsuranceTheme);
   const {coverages, loading, userId, error: loadError, refetch: loadCoverages} = useInsuranceData();
-  const [toast, setToast] = useState(null);
-
+  const {notice, showNotice, dismissNotice} = useNotice();
   const showToast = useCallback((message, type = 'success') => {
-    const id = `${Date.now()}`;
-    setToast({ id, message, type });
-    setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 4000);
-  }, []);
+    showNotice(message, type === 'error' ? 'error' : 'success');
+  }, [showNotice]);
 
-  const {busy, run} = useInsuranceMutation(supabase, showToast, loadCoverages, () => setToast(null));
+  const {busy, run} = useInsuranceMutation(supabase, showToast, loadCoverages, dismissNotice);
   const handleSetPrimary = coverage => run(userId, coverage.id, 'primary');
   const handleStopCoverage = coverage => run(userId, coverage.id, 'stop');
   const handleResumeCoverage = coverage => run(userId, coverage.id, 'resume');
@@ -199,26 +184,7 @@ function InsuranceContent({ omitShellTitle = false, scrollFabProps = {} }) {
       {...scrollFabProps}
     >
       {busy ? <Text variant="body" style={styles.emptyBody} accessibilityLiveRegion="polite">Updating saved coverage…</Text> : null}
-      {toast ? (
-        <View
-          style={[
-            styles.toast,
-            toast.type === 'error' ? styles.toastError : styles.toastSuccess,
-          ]}
-        >
-          <Ionicons
-            name={toast.type === 'error' ? 'warning-outline' : 'checkmark-circle-outline'}
-            size={20}
-            color={toast.type === 'error' ? STEEL.danger : STEEL.success}
-          />
-          <Text variant="body" style={[styles.toastText, toast.type === 'error' ? styles.toastTextError : styles.toastTextSuccess]}>
-            {toast.message}
-          </Text>
-          <Pressable onPress={() => setToast(null)} style={{minWidth:control.minTarget,minHeight:control.minTarget,alignItems:'center',justifyContent:'center'}} accessibilityRole="button" accessibilityLabel="Dismiss message">
-            <Ionicons name="close" size={20} color={STEEL.textSecondary} />
-          </Pressable>
-        </View>
-      ) : null}
+      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={STEEL} onDismiss={dismissNotice} /> : null}
 
       {/* Page title is the screen label. The top bar keeps the menu, avatar, and assistant. */}
       <View style={styles.hero}>
@@ -291,20 +257,6 @@ const createStyles = (STEEL) => StyleSheet.create({
   heroTitle: { ...typeStyles.title, fontWeight: '800', color: STEEL.textPrimary },
   heroSub: { ...typeStyles.body,  color: STEEL.textSecondary },
   heroSubOnly: { marginTop: 0 },
-  toast: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-  },
-  toastSuccess: { backgroundColor: STEEL.successBg, borderColor: STEEL.successBorder },
-  toastError: { backgroundColor: STEEL.dangerBg, borderColor: STEEL.dangerBorder },
-  toastText: { flex: 1, ...typeStyles.body, },
-  toastTextSuccess: { color: STEEL.success },
-  toastTextError: { color: STEEL.danger },
   loadingWrap: { paddingVertical: 48, alignItems: 'center' },
   emptyCard: {
     backgroundColor: STEEL.surface,
@@ -334,6 +286,8 @@ const createStyles = (STEEL) => StyleSheet.create({
     paddingBottom: 12,
   },
   cardHeaderLeft: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0 },
+  cardHeaderActions: { flexDirection: 'row', alignItems: 'center' },
+  more: { minWidth: control.minTarget, minHeight: control.minTarget, alignItems: 'center', justifyContent: 'center' },
   providerLogo: { width: 48, height: 48, borderRadius: 10 },
   providerLogoPlaceholder: {
     width: 48,

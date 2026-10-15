@@ -1,5 +1,9 @@
 import {typeStyles} from '../theme/layout';
 import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
+import {recordsColors} from '../theme/records';
+import {saveSignedInProfile} from '../lib/profile-settings';
+import {supabase} from '../lib/supabase';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -14,6 +18,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import AccountDataControls from '../components/account/AccountDataControls';
 
 const STEEL = {
@@ -74,6 +79,9 @@ export default function ProfileSettingsScreen({
   const [lastName, setLastName] = useState(initialLast);
   const [avatarUri, setAvatarUri] = useState(userProfile?.avatarUri || '');
   const [email] = useState(userProfile?.email || '');
+  const [saving, setSaving] = useState(false);
+  const {notice, showNotice, dismissNotice} = useNotice();
+  const noticeColors = recordsColors(darkShell);
 
   useEffect(() => {
     const { first, last } = splitName(userProfile?.name);
@@ -99,15 +107,25 @@ export default function ProfileSettingsScreen({
     }
   };
 
-  const handleSave = () => {
-    const name = `${firstName} ${lastName}`.trim() || userProfile?.name || 'User';
-    onUpdateUserProfile?.({
-      name,
-      email: userProfile?.email,
-      avatarUri: avatarUri || userProfile?.avatarUri,
-    });
-    Alert.alert('Profile updated', 'Your changes have been saved.');
-    onClose?.();
+  const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const saved = await saveSignedInProfile({
+        client: supabase,
+        fileSystem: FileSystem,
+        env: {supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL, anonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY},
+        firstName,
+        lastName,
+        avatarUri,
+      });
+      onUpdateUserProfile?.(saved);
+      showNotice('Profile updated.', 'success');
+    } catch (error) {
+      showNotice(error?.message || 'The profile could not be saved.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -118,6 +136,7 @@ export default function ProfileSettingsScreen({
       keyboardShouldPersistTaps="handled"
       {...scrollFabProps}
     >
+      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={noticeColors} onDismiss={dismissNotice} /> : null}
       {!omitShellTitle ? (
         <View style={styles.intro}>
           <Text variant="title" style={[styles.title, { color: T.textPrimary }]}>Profile Settings</Text>
@@ -213,11 +232,13 @@ export default function ProfileSettingsScreen({
         </Pressable>
         <Pressable
           onPress={handleSave}
+          disabled={saving}
+          accessibilityState={{disabled: saving}}
           style={[styles.saveBtn, { backgroundColor: T.accent }]}
           accessibilityRole="button"
           accessibilityLabel="Save profile changes"
         >
-          <Text variant="body" style={styles.saveBtnText}>Save changes</Text>
+          <Text variant="body" style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save changes'}</Text>
         </Pressable>
       </View>
     </ScrollView>

@@ -37,6 +37,17 @@ export async function latestDietMoment(client) {
   return data?.[0]?.consumed_at ?? null;
 }
 
+export async function latestSignalMoment(client) {
+  const uid = await requireUser(client);
+  const { data, error } = await client.from('life_signal_entries')
+    .select('recorded_at')
+    .eq('user_id', uid)
+    .limit(1)
+    .order('recorded_at', { ascending: false });
+  if (error) throw error;
+  return data?.[0]?.recorded_at ?? null;
+}
+
 export async function saveDietEntry(client, id, entry) {
   const uid = await requireUser(client);
   const { error } = await client.from('diet_log_entries').update(entry).eq('id', id).eq('user_id', uid);
@@ -46,5 +57,23 @@ export async function saveDietEntry(client, id, entry) {
 export async function removeDietEntry(client, id) {
   const uid = await requireUser(client);
   const { error } = await client.from('diet_log_entries').delete().eq('id', id).eq('user_id', uid);
+  if (error) throw error;
+}
+
+export async function confirmDietEntry(client, preview) {
+  await requireUser(client);
+  if (!preview?.consumedAt || !preview.mealType || !Array.isArray(preview.items) || !preview.items.length) {
+    throw new Error('Review the meal again before saving.');
+  }
+  const { error } = await client.rpc('confirm_wellness_entries', {
+    p_kind: 'diet',
+    p_entries: [{
+      event_time: preview.consumedAt,
+      meal_type: preview.mealType,
+      items: preview.items,
+      water_ml: preview.waterMl,
+      notes: preview.notes,
+    }],
+  });
   if (error) throw error;
 }

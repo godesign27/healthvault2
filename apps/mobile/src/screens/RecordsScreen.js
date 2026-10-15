@@ -1,6 +1,7 @@
 import {useAdaptiveLayout} from '../components/ui/AdaptiveControls';
 import {typeStyles,space} from '../theme/layout';
 import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
 import { formatRecordDate } from '../../../../packages/api-client/src/record-date';
 import React, { useState, useMemo, useCallback, useRef, createContext, useContext } from 'react';
 import {
@@ -129,6 +130,7 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
   const resendBusy=useRef(false);
   const [cancelling,setCancelling]=useState(false);
   const cancelBusy=useRef(false);
+  const {notice, showNotice, dismissNotice} = useNotice();
   function confirmCancel(){
     const request=selectedRequest;
     if(!request || cancelBusy.current || resendBusy.current || !['pending','sent','failed'].includes(request.status))return;
@@ -139,8 +141,8 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
         try{await cancelRecordRequest({requestId:request.id,getSession:async()=>(await supabase.auth.getSession()).data.session,
           baseUrl:process.env.EXPO_PUBLIC_SUPABASE_URL,anonKey:process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY});
           setSelectedRequest({...request,status:'cancelled',expired:false});
-          Alert.alert('Request cancelled','The upload link is closed. Records already received remain in your Vault.');
-        }catch(e){Alert.alert('Cancellation not confirmed',e.message,[{text:'OK',onPress:()=>{setShowRequestDetail(false);setSelectedRequest(null);}}]);}
+          showNotice('Request cancelled. The upload link is closed. Records already received remain in your Vault.', 'success');
+        }catch(e){showNotice(e.message || 'Cancellation not confirmed.', 'error'); setShowRequestDetail(false); setSelectedRequest(null);}
         finally{cancelBusy.current=false;setCancelling(false);refetchRequests();}
       }}]);
   }
@@ -156,11 +158,12 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
           const result=await resendRecordRequest({requestId:request.id,storage:AsyncStorage,
             getSession:async()=>(await supabase.auth.getSession()).data.session,
             baseUrl:process.env.EXPO_PUBLIC_SUPABASE_URL,anonKey:process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY});
-          Alert.alert(result.emailAccepted?'Email accepted':'Email not sent',result.emailAccepted
-            ?'The email service accepted the request. Inbox delivery is not yet confirmed.'
-            :'The upload link was replaced, but the email was not sent. Please contact support before trying again.');
+          showNotice(result.emailAccepted
+            ? 'Email accepted. The email service accepted the request. Inbox delivery is not yet confirmed.'
+            : 'Email not sent. The upload link was replaced, but the email was not sent. Please contact support before trying again.',
+            result.emailAccepted ? 'success' : 'error');
           setShowRequestDetail(false);setSelectedRequest(null);
-        }catch(e){Alert.alert('Resend not confirmed',e.message);}
+        }catch(e){showNotice(e.message || 'Resend not confirmed.', 'error');}
         finally{resendBusy.current=false;setResending(false);refetchRequests();}
       }}]);
   }
@@ -245,14 +248,14 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
     if(createBusy.current)return;
     let input;
     try{input=validateRecordRequest({providerName:manualName,providerEmail:manualEmail,doctorName:manualDoctor,recordTypes:manualTypes,urgency:manualPriority,message:manualMessage});}
-    catch(e){Alert.alert('Review request',e.message);return;}
+    catch(e){showNotice(e.message || 'Review the request before sending.', 'error');return;}
     Alert.alert('Send records request?',`${input.providerName}\n${input.providerEmail}\nRecords: ${input.recordTypes.join(', ')}\nPriority: ${input.urgency}\nMessage: ${input.message||'None'}\n\nYour saved identity details (including name, birth date and contact information when available) will be included.`,[
       {text:'Cancel',style:'cancel'},{text:'Send request',onPress:async()=>{
         if(createBusy.current)return;createBusy.current=true;setCreating(true);
         try{const receipt=await createRecordRequest({input,storage:AsyncStorage,getSession:async()=>(await supabase.auth.getSession()).data.session,
           digest:value=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,value),baseUrl:process.env.EXPO_PUBLIC_SUPABASE_URL,anonKey:process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY});
-          setShowRequestModal(false);Alert.alert('Request created',receipt.emailAccepted?'The email service accepted the request. Inbox delivery is not yet confirmed.':'The request was saved, but its email was not sent. Open the saved request to review it.');
-        }catch(e){Alert.alert('Request not confirmed',e.message);}
+          setShowRequestModal(false);showNotice(receipt.emailAccepted?'Request created. The email service accepted the request. Inbox delivery is not yet confirmed.':'Request created. The request was saved, but its email was not sent. Open the saved request to review it.', receipt.emailAccepted ? 'success' : 'error');
+        }catch(e){showNotice(e.message || 'Request not confirmed.', 'error');}
         finally{createBusy.current=false;setCreating(false);refetchRequests();}
       }}]);
   }
@@ -276,6 +279,7 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
 
   return (
     <View style={styles.root}>
+      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={STEEL} onDismiss={dismissNotice} /> : null}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent,{paddingBottom:insets.bottom+space.lg}]}
@@ -547,9 +551,16 @@ function RecordsContent({ omitShellTitle = false, scrollFabProps = {} }) {
               ) : null}
               {recordDetailTab === 'insights' ? (
                 <View>
-                  <Text variant="body" style={styles.insightsHint}>
-                    Record insights are not available in the mobile app yet.
-                  </Text>
+                  {selectedRecord.aiSummary ? (
+                    <View style={styles.aiSummaryCard}>
+                      <Text variant="secondary" style={styles.aiSummaryHeader}>Saved summary</Text>
+                      <Text variant="body" style={styles.aiSummaryBody}>{selectedRecord.aiSummary}</Text>
+                    </View>
+                  ) : (
+                    <Text variant="body" style={styles.insightsHint}>
+                      No saved summary is stored for this record.
+                    </Text>
+                  )}
                 </View>
               ) : null}
             </ScrollView>

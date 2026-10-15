@@ -1,35 +1,25 @@
-import {typeStyles} from '../theme/layout';
+import {typeStyles, control} from '../theme/layout';
 import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
-import React, { useState, useMemo } from 'react';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
+import {recordsColors} from '../theme/records';
+import React, { useState, useMemo, useContext, createContext } from 'react';
 import {
   View,
-
   ScrollView,
   TouchableOpacity,
-
   StyleSheet,
   RefreshControl,
+  Pressable,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProviders } from '../hooks/useProviders';
 
-const STEEL = {
-  canvas: 'transparent',
-  surface: '#FFFFFF',
-  border: '#D1D5E0',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#4F46E5',
-  accentBg: '#EEF2FF',
-  success: '#10B981',
-  successBg: '#D1FAE5',
-  warning: '#F59E0B',
-  warningBg: '#FEF3C7',
-  danger: '#EF4444',
-  dangerBg: '#FEE2E2',
-};
+const NetworkTheme = createContext(null);
+function useNetworkTheme() {
+  return useContext(NetworkTheme);
+}
 
 // Avatar background colors cycling by initials
 const AVATAR_COLORS = [
@@ -68,44 +58,9 @@ const specialtyFilters = [
   'OB/GYN',
 ];
 
-const mockPreferredPharmacy = {
-  name: 'Lakeside Pharmacy',
-  chain: 'Lakeside',
-  address: '789 Lake Dr, Springfield, IL 62703',
-  phone: '(555) 555-1234',
-  network: 'in',
-  services: ['Pickup', 'Delivery'],
-};
-
-const mockOtherPharmacies = [
-  {
-    id: 'p1',
-    name: 'Target Pharmacy',
-    chain: 'Target',
-    phone: '(555) 456-7890',
-    address: '321 Pine Rd',
-    network: 'out',
-  },
-  {
-    id: 'p2',
-    name: 'Walgreens',
-    chain: 'Walgreens',
-    phone: '(555) 234-5678',
-    address: '456 Oak Ave',
-    network: 'out',
-  },
-  {
-    id: 'p3',
-    name: 'CVS Pharmacy',
-    chain: 'CVS',
-    phone: '(555) 123-4567',
-    address: '1234 Main Street, Springfield, IL 60010',
-    service: 'Pickup',
-    network: 'out',
-  },
-];
-
 function NetworkBadge({ type }) {
+  const { STEEL, styles } = useNetworkTheme();
+  if (!type) return null;
   if (type === 'in') {
     return (
       <View style={[styles.badge, { backgroundColor: STEEL.successBg }]}>
@@ -123,7 +78,8 @@ function NetworkBadge({ type }) {
 }
 
 function RoleBadge({ role }) {
-  const color = role === 'Primary' ? STEEL.accent : '#8B5CF6';
+  const { STEEL, styles } = useNetworkTheme();
+  const color = role === 'Primary' ? STEEL.accent : STEEL.ai;
   return (
     <View style={[styles.roleBadge, { backgroundColor: color }]}>
       <Text variant="caption" style={styles.roleBadgeText}>{role}</Text>
@@ -132,6 +88,7 @@ function RoleBadge({ role }) {
 }
 
 function ProviderCard({ provider, showSave }) {
+  const { STEEL, styles } = useNetworkTheme();
   const bg = avatarColor(provider.name);
   const ini = initials(provider.name);
   return (
@@ -155,14 +112,18 @@ function ProviderCard({ provider, showSave }) {
               <Text variant="secondary" style={styles.infoText}>{provider.clinic}</Text>
             </View>
           ) : null}
-          <View style={styles.infoRow}>
-            <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
-            <Text variant="secondary" style={styles.infoText}>{provider.address}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
-            <Text variant="secondary" style={styles.infoText}>{provider.phone}</Text>
-          </View>
+          {provider.address ? (
+            <View style={styles.infoRow}>
+              <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
+              <Text variant="secondary" style={styles.infoText}>{provider.address}</Text>
+            </View>
+          ) : null}
+          {provider.phone ? (
+            <View style={styles.infoRow}>
+              <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
+              <Text variant="secondary" style={styles.infoText}>{provider.phone}</Text>
+            </View>
+          ) : null}
           {provider.languages ? (
             <View style={styles.infoRow}>
               <Ionicons name="language-outline" size={13} color={STEEL.textMuted} />
@@ -177,32 +138,12 @@ function ProviderCard({ provider, showSave }) {
           ) : null}
         </View>
       </View>
-      {showSave ? (
-        <View style={styles.cardFooter}>
-          <View style={styles.acceptingRow}>
-            {provider.accepting ? (
-              <Text variant="secondary" style={[styles.acceptingText, { color: STEEL.success }]}>Accepting patients</Text>
-            ) : (
-              <Text variant="secondary" style={styles.notAcceptingText}>Not accepting</Text>
-            )}
-            <Text variant="secondary" style={styles.distanceText}>{provider.distance || '—'}</Text>
-          </View>
-          <TouchableOpacity style={styles.saveBtn} activeOpacity={0.85}>
-            <Ionicons name="add" size={14} color="#fff" />
-            <Text variant="secondary" style={styles.saveBtnText}>Save to My Network</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <TouchableOpacity style={styles.removeBtn} activeOpacity={0.85}>
-          <Ionicons name="trash-outline" size={14} color={STEEL.danger} />
-          <Text variant="secondary" style={styles.removeBtnText}>Remove</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 }
 
-function PharmacyCard({ pharmacy, isPreferred }) {
+function PharmacyCard({ pharmacy, isPreferred, onMore }) {
+  const { STEEL, styles } = useNetworkTheme();
   return (
     <View style={[styles.card, isPreferred && styles.preferredCard]}>
       {isPreferred ? (
@@ -214,56 +155,48 @@ function PharmacyCard({ pharmacy, isPreferred }) {
       <View style={styles.providerNameRow}>
         <View style={{ flex: 1 }}>
           <Text variant="body" style={styles.providerName}>{pharmacy.name}</Text>
-          <Text variant="secondary" style={styles.providerSpecialty}>{pharmacy.chain}</Text>
+          {pharmacy.chain ? <Text variant="secondary" style={styles.providerSpecialty}>{pharmacy.chain}</Text> : null}
         </View>
         <NetworkBadge type={pharmacy.network} />
+        <Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${pharmacy.name}`} onPress={() => onMore(pharmacy)} style={styles.more}>
+          <Ionicons name="ellipsis-horizontal" size={control.icon} color={STEEL.textPrimary} />
+        </Pressable>
       </View>
-      <View style={styles.infoRow}>
-        <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
-        <Text variant="secondary" style={styles.infoText}>{pharmacy.phone}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
-        <Text variant="secondary" style={styles.infoText}>{pharmacy.address}</Text>
-      </View>
-      {pharmacy.service ? (
+      {pharmacy.phone ? (
         <View style={styles.infoRow}>
-          <Ionicons name="cube-outline" size={13} color={STEEL.textMuted} />
-          <Text variant="secondary" style={styles.infoText}>{pharmacy.service}</Text>
+          <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
+          <Text variant="secondary" style={styles.infoText}>{pharmacy.phone}</Text>
         </View>
       ) : null}
-      {pharmacy.services ? (
+      {pharmacy.address ? (
+        <View style={styles.infoRow}>
+          <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
+          <Text variant="secondary" style={styles.infoText}>{pharmacy.address}</Text>
+        </View>
+      ) : null}
+      {pharmacy.services?.length ? (
         <View style={styles.servicesRow}>
-          {pharmacy.services.map((s) => (
-            <View key={s} style={styles.servicePill}>
-              <Text variant="caption" style={styles.servicePillText}>{s}</Text>
+          {pharmacy.services.map((service) => (
+            <View key={service} style={styles.servicePill}>
+              <Text variant="caption" style={styles.servicePillText}>{service}</Text>
             </View>
           ))}
-        </View>
-      ) : null}
-      {!isPreferred ? (
-        <View style={styles.pharmacyFooter}>
-          <TouchableOpacity style={styles.setPreferredBtn} activeOpacity={0.85}>
-            <Ionicons name="star-outline" size={13} color={STEEL.textSecondary} />
-            <Text variant="secondary" style={styles.setPreferredText}>Set Preferred</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.removeBtnInline} activeOpacity={0.85}>
-            <Ionicons name="trash-outline" size={14} color={STEEL.danger} />
-            <Text variant="secondary" style={styles.removeBtnText}>Remove</Text>
-          </TouchableOpacity>
         </View>
       ) : null}
     </View>
   );
 }
 
-export default function NetworkScreen({ omitShellTitle = false, scrollFabProps = {} }) {
+function NetworkBody({ omitShellTitle = false, scrollFabProps = {} }) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('providers');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const { careTeam, directory, loading, error, refetch } = useProviders();
+  const { careTeam, directory, pharmacies, loading, error, refetch, setPreferredPharmacy, removePharmacy } = useProviders();
+  const { notice, showNotice, dismissNotice } = useNotice();
+  const { STEEL, styles } = useNetworkTheme();
+  const colors = STEEL;
 
   const filteredDirectory = useMemo(() => {
     return directory.filter((p) => {
@@ -281,9 +214,43 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
   const teamAll = careTeam.all ?? [];
   const showTeamSkeleton = loading && teamAll.length === 0;
   const showTeamEmpty = !loading && teamAll.length === 0;
+  const preferredPharmacy = pharmacies.find((pharmacy) => pharmacy.preferred) || null;
+  const otherPharmacies = pharmacies.filter((pharmacy) => !pharmacy.preferred);
+
+  async function preferPharmacy(pharmacy) {
+    try {
+      await setPreferredPharmacy(pharmacy.id);
+      showNotice('Preferred pharmacy updated.', 'success');
+    } catch (err) {
+      showNotice(err?.message || 'The preferred pharmacy could not be updated.', 'error');
+    }
+  }
+
+  function confirmRemovePharmacy(pharmacy) {
+    Alert.alert('Remove this pharmacy', `Remove ${pharmacy.name} from Health Vault?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Remove', style: 'destructive', onPress: async () => {
+        try {
+          await removePharmacy(pharmacy.id);
+          showNotice('Pharmacy removed.', 'success');
+        } catch (err) {
+          showNotice(err?.message || 'The pharmacy could not be removed.', 'error');
+        }
+      } },
+    ]);
+  }
+
+  function openPharmacyMenu(pharmacy) {
+    Alert.alert(pharmacy.name, undefined, [
+      pharmacy.preferred ? null : { text: 'Set preferred', onPress: () => preferPharmacy(pharmacy) },
+      { text: 'Remove', style: 'destructive', onPress: () => confirmRemovePharmacy(pharmacy) },
+      { text: 'Cancel', style: 'cancel' },
+    ].filter(Boolean));
+  }
 
   return (
     <View style={styles.container}>
+      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={colors} onDismiss={dismissNotice} /> : null}
       {!omitShellTitle ? (
         <View style={styles.pageHeader}>
           <Text variant="caption" style={styles.nowViewing}>NOW VIEWING</Text>
@@ -430,45 +397,39 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
           </>
         ) : (
           <>
-            <Text variant="caption" style={styles.groupLabel}>YOUR ADDRESSES</Text>
-            <Text variant="secondary" style={styles.groupSubLabel}>Used to find nearby pharmacies</Text>
-            <View style={[styles.card, styles.dashedCard]}>
-              <Ionicons name="location-outline" size={28} color={STEEL.textMuted} />
-              <Text variant="body" style={styles.emptyTitle}>Add your first address</Text>
-              <Text variant="secondary" style={styles.emptySubtitle}>
-                Home, second home, or work — used to find pharmacies near you
-              </Text>
-            </View>
-
-            <PharmacyCard pharmacy={mockPreferredPharmacy} isPreferred />
-
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
-                <Ionicons name="location-outline" size={18} color={STEEL.danger} />
-                <Text variant="section" style={styles.sectionTitle}>Nearby Pharmacies</Text>
+            {error ? <Text variant="secondary" style={styles.inlineError}>{error}</Text> : null}
+            {loading && pharmacies.length === 0 ? (
+              <View style={styles.teamSkeletonCard} />
+            ) : pharmacies.length === 0 ? (
+              <View style={[styles.card, styles.emptyState]}>
+                <Ionicons name="medkit-outline" size={28} color={STEEL.textMuted} />
+                <Text variant="body" style={styles.emptyTitle}>No saved pharmacies</Text>
+                <Text variant="secondary" style={styles.emptySubtitle}>
+                  Pharmacies you save in Health Vault appear here. Nearby search is not available yet.
+                </Text>
               </View>
-            </View>
-            <View style={[styles.card, styles.emptyState]}>
-              <Ionicons name="location-outline" size={28} color={STEEL.textMuted} />
-              <Text variant="body" style={styles.emptyTitle}>Add an address to see nearby pharmacies</Text>
-              <Text variant="secondary" style={styles.emptySubtitle}>
-                Use the address section above, or add a pharmacy manually.
-              </Text>
-              <View style={styles.emptyActions}>
-                <TouchableOpacity style={styles.addAddressBtn} activeOpacity={0.85}>
-                  <Ionicons name="add" size={14} color="#fff" />
-                  <Text variant="body" style={styles.addAddressBtnText}>Add Address</Text>
-                </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.85}>
-                  <Text variant="body" style={styles.addPharmacyLink}>+ Add Pharmacy</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <Text variant="caption" style={styles.groupLabel}>OTHER SAVED PHARMACIES</Text>
-            {mockOtherPharmacies.map((p) => (
-              <PharmacyCard key={p.id} pharmacy={p} isPreferred={false} />
-            ))}
+            ) : (
+              <>
+                {preferredPharmacy ? (
+                  <PharmacyCard pharmacy={preferredPharmacy} isPreferred onMore={openPharmacyMenu} />
+                ) : (
+                  <View style={[styles.card, styles.emptyState]}>
+                    <Text variant="body" style={styles.emptyTitle}>No preferred pharmacy</Text>
+                    <Text variant="secondary" style={styles.emptySubtitle}>
+                      Open the more menu on a saved pharmacy to set one as preferred.
+                    </Text>
+                  </View>
+                )}
+                {otherPharmacies.length > 0 ? (
+                  <>
+                    <Text variant="caption" style={styles.groupLabel}>OTHER SAVED PHARMACIES</Text>
+                    {otherPharmacies.map((pharmacy) => (
+                      <PharmacyCard key={pharmacy.id} pharmacy={pharmacy} isPreferred={false} onMore={openPharmacyMenu} />
+                    ))}
+                  </>
+                ) : null}
+              </>
+            )}
           </>
         )}
       </ScrollView>
@@ -476,7 +437,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (STEEL) => StyleSheet.create({
   container: { flex: 1, backgroundColor: STEEL.canvas },
   pageHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
   nowViewing: {
@@ -564,6 +525,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     gap: 8,
   },
+  more: { minWidth: control.minTarget, minHeight: control.minTarget, alignItems: 'center', justifyContent: 'center' },
   providerName: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary, flex: 1 },
   providerSpecialty: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 6 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
@@ -692,3 +654,11 @@ const styles = StyleSheet.create({
   addAddressBtnText: { color: '#fff', fontWeight: '600', ...typeStyles.body },
   addPharmacyLink: { ...typeStyles.body, color: STEEL.textSecondary, fontWeight: '500' },
 });
+
+export default function NetworkScreen({ darkMode = false, ...props }) {
+  const value = useMemo(() => {
+    const STEEL = recordsColors(darkMode);
+    return { STEEL, styles: createStyles(STEEL) };
+  }, [darkMode]);
+  return <NetworkTheme.Provider value={value}><NetworkBody {...props} /></NetworkTheme.Provider>;
+}

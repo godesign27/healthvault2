@@ -676,13 +676,13 @@ function AppShell({ signOut, user }) {
       body = <CareScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
     case 'network':
-      body = <NetworkScreen omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
+      body = <NetworkScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
     case 'records':
       body = <RecordsScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
     case 'medical-profile':
-      body = <MedicalProfileScreen omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
+      body = <MedicalProfileScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
     case 'medical':
       body = <MedicalScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;

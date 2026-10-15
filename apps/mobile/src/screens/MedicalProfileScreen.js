@@ -1,7 +1,8 @@
 import {DisclosureButton} from '../components/ui/AdaptiveControls';
 import {typeStyles} from '../theme/layout';
 import {AppText as Text,RevealText} from '../components/ui/AppText';
-import React, { useCallback, useEffect, useState } from 'react';
+import {recordsColors} from '../theme/records';
+import React, { useCallback, useContext, useEffect, useMemo, useState, createContext } from 'react';
 import {
   View,
 
@@ -10,30 +11,54 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 
-const STEEL = {
-  canvas: 'transparent',
-  surface: '#FFFFFF',
-  border: '#E2E8F0',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#4F46E5',
-  blueBg: '#EFF6FF',
-  blueIcon: '#2563EB',
-  emeraldBg: '#ECFDF5',
-  emeraldIcon: '#059669',
-  amberBg: '#FFFBEB',
-  amberIcon: '#D97706',
-  roseBg: '#FFF1F2',
-  roseIcon: '#E11D48',
-};
+const ProfileTheme = createContext(null);
+function useProfileTheme() {
+  return useContext(ProfileTheme);
+}
+
+function profilePalette(darkMode) {
+  const colors = recordsColors(darkMode);
+  return {
+    ...colors,
+    blueBg: colors.infoBg,
+    blueIcon: colors.info,
+    emeraldBg: colors.successBg,
+    emeraldIcon: colors.success,
+    amberBg: colors.warningBg,
+    amberIcon: colors.warning,
+    roseBg: colors.dangerBg,
+    roseIcon: colors.danger,
+  };
+}
 
 const INTRO =
   'Your medical profile gives you and your healthcare providers a complete picture of your current health. Keep your conditions, medications, allergies, and immunizations organized in one secure place — always up to date and ready to share.';
+
+function localDay(iso) {
+  if (!iso) return null;
+  const date = new Date(String(iso).includes('T') ? iso : `${iso}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function startOfToday() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+function preventiveStatus(item, today, colors) {
+  const due = localDay(item.next_due_date);
+  const overdue = Boolean(due && due < today && item.status !== 'completed');
+  if (item.status === 'completed') return { label: 'Completed', bg: colors.successBg, text: colors.success };
+  if (overdue) return { label: 'Overdue', bg: colors.dangerBg, text: colors.danger };
+  const raw = item.status || 'recommended';
+  return { label: raw.charAt(0).toUpperCase() + raw.slice(1), bg: colors.surfaceMuted, text: colors.textSecondary };
+}
 
 function formatDate(iso) {
   if (!iso) return null;
@@ -43,6 +68,7 @@ function formatDate(iso) {
 }
 
 function StatCard({ label, count, sublabel, icon, iconBg, iconColor }) {
+  const { styles } = useProfileTheme();
   return (
     <View style={styles.statCard}>
       <View style={styles.statHeader}>
@@ -58,6 +84,7 @@ function StatCard({ label, count, sublabel, icon, iconBg, iconColor }) {
 }
 
 function SectionHeader({ title, description }) {
+  const { styles } = useProfileTheme();
   return (
     <View style={styles.sectionHeader}>
       <Text variant="section" style={styles.sectionTitle}>{title}</Text>
@@ -67,6 +94,7 @@ function SectionHeader({ title, description }) {
 }
 
 function EmptyState({ icon, title, body }) {
+  const { STEEL, styles } = useProfileTheme();
   return (
     <View style={styles.emptyCard}>
       <Ionicons name={icon} size={44} color={STEEL.textMuted} style={styles.emptyIcon} />
@@ -77,6 +105,7 @@ function EmptyState({ icon, title, body }) {
 }
 
 function MedicalIdCardMobile({ profile, loading }) {
+  const { STEEL, styles } = useProfileTheme();
   const [showMore, setShowMore] = useState(false);
 
   const displayName =
@@ -180,23 +209,25 @@ function MedicalIdCardMobile({ profile, loading }) {
   );
 }
 
-function statusBadgeStyle(status) {
-  if (status === 'Active') return { bg: '#D1FAE5', text: '#047857' };
-  if (status === 'In remission') return { bg: '#DBEAFE', text: '#1D4ED8' };
-  return { bg: '#F1F5F9', text: STEEL.textSecondary };
+function statusBadgeStyle(status, colors) {
+  if (status === 'Active') return { bg: colors.successBg, text: colors.success };
+  if (status === 'In remission') return { bg: colors.infoBg, text: colors.info };
+  return { bg: colors.surfaceMuted, text: colors.textSecondary };
 }
 
-function severityBadgeStyle(sev) {
-  if (sev === 'Severe') return { bg: '#FEE2E2', text: '#B91C1C' };
-  if (sev === 'Moderate') return { bg: '#FEF3C7', text: '#B45309' };
-  return { bg: '#FEF9C3', text: '#A16207' };
+function severityBadgeStyle(sev, colors) {
+  if (sev === 'Severe') return { bg: colors.dangerBg, text: colors.danger };
+  if (sev === 'Moderate') return { bg: colors.warningBg, text: colors.warning };
+  return { bg: colors.warningBg, text: colors.warning };
 }
 
-export default function MedicalProfileScreen({ omitShellTitle = false, scrollFabProps = {} }) {
+function MedicalProfileBody({ omitShellTitle = false, scrollFabProps = {} }) {
+  const { STEEL, styles } = useProfileTheme();
   const [conditions, setConditions] = useState([]);
   const [medications, setMedications] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [immunizations, setImmunizations] = useState([]);
+  const [preventiveCare, setPreventiveCare] = useState([]);
   const [idProfile, setIdProfile] = useState({
     firstName: '',
     lastName: '',
@@ -210,10 +241,12 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
     conditions: [],
   });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
-  const fetchAllData = useCallback(async () => {
-    setLoading(true);
+  const fetchAllData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
     setLoadError(null);
     try {
       const {
@@ -225,6 +258,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         setMedications([]);
         setAllergies([]);
         setImmunizations([]);
+        setPreventiveCare([]);
         setIdProfile({
           firstName: '',
           lastName: '',
@@ -241,12 +275,13 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         return;
       }
 
-      const [conditionsRes, medicationsRes, allergiesRes, immunizationsRes, userProfileRes, patientProfileRes] =
+      const [conditionsRes, medicationsRes, allergiesRes, immunizationsRes, preventiveRes, userProfileRes, patientProfileRes] =
         await Promise.all([
           supabase.from('conditions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
           supabase.from('medications').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
           supabase.from('allergies').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
           supabase.from('immunizations').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('preventive_care').select('*').eq('user_id', userId).order('next_due_date', { ascending: true, nullsFirst: false }),
           supabase.from('user_profiles').select('first_name, last_name, date_of_birth, profile_photo_url').eq('user_id', userId).maybeSingle(),
           supabase.from('patient_profiles').select('blood_type, organ_donor, emergency_contact_name, emergency_contact_phone').eq('user_id', userId).maybeSingle(),
         ]);
@@ -255,6 +290,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
       if (medicationsRes.error) throw medicationsRes.error;
       if (allergiesRes.error) throw allergiesRes.error;
       if (immunizationsRes.error) throw immunizationsRes.error;
+      if (preventiveRes.error) throw preventiveRes.error;
 
       const condData = conditionsRes.data || [];
       const medData = medicationsRes.data || [];
@@ -265,6 +301,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
       setMedications(medData);
       setAllergies(allergyData);
       setImmunizations(immData);
+      setPreventiveCare(preventiveRes.data || []);
 
       const up = userProfileRes.error ? null : userProfileRes.data;
       const pp = patientProfileRes.error ? null : patientProfileRes.data;
@@ -285,6 +322,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
       setLoadError('Could not load your medical profile. Pull to refresh or try again later.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -293,13 +331,28 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
   }, [fetchAllData]);
 
   const activeConditions = conditions.filter((c) => c.status === 'Active' || !c.status);
+  const today = startOfToday();
+  const activeMedications = medications.filter((med) => {
+    const ended = localDay(med.end_date);
+    return !ended || ended >= today;
+  });
   const severeAllergies = allergies.filter((a) => a.severity === 'Severe');
+  const immunizationsDue = immunizations.filter((item) => {
+    const due = localDay(item.next_dose);
+    return due && due <= today;
+  }).length;
+  const immunizationSubtitle = immunizations.length === 0
+    ? 'None recorded'
+    : immunizationsDue > 0
+      ? `${immunizationsDue} due`
+      : 'Up to date';
 
   return (
     <ScrollView
       style={styles.scroll}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => fetchAllData(true)} tintColor={STEEL.accent} />}
       {...scrollFabProps}
     >
       {!omitShellTitle ? (
@@ -333,7 +386,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         <StatCard
           label="Medications"
           count={medications.length}
-          sublabel={`${medications.length} active`}
+          sublabel={`${activeMedications.length} active`}
           icon="bandage-outline"
           iconBg={STEEL.emeraldBg}
           iconColor={STEEL.emeraldIcon}
@@ -349,7 +402,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         <StatCard
           label="Immunizations"
           count={immunizations.length}
-          sublabel="Up to date"
+          sublabel={immunizationSubtitle}
           icon="shield-checkmark-outline"
           iconBg={STEEL.roseBg}
           iconColor={STEEL.roseIcon}
@@ -373,7 +426,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         />
       ) : (
         conditions.map((condition) => {
-          const st = statusBadgeStyle(condition.status);
+          const st = statusBadgeStyle(condition.status, STEEL);
           return (
             <View key={condition.id} style={styles.listCard}>
               <View style={styles.listCardHead}>
@@ -480,7 +533,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         />
       ) : (
         allergies.map((allergy) => {
-          const sev = severityBadgeStyle(allergy.severity);
+          const sev = severityBadgeStyle(allergy.severity, STEEL);
           return (
             <View key={allergy.id} style={styles.listCard}>
               <View style={styles.listCardHead}>
@@ -580,16 +633,71 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         title="Preventive Care"
         description="Stay proactive with your health. Add screenings, checkups, or care reminders recommended by your provider or the Health Vault assistant."
       />
-      <EmptyState
-        icon="calendar-outline"
-        title="No preventive care items"
-        body="Use the Vault Assistant to add screenings and checkups."
-      />
+      {loading ? (
+        <View style={styles.loadingCard}>
+          <ActivityIndicator color={STEEL.accent} />
+        </View>
+      ) : preventiveCare.length === 0 ? (
+        <EmptyState
+          icon="calendar-outline"
+          title="No preventive care items"
+          body="Use the Vault Assistant to add screenings and checkups."
+        />
+      ) : (
+        preventiveCare.map((item) => {
+          const status = preventiveStatus(item, today, STEEL);
+          return (
+            <View key={item.id} style={styles.listCard}>
+              <View style={styles.listCardHead}>
+                <View style={[styles.listIcon, { backgroundColor: STEEL.blueBg }]}>
+                  <Ionicons name="calendar-outline" size={20} color={STEEL.blueIcon} />
+                </View>
+                <View style={styles.listCardTitleCol}>
+                  <Text variant="section" style={styles.listCardTitle}>{item.item_name}</Text>
+                  {item.category ? <Text variant="body" style={styles.listCardSub}>{item.category}</Text> : null}
+                  <View style={[styles.badge, { backgroundColor: status.bg }]}>
+                    <Text variant="caption" style={[styles.badgeText, { color: status.text }]}>{status.label}</Text>
+                  </View>
+                </View>
+              </View>
+              {item.completed_date || item.next_due_date || item.frequency || item.provider ? (
+                <View style={styles.listMeta}>
+                  {item.completed_date ? (
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Completed: </Text>
+                      {formatDate(item.completed_date)}
+                    </Text>
+                  ) : null}
+                  {item.next_due_date ? (
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Next Due: </Text>
+                      {formatDate(item.next_due_date)}
+                    </Text>
+                  ) : null}
+                  {item.frequency ? (
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Frequency: </Text>
+                      {item.frequency}
+                    </Text>
+                  ) : null}
+                  {item.provider ? (
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Provider: </Text>
+                      {item.provider}
+                    </Text>
+                  ) : null}
+                </View>
+              ) : null}
+              {item.notes ? <Text variant="body" style={styles.listNotes}>{item.notes}</Text> : null}
+            </View>
+          );
+        })
+      )}
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (STEEL) => StyleSheet.create({
   scroll: { flex: 1, backgroundColor: 'transparent' },
   scrollContent: { paddingBottom: 120, paddingHorizontal: 20, paddingTop: 8 },
   hero: { marginBottom: 20 },
@@ -729,3 +837,11 @@ const styles = StyleSheet.create({
   listMetaStrong: { fontWeight: '700', color: STEEL.textPrimary },
   listNotes: { marginTop: 10, ...typeStyles.body,  color: STEEL.textSecondary },
 });
+
+export default function MedicalProfileScreen({ darkMode = false, ...props }) {
+  const value = useMemo(() => {
+    const STEEL = profilePalette(darkMode);
+    return { STEEL, styles: createStyles(STEEL) };
+  }, [darkMode]);
+  return <ProfileTheme.Provider value={value}><MedicalProfileBody {...props} /></ProfileTheme.Provider>;
+}

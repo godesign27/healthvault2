@@ -2,7 +2,7 @@ import {recordsColors} from '../theme/records';
 import {typeStyles, control, space, radius} from '../theme/layout';
 import {AppText as Text, AppTextInput} from '../components/ui/AppText';
 import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
-import {latestDietMoment, loadWellness, removeDietEntry, saveDietEntry} from '../lib/wellnessData';
+import {latestDietMoment, latestSignalMoment, loadWellness, removeDietEntry, saveDietEntry, confirmDietEntry} from '../lib/wellnessData';
 import {
   currentWellnessEnd,
   formatWellnessRange,
@@ -12,7 +12,7 @@ import {
   wellnessEndContaining,
 } from '../../../../packages/api-client/src/wellness-range';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {View, ScrollView, StyleSheet, ActivityIndicator, Pressable, RefreshControl, Modal, Alert} from 'react-native';
+import {View, ScrollView, StyleSheet, ActivityIndicator, Pressable, RefreshControl, Modal, Alert, useWindowDimensions} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {supabase} from '@/lib/supabase';
 
@@ -59,6 +59,17 @@ function displayTime(value) {
   return date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'});
 }
 
+function sourceLabel(source) {
+  if (source === 'chatgpt') return 'Added through ChatGPT';
+  if (source === 'web') return 'Added in Health Vault';
+  return 'User reported';
+}
+
+function statusLabel(status) {
+  const value = status || 'confirmed';
+  return value.charAt(0).toUpperCase() + value.slice(1).replaceAll('_', ' ');
+}
+
 function Rating({label, value, inverse = false, colors}) {
   const score = Number(value);
   const filled = inverse ? 6 - score : score;
@@ -88,6 +99,7 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
   const [rangeEnd, setRangeEnd] = useState(() => currentWellnessEnd());
   const [diet, setDiet] = useState([]);
   const [latestDiet, setLatestDiet] = useState(null);
+  const [latestSignal, setLatestSignal] = useState(null);
   const [signals, setSignals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -96,7 +108,13 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [menuEntry, setMenuEntry] = useState(null);
+  const [menuBox, setMenuBox] = useState({top: 0, right: space.md});
+  const [logDraft, setLogDraft] = useState(null);
+  const [logReview, setLogReview] = useState(null);
   const generation = useRef(0);
+  const moreRefs = useRef(new Map());
+  const window = useWindowDimensions();
   const bounds = useMemo(() => wellnessBounds(rangeEnd), [rangeEnd]);
   const showingCurrent = isCurrentWellnessWindow(rangeEnd);
   const rangeLabel = formatWellnessRange(bounds.start, bounds.end);
@@ -107,18 +125,21 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
     else setLoading(true);
     setError('');
     try {
-      const [result, latest] = await Promise.all([
+      const [result, latest, latestCheckIn] = await Promise.all([
         loadWellness(supabase, bounds.start.toISOString(), bounds.end.toISOString()),
         latestDietMoment(supabase),
+        latestSignalMoment(supabase),
       ]);
       if (run !== generation.current) return;
       setDiet(result.diet);
       setSignals(result.signals);
       setLatestDiet(latest);
+      setLatestSignal(latestCheckIn);
     } catch (err) {
       if (run !== generation.current) return;
       setDiet([]);
       setSignals([]);
+      setLatestSignal(null);
       setError(err?.message || 'Wellness could not be loaded.');
     } finally {
       if (run === generation.current) {
@@ -167,6 +188,18 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
     }
   };
 
+  const openMealMenu = (entry) => {
+    const node = moreRefs.current.get(entry.id);
+    if (!node?.measureInWindow) {
+      setMenuEntry(entry);
+      return;
+    }
+    node.measureInWindow((x, y, width, height) => {
+      setMenuBox({top: y + height + space.xs, right: Math.max(space.sm, window.width - (x + width))});
+      setMenuEntry(entry);
+    });
+  };
+
   const confirmRemove = (entry) => {
     Alert.alert('Remove this meal', 'Remove this saved meal from Health Vault?', [
       {text: 'Cancel', style: 'cancel'},
@@ -185,9 +218,53 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
     ]);
   };
 
+  const startMealLog = () => {
+    setLogReview(null);
+    setLogDraft({mealType: 'breakfast', items: '', waterMl: '', notes: ''});
+  };
+
+  const reviewMealLog = () => {
+    const items = foodsFromLines(logDraft?.items || '');
+    if (!items.length) {
+      showNotice('Add at least one food or drink before reviewing.', 'error');
+      return;
+    }
+    const water = logDraft.waterMl.trim();
+    const waterMl = water ? Number(water) : null;
+    if (water && (!Number.isInteger(waterMl) || waterMl < 0)) {
+      showNotice('Enter water in milliliters as a whole number.', 'error');
+      return;
+    }
+    setLogReview({
+      consumedAt: new Date().toISOString(),
+      mealType: logDraft.mealType,
+      items,
+      waterMl,
+      notes: logDraft.notes.trim() || null,
+    });
+  };
+
+  const saveMealLog = async () => {
+    if (!logReview || saving) return;
+    setSaving(true);
+    try {
+      await confirmDietEntry(supabase, logReview);
+      setLogDraft(null);
+      setLogReview(null);
+      showNotice('Meal saved.', 'success');
+      await load(true);
+    } catch (err) {
+      showNotice(err?.message || 'The meal could not be saved.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const visibleMeals = mealFilter === 'all' ? diet : diet.filter((entry) => entry.meal_type === mealFilter);
   const latestDietDate = latestDiet ? new Date(latestDiet) : null;
   const earlierMeals = Boolean(latestDietDate && !Number.isNaN(latestDietDate.getTime()) && latestDietDate.getTime() < bounds.start.getTime());
+  const latestSignalDate = latestSignal ? new Date(latestSignal) : null;
+  const earlierSignals = Boolean(latestSignalDate && !Number.isNaN(latestSignalDate.getTime()) && latestSignalDate.getTime() < bounds.start.getTime());
   const water = diet.reduce((sum, entry) => sum + (Number(entry.water_ml) || 0), 0);
   const uniqueFoods = new Set(diet.flatMap((entry) => (Array.isArray(entry.items) ? entry.items : []))
     .map((item) => (typeof item === 'string' ? item : item?.name)?.trim().toLowerCase())
@@ -242,6 +319,9 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
       ) : null}
       {!loading && !error && tab === 'diet' ? (
         <>
+          <Pressable accessibilityRole="button" accessibilityLabel="Log a meal" style={styles.retry} onPress={startMealLog}>
+            <Text style={styles.retryText}>Log a meal</Text>
+          </Pressable>
           <View style={styles.stats}>
             <View style={styles.stat}><Text variant="caption" style={styles.muted}>Meals</Text><Text variant="page" style={styles.cardTitle}>{diet.length}</Text></View>
             <View style={styles.stat}><Text variant="caption" style={styles.muted}>Foods</Text><Text variant="page" style={styles.cardTitle}>{uniqueFoods}</Text></View>
@@ -277,24 +357,38 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
               {entries.map((entry) => (
                 <View key={entry.id} style={styles.row}>
                   <View style={styles.mealTitle}>
-                    <Text variant="body" style={[styles.rowTitle, {flexShrink: 1}]}>{MEAL_LABELS[entry.meal_type] || 'Meal'}</Text>
-                    <Text variant="caption" style={styles.muted}>{displayTime(entry.consumed_at)}</Text>
+                    <View style={styles.mealName}>
+                      <Text variant="body" style={[styles.rowTitle, {flexShrink: 1}]}>{MEAL_LABELS[entry.meal_type] || 'Meal'}</Text>
+                      <Text variant="caption" style={styles.muted}>{displayTime(entry.consumed_at)}</Text>
+                    </View>
+                    <View
+                      ref={(node) => {
+                        if (node) moreRefs.current.set(entry.id, node);
+                        else moreRefs.current.delete(entry.id);
+                      }}
+                      collapsable={false}
+                    >
+                      <Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${MEAL_LABELS[entry.meal_type] || 'meal'}`} accessibilityState={{expanded: menuEntry?.id === entry.id}} onPress={() => openMealMenu(entry)} style={styles.more}>
+                        <Ionicons name="ellipsis-horizontal" size={control.icon} color={STEEL.textPrimary} />
+                      </Pressable>
+                    </View>
                   </View>
                   <Text variant="body" style={styles.muted}>{mealItems(entry.items).join(', ') || 'No foods listed'}</Text>
                   {entry.water_ml ? <Text variant="caption" style={styles.muted}>{entry.water_ml} mL water</Text> : null}
                   {entry.notes ? <Text variant="caption" style={styles.muted}>{entry.notes}</Text> : null}
-                  <View style={styles.actions}>
-                    <Pressable accessibilityRole="button" accessibilityLabel={`Edit ${MEAL_LABELS[entry.meal_type] || 'meal'}`} style={styles.retry} onPress={() => openEdit(entry)}>
-                      <Text style={styles.retryText}>Edit</Text>
-                    </Pressable>
-                    <Pressable accessibilityRole="button" accessibilityLabel={`Remove ${MEAL_LABELS[entry.meal_type] || 'meal'}`} style={styles.remove} onPress={() => confirmRemove(entry)}>
-                      <Text style={styles.removeText}>Remove</Text>
-                    </Pressable>
-                  </View>
+                  <Text variant="caption" style={styles.muted}>{sourceLabel(entry.source)} · {statusLabel(entry.confirmation_status)}</Text>
                 </View>
               ))}
             </View>
           ))}
+          {diet.length > 0 ? (
+            <View style={styles.card}>
+              <Text variant="section" style={styles.cardTitle}>Pattern notes</Text>
+              <Text variant="body" style={styles.muted}>Entries reflect only what you chose to report during these seven days.</Text>
+              {water === 0 ? <Text variant="body" style={styles.muted}>No water amounts are currently recorded.</Text> : null}
+              <Text variant="body" style={styles.muted}>Health Vault can help summarize patterns, but it does not estimate unlogged nutrients or prescribe a medical diet.</Text>
+            </View>
+          ) : null}
         </>
       ) : null}
       {!loading && !error && tab === 'signals' ? (
@@ -302,16 +396,23 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
           <View style={styles.card}>
             <Text variant="section" style={styles.cardTitle}>No Life Signals in these 7 days</Text>
             <Text variant="body" style={styles.muted}>
-              {showingCurrent
-                ? 'Life Signals saved on the Health Vault website appear here. Use the arrows to look at another week.'
-                : 'Use the arrows to look at another week.'}
+              {earlierSignals
+                ? 'Saved check-ins are in an earlier week.'
+                : showingCurrent
+                  ? 'Life Signals saved on the Health Vault website appear here. Use the arrows to look at another week.'
+                  : 'Use the arrows to look at another week.'}
             </Text>
+            {earlierSignals ? (
+              <Pressable accessibilityRole="button" accessibilityLabel="Show latest check-ins" style={styles.retry} onPress={() => setRangeEnd(wellnessEndContaining(new Date(latestSignal)))}>
+                <Text style={styles.retryText}>Show latest check-ins</Text>
+              </Pressable>
+            ) : null}
           </View>
         ) : signals.map((entry) => (
           <View key={entry.id} style={styles.card}>
             <View style={styles.mealTitle}>
               <Text variant="section" style={styles.cardTitle}>{dateLabel(localDateKey(entry.recorded_at))}</Text>
-              <Text variant="caption" style={styles.muted}>{displayTime(entry.recorded_at)}</Text>
+              <Text variant="caption" style={styles.muted}>{displayTime(entry.recorded_at)} · {sourceLabel(entry.source)} · {statusLabel(entry.confirmation_status)}</Text>
             </View>
             <View style={styles.ratings}>
               <Rating label="Energy" value={entry.energy} colors={STEEL} />
@@ -352,6 +453,66 @@ export default function WellnessScreen({darkMode = false, omitShellTitle = false
         </ScrollView>
       </Modal>
     </ScrollView>
+    <Modal visible={Boolean(menuEntry)} transparent animationType="fade" onRequestClose={() => setMenuEntry(null)}>
+      <View style={styles.screen}>
+        <Pressable style={styles.backdrop} onPress={() => setMenuEntry(null)} accessibilityLabel="Close actions" />
+        <View style={[styles.menu, menuBox, {backgroundColor: STEEL.surface, borderColor: STEEL.border}]} accessibilityRole="menu">
+          <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { const entry = menuEntry; setMenuEntry(null); openEdit(entry); }}>
+            <Text variant="label" style={styles.menuText}>Edit</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { const entry = menuEntry; setMenuEntry(null); confirmRemove(entry); }}>
+            <Text variant="label" style={styles.removeText}>Remove</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+    <Modal visible={Boolean(logDraft)} animationType="slide" onRequestClose={() => { if (!saving) { setLogDraft(null); setLogReview(null); } }}>
+      <ScrollView contentContainerStyle={styles.editor} keyboardShouldPersistTaps="handled">
+        <Text variant="title" style={styles.title}>{logReview ? 'Review meal' : 'Log a meal'}</Text>
+        {logReview ? (
+          <>
+            <Text variant="body" style={styles.muted}>{MEAL_LABELS[logReview.mealType] || 'Meal'}</Text>
+            <Text variant="body" style={styles.cardTitle}>{logReview.items.map((item) => item.amount ? `${item.name} — ${item.amount}` : item.name).join('\n')}</Text>
+            {logReview.waterMl != null ? <Text variant="body" style={styles.muted}>{logReview.waterMl} mL water</Text> : null}
+            {logReview.notes ? <Text variant="body" style={styles.muted}>{logReview.notes}</Text> : null}
+            <Text variant="body" style={styles.muted}>Nothing is saved until you confirm.</Text>
+            <View style={styles.actions}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Confirm meal" accessibilityState={{disabled: saving}} disabled={saving} style={styles.retry} onPress={saveMealLog}>
+                <Text style={styles.retryText}>{saving ? 'Saving' : 'Confirm meal'}</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" disabled={saving} style={styles.remove} onPress={() => setLogReview(null)}>
+                <Text style={styles.removeText}>Back</Text>
+              </Pressable>
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.filters}>
+              {MEAL_FILTERS.filter((filter) => filter.id !== 'all').map((filter) => (
+                <Pressable key={filter.id} accessibilityRole="button" accessibilityState={{selected: logDraft?.mealType === filter.id}}
+                  style={[styles.chip, logDraft?.mealType === filter.id && styles.chipOn]} onPress={() => setLogDraft((form) => ({...form, mealType: filter.id}))}>
+                  <Text variant="caption" style={logDraft?.mealType === filter.id ? styles.chipTextOn : styles.chipText}>{filter.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text variant="body" style={styles.muted}>Foods and drinks, one per line</Text>
+            <AppTextInput accessibilityLabel="Foods and drinks" multiline value={logDraft?.items || ''} onChangeText={(items) => setLogDraft((form) => ({...form, items}))} style={styles.input} />
+            <Text variant="body" style={styles.muted}>Water in milliliters</Text>
+            <AppTextInput accessibilityLabel="Water in milliliters" keyboardType="number-pad" value={logDraft?.waterMl || ''} onChangeText={(waterMl) => setLogDraft((form) => ({...form, waterMl}))} style={styles.input} />
+            <Text variant="body" style={styles.muted}>Notes</Text>
+            <AppTextInput accessibilityLabel="Notes" multiline value={logDraft?.notes || ''} onChangeText={(notes) => setLogDraft((form) => ({...form, notes}))} style={styles.input} />
+            <View style={styles.actions}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Review meal" style={styles.retry} onPress={reviewMealLog}>
+                <Text style={styles.retryText}>Review meal</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" style={styles.remove} onPress={() => setLogDraft(null)}>
+                <Text style={styles.removeText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+      </ScrollView>
+    </Modal>
     </View>
   );
 }
@@ -363,6 +524,12 @@ function createStyles(STEEL) {
     stats: {flexDirection: 'row', gap: space.sm, backgroundColor: STEEL.surface, borderRadius: radius.card, borderWidth: 1, borderColor: STEEL.border, padding: space.md},
     stat: {flex: 1, gap: space.xs},
     mealTitle: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm},
+    mealName: {flex: 1, gap: 2},
+    more: {minWidth: control.minTarget, minHeight: control.minTarget, alignItems: 'center', justifyContent: 'center'},
+    backdrop: {...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15, 23, 42, 0.2)'},
+    menu: {position: 'absolute', minWidth: 180, borderWidth: 1, borderRadius: radius.card, overflow: 'hidden'},
+    menuItem: {minHeight: control.minTarget, justifyContent: 'center', paddingHorizontal: space.lg},
+    menuText: {color: STEEL.textPrimary},
     ratings: {flexDirection: 'row', flexWrap: 'wrap', gap: space.md},
     content: {padding: space.lg, paddingBottom: 120, gap: space.md},
     title: {...typeStyles.title, color: STEEL.textPrimary},

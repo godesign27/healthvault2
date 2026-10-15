@@ -266,7 +266,7 @@ function CareContent({ omitShellTitle = false, scrollFabProps = {} }) {
                   </Text>
                 </View>
                 <Text variant="secondary" style={styles.apptDate}>
-                  {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {new Date(apt.scheduled_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 </Text>
               </View>
             ))}
@@ -303,6 +303,7 @@ function CareContent({ omitShellTitle = false, scrollFabProps = {} }) {
               const isDiscontinued =
                 rx.status?.toLowerCase() === 'discontinued' || rx.status?.toLowerCase() === 'inactive';
               const doseLine = [rx.dosage, rx.frequency].filter(Boolean).join(' · ') || rx.instructions;
+              const started = rx.startDate ? formatCareDate(rx.startDate) : '';
               return (
                 <View key={rx.id} style={styles.medRow}>
                   <View style={styles.medNameRow}>
@@ -317,12 +318,14 @@ function CareContent({ omitShellTitle = false, scrollFabProps = {} }) {
                   </View>
                   {!!rx.condition && <Text variant="secondary" style={styles.medCondition}>{rx.condition}</Text>}
                   {!!doseLine && <Text variant="body" style={styles.medInstructions}>{doseLine}</Text>}
+                  {!!started && <Text variant="secondary" style={styles.medInstructions}>Started {started}</Text>}
                   {!!rx.prescribing_doctor && (
                     <View style={styles.medDoctorRow}>
                       <Ionicons name="heart" size={14} color={STEEL.textSecondary} />
                       <Text variant="secondary" style={styles.medDoctor}>{rx.prescribing_doctor}</Text>
                     </View>
                   )}
+                  {!!rx.notes && <Text variant="secondary" style={styles.medInstructions}>{rx.notes}</Text>}
                 </View>
               );
             })}

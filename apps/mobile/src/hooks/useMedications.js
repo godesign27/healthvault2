@@ -36,9 +36,11 @@ export function useMedications() {
           status: ended ? 'Inactive' : 'Active',
           dosage: r.dosage || '',
           frequency: r.frequency || '',
-          instructions: [r.dosage, r.frequency].filter(Boolean).join(' · ') || r.notes || '',
+          instructions: [r.dosage, r.frequency].filter(Boolean).join(' · ') || '',
+          notes: r.notes || '',
           prescribing_doctor: r.prescribed_by || '',
           condition: null,
+          startDate: r.start_date || '',
           date: r.start_date || r.created_at,
         };
       });

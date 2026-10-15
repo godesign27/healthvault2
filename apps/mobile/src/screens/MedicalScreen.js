@@ -8,6 +8,7 @@ import {loadFormAutofillContext,buildAutofillAnswers} from '../../../../packages
 import {supabase} from '../lib/supabase';
 import {loadMedicalForms,saveMedicalForm,responseComplete,buildMedicalShare,sendMedicalShare,revokeMedicalShare,recoverMedicalShare,pendingMedicalShareReference} from '../lib/medical-forms';
 import {AppText} from '../components/ui/AppText';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
 import {AppButton,AppField,SelectionControl,useAdaptiveLayout} from '../components/ui/AdaptiveControls';
 import {FormSelectionRow} from '../components/forms/FormSelectionRow';
 import {recordsColors} from '../theme/records';
@@ -29,11 +30,12 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
   const frame=requestAnimationFrame(()=>shareScroll.current?.scrollTo({y:0,animated:false}));
   return()=>cancelAnimationFrame(frame);
  },[shareFinished]);
- const say=text=>{setMessage(text);AccessibilityInfo.announceForAccessibility(text);};
+ const {notice, showNotice, dismissNotice}=useNotice();
+ const say=(text,tone='info')=>{showNotice(text,tone);AccessibilityInfo.announceForAccessibility(text);};
  async function refresh(){
   const run=++epoch.current;setLoading(true);setMessagePlacement('page');
   try{const next=await loadMedicalForms(supabase);const fill=await loadFormAutofillContext(next.owner,supabase);const reference=await pendingMedicalShareReference(supabase,AsyncStorage,next.owner);if(run!==epoch.current)return;setState(next);setContext(fill);setSupportReference(reference);}
-  catch{if(run===epoch.current)say('Unable to load Medical forms. Try again.');}
+  catch{if(run===epoch.current){setMessagePlacement('page');setMessage('Unable to load Medical forms. Try again.');}}
   finally{if(run===epoch.current)setLoading(false);}
  }
  useEffect(()=>{
@@ -47,7 +49,7 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
  async function perform(action,placement='page'){
   if(lock.current)return;lock.current=true;setBusy(true);setMessagePlacement(placement);setMessage('');const run=epoch.current;
   try{await action(()=>run===epoch.current);}catch(error){if(run===epoch.current){
-   say(error.message||'The action could not be confirmed. Try again.');
+   say(error.message||'The action could not be confirmed. Try again.', 'error');
    if(state?.owner)try{const reference=await pendingMedicalShareReference(supabase,AsyncStorage,state.owner);if(run===epoch.current)setSupportReference(reference);}catch{}
   }}
   finally{lock.current=false;if(run===epoch.current)setBusy(false);}
@@ -64,15 +66,17 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
   {text('Press and hold the reference to copy it when contacting support. It identifies this interrupted send; it does not grant access to your forms.','secondary')}
  </View>:null;
  const feedback=message?<AppText accessibilityLiveRegion="polite" style={{color:colors.textPrimary}}>{message}</AppText>:null;
+ const banner=notice?<NoticeBanner message={notice.message} tone={notice.tone} colors={colors} onDismiss={dismissNotice}/>:null;
  const modal=(visible,onClose,title,children)=> <Modal visible={visible} animationType="slide" onRequestClose={()=>{if(!busy)onClose();}}>
   <KeyboardAvoidingView accessibilityViewIsModal behavior={Platform.OS==='ios'?'padding':undefined} style={[styles.fill,{backgroundColor:colors.surface,paddingTop:insets.top,paddingBottom:insets.bottom}]}>
    <ScrollView ref={visible&&sharing?shareScroll:undefined} keyboardShouldPersistTaps="handled" contentContainerStyle={{padding:layout.gutter,gap:space.lg}}>
-    {text(title,'title')}{action('Close',onClose)}{children}{feedback}{visible&&sharing?supportDetails:null}
+    {text(title,'title')}{action('Close',onClose)}{banner}{children}{feedback}{visible&&sharing?supportDetails:null}
    </ScrollView>
   </KeyboardAvoidingView>
  </Modal>;
  return <View style={styles.fill}><ScrollView accessibilityElementsHidden={!!template||sharing} importantForAccessibility={template||sharing?'no-hide-descendants':'auto'} {...scrollFabProps} contentContainerStyle={{padding:layout.gutter,gap:space.lg,paddingBottom:insets.bottom+space.xxl}}>
   {!omitShellTitle&&text('Medical forms','page')}
+  {!(template||sharing)&&banner}
   {loading?text('Loading forms…'):null}{messagePlacement==='page'?feedback:null}
   {action('Refresh forms',refresh,false,loading)}
   {state&&<>
@@ -86,7 +90,7 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
    {text('Share history','section')}
    {action('Check interrupted send',()=>perform(async active=>{
     const result=await recoverMedicalShare(supabase,AsyncStorage,state.owner);const reference=await pendingMedicalShareReference(supabase,AsyncStorage,state.owner);if(!active())return;setSupportReference(reference);
-    say(result.none?'No interrupted send is recorded on this device.':result.pending?'This send still has no confirmed result. No new email was sent. Check again later or contact support.':result.emailSent?'Send recovered: the email provider accepted the message.':'Send recovered: the link was created but email was not accepted.');
+    say(result.none?'No interrupted send is recorded on this device.':result.pending?'This send still has no confirmed result. No new email was sent. Check again later or contact support.':result.emailSent?'Send recovered: the email provider accepted the message.':'Send recovered: the link was created but email was not accepted.', result.emailSent?'success':result.none?'info':'error');
     if(result.id){try{const next=await loadMedicalForms(supabase);if(active())setState(next);}catch{}}
    },'history'))}
    {messagePlacement==='history'?feedback:null}
@@ -95,7 +99,7 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
    {state.shares.map(s=><View key={s.id} style={[styles.card,{backgroundColor:colors.surface,borderColor:colors.border}]}>
     {text(s.recipient?.email||'Recipient unavailable','label')}{text(`${s.form_response_ids?.length||0} ${(s.form_response_ids?.length||0)===1?'form':'forms'} · ${s.is_revoked||s.status==='revoked'?'revoked':s.recipient?.emailDelivery==='unknown'?'email outcome unconfirmed':s.status==='delivered'?'email accepted':s.status==='opened'?'opened':'link created'}`,'secondary')}
     {!!s.expires_at&&text(`Expires ${new Date(s.expires_at).toLocaleString()}`,'secondary')}
-    {!s.is_revoked&&s.status!=='revoked'&&action('Revoke link',()=>perform(async active=>{await revokeMedicalShare(supabase,state.owner,s.id);if(!active())return;setState(old=>({...old,shares:old.shares.map(row=>row.id===s.id?{...row,is_revoked:true,status:'revoked'}:row)}));say('Link access revoked.');}),true,false,'danger')}
+    {!s.is_revoked&&s.status!=='revoked'&&action('Revoke link',()=>perform(async active=>{await revokeMedicalShare(supabase,state.owner,s.id);if(!active())return;setState(old=>({...old,shares:old.shares.map(row=>row.id===s.id?{...row,is_revoked:true,status:'revoked'}:row)}));say('Link access revoked.', 'success');}),true,false,'danger')}
    </View>)}
   </>}
  </ScrollView>
@@ -104,7 +108,7 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
    {field.type==='select'?<>{text(field.label,'label')}{field.options.map(option=><SelectionControl key={option} colors={colors} kind="radio" label={option} checked={answers[field.key]===option} disabled={busy} onPress={()=>setAnswers(old=>({...old,[field.key]:option}))}/>)}</>:
    <AppField colors={colors} label={field.label} value={String(answers[field.key]??'')} onChangeText={value=>setAnswers(old=>({...old,[field.key]:value}))} editable={!busy} multiline={field.type==='textarea'} keyboardType={field.type==='email'?'email-address':field.type==='tel'?'phone-pad':'default'} placeholder={field.placeholder} hint={field.type==='date'?'Use YYYY-MM-DD.':undefined}/>}
   </View>)}
-  {action('Save form',()=>perform(async active=>{const saved=await saveMedicalForm(supabase,state,template.id,answers);if(!active())return;setState(old=>({...old,responses:{...old.responses,[template.id]:saved}}));say('Form saved to your Vault.');}),true,false,'success')}
+  {action('Save form',()=>perform(async active=>{const saved=await saveMedicalForm(supabase,state,template.id,answers);if(!active())return;setState(old=>({...old,responses:{...old.responses,[template.id]:saved}}));say('Form saved to your Vault.', 'success');}),true,false,'success')}
  </>)}
  {modal(sharing,()=>setSharing(false),shareFinished?'Share recorded':'Review form sharing',shareFinished?<>
   {text(`Recipient: ${recipient.email}`)}
@@ -121,8 +125,8 @@ export default function MedicalScreen({omitShellTitle=false,scrollFabProps={},da
    const body=buildMedicalShare(state,chosen,{...recipient,patientName:context.fullName},FORM_TEMPLATE_VERSION);
    const receipt=await sendMedicalShare(supabase,AsyncStorage,state,body,()=>Crypto.randomUUID());if(!active())return;
    setSupportReference(null);setShareFinished(true);setRecipient(r=>({...r,consent:false}));setSelected([]);
-   say(receipt.emailSent?'Secure link created. The email provider accepted the message; inbox delivery is not guaranteed.':'Secure link created, but the email was not accepted. Check Share history or contact support.');
-   try{const next=await loadMedicalForms(supabase);if(active())setState(next);}catch{if(active())say('Share recorded, but history could not refresh. Close this review and refresh forms.');}
+   say(receipt.emailSent?'Secure link created. The email provider accepted the message; inbox delivery is not guaranteed.':'Secure link created, but the email was not accepted. Check Share history or contact support.', receipt.emailSent?'success':'error');
+   try{const next=await loadMedicalForms(supabase);if(active())setState(next);}catch{if(active())say('Share recorded, but history could not refresh. Close this review and refresh forms.', 'error');}
   }),true,!recipient.consent||!chosen.length,'success')}
  </>)}
  </View>;

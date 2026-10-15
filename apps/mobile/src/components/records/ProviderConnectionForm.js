@@ -1,6 +1,7 @@
 import {AppField} from '../ui/AdaptiveControls';
 import {AppText as Text,AppTextInput as TextInput} from '../../components/ui/AppText';
 import {RecordActionButton} from '../ui/RecordActionButton';
+import {NoticeBanner, useNotice} from '../ui/NoticeBanner';
 import React, {useCallback,useEffect,useRef,useState} from 'react';
 import {View,TouchableOpacity,Linking,AppState} from 'react-native';
 import {watchProviderReturn} from '../../lib/provider-return';
@@ -11,28 +12,30 @@ import {providerSearchPattern,startNativeProviderConnection,checkNativeProviderC
 export function ProviderConnectionForm({colors,onManual,onConnected,onImported}) {
  const [query,setQuery]=useState(''),[results,setResults]=useState([]),[selected,setSelected]=useState(null);
  const [message,setMessage]=useState(''),[busy,setBusy]=useState(false),[receipt,setReceipt]=useState(null);
+ const {notice, showNotice, dismissNotice}=useNotice();
  const active=useRef(false),mounted=useRef(true);
  useEffect(()=>{mounted.current=true;return ()=>{mounted.current=false;};},[]);
  const run=useCallback(async action=>{
   if(active.current||!mounted.current)return;
   active.current=true;setBusy(true);setMessage('');
   try{await action();}
-  catch(e){if(mounted.current)setMessage(e.message||'Unable to complete this step. Try again.');}
+  catch(e){if(mounted.current)showNotice(e.message||'Unable to complete this step. Try again.', 'error');}
   finally{active.current=false;if(mounted.current)setBusy(false);}
- },[]);
+ },[showNotice]);
  const checkConnection=useCallback(async()=>{
   if(!receipt)return;
   const status=await checkNativeProviderConnection({receipt,supabase});
   if(!mounted.current)return;
-  setMessage(providerConnectionStatusMessage(status));
   setReceipt({...receipt,pending:status!=='active'});
-  // Refresh failure must not turn a confirmed connection into an apparent failure.
   if(status==='active'){
+   showNotice(providerConnectionStatusMessage(status), 'success');
+   setMessage('');
    try{await onConnected?.();}catch{
-    if(mounted.current)setMessage('Provider connected. The records list could not refresh. Reopen Records to refresh it. No records were imported.');
+    if(mounted.current)showNotice('Provider connected. The records list could not refresh. Reopen Records to refresh it. No records were imported.', 'info');
    }
-  }
- },[receipt,onConnected]);
+  } else if(status==='pending') setMessage(providerConnectionStatusMessage(status));
+  else showNotice(providerConnectionStatusMessage(status), 'error');
+ },[receipt,onConnected,showNotice]);
  useEffect(()=>{
   if(!receipt?.pending)return;
   return watchProviderReturn({appState:AppState,check:()=>run(checkConnection),onError:()=>{}});
@@ -41,10 +44,12 @@ export function ProviderConnectionForm({colors,onManual,onConnected,onImported})
   const next=await startNativeProviderConnection({org:selected,supabase,openURL:url=>Linking.openURL(url),isCurrent:()=>mounted.current,restart});
   if(!mounted.current)return;
   setReceipt(next);
-  setMessage(next.existing?'You already have an active connection to this provider. Check its current status below.':next.recovered?'A pending authorization was found. Finish in your browser, then check its status. If that session is no longer available, restart authorization.':'Authorization opened in your browser. Return here after completing it.');
+  if(next.existing) showNotice('You already have an active connection to this provider. Check its current status below.', 'info');
+  else setMessage(next.recovered?'A pending authorization was found. Finish in your browser, then check its status. If that session is no longer available, restart authorization.':'Authorization opened in your browser. Return here after completing it.');
  }
  const button=(label,action,primary=false)=><RecordActionButton colors={colors} label={label} busy={busy} primary={primary} onPress={()=>run(action)} />;
  return <View style={{gap:14}}>
+ {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={colors} onDismiss={dismissNotice} /> : null}
  <Text variant="body" style={{color:colors.textSecondary}}>Find your provider, then authorize access in their secure portal. You may need to sign in there. Connecting does not import records automatically.</Text>
  {!selected&&<>
  <AppField colors={colors} label="Provider name" placeholder="Provider or hospital name" value={query} onChangeText={setQuery} editable={!busy} maxLength={100} />
