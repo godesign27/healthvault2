@@ -1,5 +1,6 @@
 import { typeStyles } from '../../theme/layout';
 import { AppText as Text, AppTextInput as TextInput } from '../ui/AppText';
+import { NoticeBanner, useNotice } from '../ui/NoticeBanner';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Pressable, StyleSheet, Share, Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
@@ -15,7 +16,7 @@ import {
 export default function AccountDataControls({ colors, client = supabase }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
+  const { notice: banner, showNotice, dismissNotice } = useNotice();
   const [request, setRequest] = useState(null);
   const [loadingRequest, setLoadingRequest] = useState(true);
   const [showReview, setShowReview] = useState(false);
@@ -41,14 +42,13 @@ export default function AccountDataControls({ colors, client = supabase }) {
     if (locked.current) return;
     locked.current = true;
     setBusy('export');
-    setError('');
-    setNotice('');
+    dismissNotice();
     try {
       const payload = await fetchAccountExport(client);
       await presentAccountExport({ fileSystem: FileSystem, share: Share, platform: Platform.OS, payload });
-      setNotice('Your download is ready. Keep this file private. It contains your health information.');
+      showNotice('Your download is ready. Keep this file private. It contains your health information.', 'success');
     } catch (downloadError) {
-      setError(downloadError instanceof Error ? downloadError.message : 'Unable to download your data.');
+      showNotice(downloadError instanceof Error ? downloadError.message : 'Unable to download your data.', 'error');
     } finally {
       locked.current = false;
       setBusy(null);
@@ -59,16 +59,15 @@ export default function AccountDataControls({ colors, client = supabase }) {
     if (locked.current || confirmation !== 'DELETE' || loadingRequest) return;
     locked.current = true;
     setBusy('delete');
-    setError('');
-    setNotice('');
+    dismissNotice();
     try {
       const receipt = await submitDeletionRequest(client, confirmation);
       setRequest(receipt);
       setShowReview(false);
       setConfirmation('');
-      setNotice('Deletion request received. Your account remains active while the request is reviewed.');
+      showNotice('Deletion request received. Your account remains active while the request is reviewed.', 'success');
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to confirm your request.');
+      showNotice(requestError instanceof Error ? requestError.message : 'Unable to confirm your request.', 'error');
     } finally {
       locked.current = false;
       setBusy(null);
@@ -97,7 +96,7 @@ export default function AccountDataControls({ colors, client = supabase }) {
         </Text>
       </Pressable>
       <Pressable
-        onPress={() => { setShowReview(true); setError(''); setNotice(''); }}
+        onPress={() => { setShowReview(true); dismissNotice(); }}
         disabled={!!busy || pending || loadingRequest}
         accessibilityRole="button"
         accessibilityLabel={pending ? 'Deletion request pending' : 'Request Account Deletion'}
@@ -158,8 +157,8 @@ export default function AccountDataControls({ colors, client = supabase }) {
           </View>
         </View>
       ) : null}
-      {error ? <Text variant="secondary" accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ color: colors.textPrimary }}>{error}</Text> : null}
-      {notice ? <Text variant="secondary" accessibilityLiveRegion="polite" style={{ color: colors.textPrimary }}>{notice}</Text> : null}
+      {banner ? <NoticeBanner message={banner.message} tone={banner.tone} colors={colors} onDismiss={dismissNotice} /> : null}
+      {error ? <Text variant="secondary" accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ color: colors.danger }}>{error}</Text> : null}
     </View>
   );
 }

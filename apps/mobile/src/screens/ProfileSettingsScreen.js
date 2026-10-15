@@ -21,35 +21,10 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import AccountDataControls from '../components/account/AccountDataControls';
 
-const STEEL = {
-  canvas: 'transparent',
-  surface: '#FFFFFF',
-  surfaceMuted: '#F1F5F9',
-  border: '#E2E8F0',
-  borderStrong: '#D1D5E0',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#4F46E5',
-  accentHover: '#4338CA',
-  danger: '#DC2626',
-  dangerBg: '#FEF2F2',
-};
-
-const STEEL_DARK = {
-  canvas: 'transparent',
-  surface: '#1E293B',
-  surfaceMuted: '#334155',
-  border: '#334155',
-  borderStrong: '#475569',
-  textPrimary: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  textMuted: '#64748B',
-  accent: '#818CF8',
-  accentHover: '#A5B4FC',
-  danger: '#F87171',
-  dangerBg: 'rgba(248, 113, 113, 0.12)',
-};
+function settingsColors(darkMode) {
+  const colors = recordsColors(darkMode);
+  return { ...colors, borderStrong: colors.controlBorder, canvas: 'transparent' };
+}
 
 function splitName(full) {
   const t = (full || '').trim();
@@ -72,7 +47,7 @@ export default function ProfileSettingsScreen({
   onClose,
   onSignOut,
 }) {
-  const T = darkShell ? STEEL_DARK : STEEL;
+  const T = settingsColors(darkShell);
   const { first: initialFirst, last: initialLast } = splitName(userProfile?.name);
 
   const [firstName, setFirstName] = useState(initialFirst);
@@ -81,7 +56,6 @@ export default function ProfileSettingsScreen({
   const [email] = useState(userProfile?.email || '');
   const [saving, setSaving] = useState(false);
   const {notice, showNotice, dismissNotice} = useNotice();
-  const noticeColors = recordsColors(darkShell);
 
   useEffect(() => {
     const { first, last } = splitName(userProfile?.name);
@@ -130,13 +104,13 @@ export default function ProfileSettingsScreen({
 
   return (
     <ScrollView
-      style={[styles.scroll, { backgroundColor: darkShell ? STEEL_DARK.canvas : STEEL.canvas }]}
+      style={[styles.scroll, { backgroundColor: T.canvas }]}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       {...scrollFabProps}
     >
-      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={noticeColors} onDismiss={dismissNotice} /> : null}
+      {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={T} onDismiss={dismissNotice} /> : null}
       {!omitShellTitle ? (
         <View style={styles.intro}>
           <Text variant="title" style={[styles.title, { color: T.textPrimary }]}>Profile Settings</Text>

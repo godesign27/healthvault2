@@ -2,6 +2,7 @@ import 'react-native-url-polyfill/auto';
 import 'react-native-gesture-handler';
 import {typeStyles, control, adaptiveLayout} from './src/theme/layout';
 import {recordsColors} from './src/theme/records';
+import {NoticeBanner} from './src/components/ui/NoticeBanner';
 import {AppText as Text,AppTextInput as TextInput,RevealText} from './src/components/ui/AppText';
 import { AppRegistry } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -119,8 +120,9 @@ function titleForRoute(route) {
 
 function AppTopBar({ darkShell, onMenuPress, onLogoPress, userProfile, onAvatarPress, onAssistantPress, menuButtonRef, assistantButtonRef }) {
   const insets = useSafeAreaInsets();
-  const bg = darkShell ? '#1E293B' : STEEL.surface;
-  const border = darkShell ? '#334155' : STEEL.stroke;
+  const colors = recordsColors(darkShell);
+  const bg = colors.surface;
+  const border = colors.border;
 
   return (
     <View
@@ -136,7 +138,7 @@ function AppTopBar({ darkShell, onMenuPress, onLogoPress, userProfile, onAvatarP
       <View style={styles.topBarSide}>
       <Pressable
         ref={menuButtonRef}
-        style={[styles.hamburgerBtn, { backgroundColor: darkShell ? '#334155' : STEEL.navy }]}
+        style={[styles.hamburgerBtn, { backgroundColor: colors.navy }]}
         onPress={onMenuPress}
         accessibilityRole="button"
         accessibilityLabel="Open menu"
@@ -185,7 +187,7 @@ function AppTopBar({ darkShell, onMenuPress, onLogoPress, userProfile, onAvatarP
         onPress={onAssistantPress}
         accessibilityRole="button"
         accessibilityLabel="Open Vault Assistant"
-        style={[styles.assistantBtn, { backgroundColor: darkShell ? '#334155' : STEEL.navy }]}
+        style={[styles.assistantBtn, { backgroundColor: colors.navy }]}
       >
         <Ionicons name="sparkles" size={22} color="#fff" />
       </Pressable>
@@ -250,7 +252,7 @@ function AppDrawer({
       ]}
     >
       <Ionicons name={item.icon} size={22} color={isActive ? colors.accent : muted} />
-      <Text variant="body" style={[styles.drawerRowLabel, { color: text }, isActive && { fontWeight: '700', color: darkShell ? '#fff' : STEEL.text }]}>
+      <Text variant="body" style={[styles.drawerRowLabel, { color: text }, isActive && { fontWeight: '700', color: colors.textPrimary }]}>
         {item.label}
       </Text>
     </Pressable>
@@ -289,7 +291,7 @@ function AppDrawer({
               <Row key={item.key} item={item} />
             ))}
 
-            <Text variant="caption" style={[styles.drawerSectionLabel, { color: STEEL.accent }]}>ACCOUNT</Text>
+            <Text variant="caption" style={[styles.drawerSectionLabel, { color: colors.accent }]}>ACCOUNT</Text>
             {NAV_ACCOUNT.map((item) => (
               <Row key={item.key} item={item} />
             ))}
@@ -356,14 +358,18 @@ function AppDrawer({
   );
 }
 
-function VaultAssistantSheet({ visible, onClose, onDismiss, contextTitle }) {
+function VaultAssistantSheet({ visible, onClose, onDismiss, contextTitle, darkMode = false }) {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReduceMotion();
   const closeButtonRef = useRef(null);
+  const colors = recordsColors(darkMode);
   const [message, setMessage] = useState('');
+  const [hiddenError, setHiddenError] = useState('');
   const chat=useAssistant(contextTitle);
   useEffect(()=>setMessage(''),[chat.ownerId]);
+  useEffect(() => { setHiddenError(''); }, [chat.error]);
   async function submit(){if(await chat.send(message))setMessage('');}
+  const assistantError = chat.error && chat.error !== hiddenError ? chat.error : '';
 
   return (
     <Modal visible={visible} transparent animationType={modalAnimation(reduceMotion, 'slide')} onRequestClose={onClose}
@@ -378,81 +384,81 @@ function VaultAssistantSheet({ visible, onClose, onDismiss, contextTitle }) {
       onDismiss={onDismiss}>
       <View style={styles.asstModalRoot} accessibilityViewIsModal onAccessibilityEscape={onClose}>
         <Pressable style={styles.asstBackdrop} onPress={onClose} accessible={false} importantForAccessibility="no" />
-        <View style={[styles.asstSheet, { paddingBottom: Math.max(insets.bottom, 16) }]}>
-        <View style={styles.asstHandle} />
+        <View style={[styles.asstSheet, { paddingBottom: Math.max(insets.bottom, 16), backgroundColor: colors.surface }]}>
+        <View style={[styles.asstHandle, { backgroundColor: colors.border }]} />
         <View style={styles.asstHeaderRow}>
-          <View style={styles.asstIconCircle}>
-            <Ionicons name="sparkles" size={22} color="#fff" />
+          <View style={[styles.asstIconCircle, { backgroundColor: colors.accent }]}>
+            <Ionicons name="sparkles" size={22} color={colors.onAction} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text variant="section" style={styles.asstTitle}>Vault Assistant</Text>
-            <Text variant="secondary" style={styles.asstContext}>Context: {contextTitle}</Text>
+            <Text variant="section" style={[styles.asstTitle, { color: colors.textPrimary }]}>Vault Assistant</Text>
+            <Text variant="secondary" style={[styles.asstContext, { color: colors.textSecondary }]}>Context: {contextTitle}</Text>
           </View>
-          <Pressable ref={closeButtonRef} style={styles.asstCloseOutline} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close assistant">
-            <Ionicons name="close" size={22} color={STEEL.accent} />
+          <Pressable ref={closeButtonRef} style={[styles.asstCloseOutline, { borderColor: colors.border, backgroundColor: colors.surface }]} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close assistant">
+            <Ionicons name="close" size={22} color={colors.accent} />
           </Pressable>
         </View>
+        {assistantError ? <NoticeBanner message={assistantError} tone="error" colors={colors} onDismiss={() => setHiddenError(chat.error)} /> : null}
 
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} style={{ flexGrow: 0 }}>
           <View style={styles.asstHero}>
-            <View style={styles.asstHeroIcon}>
-              <Ionicons name="sparkles" size={28} color={STEEL.text} />
+            <View style={[styles.asstHeroIcon, { backgroundColor: colors.accentBg }]}>
+              <Ionicons name="sparkles" size={28} color={colors.textPrimary} />
             </View>
-            <Text variant="section" style={styles.asstHeadline}>Ask anything about your health</Text>
-            <Text variant="body" style={styles.asstSub}>
+            <Text variant="section" style={[styles.asstHeadline, { color: colors.textPrimary }]}>Ask anything about your health</Text>
+            <Text variant="body" style={[styles.asstSub, { color: colors.textSecondary }]}>
               Ask about your saved records, medications, insurance, and care team. This chat cannot change or share your data.
             </Text>
           </View>
 
           {['Show my health records', 'List my medications', 'Show my insurance coverage', 'Who is on my care team?'].map((p) => (
-            <Pressable key={p} style={styles.asstPromptPill} disabled={chat.busy} onPress={()=>setMessage(p)}>
-              <Text variant="body" style={styles.asstPromptText}>{p}</Text>
+            <Pressable key={p} style={[styles.asstPromptPill, { borderColor: colors.border, backgroundColor: colors.surface }]} disabled={chat.busy} onPress={()=>setMessage(p)}>
+              <Text variant="body" style={[styles.asstPromptText, { color: colors.textPrimary }]}>{p}</Text>
             </Pressable>
           ))}
-          {chat.messages.map((item,index)=><View key={index} style={styles.asstPromptPill}>
-            <Text variant="body" style={styles.asstPromptText}>{item.role==='user'?'You':'Vault Assistant'}: {item.content}</Text>
+          {chat.messages.map((item,index)=><View key={index} style={[styles.asstPromptPill, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+            <Text variant="body" style={[styles.asstPromptText, { color: colors.textPrimary }]}>{item.role==='user'?'You':'Vault Assistant'}: {item.content}</Text>
           </View>)}
-          {chat.busy && <Text variant="body" style={styles.asstSub}>Checking your Vault…</Text>}
-          {!!chat.error && <Text variant="body" accessibilityLiveRegion="polite" style={styles.asstSub}>{chat.error}</Text>}
+          {chat.busy && <Text variant="body" style={[styles.asstSub, { color: colors.textSecondary }]}>Checking your Vault…</Text>}
         </ScrollView>
 
-        <View style={styles.asstInputRow}>
-          <Ionicons name="mic-outline" size={22} color={STEEL.textSecondary} />
+        <View style={[styles.asstInputRow, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}>
+          <Ionicons name="mic-outline" size={22} color={colors.textSecondary} />
           <TextInput
-            style={styles.asstInput}
+            style={[styles.asstInput, { color: colors.textPrimary }]}
             placeholder="Message Vault Assistant…"
-            placeholderTextColor={STEEL.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={message}
             onChangeText={setMessage}
             editable={!chat.busy}
             maxLength={8000}
             onSubmitEditing={submit}
           />
-          <Pressable style={styles.asstSendBtn} accessibilityLabel="Send message" disabled={chat.busy || !message.trim()} onPress={submit}>
-            <Ionicons name="send" size={18} color="#fff" />
+          <Pressable style={[styles.asstSendBtn, { backgroundColor: colors.accent }]} accessibilityLabel="Send message" disabled={chat.busy || !message.trim()} onPress={submit}>
+            <Ionicons name="send" size={18} color={colors.onAction} />
           </Pressable>
         </View>
-        <Text variant="caption" style={styles.asstDisclaimer}>AI may be inaccurate — verify medical decisions with your provider.</Text>
+        <Text variant="caption" style={[styles.asstDisclaimer, { color: colors.textMuted }]}>AI may be inaccurate — verify medical decisions with your provider.</Text>
       </View>
       </View>
     </Modal>
   );
 }
 
-function StatCard({ icon, title, value, subtitle, iconBg, iconColor, stacked }) {
+function StatCard({ icon, title, value, subtitle, iconBg, iconColor, stacked, colors }) {
   return (
-    <View style={[styles.statCard, stacked && styles.statCardStacked]}>
+    <View style={[styles.statCard, stacked && styles.statCardStacked, { backgroundColor: colors.surface }]}>
       <View style={[styles.statIconWrap, { backgroundColor: iconBg }]}>
         <Ionicons name={icon} size={20} color={iconColor} />
       </View>
-      <Text variant="caption" style={styles.statTitle}>{title}</Text>
-      <Text variant="title" style={styles.statValue}>{value}</Text>
-      <Text variant="caption" style={styles.statSubtitle}>{subtitle}</Text>
+      <Text variant="caption" style={[styles.statTitle, { color: colors.textSecondary }]}>{title}</Text>
+      <Text variant="title" style={[styles.statValue, { color: colors.textPrimary }]}>{value}</Text>
+      <Text variant="caption" style={[styles.statSubtitle, { color: colors.textMuted }]}>{subtitle}</Text>
     </View>
   );
 }
 
-function MedicalIdCardMobile({ medicalID, profileLoading, profileError }) {
+function MedicalIdCardMobile({ medicalID, profileLoading, profileError, colors }) {
   const stack = useStackedLayout();
   const showPlaceholder = profileLoading || !!profileError;
   const allergyList = Array.isArray(medicalID?.allergies)
@@ -476,31 +482,32 @@ function MedicalIdCardMobile({ medicalID, profileLoading, profileError }) {
       : 'None on file';
 
   return (
-    <View style={styles.medCard}>
-      <Text variant="caption" style={styles.medCardLabel}>Medical ID Card</Text>
-      <View style={styles.medAvatar}>
-        <Text variant="page" style={styles.medAvatarText}>{initialsText}</Text>
+    <View style={[styles.medCard, { backgroundColor: colors.surface }]}>
+      <Text variant="caption" style={[styles.medCardLabel, { color: colors.textSecondary }]}>Medical ID Card</Text>
+      <View style={[styles.medAvatar, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+        <Text variant="page" style={[styles.medAvatarText, { color: colors.textSecondary }]}>{initialsText}</Text>
       </View>
-      <Text variant="section" style={styles.medName}>{nameText}</Text>
-      <Text variant="secondary" style={styles.medMeta}>{dobText}</Text>
+      <Text variant="section" style={[styles.medName, { color: colors.textPrimary }]}>{nameText}</Text>
+      <Text variant="secondary" style={[styles.medMeta, { color: colors.textMuted }]}>{dobText}</Text>
       {profileError && !profileLoading ? (
-        <Text variant="caption" style={styles.medInlineError}>{profileError}</Text>
+        <Text variant="caption" style={[styles.medInlineError, { color: colors.danger }]}>{profileError}</Text>
       ) : null}
-      <View style={styles.medDivider} />
+      <View style={[styles.medDivider, { backgroundColor: colors.border }]} />
       <View style={[styles.medRow, stack && styles.medRowStacked]}>
-        <Text variant="secondary" style={styles.medMuted}>Blood type</Text>
-        <Text variant="secondary" style={[styles.medStrong, stack && styles.medStrongStacked]}>{bloodText}</Text>
+        <Text variant="secondary" style={[styles.medMuted, { color: colors.textSecondary }]}>Blood type</Text>
+        <Text variant="secondary" style={[styles.medStrong, stack && styles.medStrongStacked, { color: colors.textPrimary }]}>{bloodText}</Text>
       </View>
       <View style={[styles.medRow, stack && styles.medRowStacked]}>
-        <Text variant="secondary" style={styles.medMuted}>Allergies</Text>
-        <RevealText variant="secondary" style={[styles.medStrong, stack && styles.medStrongStacked]} numberOfLines={2}>{allergiesText}</RevealText>
+        <Text variant="secondary" style={[styles.medMuted, { color: colors.textSecondary }]}>Allergies</Text>
+        <RevealText variant="secondary" style={[styles.medStrong, stack && styles.medStrongStacked, { color: colors.textPrimary }]} numberOfLines={2}>{allergiesText}</RevealText>
       </View>
     </View>
   );
 }
 
-function DashboardScreen({ onNavigate, omitShellTitle = false, scrollFabProps = {} }) {
+function DashboardScreen({ onNavigate, omitShellTitle = false, scrollFabProps = {}, darkMode = false }) {
   const stack = useStackedLayout();
+  const colors = recordsColors(darkMode);
   const { medicalID, loading: profileLoading, error: profileError } = useProfile();
   const { stats, loading: statsLoading, error: statsError } = useVaultStats();
   // Total records count
@@ -527,10 +534,10 @@ function DashboardScreen({ onNavigate, omitShellTitle = false, scrollFabProps = 
       {!omitShellTitle ? (
         <View style={styles.dashIntro}>
           <View style={[styles.dashTitleRow, stack && styles.dashTitleRowStacked]}>
-            <Ionicons name="home" size={26} color={NAVY} />
-            <Text variant="title" style={styles.dashTitle}>Dashboard</Text>
+            <Ionicons name="home" size={26} color={colors.textPrimary} />
+            <Text variant="title" style={[styles.dashTitle, { color: colors.textPrimary }]}>Dashboard</Text>
           </View>
-          <Text variant="body" style={styles.dashWelcome}>{"Welcome back! Here's your health overview."}</Text>
+          <Text variant="body" style={[styles.dashWelcome, { color: colors.textSecondary }]}>{"Welcome back! Here's your health overview."}</Text>
         </View>
       ) : null}
 
@@ -539,88 +546,93 @@ function DashboardScreen({ onNavigate, omitShellTitle = false, scrollFabProps = 
           medicalID={medicalID}
           profileLoading={profileLoading}
           profileError={profileError}
+          colors={colors}
         />
 
         <View style={[styles.statGrid, stack && styles.statGridStacked]}>
           {statsLoading ? (
             [0, 1, 2, 3].map((i) => (
-              <View key={i} style={[styles.statCard, stack && styles.statCardStacked, styles.statCardSkeleton]}>
-                <View style={styles.statSkeletonIcon} />
-                <View style={styles.statSkeletonLine} />
-                <View style={styles.statSkeletonLineShort} />
-                <View style={styles.statSkeletonLineTall} />
+              <View key={i} style={[styles.statCard, stack && styles.statCardStacked, styles.statCardSkeleton, { backgroundColor: colors.surface }]}>
+                <View style={[styles.statSkeletonIcon, { backgroundColor: colors.skeleton }]} />
+                <View style={[styles.statSkeletonLine, { backgroundColor: colors.skeleton }]} />
+                <View style={[styles.statSkeletonLineShort, { backgroundColor: colors.skeleton }]} />
+                <View style={[styles.statSkeletonLineTall, { backgroundColor: colors.skeleton }]} />
               </View>
             ))
           ) : (
             <>
               <StatCard
                 stacked={stack}
+                colors={colors}
                 icon="document-text"
                 title="Health Records"
                 value={statsError ? '—' : String(stats?.totalRecords ?? 0)}
                 subtitle={healthSubtitle}
-                iconBg="#EEF2FF"
-                iconColor="#4F46E5"
+                iconBg={colors.accentBg}
+                iconColor={colors.accent}
               />
               <StatCard
                 stacked={stack}
+                colors={colors}
                 icon="pulse"
                 title="Medical Forms"
                 value="—"
                 subtitle="View in Medical Forms"
-                iconBg="#ECFDF5"
-                iconColor="#059669"
+                iconBg={colors.successBg}
+                iconColor={colors.success}
               />
               <StatCard
                 stacked={stack}
+                colors={colors}
                 icon="calendar"
                 title="Appointments"
                 value="—"
                 subtitle="View in Care"
-                iconBg="#FFFBEB"
-                iconColor="#D97706"
+                iconBg={colors.warningBg}
+                iconColor={colors.warning}
               />
               <StatCard
                 stacked={stack}
+                colors={colors}
                 icon="medkit"
                 title="Medications"
                 value="—"
                 subtitle="View in Care"
-                iconBg="#FFF1F2"
-                iconColor="#E11D48"
+                iconBg={colors.dangerBg}
+                iconColor={colors.danger}
               />
             </>
           )}
         </View>
         {statsError && !statsLoading ? (
-          <Text variant="secondary" style={styles.dashStatsError}>{statsError}</Text>
+          <Text variant="secondary" style={[styles.dashStatsError, { color: colors.danger }]}>{statsError}</Text>
         ) : null}
 
-        <View style={styles.panelCard}>
+        <View style={[styles.panelCard, { backgroundColor: colors.surface }]}>
           <View style={styles.panelHead}>
-            <View style={styles.panelIconWrap}>
-              <Ionicons name="sparkles" size={18} color="#4F46E5" />
+            <View style={[styles.panelIconWrap, { backgroundColor: colors.accentBg }]}>
+              <Ionicons name="sparkles" size={18} color={colors.accent} />
             </View>
-            <Text variant="section" style={styles.panelTitle}>Quick Actions</Text>
+            <Text variant="section" style={[styles.panelTitle, { color: colors.textPrimary }]}>Quick Actions</Text>
           </View>
-          <Text variant="secondary" style={styles.panelSub}>Common tasks to manage your health data</Text>
-          <Pressable style={styles.btnPrimary} accessibilityRole="button" onPress={() => onNavigate('medical')}>
-            <Ionicons name="document-text" size={18} color="#fff" />
-            <Text variant="body" style={styles.btnPrimaryText}>Open Medical Forms</Text>
+          <Text variant="secondary" style={[styles.panelSub, { color: colors.textSecondary }]}>Common tasks to manage your health data</Text>
+          <Pressable style={[styles.btnPrimary, { backgroundColor: colors.accent }]} accessibilityRole="button" onPress={() => onNavigate('medical')}>
+            <Ionicons name="document-text" size={18} color={colors.onAction} />
+            <Text variant="body" style={[styles.btnPrimaryText, { color: colors.onAction }]}>Open Medical Forms</Text>
           </Pressable>
-          <Pressable style={styles.btnOutline} accessibilityRole="button" onPress={() => onNavigate('care')}>
+          <Pressable style={[styles.btnOutline, { borderColor: colors.border }]} accessibilityRole="button" onPress={() => onNavigate('care')}>
             <View style={styles.btnOutlineLeft}>
-              <Ionicons name="pulse" size={18} color={NAVY} />
-              <Text variant="body" style={styles.btnOutlineText}>Open Care</Text>
+              <Ionicons name="pulse" size={18} color={colors.textPrimary} />
+              <Text variant="body" style={[styles.btnOutlineText, { color: colors.textPrimary }]}>Open Care</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
-          <Pressable style={styles.btnOutline} accessibilityRole="button" onPress={() => onNavigate('records')}>
+          <Pressable style={[styles.btnOutline, { borderColor: colors.border }]} accessibilityRole="button" onPress={() => onNavigate('records')}>
             <View style={styles.btnOutlineLeft}>
-              <Ionicons name="calendar" size={18} color={NAVY} />
-              <Text variant="body" style={styles.btnOutlineText}>Open Records</Text>
+              <Ionicons name="calendar" size={18} color={colors.textPrimary} />
+              <Text variant="body" style={[styles.btnOutlineText, { color: colors.textPrimary }]}>Open Records</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
 
@@ -670,7 +682,7 @@ function AppShell({ signOut, user }) {
   let body = null;
   switch (activeRoute) {
     case 'dashboard':
-      body = <DashboardScreen onNavigate={setActiveRoute} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
+      body = <DashboardScreen darkMode={darkShell} onNavigate={setActiveRoute} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
     case 'care':
       body = <CareScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
@@ -758,6 +770,7 @@ function AppShell({ signOut, user }) {
 
       <VaultAssistantSheet
         visible={assistantOpen}
+        darkMode={darkShell}
         onClose={() => setAssistantOpen(false)}
         onDismiss={() => {
           const focusAssistant = () => {

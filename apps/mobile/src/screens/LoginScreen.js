@@ -1,6 +1,7 @@
 import {recordsColors} from '../theme/records';
 import {control, space, typeStyles} from '../theme/layout';
 import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
+import {NoticeBanner, useNotice} from '../components/ui/NoticeBanner';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -29,47 +30,49 @@ export default function LoginScreen({ onLogin, onRecovery, recovery = false, rec
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const {notice, showNotice, dismissNotice} = useNotice();
+  const report = (message, tone = 'info') => {
+    showNotice(message, tone);
+    AccessibilityInfo.announceForAccessibility(message);
+  };
 
   const [requestMode, setRequestMode] = useState(false);
   const [confirmation, setConfirmation] = useState('');
-  const [notice, setNotice] = useState('');
   const busy = useRef(false);
   const passwordRef = useRef(null);
   useEffect(() => {
-    if (recovery) { setNotice(''); setError(''); setPassword(''); setConfirmation(''); }
+    if (recovery) { dismissNotice(); setPassword(''); setConfirmation(''); }
     setRequestMode(false);
-  }, [recovery]);
+  }, [recovery, dismissNotice]);
   useEffect(() => {
-    const message = error || recoveryError || notice;
-    if (message) AccessibilityInfo.announceForAccessibility(message);
-  }, [error, recoveryError, notice]);
+    if (recoveryError) report(recoveryError, 'error');
+  }, [recoveryError]);
   const handleLogin = async () => {
     if (busy.current) return;
     if (!recovery && !requestMode && (!email.trim() || !password)) {
-      setError('Please enter your email and password.'); return;
+      report('Please enter your email and password.', 'error'); return;
     }
-    busy.current = true; setLoading(true); setError(''); setNotice('');
+    busy.current = true; setLoading(true); dismissNotice();
     try {
       if (recovery) {
         await onSavePassword(password, confirmation);
         setPassword(''); setConfirmation('');
-        setNotice('Password updated. Sign in with your new password.');
+        report('Password updated. Sign in with your new password.', 'success');
       } else if (requestMode) {
         await onRecovery(email);
-        setNotice('If an account exists for this email, you will receive a recovery link. Open it on this device.');
+        report('If an account exists for this email, you will receive a recovery link. Open it on this device.', 'info');
       } else {
         const { error: signErr } = await onLogin(email, password);
         if (signErr) throw signErr;
       }
-    } catch (err) { setError(err?.message || 'Unable to complete this request. Please try again.'); }
+    } catch (err) { report(err?.message || 'Unable to complete this request. Please try again.', 'error'); }
     finally { busy.current = false; setLoading(false); }
   };
   const cancelRecovery = async () => {
     if (busy.current) return;
     busy.current = true; setLoading(true);
     try { const result = await onCancelRecovery(); if (result?.error) throw result.error; }
-    catch { setError('Unable to sign out. Please try again.'); }
+    catch { report('Unable to sign out. Please try again.', 'error'); }
     finally { busy.current = false; setLoading(false); }
   };
 
@@ -94,17 +97,10 @@ export default function LoginScreen({ onLogin, onRecovery, recovery = false, rec
           </View>
 
           <View style={styles.card}>
+          {notice ? <NoticeBanner message={notice.message} tone={notice.tone} colors={colors} onDismiss={dismissNotice} /> : null}
           <Text variant="title" style={styles.cardTitle}>{recovery ? 'Set new password' : requestMode ? 'Reset password' : 'Sign in'}</Text>
           <Text variant="body" style={styles.cardSubtitle}>Access your secure health records</Text>
 
-          {error || recoveryError ? (
-            <View style={styles.errorBanner} accessibilityRole="alert">
-              <Ionicons name="alert-circle-outline" size={16} color={colors.danger} />
-              <Text variant="secondary" style={styles.errorText}>{error || recoveryError}</Text>
-            </View>
-          ) : null}
-
-          {notice ? <Text variant="body" accessibilityLiveRegion="polite" style={styles.cardSubtitle}>{notice}</Text> : null}
           {!recovery ? <>
           <Text variant="secondary" style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
@@ -162,7 +158,7 @@ export default function LoginScreen({ onLogin, onRecovery, recovery = false, rec
           </> : null}
           <TouchableOpacity style={styles.forgotBtn} accessibilityRole="button" disabled={loading}
             accessibilityState={{disabled:loading}}
-            onPress={recovery ? cancelRecovery : () => { setRequestMode(!requestMode); setError(''); setNotice(''); setPassword(''); }}>
+            onPress={recovery ? cancelRecovery : () => { setRequestMode(!requestMode); dismissNotice(); setPassword(''); }}>
             <Text variant="secondary" style={styles.forgotText}>{recovery ? 'Cancel and sign out' : requestMode ? 'Back to sign in' : 'Forgot password?'}</Text>
           </TouchableOpacity>
 
