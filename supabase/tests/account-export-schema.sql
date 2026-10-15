@@ -1,0 +1,38 @@
+-- Live schema/privilege compatibility probe for the account-export allowlist.
+-- Reads zero rows. This does not replace authenticated HTTP or RLS isolation tests.
+begin; set local role authenticated;
+select id,user_id,status,requested_at,resolved_at,user_message from public.account_deletion_requests where false;
+select id,user_id,first_name,last_name,email,created_at,updated_at,date_of_birth,phone,address_line1,address_line2,city,state,postal_code,country,last4_ssn,phone_verified,email_verified,identity_verified,onboarding_complete from public.user_profiles where false;
+select id,user_id,name,birth_date,contact_email,contact_phone,blood_type,organ_donor,emergency_contact_name,emergency_contact_phone,emergency_contact_relationship,height_cm,weight_kg,created_at,updated_at from public.patient_profiles where false;
+select id,user_id,address_type,label,address_line1,address_line2,city,state,postal_code,country,is_active,created_at,updated_at from public.user_addresses where false;
+select id,user_id,help_with_labs,help_with_forms,help_with_providers,help_with_wellness_suggestions,created_at,updated_at from public.user_preferences where false;
+select id,user_id,name,diagnosed_on,status,managing_physician,notes,created_at,updated_at from public.conditions where false;
+select id,user_id,name,dosage,frequency,prescribed_by,start_date,end_date,notes,refills_total,refills_remaining,created_at,updated_at from public.medications where false;
+select id,user_id,allergen,reaction,severity,diagnosed_on,notes,created_at,updated_at from public.allergies where false;
+select id,user_id,vaccine,administered_on,provider,lot_number,next_dose,notes,created_at,updated_at from public.immunizations where false;
+select id,user_id,title,encounter_date,provider_name,location,encounter_type,description,notes,created_at,updated_at from public.encounters where false;
+select id,user_id,provider_name,provider_id,appointment_type,scheduled_at,location,status,notes,created_at,updated_at from public.appointments where false;
+select id,user_id,name,title,specialty,organization,email,phone,is_primary,notes,created_at,updated_at from public.care_team where false;
+select id,user_id,item_name,category,status,recommended_date,completed_date,next_due_date,frequency,provider,notes,source,created_at,updated_at from public.preventive_care where false;
+select id,user_id,npi,name,specialty,clinic,phone,email,address,relationship,connection_source,last_visit_date,in_network,notes,created_at,updated_at from public.providers where false;
+select id,user_id,name,chain,phone,address,preferred,delivery_options,in_network,notes,created_at,updated_at from public.pharmacies where false;
+select id,user_id,provider_id,plan_name,member_id_hash,group_number,bin,pcn,relationship,effective_start,effective_end,is_primary,verification_status,last_verified_at,source,coverage_status,stopped_at,created_at,updated_at from public.insurance_coverages where false;
+select id,user_id,carrier_name,member_id,group_number,plan_type,claims_phone,is_primary,created_at,updated_at from public.insurance_policies where false;
+select id,user_id,coverage_id,claim_number,provider_name,service_date,billed_amount,allowed_amount,patient_responsibility,status,description,created_at,updated_at from public.claims where false;
+select id,user_id,kind,title,provider_name,provider_id,service_date,received_at,source,file_type,file_size_bytes,ai_summary,tags,created_at,updated_at from public.health_records where false;
+select id,user_id,provider_name,provider_id,record_types,date_range_start,date_range_end,status,notes,provider_email,doctor_name,message,patient_name,urgency,expires_at,opened_at,submitted_at,created_at,updated_at from public.health_record_requests where false;
+select id,user_id,patient_id,title,notes,original_filename,mime_type,size_bytes,status,created_at,updated_at from public.medical_form_uploads where false;
+select id,user_id,provider_organization_id,connection_method,status,last_synced_at,ehr_source,created_at,updated_at from public.provider_connections where false;
+select id,user_id,meal_type,consumed_at,items,water_ml,notes,source,confirmation_status,created_at,updated_at from public.diet_log_entries where false;
+select id,user_id,energy,sleep,mood,stress,pain,note,recorded_at,source,confirmation_status,created_at,updated_at from public.life_signal_entries where false;
+select id,user_id,metric,value,secondary_value,unit,observed_at,source_kind,source_name,device_name,created_at from public.vital_measurements where false;
+select id,user_id,record_type,title,code,status,effective_date,provider_name,details,source_kind,source_name,created_at from public.connected_health_records where false;
+select id,user_id,partner_key,questionnaire_version,answers,skipped_questions,answered_count,status,completed_at,created_at,updated_at from public.wellness_check_ins where false;
+select id,user_id,partner_key,version,status,insight,source_kinds,safety_flags,generated_at,created_at from public.wellness_insights where false;
+select id,user_id,insight_id,target,rating,created_at,updated_at from public.wellness_insight_feedback where false;
+select id,user_id,partner_key,active,consent_version,opted_in_at,opted_in_source,snoozed_until,opted_out_at,created_at,updated_at from public.wellness_partner_enrollments where false;
+select id,patient_id,template_id,answers_json,fhir_qr_json,status,signed_at,created_at,updated_at from public.form_responses where false;
+select id,patient_id,form_response_ids,method,recipient,status,sent_at,opened_at,revoked_at,is_revoked,note,created_at,expires_at from public.share_events where false;
+select id,consumer_principal_id,resource_type,title,occurred_at,provider_name,payload,released_at from public.patient_clinical_records where false;
+select id,consumer_principal_id,scope,purpose,consent_version,status,effective_at,expires_at,granted_at,revoked_at,created_at from public.provider_access_grants where false;
+rollback; select 'PASS: all 34 export projections compile with authenticated-role permissions' as result;

@@ -1,17 +1,20 @@
+import {typeStyles} from '../theme/layout';
+import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
+
   ScrollView,
   Pressable,
   StyleSheet,
-  TextInput,
+
   Image,
   Alert,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import AccountDataControls from '../components/account/AccountDataControls';
 
 const STEEL = {
   canvas: 'transparent',
@@ -117,23 +120,23 @@ export default function ProfileSettingsScreen({
     >
       {!omitShellTitle ? (
         <View style={styles.intro}>
-          <Text style={[styles.title, { color: T.textPrimary }]}>Profile Settings</Text>
-          <Text style={[styles.sub, { color: T.textSecondary }]}>
+          <Text variant="title" style={[styles.title, { color: T.textPrimary }]}>Profile Settings</Text>
+          <Text variant="body" style={[styles.sub, { color: T.textSecondary }]}>
             Manage your account information and preferences.
           </Text>
         </View>
       ) : null}
 
       <View style={[styles.card, { backgroundColor: T.surface, borderColor: T.border }]}>
-        <Text style={[styles.cardTitle, { color: T.textPrimary }]}>Profile photo</Text>
-        <Text style={[styles.cardHint, { color: T.textSecondary }]}>Your public avatar and identity</Text>
+        <Text variant="body" style={[styles.cardTitle, { color: T.textPrimary }]}>Profile photo</Text>
+        <Text variant="caption" style={[styles.cardHint, { color: T.textSecondary }]}>Your public avatar and identity</Text>
         <View style={styles.avatarBlock}>
           <View style={styles.avatarWrap}>
             {avatarUri ? (
               <Image source={{ uri: avatarUri }} style={styles.avatarImg} accessibilityLabel="Profile" />
             ) : (
               <View style={[styles.avatarPlaceholder, { backgroundColor: T.surfaceMuted }]}>
-                <Text style={[styles.avatarLetters, { color: T.textSecondary }]}>
+                <Text variant="page" style={[styles.avatarLetters, { color: T.textSecondary }]}>
                   {(firstName[0] || '') + (lastName[0] || '') || '?'}
                 </Text>
               </View>
@@ -147,28 +150,28 @@ export default function ProfileSettingsScreen({
               <Ionicons name="cloud-upload-outline" size={20} color="#fff" />
             </Pressable>
           </View>
-          <Text style={[styles.displayName, { color: T.textPrimary }]}>
+          <Text variant="section" style={[styles.displayName, { color: T.textPrimary }]}>
             {`${firstName} ${lastName}`.trim() || '—'}
           </Text>
           <View style={styles.emailRow}>
             <Ionicons name="mail-outline" size={14} color={T.textSecondary} />
-            <Text style={[styles.emailText, { color: T.textSecondary }]} numberOfLines={1}>
+            <Text variant="secondary" style={[styles.emailText, { color: T.textSecondary }]} numberOfLines={1}>
               {email || '—'}
             </Text>
           </View>
           <View style={styles.verifiedRow}>
             <Ionicons name="shield-checkmark" size={14} color="#10B981" />
-            <Text style={[styles.verifiedText, { color: T.textSecondary }]}>Verified account</Text>
+            <Text variant="caption" style={[styles.verifiedText, { color: T.textSecondary }]}>Verified account</Text>
           </View>
         </View>
       </View>
 
       <View style={[styles.card, { backgroundColor: T.surface, borderColor: T.border }]}>
-        <Text style={[styles.cardTitle, { color: T.textPrimary }]}>Personal information</Text>
-        <Text style={[styles.cardHint, { color: T.textSecondary }]}>Update your profile details</Text>
+        <Text variant="body" style={[styles.cardTitle, { color: T.textPrimary }]}>Personal information</Text>
+        <Text variant="caption" style={[styles.cardHint, { color: T.textSecondary }]}>Update your profile details</Text>
         <View style={styles.fieldRow}>
           <View style={styles.fieldHalf}>
-            <Text style={[styles.label, { color: T.textPrimary }]}>First name</Text>
+            <Text variant="caption" style={[styles.label, { color: T.textPrimary }]}>First name</Text>
             <TextInput
               value={firstName}
               onChangeText={setFirstName}
@@ -178,7 +181,7 @@ export default function ProfileSettingsScreen({
             />
           </View>
           <View style={styles.fieldHalf}>
-            <Text style={[styles.label, { color: T.textPrimary }]}>Last name</Text>
+            <Text variant="caption" style={[styles.label, { color: T.textPrimary }]}>Last name</Text>
             <TextInput
               value={lastName}
               onChangeText={setLastName}
@@ -190,6 +193,8 @@ export default function ProfileSettingsScreen({
         </View>
       </View>
 
+      <AccountDataControls colors={T} />
+
       {onSignOut ? (
         <Pressable
           onPress={onSignOut}
@@ -198,13 +203,13 @@ export default function ProfileSettingsScreen({
           accessibilityLabel="Sign out"
         >
           <Ionicons name="log-out-outline" size={20} color={T.danger} />
-          <Text style={[styles.signOutText, { color: T.danger }]}>Sign out</Text>
+          <Text variant="body" style={[styles.signOutText, { color: T.danger }]}>Sign out</Text>
         </Pressable>
       ) : null}
 
       <View style={styles.footerActions}>
         <Pressable onPress={onClose} style={styles.cancelBtn} accessibilityRole="button">
-          <Text style={[styles.cancelText, { color: T.textSecondary }]}>Cancel</Text>
+          <Text variant="body" style={[styles.cancelText, { color: T.textSecondary }]}>Cancel</Text>
         </Pressable>
         <Pressable
           onPress={handleSave}
@@ -212,7 +217,7 @@ export default function ProfileSettingsScreen({
           accessibilityRole="button"
           accessibilityLabel="Save profile changes"
         >
-          <Text style={styles.saveBtnText}>Save changes</Text>
+          <Text variant="body" style={styles.saveBtnText}>Save changes</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -227,8 +232,8 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   intro: { marginBottom: 20 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 6 },
-  sub: { fontSize: 15, lineHeight: 22 },
+  title: { ...typeStyles.title, fontWeight: '800', marginBottom: 6 },
+  sub: { ...typeStyles.body, },
   card: {
     borderRadius: 16,
     borderWidth: 1,
@@ -244,8 +249,8 @@ const styles = StyleSheet.create({
       android: { elevation: 2 },
     }),
   },
-  cardTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
-  cardHint: { fontSize: 12, marginBottom: 16 },
+  cardTitle: { ...typeStyles.body, fontWeight: '700', marginBottom: 4 },
+  cardHint: { ...typeStyles.caption, marginBottom: 16 },
   avatarBlock: { alignItems: 'center' },
   avatarWrap: { position: 'relative', marginBottom: 12 },
   avatarImg: { width: 120, height: 120, borderRadius: 60 },
@@ -256,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarLetters: { fontSize: 36, fontWeight: '800' },
+  avatarLetters: { ...typeStyles.page, fontWeight: '800' },
   uploadFab: {
     position: 'absolute',
     right: 0,
@@ -270,20 +275,20 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#fff',
   },
-  displayName: { fontSize: 17, fontWeight: '700', marginBottom: 4 },
+  displayName: { ...typeStyles.section, fontWeight: '700', marginBottom: 4 },
   emailRow: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
-  emailText: { fontSize: 13, flex: 1 },
+  emailText: { ...typeStyles.secondary, flex: 1 },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
-  verifiedText: { fontSize: 12, fontWeight: '600' },
+  verifiedText: { ...typeStyles.caption, fontWeight: '600' },
   fieldRow: { flexDirection: 'row', gap: 12 },
   fieldHalf: { flex: 1, minWidth: 0 },
-  label: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
+  label: { ...typeStyles.caption, fontWeight: '600', marginBottom: 6 },
   input: {
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 15,
+    ...typeStyles.body,
   },
   signOutBtn: {
     flexDirection: 'row',
@@ -295,7 +300,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 20,
   },
-  signOutText: { fontSize: 15, fontWeight: '700' },
+  signOutText: { ...typeStyles.body, fontWeight: '700' },
   footerActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -304,11 +309,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   cancelBtn: { paddingVertical: 12, paddingHorizontal: 8 },
-  cancelText: { fontSize: 15, fontWeight: '600' },
+  cancelText: { ...typeStyles.body, fontWeight: '600' },
   saveBtn: {
     paddingVertical: 12,
     paddingHorizontal: 22,
     borderRadius: 12,
   },
-  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  saveBtnText: { color: '#fff', ...typeStyles.body, fontWeight: '700' },
 });

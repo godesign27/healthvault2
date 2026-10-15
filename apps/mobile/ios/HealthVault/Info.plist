@@ -51,6 +51,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Health Vault uses the camera to scan and upload medical documents.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Health Vault reads your Apple Health measurements so you can review them and choose which ones to save.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Health Vault uses Face ID to keep your medical records secure.</string>
 	<key>NSMicrophoneUsageDescription</key>

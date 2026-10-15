@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {cancelRecordRequest} from '../apps/mobile/src/lib/request-cancel.js';
+const id='a8cb8e8a-b62a-4fa2-b596-bcd5bc99fb00';
+const opts={requestId:id,getSession:async()=>({user:{id:'owner'},access_token:'jwt'}),baseUrl:'https://example.invalid',anonKey:'public'};
+let calls=0;
+const fetchImpl=async(url,init)=>{calls++;assert(url.endsWith(`/${id}/cancel`));assert.equal(init.headers.Authorization,'Bearer jwt');assert.equal(init.body,undefined);return new Response(JSON.stringify({id,status:'cancelled'}));};
+await cancelRecordRequest({...opts,fetchImpl});await cancelRecordRequest({...opts,fetchImpl});assert.equal(calls,2);
+await assert.rejects(cancelRecordRequest({...opts,getSession:async()=>null,fetchImpl}),/Sign in/);assert.equal(calls,2);
+await assert.rejects(cancelRecordRequest({...opts,fetchImpl:async()=>{throw Error('lost');}}),/unknown/);
+await assert.rejects(cancelRecordRequest({...opts,fetchImpl:async()=>new Response('{}',{status:409})}),/closed/);
+await assert.rejects(cancelRecordRequest({...opts,fetchImpl:async()=>new Response('{}')}),/not confirmed/);
+let n=0;await assert.rejects(cancelRecordRequest({...opts,fetchImpl,getSession:async()=>({user:{id:n++?'other':'owner'},access_token:'jwt'})}),/account changed/);
+console.log('PASS cancellation auth, receipt validation, safe retry, closed/unknown outcomes and account change');
+
+await assert.rejects(cancelRecordRequest({...opts,timeoutMs:10,fetchImpl:async()=>({ok:true,status:200,json:()=>new Promise(()=>{})})}),/unknown/);
+await assert.rejects(cancelRecordRequest({...opts,timeoutMs:10,fetchImpl:()=>new Promise(()=>{})}),/unknown/);
+let committed=false;
+await assert.rejects(cancelRecordRequest({...opts,fetchImpl:async()=>{committed=true;throw Error('response lost');}}),/unknown/);
+assert(committed);await cancelRecordRequest({...opts,fetchImpl});
+console.log('PASS stalled headers/body deadlines and retry after simulated committed-but-lost response');

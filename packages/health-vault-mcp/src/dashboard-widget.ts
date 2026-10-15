@@ -300,3 +300,4 @@ export const DASHBOARD_WIDGET_HTML = `<!doctype html>
   </script>
 </body>
 </html>`;
+

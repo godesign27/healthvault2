@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 export function useProfile() {
   const [profile, setProfile] = useState(null);
   const [patientProfile, setPatientProfile] = useState(null);
+  const [allergyNames, setAllergyNames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,30 +21,36 @@ export function useProfile() {
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
-      }
+      if (profileError) throw profileError;
 
       const { data: patientData, error: patientError } = await supabase
         .from('patient_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (patientError && patientError.code !== 'PGRST116') {
-        throw patientError;
-      }
+      if (patientError) throw patientError;
+
+      const { data: allergyRows, error: allergyError } = await supabase
+        .from('allergies')
+        .select('allergen')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (allergyError) throw allergyError;
 
       setProfile(userProfile || null);
       setPatientProfile(patientData || null);
+      setAllergyNames((allergyRows || []).map((row) => row.allergen).filter(Boolean));
     } catch (err) {
       console.error('[useProfile]', err);
       setError(err?.message || 'Failed to load profile');
       setProfile(null);
       setPatientProfile(null);
+      setAllergyNames([]);
     } finally {
       setLoading(false);
     }
@@ -57,7 +64,7 @@ export function useProfile() {
     fullName: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : null,
     dateOfBirth: profile?.date_of_birth || null,
     bloodType: patientProfile?.blood_type || null,
-    allergies: patientProfile?.allergies || [],
+    allergies: allergyNames,
     conditions: patientProfile?.conditions || [],
     initials: profile
       ? `${(profile.first_name || '')[0] || ''}${(profile.last_name || '')[0] || ''}`.toUpperCase()

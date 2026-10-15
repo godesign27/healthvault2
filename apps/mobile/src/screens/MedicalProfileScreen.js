@@ -1,7 +1,10 @@
+import {DisclosureButton} from '../components/ui/AdaptiveControls';
+import {typeStyles} from '../theme/layout';
+import {AppText as Text,RevealText} from '../components/ui/AppText';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
-  Text,
+
   ScrollView,
   StyleSheet,
   ActivityIndicator,
@@ -43,13 +46,13 @@ function StatCard({ label, count, sublabel, icon, iconBg, iconColor }) {
   return (
     <View style={styles.statCard}>
       <View style={styles.statHeader}>
-        <Text style={styles.statLabel}>{label}</Text>
+        <Text variant="secondary" style={styles.statLabel}>{label}</Text>
         <View style={[styles.statIconWrap, { backgroundColor: iconBg }]}>
           <Ionicons name={icon} size={18} color={iconColor} />
         </View>
       </View>
-      <Text style={styles.statCount}>{count}</Text>
-      {sublabel ? <Text style={styles.statSub}>{sublabel}</Text> : null}
+      <Text variant="page" style={styles.statCount}>{count}</Text>
+      {sublabel ? <Text variant="secondary" style={styles.statSub}>{sublabel}</Text> : null}
     </View>
   );
 }
@@ -57,8 +60,8 @@ function StatCard({ label, count, sublabel, icon, iconBg, iconColor }) {
 function SectionHeader({ title, description }) {
   return (
     <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <Text style={styles.sectionDesc}>{description}</Text>
+      <Text variant="section" style={styles.sectionTitle}>{title}</Text>
+      <Text variant="body" style={styles.sectionDesc}>{description}</Text>
     </View>
   );
 }
@@ -67,8 +70,8 @@ function EmptyState({ icon, title, body }) {
   return (
     <View style={styles.emptyCard}>
       <Ionicons name={icon} size={44} color={STEEL.textMuted} style={styles.emptyIcon} />
-      <Text style={styles.emptyTitle}>{title}</Text>
-      <Text style={styles.emptyBody}>{body}</Text>
+      <Text variant="section" style={styles.emptyTitle}>{title}</Text>
+      <Text variant="body" style={styles.emptyBody}>{body}</Text>
     </View>
   );
 }
@@ -111,7 +114,7 @@ function MedicalIdCardMobile({ profile, loading }) {
 
   return (
     <View style={styles.idCard}>
-      <Text style={styles.idCardKicker}>Medical ID Card</Text>
+      <Text variant="caption" style={styles.idCardKicker}>Medical ID Card</Text>
 
       {loading ? (
         <ActivityIndicator style={styles.idSpinner} color={STEEL.accent} />
@@ -119,47 +122,47 @@ function MedicalIdCardMobile({ profile, loading }) {
         <Image source={{ uri: profile.profilePhoto }} style={styles.idAvatarImg} accessibilityLabel={displayName || 'Profile'} />
       ) : (
         <View style={styles.idAvatarPlaceholder}>
-          <Text style={styles.idAvatarLetters}>{initials}</Text>
+          <Text variant="page" style={styles.idAvatarLetters}>{initials}</Text>
         </View>
       )}
 
-      <Text style={styles.idName}>{loading ? '…' : displayName || 'Your Name'}</Text>
+      <Text variant="section" style={styles.idName}>{loading ? '…' : displayName || 'Your Name'}</Text>
 
       <View style={styles.idRow}>
-        <Text style={styles.idRowLabel}>Date of Birth</Text>
-        <Text style={styles.idRowValue}>{loading ? '…' : dobText}</Text>
+        <Text variant="body" style={styles.idRowLabel}>Date of Birth</Text>
+        <Text variant="body" style={styles.idRowValue}>{loading ? '…' : dobText}</Text>
       </View>
       <View style={styles.idDivider} />
       <View style={styles.idRow}>
-        <Text style={styles.idRowLabel}>Allergies</Text>
-        <Text style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={2}>
+        <Text variant="body" style={styles.idRowLabel}>Allergies</Text>
+        <RevealText variant="body" style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={2}>
           {loading ? '…' : allergiesText}
-        </Text>
+        </RevealText>
       </View>
       <View style={styles.idDivider} />
       <View style={styles.idRow}>
-        <Text style={styles.idRowLabel}>Medical Conditions</Text>
-        <Text style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={2}>
+        <Text variant="body" style={styles.idRowLabel}>Medical Conditions</Text>
+        <RevealText variant="body" style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={2}>
           {loading ? '…' : conditionsText}
-        </Text>
+        </RevealText>
       </View>
       <View style={styles.idDivider} />
       <View style={styles.idRow}>
-        <Text style={styles.idRowLabel}>Organ Donor</Text>
-        <Text style={styles.idRowValue}>{loading ? '…' : organText}</Text>
+        <Text variant="body" style={styles.idRowLabel}>Organ Donor</Text>
+        <Text variant="body" style={styles.idRowValue}>{loading ? '…' : organText}</Text>
       </View>
 
       {showMore ? (
         <View style={styles.idMoreBlock}>
           <View style={styles.idDividerStrong} />
           <View style={styles.idRow}>
-            <Text style={styles.idRowLabel}>Blood Type</Text>
-            <Text style={styles.idRowValue}>{loading ? '…' : profile.bloodType || 'Unknown'}</Text>
+            <Text variant="body" style={styles.idRowLabel}>Blood Type</Text>
+            <Text variant="body" style={styles.idRowValue}>{loading ? '…' : profile.bloodType || 'Unknown'}</Text>
           </View>
           <View style={styles.idDivider} />
           <View style={styles.idRow}>
-            <Text style={styles.idRowLabel}>Emergency Contact</Text>
-            <Text style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={3}>
+            <Text variant="body" style={styles.idRowLabel}>Emergency Contact</Text>
+            <RevealText variant="body" style={[styles.idRowValue, styles.idRowValueShrink]} numberOfLines={3}>
               {loading
                 ? '…'
                 : profile.emergencyContactName
@@ -167,15 +170,12 @@ function MedicalIdCardMobile({ profile, loading }) {
                       profile.emergencyContactPhone ? ` · ${profile.emergencyContactPhone}` : ''
                     }`
                   : 'Not on file'}
-            </Text>
+            </RevealText>
           </View>
         </View>
       ) : null}
 
-      <Pressable onPress={() => setShowMore((s) => !s)} style={styles.idToggle} accessibilityRole="button">
-        <Ionicons name={showMore ? 'chevron-up' : 'chevron-down'} size={18} color={STEEL.accent} />
-        <Text style={styles.idToggleText}>Show {showMore ? 'Less' : 'More'}</Text>
-      </Pressable>
+      <DisclosureButton colors={STEEL} label={showMore?'Show less':'Show more'} expanded={showMore} onPress={()=>setShowMore(s=>!s)} />
     </View>
   );
 }
@@ -306,16 +306,16 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
         <View style={styles.hero}>
           <View style={styles.heroTitleRow}>
             <Ionicons name="person" size={26} color={STEEL.textPrimary} />
-            <Text style={styles.heroTitle}>Medical Profile</Text>
+            <Text variant="title" style={styles.heroTitle}>Medical Profile</Text>
           </View>
-          <Text style={styles.heroIntro}>{INTRO}</Text>
+          <Text variant="body" style={styles.heroIntro}>{INTRO}</Text>
         </View>
       ) : null}
 
       {loadError ? (
         <View style={styles.errorBanner}>
           <Ionicons name="warning-outline" size={20} color="#B45309" />
-          <Text style={styles.errorBannerText}>{loadError}</Text>
+          <Text variant="body" style={styles.errorBannerText}>{loadError}</Text>
         </View>
       ) : null}
 
@@ -363,7 +363,7 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
       {loading ? (
         <View style={styles.loadingCard}>
           <ActivityIndicator color={STEEL.accent} />
-          <Text style={styles.loadingText}>Loading conditions…</Text>
+          <Text variant="body" style={styles.loadingText}>Loading conditions…</Text>
         </View>
       ) : conditions.length === 0 ? (
         <EmptyState
@@ -381,10 +381,10 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
                   <Ionicons name="medkit-outline" size={20} color={STEEL.blueIcon} />
                 </View>
                 <View style={styles.listCardTitleCol}>
-                  <Text style={styles.listCardTitle}>{condition.name}</Text>
+                  <Text variant="section" style={styles.listCardTitle}>{condition.name}</Text>
                   {condition.status ? (
                     <View style={[styles.badge, { backgroundColor: st.bg }]}>
-                      <Text style={[styles.badgeText, { color: st.text }]}>{condition.status}</Text>
+                      <Text variant="caption" style={[styles.badgeText, { color: st.text }]}>{condition.status}</Text>
                     </View>
                   ) : null}
                 </View>
@@ -392,20 +392,20 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
               {condition.diagnosed_on || condition.managing_physician ? (
                 <View style={styles.listMeta}>
                   {condition.diagnosed_on ? (
-                    <Text style={styles.listMetaLine}>
-                      <Text style={styles.listMetaStrong}>Diagnosed: </Text>
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Diagnosed: </Text>
                       {formatDate(condition.diagnosed_on)}
                     </Text>
                   ) : null}
                   {condition.managing_physician ? (
-                    <Text style={styles.listMetaLine}>
-                      <Text style={styles.listMetaStrong}>Managing Physician: </Text>
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Managing Physician: </Text>
                       {condition.managing_physician}
                     </Text>
                   ) : null}
                 </View>
               ) : null}
-              {condition.notes ? <Text style={styles.listNotes}>{condition.notes}</Text> : null}
+              {condition.notes ? <Text variant="body" style={styles.listNotes}>{condition.notes}</Text> : null}
             </View>
           );
         })
@@ -433,33 +433,33 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
                 <Ionicons name="bandage-outline" size={20} color={STEEL.emeraldIcon} />
               </View>
               <View style={styles.listCardTitleCol}>
-                <Text style={styles.listCardTitle}>{med.name}</Text>
-                {med.dosage ? <Text style={styles.listCardSub}>{med.dosage}</Text> : null}
+                <Text variant="section" style={styles.listCardTitle}>{med.name}</Text>
+                {med.dosage ? <Text variant="body" style={styles.listCardSub}>{med.dosage}</Text> : null}
               </View>
             </View>
             {med.frequency || med.prescribed_by || med.start_date ? (
               <View style={styles.listMeta}>
                 {med.frequency ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Frequency: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Frequency: </Text>
                     {med.frequency}
                   </Text>
                 ) : null}
                 {med.prescribed_by ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Prescribed By: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Prescribed By: </Text>
                     {med.prescribed_by}
                   </Text>
                 ) : null}
                 {med.start_date ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Started: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Started: </Text>
                     {formatDate(med.start_date)}
                   </Text>
                 ) : null}
               </View>
             ) : null}
-            {med.notes ? <Text style={styles.listNotes}>{med.notes}</Text> : null}
+            {med.notes ? <Text variant="body" style={styles.listNotes}>{med.notes}</Text> : null}
           </View>
         ))
       )}
@@ -488,10 +488,10 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
                   <Ionicons name="warning-outline" size={20} color={STEEL.amberIcon} />
                 </View>
                 <View style={styles.listCardTitleCol}>
-                  <Text style={styles.listCardTitle}>{allergy.allergen}</Text>
+                  <Text variant="section" style={styles.listCardTitle}>{allergy.allergen}</Text>
                   {allergy.severity ? (
                     <View style={[styles.badge, { backgroundColor: sev.bg }]}>
-                      <Text style={[styles.badgeText, { color: sev.text }]}>{allergy.severity}</Text>
+                      <Text variant="caption" style={[styles.badgeText, { color: sev.text }]}>{allergy.severity}</Text>
                     </View>
                   ) : null}
                 </View>
@@ -499,20 +499,20 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
               {allergy.reaction || allergy.diagnosed_on ? (
                 <View style={styles.listMeta}>
                   {allergy.reaction ? (
-                    <Text style={styles.listMetaLine}>
-                      <Text style={styles.listMetaStrong}>Reaction: </Text>
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Reaction: </Text>
                       {allergy.reaction}
                     </Text>
                   ) : null}
                   {allergy.diagnosed_on ? (
-                    <Text style={styles.listMetaLine}>
-                      <Text style={styles.listMetaStrong}>Diagnosed: </Text>
+                    <Text variant="body" style={styles.listMetaLine}>
+                      <Text variant="body" style={styles.listMetaStrong}>Diagnosed: </Text>
                       {formatDate(allergy.diagnosed_on)}
                     </Text>
                   ) : null}
                 </View>
               ) : null}
-              {allergy.notes ? <Text style={styles.listNotes}>{allergy.notes}</Text> : null}
+              {allergy.notes ? <Text variant="body" style={styles.listNotes}>{allergy.notes}</Text> : null}
             </View>
           );
         })
@@ -540,38 +540,38 @@ export default function MedicalProfileScreen({ omitShellTitle = false, scrollFab
                 <Ionicons name="shield-checkmark-outline" size={20} color={STEEL.roseIcon} />
               </View>
               <View style={styles.listCardTitleCol}>
-                <Text style={styles.listCardTitle}>{imm.vaccine}</Text>
+                <Text variant="section" style={styles.listCardTitle}>{imm.vaccine}</Text>
               </View>
             </View>
             {imm.administered_on || imm.provider || imm.lot_number || imm.next_dose ? (
               <View style={styles.listMeta}>
                 {imm.administered_on ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Administered: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Administered: </Text>
                     {formatDate(imm.administered_on)}
                   </Text>
                 ) : null}
                 {imm.provider ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Provider: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Provider: </Text>
                     {imm.provider}
                   </Text>
                 ) : null}
                 {imm.lot_number ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Lot Number: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Lot Number: </Text>
                     {imm.lot_number}
                   </Text>
                 ) : null}
                 {imm.next_dose ? (
-                  <Text style={styles.listMetaLine}>
-                    <Text style={styles.listMetaStrong}>Next Dose: </Text>
+                  <Text variant="body" style={styles.listMetaLine}>
+                    <Text variant="body" style={styles.listMetaStrong}>Next Dose: </Text>
                     {formatDate(imm.next_dose)}
                   </Text>
                 ) : null}
               </View>
             ) : null}
-            {imm.notes ? <Text style={styles.listNotes}>{imm.notes}</Text> : null}
+            {imm.notes ? <Text variant="body" style={styles.listNotes}>{imm.notes}</Text> : null}
           </View>
         ))
       )}
@@ -594,8 +594,8 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 120, paddingHorizontal: 20, paddingTop: 8 },
   hero: { marginBottom: 20 },
   heroTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  heroTitle: { fontSize: 24, fontWeight: '800', color: STEEL.textPrimary },
-  heroIntro: { fontSize: 15, lineHeight: 22, color: STEEL.textSecondary },
+  heroTitle: { ...typeStyles.title, fontWeight: '800', color: STEEL.textPrimary },
+  heroIntro: { ...typeStyles.body,  color: STEEL.textSecondary },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
     borderColor: '#FDE68A',
     marginBottom: 16,
   },
-  errorBannerText: { flex: 1, fontSize: 14, color: '#92400E', lineHeight: 20 },
+  errorBannerText: { flex: 1, ...typeStyles.body, color: '#92400E', },
   idCard: {
     backgroundColor: STEEL.surface,
     borderRadius: 16,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     borderColor: STEEL.border,
   },
   idCardKicker: {
-    fontSize: 11,
+    ...typeStyles.caption,
     fontWeight: '700',
     letterSpacing: 1.2,
     color: STEEL.textSecondary,
@@ -644,17 +644,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: STEEL.border,
   },
-  idAvatarLetters: { fontSize: 32, fontWeight: '800', color: STEEL.textSecondary },
+  idAvatarLetters: { ...typeStyles.page, fontWeight: '800', color: STEEL.textSecondary },
   idName: {
-    fontSize: 20,
+    ...typeStyles.section,
     fontWeight: '800',
     color: STEEL.textPrimary,
     textAlign: 'center',
     marginBottom: 16,
   },
   idRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 6 },
-  idRowLabel: { fontSize: 14, color: STEEL.textSecondary, flexShrink: 0, marginRight: 12 },
-  idRowValue: { fontSize: 14, fontWeight: '600', color: STEEL.textPrimary, textAlign: 'right', flex: 1 },
+  idRowLabel: { ...typeStyles.body, color: STEEL.textSecondary, flexShrink: 0, marginRight: 12 },
+  idRowValue: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary, textAlign: 'right', flex: 1 },
   idRowValueShrink: { flexShrink: 1 },
   idDivider: { height: StyleSheet.hairlineWidth, backgroundColor: STEEL.border, marginVertical: 4 },
   idDividerStrong: { height: StyleSheet.hairlineWidth, backgroundColor: '#CBD5E1', marginVertical: 12 },
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingVertical: 10,
   },
-  idToggleText: { fontSize: 14, fontWeight: '600', color: STEEL.accent },
+  idToggleText: { ...typeStyles.body, fontWeight: '600', color: STEEL.accent },
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 8 },
   statCard: {
     width: '47%',
@@ -680,13 +680,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  statLabel: { fontSize: 13, fontWeight: '600', color: STEEL.textSecondary },
+  statLabel: { ...typeStyles.secondary, fontWeight: '600', color: STEEL.textSecondary },
   statIconWrap: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  statCount: { fontSize: 28, fontWeight: '800', color: STEEL.textPrimary },
-  statSub: { fontSize: 13, color: STEEL.textSecondary, marginTop: 2 },
+  statCount: { ...typeStyles.page, fontWeight: '800', color: STEEL.textPrimary },
+  statSub: { ...typeStyles.secondary, color: STEEL.textSecondary, marginTop: 2 },
   sectionHeader: { marginTop: 20, marginBottom: 12 },
-  sectionTitle: { fontSize: 20, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 6 },
-  sectionDesc: { fontSize: 14, lineHeight: 20, color: STEEL.textSecondary },
+  sectionTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 6 },
+  sectionDesc: { ...typeStyles.body,  color: STEEL.textSecondary },
   loadingCard: {
     backgroundColor: STEEL.surface,
     borderRadius: 14,
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     borderColor: STEEL.border,
     marginBottom: 12,
   },
-  loadingText: { marginTop: 10, fontSize: 14, color: STEEL.textSecondary },
+  loadingText: { marginTop: 10, ...typeStyles.body, color: STEEL.textSecondary },
   emptyCard: {
     backgroundColor: STEEL.surface,
     borderRadius: 14,
@@ -707,8 +707,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyIcon: { marginBottom: 12 },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 8, textAlign: 'center' },
-  emptyBody: { fontSize: 14, lineHeight: 20, color: STEEL.textSecondary, textAlign: 'center' },
+  emptyTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 8, textAlign: 'center' },
+  emptyBody: { ...typeStyles.body,  color: STEEL.textSecondary, textAlign: 'center' },
   listCard: {
     backgroundColor: STEEL.surface,
     borderRadius: 14,
@@ -720,12 +720,12 @@ const styles = StyleSheet.create({
   listCardHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   listIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   listCardTitleCol: { flex: 1, minWidth: 0 },
-  listCardTitle: { fontSize: 17, fontWeight: '700', color: STEEL.textPrimary },
-  listCardSub: { fontSize: 14, color: STEEL.textSecondary, marginTop: 4 },
+  listCardTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary },
+  listCardSub: { ...typeStyles.body, color: STEEL.textSecondary, marginTop: 4 },
   badge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 6 },
-  badgeText: { fontSize: 12, fontWeight: '700' },
+  badgeText: { ...typeStyles.caption, fontWeight: '700' },
   listMeta: { marginTop: 12, gap: 6 },
-  listMetaLine: { fontSize: 14, color: STEEL.textSecondary, lineHeight: 20 },
+  listMetaLine: { ...typeStyles.body, color: STEEL.textSecondary, },
   listMetaStrong: { fontWeight: '700', color: STEEL.textPrimary },
-  listNotes: { marginTop: 10, fontSize: 14, lineHeight: 20, color: STEEL.textSecondary },
+  listNotes: { marginTop: 10, ...typeStyles.body,  color: STEEL.textSecondary },
 });

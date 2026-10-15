@@ -1,8 +1,10 @@
+import { formatRecordDate } from '../../../packages/api-client/src/record-date';
 import { useState, useEffect } from 'react';
 import { X, FileText, Share2, Sparkles, ExternalLink, Loader2 } from 'lucide-react';
 import { HealthRecord } from '../../lib/records/types';
 import { ShareInput } from '../../lib/records/zod';
 import { shareRecord } from '../../lib/records/query';
+import { loadRecordFile } from '../../lib/records/file';
 import { supabase } from '../../lib/supabase';
 
 interface DocumentViewerProps {
@@ -22,7 +24,35 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
   const [insightLoading, setInsightLoading] = useState(false);
   const [insightResult, setInsightResult] = useState<string | null>(null);
   const [insightError, setInsightError] = useState<string | null>(null);
+  const [filePreview, setFilePreview] = useState<{ id: string; url: string } | null>(null);
+  const [fileLoading, setFileLoading] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
   const isOpen = !!record;
+  const previewUrl = record?.fileAccess === 'authenticated'
+    ? (filePreview?.id === record.id ? filePreview.url : undefined) : record?.previewUrl;
+
+  useEffect(() => {
+    setFilePreview(null); setFileError(null); setFileLoading(false);
+    if (!record || record.fileAccess !== 'authenticated' || activeTab !== 'document') return;
+    const controller = new AbortController(); let objectUrl: string | undefined; let sessionUser: string | undefined;
+    setFileLoading(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const changedUser = sessionUser !== undefined && session?.user.id !== sessionUser;
+      sessionUser = session?.user.id;
+      if (event === 'SIGNED_OUT' || changedUser) {
+        controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl);
+        setFilePreview(null); setFileLoading(false);
+        setFileError('Your session changed. Close and reopen this document.');
+      }
+    });
+    loadRecordFile(record.id, controller.signal).then(blob => {
+      if (controller.signal.aborted) return;
+      objectUrl = URL.createObjectURL(blob); setFilePreview({ id: record.id, url: objectUrl });
+    }).catch(error => {
+      if (!controller.signal.aborted) setFileError(error instanceof Error ? error.message : 'Unable to open this file.');
+    }).finally(() => { if (!controller.signal.aborted) setFileLoading(false); });
+    return () => { controller.abort(); subscription.unsubscribe(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [record?.id, record?.fileAccess, activeTab]);
 
   useEffect(() => {
     if (isOpen) {
@@ -164,7 +194,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium">Date:</span>
-                    <span>{record.serviceDate ? new Date(record.serviceDate).toLocaleDateString() : 'N/A'}</span>
+                    <span>{record.serviceDate ? formatRecordDate(record.serviceDate) : 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium">Type:</span>
@@ -195,17 +225,23 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
 
           {activeTab === 'document' && (
             <div>
-              {record.previewUrl ? (
+              {fileLoading ? (
+                <div role="status" className="flex items-center justify-center gap-2 py-12 text-content-secondary">
+                  <Loader2 className="w-5 h-5 animate-spin" /> Opening your file…
+                </div>
+              ) : fileError ? (
+                <p role="alert" className="py-8 text-content-secondary">{fileError}</p>
+              ) : previewUrl ? (
                 <div className="space-y-3">
                   {['jpg', 'png'].includes(record.fileType) ? (
                     <img
-                      src={record.previewUrl}
+                      src={previewUrl}
                       alt={record.title}
                       className="w-full rounded-lg border border-stroke-subtle"
                     />
                   ) : record.fileType === 'pdf' ? (
                     <iframe
-                      src={record.previewUrl}
+                      src={previewUrl}
                       title={record.title}
                       className="w-full rounded-lg border border-stroke-subtle"
                       style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
@@ -217,7 +253,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                       <FileText className="w-16 h-16 mb-4" />
                       <p className="text-center mb-4">Preview not available for {record.fileType.toUpperCase()} files</p>
                       <a
-                        href={record.previewUrl}
+                        href={previewUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
@@ -233,7 +269,7 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                   )}
                   <div className="flex justify-end">
                     <a
-                      href={record.previewUrl}
+                      href={previewUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
@@ -256,9 +292,9 @@ export function DocumentViewer({ record, darkMode = false, onClose, onRequestIns
                     <>
                       <p className="text-center mb-2">DICOM viewing is not yet supported in-browser.</p>
                       <p className="text-sm text-center mb-4">Download the file and open it with a DICOM viewer such as <strong>OsiriX</strong>, <strong>RadiAnt</strong>, or <strong>3D Slicer</strong>.</p>
-                      {record.previewUrl && (
+                      {previewUrl && (
                         <a
-                          href={record.previewUrl}
+                          href={previewUrl}
                           download
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                             darkMode

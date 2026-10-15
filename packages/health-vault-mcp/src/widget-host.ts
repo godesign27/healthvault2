@@ -25,8 +25,8 @@ const hvHost = (() => {
       pending.delete(message.id);
       if (message.error) request.reject(new Error(message.error.message || 'The request failed.'));
       else request.resolve(message.result);
-    } else if (message.method === 'ui/notifications/tool-result' && !message.params?.isError) {
-      notify(message.params?.structuredContent);
+    } else if (message.method === 'ui/notifications/tool-result') {
+      notify(message.params?.isError ? { isError: true, error: (message.params.content || []).filter(item => item.type === 'text').map(item => item.text).join(' ') || 'Health Vault could not complete the request.' } : message.params?.structuredContent);
     }
   });
   window.parent.postMessage({ jsonrpc: '2.0', id: 'hv-init', method: 'ui/initialize', params: {

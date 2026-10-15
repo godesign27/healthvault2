@@ -1,7 +1,7 @@
 type Page = 'privacy' | 'terms' | 'support';
 
-// Draft legal text: deployment for review does not approve these notices
-// as final policy or binding terms. Retention and contractual review remain open.
+// Privacy notice approved by the operator on October 7, 2026.
+// Terms remain a draft. Retention periods and contractual terms remain open.
 const content: Record<Page, { title: string; sections: [string, string][] }> = {
   privacy: {
     title: 'Privacy notice',
@@ -12,7 +12,7 @@ const content: Record<Page, { title: string; sections: [string, string][] }> = {
       ['ChatGPT and AI features', 'Connecting Health Vault to ChatGPT allows the connected app to retrieve information and perform supported actions on your behalf. Information returned to ChatGPT is also handled under your agreement and settings with that service. Disconnecting the app does not remove information already included in a conversation. AI features may send relevant information to the model provider to generate a response.'],
       ['Sharing and service providers', 'When you create a secure share, the selected information is made available through an expiring link. Anyone who receives a usable link may be able to access the shared information; do not forward it. Revocation stops future access through that link but cannot retrieve copies already downloaded. Health Vault uses infrastructure providers, including Supabase for account/data services, Cloudflare for hosting, and Resend for email delivery.'],
       ['Your controls', 'In Settings, Download My Data provides a JSON export of personal structured Vault data, including saved form answers and wellness entries. Original files, images and PDFs are downloaded separately from their records. Credentials and internal administrative records are excluded. Request Account Deletion submits a request for review and provides a status and reference. Submitting a request does not immediately erase data, revoke existing shares, or close the account.'],
-      ['Retention and deletion review', 'Your deletion request requires review of personal Vault records, uploaded files, provider/consent records, access links and backup handling. The operator must confirm the scope, any required retention and the outcome of that review before recording a request as completed. No immediate-erasure or fixed backup-removal deadline is promised by this draft.'],
+      ['Retention and deletion review', 'Your deletion request requires review of personal Vault records, uploaded files, provider/consent records, access links and backup handling. The operator must confirm the scope, any required retention and the outcome of that review before recording a request as completed. No immediate-erasure or fixed backup-removal deadline is promised by this notice.'],
       ['Questions', 'Use the Support page for contact information. Do not send passwords, access links or medical documents in an initial support email.'],
     ],
   },
@@ -46,7 +46,7 @@ export function AccountPolicyPage({ page }: { page: Page }) {
   return <div className="min-h-screen bg-surface-base text-content-primary">
     <header className="border-b border-stroke-default"><div className="mx-auto max-w-3xl px-6 py-6 flex flex-wrap gap-4 justify-between"><a href="/" className="font-semibold text-xl">Health Vault</a><a href="/dashboard" className="underline">Open my Vault</a></div></header>
     <main className="mx-auto max-w-3xl px-6 py-12 space-y-8">
-      <div><h1 className="text-3xl font-semibold">{title}</h1><p className="mt-3 text-sm text-content-secondary">{page === 'support' ? 'Product and account assistance' : 'Draft for review · October 2, 2026 · Not approved as final policy'}</p></div>
+      <div><h1 className="text-3xl font-semibold">{title}</h1><p className="mt-3 text-sm text-content-secondary">{page === 'support' ? 'Product and account assistance' : page === 'privacy' ? 'Approved October 7, 2026' : 'Draft for review · October 2, 2026 · Not approved as final terms'}</p></div>
       {sections.map(([heading, text]) => <section key={heading} id={heading === 'No medical advice or emergency service' ? 'medical-disclaimer' : undefined} className="space-y-3"><h2 className="text-xl font-semibold">{heading}</h2><p className="leading-7 text-content-secondary">{text}</p></section>)}
       {page === 'support' && <a className="inline-block rounded-lg border border-stroke-default px-5 py-3 underline" href="mailto:team@healthvault.me?subject=Health%20Vault%20support">Email Health Vault</a>}
     </main>

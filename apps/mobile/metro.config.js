@@ -12,8 +12,10 @@ const config = withNativeWind(getDefaultConfig(projectRoot), { input: './global.
 config.watchFolders = [
   projectRoot,
   path.join(monorepoRoot, 'packages', 'types'),
+  path.join(monorepoRoot, 'packages', 'forms'),
   path.join(monorepoRoot, 'packages', 'design-tokens'),
   path.join(monorepoRoot, 'packages', 'api-client'),
+  path.join(monorepoRoot, 'packages', 'health-vault-mcp', 'src'),
 ];
 
 // npm workspaces can leave multiple compatible Reacts on disk; Metro may load more than one →

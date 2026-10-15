@@ -1,8 +1,9 @@
+import { HealthVaultClient } from '../../../packages/api-client/src/client';
+import { uploadRetryKey } from './upload-retry';
 import { HealthRecord, RecordKind, RecordSource, ShareLink, AIInsight } from './types';
 import { UploadInput, ShareInput, InsightInput } from './zod';
 import { supabase } from '../supabase';
 
-let localUploads: HealthRecord[] = [];
 
 function mapKind(kind: string): RecordKind {
   const map: Record<string, RecordKind> = {
@@ -16,6 +17,7 @@ function mapKind(kind: string): RecordKind {
 }
 
 function mapFileType(ft: string | null): HealthRecord['fileType'] {
+  if (ft === 'jpeg') return 'jpg';
   const valid = ['pdf', 'jpg', 'png', 'dicom', 'txt'] as const;
   if (ft && valid.includes(ft as any)) return ft as HealthRecord['fileType'];
   return 'pdf';
@@ -45,7 +47,7 @@ async function fetchSupabaseRecords(): Promise<HealthRecord[]> {
       source: r.source === 'shared' ? RecordSource.Shared : r.source === 'connected' ? RecordSource.Connected : RecordSource.Uploaded,
       fileType: mapFileType(r.file_type),
       fileSizeBytes: r.file_size_bytes || undefined,
-      previewUrl: r.preview_url || undefined,
+      fileAccess: r.preview_url ? 'authenticated' as const : undefined,
       aiSummary: r.ai_summary || undefined,
       tags: r.tags || [],
     }));
@@ -57,11 +59,7 @@ async function fetchSupabaseRecords(): Promise<HealthRecord[]> {
 export async function listRecords(filters?: { kind?: RecordKind }): Promise<HealthRecord[]> {
   const supabaseRecords = await fetchSupabaseRecords();
 
-  const supabaseIds = new Set(supabaseRecords.map(r => r.id));
-  const all = [
-    ...supabaseRecords,
-    ...localUploads.filter(r => !supabaseIds.has(r.id)),
-  ];
+  const all = [...supabaseRecords];
 
   all.sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime());
 
@@ -83,7 +81,7 @@ export async function getRecord(id: string): Promise<HealthRecord | null> {
     .eq('user_id', session.user.id)
     .maybeSingle();
 
-  if (!data) return localUploads.find(r => r.id === id) || null;
+  if (!data) return null;
 
   return {
     id: data.id,
@@ -96,29 +94,32 @@ export async function getRecord(id: string): Promise<HealthRecord | null> {
     source: data.source === 'shared' ? RecordSource.Shared : data.source === 'connected' ? RecordSource.Connected : RecordSource.Uploaded,
     fileType: mapFileType(data.file_type),
     fileSizeBytes: data.file_size_bytes || undefined,
-    previewUrl: data.preview_url || undefined,
+    fileAccess: data.preview_url ? 'authenticated' : undefined,
     aiSummary: data.ai_summary || undefined,
     tags: data.tags || [],
   };
 }
 
-export async function uploadRecord(input: UploadInput): Promise<HealthRecord> {
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const newRecord: HealthRecord = {
-    id: `rec-upload-${Date.now()}`,
-    kind: input.kind ? RecordKind[input.kind as keyof typeof RecordKind] : RecordKind.Other,
-    title: input.fileName,
-    providerName: input.providerName,
-    serviceDate: input.serviceDate,
-    receivedAt: new Date().toISOString(),
-    source: RecordSource.Uploaded,
-    fileType: input.fileType,
-    tags: ["uploaded"]
-  };
-
-  localUploads = [newRecord, ...localUploads];
-  return newRecord;
+export async function uploadRecord(input: Omit<UploadInput, 'fileType'> & { file?: File; fileType?: UploadInput['fileType'] }): Promise<HealthRecord> {
+  if (!input.file) throw new Error('Choose the actual file using Upload File in Health Records. A filename alone cannot be saved.');
+  if (!input.file.size || input.file.size > 25 * 1024 * 1024) throw new Error('Choose a nonempty file of at most 25 MB.');
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user.id) throw new Error('Sign in before uploading a file.');
+  const ownerId=session.user.id;
+  const kind=(input.kind || 'OTHER').toLowerCase() as 'lab' | 'imaging' | 'pathology' | 'specialist_report' | 'other';
+  const idempotencyKey=await uploadRetryKey(ownerId,await input.file.arrayBuffer(),
+    [input.file.name,kind,input.providerName ?? null,input.serviceDate ?? null],localStorage);
+  const client=new HealthVaultClient({supabaseUrl:import.meta.env.VITE_SUPABASE_URL,
+    supabaseAnonKey:import.meta.env.VITE_SUPABASE_ANON_KEY,getAccessToken:async()=>{
+      const {data:{session:current}}=await supabase.auth.getSession();
+      if(current?.user.id!==ownerId) throw new Error('The signed-in account changed. Select your file again.');
+      return current.access_token;
+    }});
+  const receipt=await client.uploadRecord({file:input.file,fileName:input.file.name,kind,
+    providerName:input.providerName,serviceDate:input.serviceDate,idempotencyKey});
+  const record=await getRecord(receipt.recordId);
+  if (!record) throw new Error('The upload was received, but the record could not be reloaded. Retry the same file to recover its saved status.');
+  return record;
 }
 
 export async function shareRecord(input: ShareInput): Promise<ShareLink> {
@@ -140,19 +141,20 @@ export async function shareRecord(input: ShareInput): Promise<ShareLink> {
 export async function requestInsights(input: InsightInput): Promise<AIInsight> {
   await new Promise(resolve => setTimeout(resolve, 800));
 
+  const savedRecords = await listRecords();
   let result = "";
 
   switch (input.intent) {
     case "SUMMARIZE":
       if (input.recordIds && input.recordIds.length > 0) {
-        const records = localUploads.filter(r => input.recordIds?.includes(r.id));
+        const records = savedRecords.filter(r => input.recordIds?.includes(r.id));
         result = records.map(r => `${r.title}: ${r.aiSummary || "No summary available"}`).join("\n\n");
       }
       break;
 
     case "COMPARE":
       if (input.recordIds && input.recordIds.length >= 2) {
-        const records = localUploads.filter(r => input.recordIds?.includes(r.id));
+        const records = savedRecords.filter(r => input.recordIds?.includes(r.id));
         result = `Comparison of ${records.length} records:\n\n`;
         records.forEach((r, i) => {
           result += `Record ${i + 1} (${r.serviceDate}):\n${r.aiSummary}\n\n`;
@@ -162,7 +164,7 @@ export async function requestInsights(input: InsightInput): Promise<AIInsight> {
 
     case "SEARCH":
     case "FIND_KIND":
-      const filtered = localUploads.filter(r => {
+      const filtered = savedRecords.filter(r => {
         if (input.filters?.kind) {
           return r.kind === input.filters.kind;
         }
@@ -172,7 +174,7 @@ export async function requestInsights(input: InsightInput): Promise<AIInsight> {
       break;
 
     case "FIND_DATE_RANGE":
-      const dateFiltered = localUploads.filter(r => {
+      const dateFiltered = savedRecords.filter(r => {
         if (!r.serviceDate) return false;
         if (input.filters?.from && r.serviceDate < input.filters.from) return false;
         if (input.filters?.to && r.serviceDate > input.filters.to) return false;
@@ -192,8 +194,4 @@ export async function requestInsights(input: InsightInput): Promise<AIInsight> {
     result,
     createdAt: new Date().toISOString()
   };
-}
-
-export function resetLocalUploads() {
-  localUploads = [];
 }

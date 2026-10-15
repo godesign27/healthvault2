@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { confirmHealthRecord } from "./health-record-confirmation.ts";
 
 export type AppointmentInput = {
   providerName: string;
@@ -35,20 +36,12 @@ export async function createAppointment(
 ) {
   const preview = previewAppointment(input);
   const { requiresConfirmation: _requiresConfirmation, ...appointment } = preview;
-  const { data, error } = await supabase
-    .from("appointments")
-    .insert({
-      user_id: userId,
-      provider_name: appointment.providerName,
-      appointment_type: appointment.appointmentType,
-      scheduled_at: appointment.scheduledAt,
-      location: appointment.location,
-      notes: appointment.notes,
-      status: appointment.status,
-    })
-    .select("id, provider_name, appointment_type, scheduled_at, location, status, notes")
-    .single();
-
-  if (error) throw new Error(`Unable to add appointment: ${error.message}`);
-  return data;
+  return confirmHealthRecord(supabase, "appointments", {
+    provider_name: appointment.providerName,
+    appointment_type: appointment.appointmentType,
+    scheduled_at: appointment.scheduledAt,
+    location: appointment.location,
+    notes: appointment.notes,
+    status: appointment.status,
+  });
 }

@@ -17,6 +17,7 @@ import { InsurancePage } from './InsurancePage';
 import NetworkPage from './NetworkPage';
 import { HealthRecordsPage } from './HealthRecordsPage';
 import { ProfileSettingsDrawer } from '../components/ProfileSettingsDrawer';
+import { VitalsPage } from './VitalsPage';
 import { WellnessPage } from './WellnessPage';
 
 interface DashboardPageProps {
@@ -303,26 +304,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
       return <WellnessPage onOpenAssistant={() => setIsAIPanelOpen(true)} />;
     }
 
-    if (currentPage === 'vitals') {
-      return (
-        <div className="w-full p-6 sm:p-8 lg:p-12">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-content-primary">Vitals</h1>
-            <p className="mt-1 text-content-secondary">Track your vital signs and health metrics</p>
-          </div>
-
-          <div className="flex flex-col items-center justify-center py-24">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-surface-sunken">
-              <Activity className="w-8 h-8 text-content-tertiary" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2 text-content-primary">Coming Soon</h2>
-            <p className="text-center max-w-md text-content-secondary">
-              We're working on bringing you powerful vitals tracking features. Stay tuned!
-            </p>
-          </div>
-        </div>
-      );
-    }
+    if (currentPage === 'vitals') return <VitalsPage />;
 
     return (
       <div className="w-full p-6 sm:p-8 lg:p-12 relative">
@@ -581,7 +563,7 @@ export default function DashboardPage({ onViewChange }: DashboardPageProps) {
             </div>
           </div>
 
-        <main data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 min-h-0 relative bg-surface-page">
+        <main data-hv-semantic data-steel-chrome="main" className="flex-1 overflow-y-auto min-w-0 min-h-0 relative bg-surface-page">
           {renderMainContent()}
         </main>
 

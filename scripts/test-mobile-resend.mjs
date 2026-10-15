@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {resendRecordRequest} from '../apps/mobile/src/lib/request-resend.js';
+const id='11111111-1111-4111-8111-111111111111',values=new Map();let calls=0,mode='success';
+const storage={getItem:async k=>values.get(k),setItem:async(k,v)=>values.set(k,v),removeItem:async k=>values.delete(k)};
+const args={requestId:id,storage,baseUrl:'https://preview.invalid',anonKey:'anon',getSession:async()=>({user:{id:'one'},access_token:'jwt'}),fetchImpl:async(url,init)=>{
+ calls++;assert.equal(init.headers.Authorization,'Bearer jwt');assert.match(url,/\/resend$/);
+ if(mode==='lost')throw Error('network');
+ if(mode==='invalid')return Response.json({});
+ if(mode==='denied')return Response.json({error:'denied'},{status:403});
+ return Response.json({id,emailSent:mode==='success'});
+}};
+assert.equal((await resendRecordRequest(args)).emailAccepted,true);assert.equal(values.size,0);
+mode='failed';assert.equal((await resendRecordRequest(args)).emailAccepted,false);
+mode='lost';await assert.rejects(resendRecordRequest(args));const count=calls;
+await assert.rejects(resendRecordRequest(args));assert.equal(calls,count);assert.equal(values.size,1);
+values.clear();mode='invalid';await assert.rejects(resendRecordRequest(args));assert.equal(values.size,1);
+values.clear();mode='denied';await assert.rejects(resendRecordRequest(args));assert.equal(values.size,0);
+const before=calls;await assert.rejects(resendRecordRequest({...args,getSession:async()=>null}));assert.equal(calls,before);
+let n=0;await assert.rejects(resendRecordRequest({...args,getSession:async()=>({user:{id:++n===1?'one':'two'},access_token:'jwt'})}));assert.equal(calls,before);assert.equal(values.size,0);
+console.log('PASS explicit results, JWT, persistent uncertain-send protection, rejected/malformed responses and account changes');

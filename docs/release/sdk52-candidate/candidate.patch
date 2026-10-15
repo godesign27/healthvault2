@@ -1,0 +1,276 @@
+--- a/package.json
++++ b/package.json
+@@ -8,15 +8,12 @@
+     "apps/*"
+   ],
+   "overrides": {
+-    "react": "18.2.0",
+-    "react-dom": "18.2.0",
+-    "react-native": "0.74.5",
+-    "react-native-reanimated": "3.10.1",
+-    "metro": "0.80.12",
+-    "metro-config": "0.80.12",
+-    "metro-resolver": "0.80.12",
+-    "expo-font": "12.0.10",
+-    "expo-linking": "6.3.1"
++    "react": "18.3.1",
++    "react-dom": "18.3.1",
++    "react-native": "0.76.9",
++    "react-native-reanimated": "~3.16.1",
++    "expo-font": "~13.0.4",
++    "expo-linking": "~7.0.5"
+   },
+   "scripts": {
+     "dev": "vite",
+@@ -40,8 +37,8 @@
+     "@supabase/supabase-js": "^2.112.3",
+     "lucide-react": "^0.344.0",
+     "openai": "^6.33.0",
+-    "react": "18.2.0",
+-    "react-dom": "18.2.0",
++    "react": "18.3.1",
++    "react-dom": "18.3.1",
+     "sonner": "^2.0.7",
+     "vaul": "^1.1.2",
+     "zod": "^4.1.12"
+@@ -50,7 +47,7 @@
+     "@eslint/js": "^9.9.1",
+     "@types/react": "~18.2.0",
+     "@types/react-dom": "^18.3.0",
+-    "@vitejs/plugin-react": "^4.3.1",
++    "@vitejs/plugin-react": "4.3.1",
+     "autoprefixer": "^10.4.18",
+     "eslint": "^9.9.1",
+     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+@@ -60,7 +57,7 @@
+     "tailwindcss": "^3.4.1",
+     "typescript": "^5.5.3",
+     "typescript-eslint": "^8.3.0",
+-    "vite": "^5.4.2",
++    "vite": "5.4.21",
+     "wrangler": "^4.127.0"
+   },
+   "packageManager": "npm@10.9.2"
+--- a/apps/mobile/package.json
++++ b/apps/mobile/package.json
+@@ -19,34 +19,34 @@
+     "lint": "expo lint"
+   },
+   "dependencies": {
+-    "@expo/vector-icons": "^14.0.3",
++    "@expo/vector-icons": "~14.0.4",
+     "@health-vault/api-client": "*",
+     "@health-vault/types": "*",
+     "@react-native-async-storage/async-storage": "1.23.1",
+-    "@react-navigation/native": "^6.1.18",
++    "@react-navigation/native": "^7.0.14",
+     "@supabase/supabase-js": "^2.57.4",
+-    "expo": "~51.0.0",
+-    "expo-constants": "~16.0.2",
+-    "expo-crypto": "~13.0.2",
+-    "expo-dev-client": "~4.0.29",
+-    "expo-document-picker": "~12.0.2",
+-    "expo-file-system": "~17.0.1",
+-    "expo-font": "~12.0.10",
+-    "expo-haptics": "~13.0.1",
+-    "expo-image-picker": "~15.1.0",
+-    "expo-linking": "~6.3.1",
+-    "expo-local-authentication": "~14.0.1",
+-    "expo-router": "~3.5.23",
+-    "expo-secure-store": "~13.0.2",
+-    "expo-status-bar": "~1.12.1",
++    "expo": "~52.0.49",
++    "expo-constants": "~17.0.8",
++    "expo-crypto": "~14.0.2",
++    "expo-dev-client": "~5.0.20",
++    "expo-document-picker": "~13.0.3",
++    "expo-file-system": "~18.0.12",
++    "expo-font": "~13.0.4",
++    "expo-haptics": "~14.0.1",
++    "expo-image-picker": "~16.0.6",
++    "expo-linking": "~7.0.5",
++    "expo-local-authentication": "~15.0.2",
++    "expo-router": "~4.0.22",
++    "expo-secure-store": "~14.0.1",
++    "expo-status-bar": "~2.0.1",
+     "nativewind": "^4.1.23",
+-    "react": "18.2.0",
+-    "react-native": "0.74.5",
++    "react": "18.3.1",
++    "react-native": "0.76.9",
+     "react-native-css-interop": "0.2.3",
+-    "react-native-gesture-handler": "~2.16.1",
+-    "react-native-reanimated": "~3.10.1",
+-    "react-native-safe-area-context": "4.10.1",
+-    "react-native-screens": "3.31.1",
++    "react-native-gesture-handler": "~2.20.2",
++    "react-native-reanimated": "~3.16.1",
++    "react-native-safe-area-context": "4.12.0",
++    "react-native-screens": "~4.4.0",
+     "react-native-url-polyfill": "^3.0.0"
+   },
+   "devDependencies": {
+--- a/apps/admin/package.json
++++ b/apps/admin/package.json
+@@ -15,14 +15,14 @@
+     "@health-vault/provider-contracts": "*",
+     "@supabase/supabase-js": "^2.112.3",
+     "lucide-react": "^0.344.0",
+-    "react": "18.2.0",
+-    "react-dom": "18.2.0"
++    "react": "18.3.1",
++    "react-dom": "18.3.1"
+   },
+   "devDependencies": {
+     "@types/react": "~18.2.0",
+     "@types/react-dom": "^18.3.0",
+-    "@vitejs/plugin-react": "^4.3.1",
++    "@vitejs/plugin-react": "4.3.1",
+     "typescript": "^5.5.3",
+-    "vite": "^5.4.2"
++    "vite": "5.4.21"
+   }
+ }
+--- a/apps/mobile/ios/Podfile.properties.json
++++ b/apps/mobile/ios/Podfile.properties.json
+@@ -1,4 +1,6 @@
+ {
+   "expo.jsEngine": "hermes",
+-  "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true"
++  "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true",
++  "ios.deploymentTarget": "15.1",
++  "newArchEnabled": "false"
+ }
+--- a/apps/mobile/ios/HealthVault.xcodeproj/project.pbxproj
++++ b/apps/mobile/ios/HealthVault.xcodeproj/project.pbxproj
+@@ -275,20 +275,28 @@
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/ExpoConstants_privacy.bundle",
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoFileSystem/ExpoFileSystem_privacy.bundle",
++				"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly/RCT-Folly_privacy.bundle",
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage/RNCAsyncStorage_resources.bundle",
+-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
++				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
++				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
++				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-launcher/EXDevLauncher.bundle",
+ 				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-menu/EXDevMenu.bundle",
++				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
+ 			);
+ 			name = "[CP] Copy Pods Resources";
+ 			outputPaths = (
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXConstants.bundle",
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoConstants_privacy.bundle",
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoFileSystem_privacy.bundle",
++				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCT-Folly_privacy.bundle",
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNCAsyncStorage_resources.bundle",
+-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
++				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
++				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
++				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevLauncher.bundle",
+ 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevMenu.bundle",
++				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 			shellPath = /bin/sh;
+@@ -346,7 +354,7 @@
+ 					"FB_SONARKIT_ENABLED=1",
+ 				);
+ 				INFOPLIST_FILE = HealthVault/Info.plist;
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+ 				LD_RUNPATH_SEARCH_PATHS = (
+ 					"$(inherited)",
+ 					"@executable_path/Frameworks",
+@@ -378,7 +386,7 @@
+ 				CURRENT_PROJECT_VERSION = 1;
+ 				DEVELOPMENT_TEAM = GC3W38587K;
+ 				INFOPLIST_FILE = HealthVault/Info.plist;
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+ 				LD_RUNPATH_SEARCH_PATHS = (
+ 					"$(inherited)",
+ 					"@executable_path/Frameworks",
+@@ -448,7 +456,7 @@
+ 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+ 				GCC_WARN_UNUSED_FUNCTION = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+ 				LD = "";
+ 				LDPLUSPLUS = "";
+ 				LD_RUNPATH_SEARCH_PATHS = (
+@@ -464,6 +472,7 @@
+ 				);
+ 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../../node_modules/react-native";
+ 				SDKROOT = iphoneos;
++				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+ 				USE_HERMES = true;
+ 			};
+ 			name = Debug;
+@@ -510,7 +519,7 @@
+ 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+ 				GCC_WARN_UNUSED_FUNCTION = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+ 				LD = "";
+ 				LDPLUSPLUS = "";
+ 				LD_RUNPATH_SEARCH_PATHS = (
+--- a/apps/mobile/ios/Podfile
++++ b/apps/mobile/ios/Podfile
+@@ -2,6 +2,8 @@
+ require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
+ 
+ require 'json'
++require_relative '../../../scripts/patch-fmt-consteval'
++ENV['EXPO_UNSTABLE_CORE_AUTOLINKING'] ||= '1'
+ podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
+ 
+ ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
+@@ -28,7 +30,7 @@
+   end
+ end
+ 
+-platform :ios, podfile_properties['ios.deploymentTarget'] || '13.4'
++platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
+ install! 'cocoapods',
+   :deterministic_uuids => false
+ 
+@@ -57,6 +59,17 @@
+       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
+     )
+ 
++    patch_fmt_consteval(installer.sandbox.root.to_s)
++    # Resource bundle pods may carry unsupported historic deployment targets.
++    installer.pods_project.targets.each do |target|
++      target.build_configurations.each do |build_config|
++        current = build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
++        if current.nil? || Gem::Version.new(current) < Gem::Version.new('15.1')
++          build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
++        end
++      end
++    end
++
+     # This is necessary for Xcode 14, because it signs resource bundles by default
+     # when building for devices.
+     installer.target_installation_results.pod_target_installation_results
+--- /dev/null
++++ b/scripts/patch-fmt-consteval.rb
+@@ -0,0 +1,15 @@
++# SDK 52 candidate only: backport https://github.com/fmtlib/fmt/pull/4612.
++# Preserve compile-time validation; do not disable FMT_USE_CONSTEVAL.
++def patch_fmt_consteval(pods_root)
++  base = File.join(pods_root, 'fmt/include/fmt/base.h')
++  header = File.join(pods_root, 'fmt/include/fmt/format.h')
++  raise 'Review fmt backport for changed version' unless File.read(base).include?('#define FMT_VERSION 110002')
++  original = '#define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )'
++  replacement = "#if FMT_USE_CONSTEVAL\n#  define FMT_STRING(s) s\n#else\n#  define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )\n#endif  // FMT_USE_CONSTEVAL"
++  source = File.read(header)
++  return if source.include?(replacement)
++  raise 'Unexpected fmt header; review upstream patch' unless source.scan(original).size == 1
++  File.chmod(File.stat(header).mode | 0200, header)
++  File.write(header, source.sub(original, replacement))
++end
++patch_fmt_consteval(ARGV.fetch(0)) if $PROGRAM_NAME == __FILE__

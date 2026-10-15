@@ -1,32 +1,32 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import {recordsColors} from '../theme/records';
+import {typeStyles,control,space} from '../theme/layout';
+import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
+import React, { useMemo, useState, useCallback, createContext, useContext } from 'react';
 import {
   View,
-  Text,
+
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
+
   Platform,
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMedications } from '../hooks/useMedications';
+import { formatCareDate, parseCareDate } from '../lib/careDates';
+import { useCareData } from '../hooks/useCareData';
 import { useCareStats } from '../hooks/useCareStats';
 
-// Steel theme colors (aligned with desktop Care surface)
-const STEEL = {
-  canvas: 'transparent',
-  surface: '#FFFFFF',
-  border: '#D1D5E0',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#4F46E5',
-  accentBg: '#EEF2FF',
-  success: '#10B981',
-  successBg: '#D1FAE5',
-};
+const CareTheme = createContext(null);
+export default function CareScreen({ darkMode = false, ...props }) {
+  const theme = useMemo(() => {
+    const STEEL = recordsColors(darkMode);
+    return { STEEL, styles: createStyles(STEEL) };
+  }, [darkMode]);
+  return <CareTheme.Provider value={theme}><CareContent {...props} /></CareTheme.Provider>;
+}
 
 const TIME_OPTIONS = [
   { id: 'all', label: 'All time' },
@@ -42,52 +42,11 @@ const SOURCE_OPTIONS = [
   { id: 'claims', label: 'Claims' },
 ];
 
-/*
- * MOCK_FALLBACK — previous sample medications (live data from `medications` table via useMedications).
- */
-
-const mockAppointments = [];
-
-const mockEncounters = [
-  {
-    id: 'e1',
-    encounter_type: 'Lab',
-    encounter_date: '2025-04-10',
-    chief_complaint: 'Complete Blood Count',
-    notes: 'Results within normal range',
-    facility_name: 'City Lab',
-    provider_name: '',
-  },
-  {
-    id: 'e2',
-    encounter_type: 'Office Visit',
-    encounter_date: '2024-11-02',
-    chief_complaint: 'Annual wellness visit',
-    notes: '',
-    facility_name: '',
-    provider_name: 'Dr. Sarah Johnson',
-  },
-];
-
-const mockClaims = [
-  {
-    id: 'c1',
-    service_date: '2024-10-15',
-    description: 'Insurance Claim',
-    amount_billed: 120,
-    provider_name: 'City Hospital',
-  },
-];
-
 function buildCareHistory(encounters, claims) {
   const rows = [
     ...encounters.map((e) => ({
       type: e.encounter_type || 'Encounter',
-      date: new Date(e.encounter_date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
+      date: formatCareDate(e.encounter_date),
       title: e.chief_complaint || `${e.encounter_type || 'Encounter'} Visit`,
       description: e.notes || '',
       location: e.facility_name || e.provider_name || '',
@@ -95,82 +54,80 @@ function buildCareHistory(encounters, claims) {
     })),
     ...claims.map((c) => ({
       type: 'Claim',
-      date: new Date(c.service_date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
+      date: formatCareDate(c.service_date),
       title: c.description || 'Insurance Claim',
       description: c.amount_billed != null ? `Billed: $${Number(c.amount_billed).toFixed(2)}` : '',
       location: c.provider_name || '',
       rawDate: c.service_date,
     })),
   ];
-  rows.sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
+  rows.sort((a, b) => (parseCareDate(b.rawDate)?.getTime() ?? -Infinity) - (parseCareDate(a.rawDate)?.getTime() ?? -Infinity));
   return rows;
 }
 
-function getHistoryTypeColors(type) {
-  if (type === 'ER Visit') return { bg: '#fef2f2', fg: '#b91c1c' };
-  if (type === 'Claim') return { bg: '#fffbeb', fg: '#b45309' };
-  return { bg: '#EEF2FF', fg: '#4338ca' };
-}
-
 function StatMiniCard({ label, icon, count, loading }) {
+  const { STEEL, styles } = useContext(CareTheme);
   const display = loading ? '—' : String(count);
   return (
     <View style={styles.statCard}>
       <View style={styles.statCardTop}>
-        <Text style={styles.statLabel}>{label}</Text>
+        <Text variant="secondary" style={styles.statLabel}>{label}</Text>
         <View style={styles.statIconWrap}>
           <Ionicons name={icon} size={18} color={STEEL.accent} />
         </View>
       </View>
-      <Text style={styles.statCount}>{display}</Text>
+      <Text variant="page" style={styles.statCount}>{display}</Text>
     </View>
   );
 }
 
 function EmptyBlock({ icon, title, description }) {
+  const { STEEL, styles } = useContext(CareTheme);
   return (
     <View style={styles.emptyBlock}>
       <View style={styles.emptyIconCircle}>
         <Ionicons name={icon} size={28} color={STEEL.textMuted} />
       </View>
-      <Text style={styles.emptyTitle}>{title}</Text>
-      <Text style={styles.emptyDesc}>{description}</Text>
+      <Text variant="body" style={styles.emptyTitle}>{title}</Text>
+      <Text variant="secondary" style={styles.emptyDesc}>{description}</Text>
     </View>
   );
 }
 
 function HistoryRow({ record }) {
-  const { bg, fg } = getHistoryTypeColors(record.type);
+  const { STEEL, styles } = useContext(CareTheme);
+  // Record types describe provenance, not urgency or clinical severity.
+  const bg = STEEL.infoBg, fg = STEEL.info;
   return (
     <View style={styles.historyRowCard}>
       <View style={styles.historyRowTop}>
         <View style={styles.historyRowMeta}>
           <View style={[styles.typeBadge, { backgroundColor: bg }]}>
-            <Text style={[styles.typeBadgeText, { color: fg }]}>{record.type}</Text>
+            <Text variant="caption" style={[styles.typeBadgeText, { color: fg }]}>{record.type}</Text>
           </View>
-          <Text style={styles.historyRowDate}>{record.date}</Text>
+          <Text variant="secondary" style={styles.historyRowDate}>{record.date}</Text>
         </View>
-        {!!record.location && <Text style={styles.historyRowLocation}>{record.location}</Text>}
+        {!!record.location && <Text variant="caption" style={styles.historyRowLocation}>{record.location}</Text>}
       </View>
-      <Text style={styles.historyRowTitle}>{record.title}</Text>
-      {!!record.description && <Text style={styles.historyRowBody}>{record.description}</Text>}
+      <Text variant="body" style={styles.historyRowTitle}>{record.title}</Text>
+      {!!record.description && <Text variant="secondary" style={styles.historyRowBody}>{record.description}</Text>}
     </View>
   );
 }
 
-export default function CareScreen({ omitShellTitle = false, scrollFabProps = {} }) {
+function CareContent({ omitShellTitle = false, scrollFabProps = {} }) {
+  const { STEEL, styles } = useContext(CareTheme);
   const insets = useSafeAreaInsets();
   const { medications, loading: medsLoading, error: medsError, refetch: refetchMeds } = useMedications();
   const { stats: careStats, loading: statsLoading, error: statsError, refetch: refetchCareStats } = useCareStats();
 
+  const { appointments, encounters, claims, loading: isLoading, error: careError, refetch: refetchCare } = useCareData();
+
   const onRefresh = useCallback(() => {
     refetchMeds();
     refetchCareStats();
-  }, [refetchMeds, refetchCareStats]);
+    refetchCare();
+  }, [refetchMeds, refetchCareStats, refetchCare]);
 
   const overviewStats = useMemo(
     () => [
@@ -182,10 +139,6 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
     [careStats]
   );
 
-  const appointments = mockAppointments;
-  const encounters = mockEncounters;
-  const claims = mockClaims;
-  const isLoading = false;
 
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
   const [selectedSourceFilter, setSelectedSourceFilter] = useState('all-sources');
@@ -198,7 +151,8 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
   const timeFilteredHistory = useMemo(() => {
     return careHistory.filter((item) => {
       if (selectedTimeFilter === 'all') return true;
-      const itemDate = new Date(item.rawDate);
+      const itemDate = parseCareDate(item.rawDate);
+      if (!itemDate) return false;
       const now = new Date();
       if (selectedTimeFilter === '6months') {
         const cutoff = new Date(now);
@@ -248,15 +202,15 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
       style={[styles.root, { backgroundColor: STEEL.canvas }]}
       contentContainerStyle={[
         styles.content,
-        { paddingBottom: insets.bottom + 100, flexGrow: 1 },
+        { paddingBottom: insets.bottom + space.lg, flexGrow: 1 },
       ]}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
-          refreshing={medsLoading || statsLoading}
+          refreshing={medsLoading || statsLoading || isLoading}
           onRefresh={onRefresh}
-          tintColor="#4F46E5"
+          tintColor={STEEL.accent}
         />
       }
       {...scrollFabProps}
@@ -264,15 +218,15 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
       {!omitShellTitle ? (
         <View style={styles.pageIntro}>
           <View style={styles.pageTitleRow}>
-            <Ionicons name="heart" size={26} color="#E11D48" />
-            <Text style={styles.pageTitle}>Care Management</Text>
+            <Ionicons name="heart" size={26} color={STEEL.accent} />
+            <Text variant="title" style={styles.pageTitle}>Care Management</Text>
           </View>
-          <Text style={styles.pageSubtitle}>Track your medications, appointments, and medical history</Text>
+          <Text variant="body" style={styles.pageSubtitle}>Track your medications, appointments, and medical history</Text>
         </View>
       ) : null}
 
       {/* Overview — same counts as desktop CarePage (no nested ScrollView; avoids blank layout) */}
-      <Text style={styles.sectionHeading}>Overview</Text>
+      <Text variant="section" style={styles.sectionHeading}>Overview</Text>
       <View style={styles.statGrid}>
         {overviewStats.map((s) => (
           <StatMiniCard
@@ -280,38 +234,38 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
             label={s.label}
             icon={s.icon}
             count={s.count}
-            loading={statsLoading}
+            loading={statsLoading || !!statsError}
           />
         ))}
       </View>
-      {statsError ? <Text style={styles.inlineError}>{statsError}</Text> : null}
+      {statsError ? <Text variant="secondary" style={styles.inlineError}>{statsError}</Text> : null}
 
       {/* Upcoming Appointments */}
       <View style={styles.card}>
         <View style={styles.cardHeaderRow}>
           <Ionicons name="calendar-outline" size={20} color={STEEL.textSecondary} />
-          <Text style={styles.cardTitle}>Upcoming Appointments</Text>
+          <Text variant="section" style={styles.cardTitle}>Upcoming Appointments</Text>
         </View>
-        {isLoading ? (
+        {careError ? <Text variant="secondary" accessibilityRole="alert" style={styles.inlineError}>{careError} Pull down to retry.</Text> : isLoading ? (
           <View style={styles.skeletonBar} />
         ) : appointments.length === 0 ? (
           <EmptyBlock
             icon="calendar-outline"
             title="No upcoming appointments"
-            description="Your scheduled appointments will appear here. Ask the AI assistant to schedule one."
+            description="Your upcoming scheduled appointments will appear here."
           />
         ) : (
           <View style={styles.listBlock}>
             {appointments.map((apt) => (
               <View key={apt.id} style={styles.apptRow}>
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={styles.apptProvider}>{apt.provider_name}</Text>
-                  <Text style={styles.apptMeta}>
+                  <Text variant="body" style={styles.apptProvider}>{apt.provider_name}</Text>
+                  <Text variant="secondary" style={styles.apptMeta}>
                     {apt.appointment_type}
                     {apt.location ? ` · ${apt.location}` : ''}
                   </Text>
                 </View>
-                <Text style={styles.apptDate}>
+                <Text variant="secondary" style={styles.apptDate}>
                   {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </Text>
               </View>
@@ -324,25 +278,25 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
       <View style={styles.card}>
         <View style={styles.cardHeaderRow}>
           <Ionicons name="medkit-outline" size={20} color={STEEL.textSecondary} />
-          <Text style={styles.cardTitle}>Medications</Text>
+          <Text variant="section" style={styles.cardTitle}>Medications</Text>
         </View>
-        {medsError ? <Text style={styles.inlineError}>{medsError}</Text> : null}
+        {medsError ? <Text variant="secondary" style={styles.inlineError}>{medsError}</Text> : null}
         {medsLoading && medications.length === 0 ? (
           <>
             <View style={styles.skeletonRow} />
             <View style={styles.skeletonRow} />
           </>
-        ) : medications.length === 0 ? (
+        ) : medsError ? null : medications.length === 0 ? (
           <View style={styles.emptyBlock}>
             <View style={styles.emptyIconCircle}>
               <Ionicons name="medical-outline" size={28} color={STEEL.textMuted} />
             </View>
-            <Text style={styles.emptyTitle}>No medications on file</Text>
-            <Text style={styles.emptyDesc}>Ask the AI assistant to log a medication</Text>
+            <Text variant="body" style={styles.emptyTitle}>No medications on file</Text>
+            <Text variant="secondary" style={styles.emptyDesc}>Ask the AI assistant to log a medication</Text>
           </View>
         ) : (
           <>
-            <Text style={styles.medsMeta}>
+            <Text variant="secondary" style={styles.medsMeta}>
               {medications.length} medication{medications.length !== 1 ? 's' : ''} on file
             </Text>
             {medications.map((rx) => {
@@ -352,21 +306,21 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
               return (
                 <View key={rx.id} style={styles.medRow}>
                   <View style={styles.medNameRow}>
-                    <Text style={styles.medName}>{rx.name}</Text>
+                    <Text variant="body" style={styles.medName}>{rx.name}</Text>
                     <View style={[styles.statusPill, isDiscontinued ? styles.statusPillInactive : styles.statusPillActive]}>
-                      <Text
+                      <Text variant="caption"
                         style={isDiscontinued ? styles.statusPillTextInactive : styles.statusPillTextActive}
                       >
                         {isDiscontinued ? 'Inactive' : 'Active'}
                       </Text>
                     </View>
                   </View>
-                  {!!rx.condition && <Text style={styles.medCondition}>{rx.condition}</Text>}
-                  {!!doseLine && <Text style={styles.medInstructions}>{doseLine}</Text>}
+                  {!!rx.condition && <Text variant="secondary" style={styles.medCondition}>{rx.condition}</Text>}
+                  {!!doseLine && <Text variant="body" style={styles.medInstructions}>{doseLine}</Text>}
                   {!!rx.prescribing_doctor && (
                     <View style={styles.medDoctorRow}>
                       <Ionicons name="heart" size={14} color={STEEL.textSecondary} />
-                      <Text style={styles.medDoctor}>{rx.prescribing_doctor}</Text>
+                      <Text variant="secondary" style={styles.medDoctor}>{rx.prescribing_doctor}</Text>
                     </View>
                   )}
                 </View>
@@ -380,8 +334,8 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
       <View style={styles.card}>
         <View style={styles.historyHeader}>
           <View style={styles.historyTitles}>
-            <Text style={styles.historyMainTitle}>Care History</Text>
-            <Text style={styles.historySubtitle}>Complete timeline of your healthcare journey</Text>
+            <Text variant="section" style={styles.historyMainTitle}>Care History</Text>
+            <Text variant="secondary" style={styles.historySubtitle}>Your recorded encounters and claims</Text>
           </View>
         </View>
 
@@ -392,10 +346,11 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
               onPress={() => setTimeMenuOpen((o) => !o)}
               activeOpacity={0.85}
               accessibilityRole="button"
-              accessibilityLabel="Time range"
+              accessibilityLabel={`Time range: ${timeLabel}`}
+              accessibilityState={{ expanded: timeMenuOpen }}
             >
               <Ionicons name="calendar-outline" size={18} color={STEEL.textPrimary} />
-              <Text style={styles.timeFilterText}>{timeLabel}</Text>
+              <Text variant="body" style={styles.timeFilterText}>{timeLabel}</Text>
               <Ionicons name="chevron-down" size={18} color={STEEL.textSecondary} />
             </TouchableOpacity>
             {timeMenuOpen && (
@@ -403,13 +358,15 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
                 {TIME_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.id}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: selectedTimeFilter === opt.id }}
                     style={[styles.timeMenuItem, selectedTimeFilter === opt.id && styles.timeMenuItemActive]}
                     onPress={() => {
                       setSelectedTimeFilter(opt.id);
                       setTimeMenuOpen(false);
                     }}
                   >
-                    <Text
+                    <Text variant="body"
                       style={[
                         styles.timeMenuItemText,
                         selectedTimeFilter === opt.id && styles.timeMenuItemTextActive,
@@ -432,10 +389,7 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
             <Ionicons name="search-outline" size={22} color={STEEL.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.shareBtn} activeOpacity={0.9} accessibilityRole="button">
-            <Ionicons name="share-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.shareBtnText}>Share Link</Text>
-          </TouchableOpacity>
+
         </View>
 
         {searchExpanded && (
@@ -457,17 +411,19 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
             return (
               <TouchableOpacity
                 key={f.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
                 onPress={() => setSelectedSourceFilter(f.id)}
                 style={[styles.filterTab, active && styles.filterTabActive]}
                 activeOpacity={0.85}
               >
-                <Text style={[styles.filterTabText, active && styles.filterTabTextActive]}>{f.label}</Text>
+                <Text variant="secondary" style={[styles.filterTabText, active && styles.filterTabTextActive]}>{f.label}</Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {isLoading ? (
+        {careError ? <Text variant="secondary" accessibilityRole="alert" style={styles.inlineError}>{careError} Pull down to retry.</Text> : isLoading ? (
           <View style={styles.historySkeletonWrap}>
             {[0, 1, 2].map((k) => (
               <View key={k} style={styles.skeletonHistory} />
@@ -476,12 +432,12 @@ export default function CareScreen({ omitShellTitle = false, scrollFabProps = {}
         ) : searchFilteredHistory.length === 0 ? (
           <EmptyBlock
             icon="document-text-outline"
-            title="No care history yet"
-            description="Your encounters and claims will appear here once connected providers share your records."
+            title={careHistory.length ? "No matching care history" : "No care history yet"}
+            description={careHistory.length ? "Try another time range, source, or search term." : "Your encounters and claims will appear here once connected providers share your records."}
           />
         ) : (
           <>
-            <Text style={styles.careShowingCount}>
+            <Text variant="caption" style={styles.careShowingCount}>
               Showing {searchFilteredHistory.length} of {careHistory.length} records
             </Text>
             {searchFilteredHistory.map((record, index) => (
@@ -504,7 +460,7 @@ const cardShadow = Platform.select({
   android: { elevation: 2 },
 });
 
-const styles = StyleSheet.create({
+const createStyles = (STEEL) => StyleSheet.create({
   root: { flex: 1 },
   content: {
     paddingHorizontal: 20,
@@ -512,9 +468,9 @@ const styles = StyleSheet.create({
   },
   pageIntro: { marginBottom: 20 },
   pageTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: STEEL.textPrimary },
-  pageSubtitle: { fontSize: 15, color: STEEL.textSecondary, lineHeight: 22 },
-  sectionHeading: { fontSize: 18, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 12 },
+  pageTitle: { ...typeStyles.title, fontWeight: '700', color: STEEL.textPrimary },
+  pageSubtitle: { ...typeStyles.body, color: STEEL.textSecondary, },
+  sectionHeading: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 12 },
   statGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -538,7 +494,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  statLabel: { flex: 1, fontSize: 13, fontWeight: '500', color: STEEL.textSecondary, paddingRight: 8 },
+  statLabel: { flex: 1, ...typeStyles.secondary, fontWeight: '500', color: STEEL.textSecondary, paddingRight: 8 },
   statIconWrap: {
     width: 32,
     height: 32,
@@ -547,7 +503,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  statCount: { fontSize: 28, fontWeight: '800', color: STEEL.textPrimary },
+  statCount: { ...typeStyles.page, fontWeight: '800', color: STEEL.textPrimary },
   card: {
     backgroundColor: STEEL.surface,
     borderRadius: 16,
@@ -558,36 +514,36 @@ const styles = StyleSheet.create({
     ...cardShadow,
   },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  cardTitle: { fontSize: 17, fontWeight: '700', color: STEEL.textPrimary },
+  cardTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary },
   skeletonBar: {
     height: 96,
     borderRadius: 10,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: STEEL.surfaceMuted,
     marginVertical: 8,
   },
   skeletonRow: {
     height: 52,
     borderRadius: 10,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: STEEL.surfaceMuted,
     marginBottom: 10,
   },
-  inlineError: { fontSize: 13, color: '#EF4444', marginBottom: 10, lineHeight: 18 },
+  inlineError: { ...typeStyles.secondary, color: STEEL.dangerAction, marginBottom: 10, },
   emptyBlock: { alignItems: 'center', paddingVertical: 20, paddingHorizontal: 8 },
   emptyIconCircle: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: STEEL.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
-  emptyTitle: { fontSize: 15, fontWeight: '600', color: STEEL.textPrimary, marginBottom: 6, textAlign: 'center' },
+  emptyTitle: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary, marginBottom: 6, textAlign: 'center' },
   emptyDesc: {
-    fontSize: 13,
+    ...typeStyles.secondary,
     color: STEEL.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
+
     maxWidth: 320,
   },
   listBlock: { gap: 0 },
@@ -599,33 +555,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: STEEL.border,
   },
-  apptProvider: { fontSize: 15, fontWeight: '600', color: STEEL.textPrimary },
-  apptMeta: { fontSize: 13, color: STEEL.textSecondary, marginTop: 4 },
-  apptDate: { fontSize: 13, fontWeight: '600', color: STEEL.textPrimary, marginLeft: 8 },
-  medsMeta: { fontSize: 13, color: STEEL.textSecondary, marginBottom: 14 },
+  apptProvider: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary },
+  apptMeta: { ...typeStyles.secondary, color: STEEL.textSecondary, marginTop: 4 },
+  apptDate: { ...typeStyles.secondary, fontWeight: '600', color: STEEL.textPrimary, marginLeft: 8 },
+  medsMeta: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 14 },
   medRow: {
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: STEEL.border,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: STEEL.surfaceMuted,
     padding: 14,
     marginBottom: 10,
   },
   medNameRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
-  medName: { fontSize: 16, fontWeight: '700', color: STEEL.textPrimary },
-  medCondition: { fontSize: 13, color: STEEL.textSecondary, marginBottom: 6 },
+  medName: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary },
+  medCondition: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 6 },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   statusPillActive: { backgroundColor: STEEL.successBg },
-  statusPillInactive: { backgroundColor: '#E2E8F0' },
-  statusPillTextActive: { fontSize: 11, fontWeight: '700', color: STEEL.success },
-  statusPillTextInactive: { fontSize: 11, fontWeight: '600', color: STEEL.textSecondary },
-  medInstructions: { fontSize: 14, color: STEEL.textPrimary, lineHeight: 20, marginBottom: 4 },
+  statusPillInactive: { backgroundColor: STEEL.surfaceMuted },
+  statusPillTextActive: { ...typeStyles.caption, fontWeight: '700', color: STEEL.success },
+  statusPillTextInactive: { ...typeStyles.caption, fontWeight: '600', color: STEEL.textSecondary },
+  medInstructions: { ...typeStyles.body, color: STEEL.textPrimary,  marginBottom: 4 },
   medDoctorRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  medDoctor: { fontSize: 13, color: STEEL.textSecondary },
+  medDoctor: { ...typeStyles.secondary, color: STEEL.textSecondary },
   historyHeader: { marginBottom: 14 },
   historyTitles: { gap: 4 },
-  historyMainTitle: { fontSize: 20, fontWeight: '700', color: STEEL.textPrimary },
-  historySubtitle: { fontSize: 13, color: STEEL.textSecondary, lineHeight: 18 },
+  historyMainTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary },
+  historySubtitle: { ...typeStyles.secondary, color: STEEL.textSecondary, },
   historyToolbar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -636,6 +592,7 @@ const styles = StyleSheet.create({
   },
   timeFilterWrap: { position: 'relative', zIndex: 20 },
   timeFilterBtn: {
+    minHeight: control.minTarget,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -644,13 +601,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: STEEL.border,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: STEEL.surfaceMuted,
   },
-  timeFilterText: { fontSize: 14, fontWeight: '600', color: STEEL.textPrimary },
+  timeFilterText: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary },
   timeMenu: {
     position: 'absolute',
     left: 0,
-    top: 48,
+    top: '100%',
     minWidth: 180,
     backgroundColor: STEEL.surface,
     borderRadius: 12,
@@ -661,21 +618,22 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   timeMenuItem: {
+    minHeight: control.minTarget,
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: STEEL.border,
   },
   timeMenuItemActive: { backgroundColor: STEEL.accentBg },
-  timeMenuItemText: { fontSize: 14, color: STEEL.textSecondary },
+  timeMenuItemText: { ...typeStyles.body, color: STEEL.textSecondary },
   timeMenuItemTextActive: { color: STEEL.accent, fontWeight: '700' },
   iconBtn: {
-    width: 44,
-    height: 44,
+    width: control.minTarget,
+    height: control.minTarget,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: STEEL.border,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: STEEL.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -686,9 +644,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 10,
-    backgroundColor: STEEL.accent,
+    backgroundColor: STEEL.navy,
   },
-  shareBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
+  shareBtnText: { color: STEEL.onAction, ...typeStyles.body, fontWeight: '600' },
   searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -697,18 +655,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     marginBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: STEEL.surface,
   },
   searchIcon: { marginRight: 8 },
-  searchInput: { flex: 1, fontSize: 14, color: STEEL.textPrimary, paddingVertical: 10, minHeight: 44 },
+  searchInput: { flex: 1, ...typeStyles.body, color: STEEL.textPrimary, paddingVertical: 10, minHeight: control.minTarget },
   filterTabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-  filterTab: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'transparent' },
-  filterTabActive: { backgroundColor: STEEL.accent },
-  filterTabText: { fontSize: 13, fontWeight: '600', color: STEEL.textSecondary },
-  filterTabTextActive: { color: '#FFFFFF' },
-  careShowingCount: { fontSize: 12, color: STEEL.textSecondary, marginBottom: 10 },
+  filterTab: { minHeight: control.minTarget, justifyContent: 'center', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'transparent' },
+  filterTabActive: { backgroundColor: STEEL.navy },
+  filterTabText: { ...typeStyles.secondary, fontWeight: '600', color: STEEL.textSecondary },
+  filterTabTextActive: { color: STEEL.onAction },
+  careShowingCount: { ...typeStyles.caption, color: STEEL.textSecondary, marginBottom: 10 },
   historySkeletonWrap: { gap: 10, marginTop: 8 },
-  skeletonHistory: { height: 96, borderRadius: 10, backgroundColor: '#E2E8F0' },
+  skeletonHistory: { height: 96, borderRadius: 10, backgroundColor: STEEL.surfaceMuted },
   historyRowCard: {
     backgroundColor: STEEL.surface,
     borderRadius: 12,
@@ -726,9 +684,9 @@ const styles = StyleSheet.create({
   },
   historyRowMeta: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, flex: 1, minWidth: 0 },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  typeBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.2 },
-  historyRowDate: { fontSize: 13, fontWeight: '600', color: STEEL.textPrimary },
-  historyRowLocation: { fontSize: 12, color: STEEL.textSecondary, maxWidth: 120, textAlign: 'right' },
-  historyRowTitle: { fontSize: 15, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 4 },
-  historyRowBody: { fontSize: 13, color: STEEL.textSecondary, lineHeight: 19 },
+  typeBadgeText: { ...typeStyles.caption, fontWeight: '700', letterSpacing: 0.2 },
+  historyRowDate: { ...typeStyles.secondary, fontWeight: '600', color: STEEL.textPrimary },
+  historyRowLocation: { ...typeStyles.caption, color: STEEL.textSecondary, maxWidth: 120, textAlign: 'right' },
+  historyRowTitle: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary, marginBottom: 4 },
+  historyRowBody: { ...typeStyles.secondary, color: STEEL.textSecondary, },
 });

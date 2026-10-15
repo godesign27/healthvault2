@@ -1,6 +1,6 @@
 import { WIDGET_HOST_SCRIPT } from "./widget-host.ts";
 
-export const MEDICAL_FORM_WIDGET_URI = "ui://widget/health-vault-medical-form-interview.html";
+export const MEDICAL_FORM_WIDGET_URI = "ui://widget/health-vault-medical-form-interview-v2.html";
 
 export const MEDICAL_FORM_WIDGET_HTML = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -198,14 +198,21 @@ function renderSaved(saved){
     finally{button.disabled=false;button.textContent='Create a secure share'}
   });
 }
+function renderFailure(message){
+  document.getElementById('app').innerHTML='<div class="hero"><p class="eyebrow">Health Vault</p><h1>Unable to confirm the form result</h1></div><div class="body"><div class="notice error" role="alert">'+esc(message||'Health Vault did not return a form result.')+'</div><p class="meta">Check your forms in Health Vault before trying again. This card has not retried the save.</p><a class="link" href="https://healthvault.me/?app=medical-forms&source=chatgpt" id="check-vault">Check Health Vault</a></div>';
+  document.getElementById('check-vault')?.addEventListener('click',(event)=>{event.preventDefault();external(event.currentTarget.href)});
+}
 function renderOutput(out){
   if(!out||typeof out!=='object')return;
+  if(out.isError||out.error)return renderFailure(out.error||(out.content||[]).filter(item=>item.type==='text').map(item=>item.text).join(' '));
   if(out.saved)return renderSaved(out.saved);
   if(out.preview)return renderReview(out.preview,out);
   if(out.form)return renderInterview(out.form,out);
   if(out.forms)return renderCatalog(out);
+  if(Object.keys(out).length)return renderFailure();
 }
 function render(){renderOutput(interactiveOutput||hvHost.output||{})}
 hvHost.subscribe(()=>{interactiveOutput=null;render()});
 render();
+setTimeout(()=>{if(!interactiveOutput&&!hvHost.output)renderFailure('No form result was received from ChatGPT.');},30000);
 </script></body></html>`;

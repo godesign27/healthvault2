@@ -1,3 +1,4 @@
+import { uploadNeedsReview } from '../lib/records/upload-result';
 import { useState, useEffect, useRef } from 'react';
 import {
   FileText, Upload, CheckCircle, AlertCircle, Clock, Shield,
@@ -39,6 +40,7 @@ const KIND_CONFIG: Record<string, { label: string; icon: typeof FileText }> = {
 
 export default function ProviderRecordSubmitPage() {
   const [state, setState] = useState<'loading' | 'form' | 'submitting' | 'success' | 'error' | 'expired' | 'already_submitted'>('loading');
+  const [retryBlocked, setRetryBlocked] = useState(false);
   const [request, setRequest] = useState<RequestDetails | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [files, setFiles] = useState<FileEntry[]>([]);
@@ -119,7 +121,13 @@ export default function ProviderRecordSubmitPage() {
   };
 
   const handleSubmit = async () => {
-    if (files.length === 0) return;
+    if (files.length === 0 || retryBlocked) return;
+    // Reject before reading/base64-encoding files. Leave failed selections editable.
+    if (files.length > 20 || files.some(entry => entry.file.size > 25 * 1024 * 1024) ||
+        files.reduce((total, entry) => total + 4 * Math.ceil(entry.file.size / 3), 0) > 40 * 1024 * 1024) {
+      setErrorMessage('Send at most 20 files, each under 25 MB. The combined upload is too large; choose a smaller batch.');
+      return;
+    }
     setState('submitting');
 
     try {
@@ -144,6 +152,12 @@ export default function ProviderRecordSubmitPage() {
         })
       );
 
+      const payload = JSON.stringify({ token, files: filePayloads, providerNotes: globalNotes });
+      if (new TextEncoder().encode(payload).byteLength > 40 * 1024 * 1024) {
+        setErrorMessage('The combined upload is too large. Choose a smaller batch or shorten the notes. Nothing was sent.');
+        setState('form');
+        return;
+      }
       const res = await fetch(
         `${SUPABASE_URL}/functions/v1/record-request/${requestId}/submit`,
         {
@@ -152,22 +166,30 @@ export default function ProviderRecordSubmitPage() {
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            token,
-            files: filePayloads,
-            providerNotes: globalNotes,
-          }),
+          body: payload,
         }
       );
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Submission failed');
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body.success !== true) {
+        const savedIndices = new Set<number>((Array.isArray(body.saved) ? body.saved : [])
+          .map((entry: { index: number }) => entry.index));
+        setFiles(previous => previous.filter((_, index) => !savedIndices.has(index)));
+        const uncertain = uploadNeedsReview(res.status, body);
+        setRetryBlocked(uncertain);
+        setErrorMessage(uncertain
+          ? 'The upload needs review before retrying. Do not submit these files again until their status is checked. Contact Health Vault support.'
+          : savedIndices.size
+            ? `${savedIndices.size} file${savedIndices.size === 1 ? '' : 's'} saved. The remaining files were not saved. Review them before retrying.`
+            : body.error || 'No files were saved. Review the files before retrying.');
+        setState('form');
+        return;
       }
 
       setState('success');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to submit records');
+      setRetryBlocked(true);
+      setErrorMessage('We could not confirm the upload result. Reload to check the request status or contact support before retrying.');
       setState('form');
     }
   };
@@ -410,7 +432,7 @@ export default function ProviderRecordSubmitPage() {
           <div className="p-6 sm:p-8 border-t border-stroke-subtle bg-surface-sunken/50">
             <button
               onClick={handleSubmit}
-              disabled={files.length === 0 || state === 'submitting'}
+              disabled={files.length === 0 || state === 'submitting' || retryBlocked}
               className="w-full px-6 py-3.5 bg-surface-raised text-white rounded-xl font-semibold hover:bg-surface-sunken disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {state === 'submitting' ? (
@@ -459,7 +481,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-stroke-subtle bg-white mt-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 text-center">
           <p className="text-xs text-content-secondary">
-            &copy; {new Date().getFullYear()} Health Vault. All rights reserved. HIPAA compliant.
+            &copy; {new Date().getFullYear()} Health Vault. All rights reserved.
           </p>
         </div>
       </footer>

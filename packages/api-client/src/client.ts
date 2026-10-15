@@ -1,3 +1,4 @@
+import { sendImport, requireRetryKey, ImportRequestError } from "./imports";
 import type {
   HealthRecord,
   PendingRequest,
@@ -308,23 +309,49 @@ export class HealthVaultClient {
     fileName: string;
     kind: RecordKind;
     title?: string;
+    providerName?: string;
+    serviceDate?: string;
+    /** Persist once per logical upload; reuse after network failure or reload. */
+    idempotencyKey: string;
   }): Promise<UploadedFile> {
+    requireRetryKey(params.idempotencyKey);
+    if (!params.file.size || params.file.size > 25 * 1024 * 1024) {
+      throw new ImportRequestError('Choose a nonempty file of at most 25 MB.', params.idempotencyKey, 'rejected', 413);
+    }
     const token = await this.config.getAccessToken();
-    const formData = new FormData();
-    formData.append("file", params.file, params.fileName);
-    formData.append("kind", params.kind);
-    if (params.title) formData.append("title", params.title);
+    if (!token) throw new ImportRequestError('Sign in before uploading.', params.idempotencyKey, 'rejected', 401);
+    const bytes = new Uint8Array(await params.file.arrayBuffer());
+    const chunks: string[] = [];
+    for (let i=0;i<bytes.length;i+=32768) chunks.push(String.fromCharCode(...bytes.subarray(i,i+32768)));
+    return this.uploadRecordBase64({...params, base64:btoa(chunks.join(''))});
+  }
 
-    const res = await fetch(`${this.fnBase}/inbound-records/upload`, {
-      method: "POST",
-      headers: {
-        apikey: this.config.supabaseAnonKey,
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: formData,
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.error ?? `Upload failed (${res.status})`);
-    return json as UploadedFile;
+  /** Native clients may read a local URI as base64 without browser Blob APIs. */
+  async uploadRecordBase64(params: {
+    base64: string; fileName: string; kind: RecordKind; title?: string;
+    providerName?: string; serviceDate?: string; idempotencyKey: string;
+  }): Promise<UploadedFile> {
+    requireRetryKey(params.idempotencyKey);
+    const encoded = params.base64;
+    const size = encoded.length / 4 * 3 - (encoded.endsWith('==') ? 2 : encoded.endsWith('=') ? 1 : 0);
+    if (!encoded || encoded.length % 4 || size > 25 * 1024 * 1024 ||
+        !/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) {
+      throw new ImportRequestError('Choose a valid nonempty file of at most 25 MB.', params.idempotencyKey, 'rejected', 413);
+    }
+    const token = await this.config.getAccessToken();
+    if (!token) throw new ImportRequestError('Sign in before uploading.', params.idempotencyKey, 'rejected', 401);
+    const fileType = params.fileName.split('.').pop()?.toLowerCase() || 'other';
+    const receipt = await sendImport(`${this.fnBase}/inbound-records/upload`, {
+      apikey:this.config.supabaseAnonKey,Authorization:`Bearer ${token}`,
+    }, {records:[{kind:params.kind,title:params.title ?? params.fileName,fileName:params.fileName,
+      fileType,providerName:params.providerName,serviceDate:params.serviceDate,base64:encoded}]}, params.idempotencyKey);
+    if (!receipt.success || receipt.records.length !== 1) {
+      const uncertain = receipt.recordErrors.some(error => error.code === 'reconciliation_required');
+      throw new ImportRequestError('The file was not confirmed saved. Review the import receipt.',
+        params.idempotencyKey, uncertain ? 'unknown' : 'rejected', undefined, receipt);
+    }
+    const record=receipt.records[0];
+    return { recordId:record.id,title:record.title,kind:record.kind as RecordKind,
+      fileType,fileSizeBytes:size,previewUrl:null,fileAccess:'authenticated',importBatchId:receipt.importBatchId };
   }
 }

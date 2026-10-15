@@ -1,6 +1,9 @@
 # ChatGPT widget release review — 2026-09-19
 
-Current deployment: `health-vault-mcp` version 127. This targeted confirmation-flow
+Current deployment: `health-vault-mcp` version 131. See `PRODUCTION_READINESS.md` for
+current gates and validation (100 tests and package typecheck). Source parity now covers
+all 32 deployed MCP files; the remaining dated findings below are historical.
+This targeted confirmation-flow
 review began at version 122; the dated/versioned findings below retain that history.
 It is not a full security audit.
 
@@ -156,3 +159,45 @@ The passing existing tests do not establish end-to-end success for these paths.
 Full package typecheck/build was not run: dependencies are not installed in this
 worktree. The tests use Node 24's native TypeScript stripping. Publishing and
 changes to the ChatGPT installation's CSP setting were not performed.
+
+
+## 2026-10-02 — Wellness check-in widget hardening (MCP v132)
+
+- Confirmed fresh production was v131; deployed only the Nourished Rebel widget source change, preserving the other 31 source files.
+- Widget URI v5 uses the shared legacy/standard host bridge. Saves disable controls, reject repeated clicks, preserve editing against incidental output, and validate enrollment and the exact returned answer/skip before showing saved feedback.
+- Empty input no longer enrolls a user. Missing/error responses stop for verification instead of claiming success or allowing resubmission. Completed six-question check-ins no longer restart at question one.
+- Validation: 108 passing Node tests (8 new dual-host wellness tests), isolated package TypeScript check, whitespace check excluding preserved baseline EOF blanks. Fresh production v132 matches all 32 tested source files; discovery HTTP 200 and unauthenticated POST HTTP 401.
+- No health records, enrollment, answers, or emails were created during verification. Fresh CSP-enforced browser acceptance, real OAuth negative writes, independent-session concurrency, and operational/privacy release gates remain outstanding. This is not production-readiness approval.
+
+## 2026-10-02 — Fixed cross-account patient/profile form reads
+- Live pg_policies inspection found SELECT USING (true) demo policies on patient_profiles and form_responses. A transaction-only synthetic probe reproduced both cross-account reads (one profile and one form visible to identity B).
+- Applied restrict_patient_form_reads_to_owner using Supabase apply_migration. Local migration: 20261002165322_restrict_patient_form_reads_to_owner.sql. Replaced only the two demo SELECT policies; enabled RLS explicitly. No rows, ownership values, grants, or server-side share token behavior changed.
+- Regression test supabase/tests/patient-form-isolation.sql passes on the live database: owner insert/read/update; cross-owner read/update/delete denied; forged inserts and owner reassignments denied; anonymous reads denied. Synthetic identities are transaction-local JWT claim simulations, NOT real OAuth browser sessions.
+- Verified live policy definitions and zero remaining fixture rows after rollback. Existing provider access requires explicit authorized server routes; broad browser reads of all patient profiles are intentionally blocked.
+- Source had an older owner-only form migration that was not reflected in live policy state; why the drift occurred remains unverified. Do not reapply unrelated historical migrations blindly.
+- This establishes an exposure condition, not evidence that another person accessed data. Historical access assessment and wider view/privileged-function review remain open before release.
+- Supabase RLS documentation and changelog reviewed. Current minor-version notes do not change this owner-equality policy pattern.
+- User separately reported entering “8 hours” and saving successfully in the live wellness card; mark successful save as user-verified, not an agent-created fixture.
+
+## 2026-10-02 — Share isolation and migration-history follow-up
+- Live migration history has no version 20260822000003 or name secure_gpt_medical_form_proposals, although that migration exists in the checkout. Later proposal-table migrations are recorded. This confirms differing recorded migration history, not proof of exactly when/how the read policies persisted or actual data access.
+- New rollback suite supabase/tests/share-isolation.sql passes for health_share and medical_form_email: foreign-owner share/receipt reads denied, revoke/update denied, completion RPC rejects another owner's operation, forged owner insert denied, same request across owners has distinct identity, pending and completed retries reused, owner revoke allowed. No emails or external share links sent.
+- Zero synthetic share and receipt rows remain after rollback. Form response patient/template unique index is present (implemented as an index, not a table constraint).
+- Added/read-tested ownership-policy-gate.sql against 11 private tables: fails on disabled RLS or unconditional client policies. This is a scoped catalog guard, not proof against all possible policy bugs or a scheduled monitor.
+- Real browser OAuth negative-write tests, concurrent-session tests, historical access investigation, and proposal behavioral coverage remain open. No production code or schema changes this turn.
+
+## 2026-10-02 — Real OAuth revoke acceptance and MCP v133
+- Created two tightly scoped disposable share fixtures: empty form lists, no usable token, expired, no health payload/email. One belonged to the signed-in AOL account and one to a synthetic owner.
+- Through the existing ChatGPT OAuth connection, requested revoke_health_share once per fixture. Foreign-owner request was rejected and database verification showed no change. Owner request succeeded; database showed revoked=true/status=revoked with timestamp. This proves a real OAuth negative revoke and positive owner revoke, not two separately logged-in OAuth sessions or an active-token lifecycle test.
+- Both exact fixture rows were deleted under ID/note/owner constraints and zero remaining rows verified.
+- Fixed unhelpful zero-row revocation error via maybeSingle + explicit unavailable/not-found/already-revoked message, preserving row-level security and filters. 111 tests and frozen Deno entrypoint check pass.
+- Deployed only health-sharing.ts change from fresh v132 snapshot as v133. Fresh snapshot matches all 32 candidate files; GET discovery 200, unauthenticated POST 401.
+- Evidence: /tmp/health-vault-oauth-revoke-test.png and existing chat 6abfcc3e-0948-83e8-a787-8fdce9d3b661. Screenshot shows the pre-fix raw error from the successful negative test.
+- Simultaneous saves remain untested: need two independently controllable DB sessions. Asked user to identify dedicated staging project (no credentials in chat). Existing preview branch belongs to another PR and was not repurposed. No new infrastructure created.
+
+## 2026-10-02 — Failed medical-form card fix, MCP v134
+- confirm_form_answers now returns structured error content as well as isError/text. Shared widget host delivers standard tool-result errors to subscribers; parent-source validation and mutation locking remain unchanged.
+- Medical form interview resource v2 renders an escaped terminal error with Check Health Vault. Unexpected results and missing responses (30 seconds) no longer remain indefinitely loading. The card never retries a save or claims an uncertain result was saved/unsaved.
+- Full suite: 118 tests passed; an additional host-lock regression passed in a focused 12-test run (119 tests total now). Frozen Deno 2.9.6 entrypoint check passed with network access after sandbox npm DNS failure.
+- Deployed only three changed production files from a fresh v133 snapshot. Fresh v134 retrieval matches all 32 candidate/local files. Discovery GET 200, unauthenticated POST 401. No commits, health-data changes, or email sends.
+- Live ChatGPT browser acceptance passed after metadata refresh: one call using the previously deleted disposable proposal displayed the actual rejection inside the new card, with “Check Health Vault” and no loading placeholder. DOM and screenshot verified independently of ChatGPT prose. Evidence: /tmp/health-vault-form-error-fixed.png. No new fixtures were created. Timeout behavior is unit-tested, not independently exercised in live ChatGPT.

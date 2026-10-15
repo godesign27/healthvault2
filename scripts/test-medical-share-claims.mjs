@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const js=ts.transpileModule(fs.readFileSync('supabase/functions/share/share-request.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2020}}).outputText;
+const {validRequestId,shareFingerprint,claimShareRequest}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+assert.ok(validRequestId('a1111111-1111-4111-8111-111111111111'));assert.equal(validRequestId('../other'),false);
+const rows=new Map();
+const db={from(){let filters={};const q={select(){return q;},eq(k,v){filters[k]=v;return q;},async maybeSingle(){return {data:rows.get(filters.owner_id+filters.request_id)};},async insert(row){const key=row.owner_id+row.request_id;if(rows.has(key))return {error:{code:'23505'}};rows.set(key,{...row,receipt:null});return {error:null};}};return q;}};
+const hash=await shareFingerprint({forms:['a'],recipient:'synthetic@example.com'});
+const results=await Promise.all([claimShareRequest(db,'a','r',hash),claimShareRequest(db,'a','r',hash)]);
+assert.equal(results.filter(r=>r.claimed).length,1);
+assert.ok((await claimShareRequest(db,'a','r','changed')).conflict);
+rows.get('ar').receipt={id:'share',emailSent:true};assert.equal((await claimShareRequest(db,'a','r',hash)).receipt.emailSent,true);
+assert.ok((await claimShareRequest(db,'b','r',hash)).claimed);
+await assert.rejects(claimShareRequest({from:()=>({insert:async()=>({error:{code:'database-down'}})})},'a','x',hash));
+console.log('PASS concurrent claim arbitration model, content conflict, owner separation, receipt replay and fail-closed DB errors');

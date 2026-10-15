@@ -220,7 +220,7 @@ function InsuranceContent({ omitShellTitle = false, scrollFabProps = {} }) {
         </View>
       ) : null}
 
-      {/* Always show intro: shell uses omitShellTitle so the top bar is the only title otherwise */}
+      {/* Page title is the screen label. The top bar keeps the menu, avatar, and assistant. */}
       <View style={styles.hero}>
         {!omitShellTitle ? (
           <View style={styles.heroTitleRow}>

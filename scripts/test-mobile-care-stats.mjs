@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+let slots=[],cursor=0,effects=[],fail=false;const tables=[];
+const react={useState(v){const i=cursor++;if(!(i in slots))slots[i]=v;return[slots[i],x=>slots[i]=x]},useRef(v){const i=cursor++;return slots[i]??=( {current:v})},useCallback:fn=>fn,useEffect:fn=>effects.push(fn)};
+const supabase={auth:{getUser:async()=>({data:{user:{id:'owner'}}})},from(table){tables.push(table);let owner=false;const q={select(){return q},eq(k,v){if(k==='user_id')owner=v==='owner';return q},then(resolve){assert.ok(owner);resolve({count:7,error:fail?Error('Denied'):null})}};return q;}};
+const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('apps/mobile/src/hooks/useCareStats.js','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:n=>n==='react'?react:{supabase}});
+const render=()=>{cursor=0;return exports.useCareStats()};
+render();effects.shift()();await new Promise(setImmediate);
+assert.deepEqual(tables,['health_records','encounters','medications','claims']);assert.equal(render().stats.claims,7);
+fail=true;await render().refetch();assert.equal(render().error,'Denied');assert.equal(render().stats.claims,7);
+console.log('PASS Care stats: actual tables, owner filtering, query failures reported without replacing counts with zero');

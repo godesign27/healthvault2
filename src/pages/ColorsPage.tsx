@@ -1,3 +1,5 @@
+import {TrendChart} from '../components/charts/TrendChart';
+import {chartOrder,chartSeed} from '../components/charts/chartPolicy';
 import { useEffect, useState } from 'react';
 import { supabase, type DesignToken } from '../lib/supabase';
 
@@ -231,6 +233,11 @@ export function ColorsPage() {
           </section>
         </div>
       </div>
-    </div>
+    <section aria-label="Data Viz Option 1" className="space-y-6 mt-8">
+        <h2 className="text-xl font-semibold">Data Viz Option 1</h2>
+        <p>Health Vault categorical palette. Synthetic reference data only.</p>
+        {(['light','dark'] as const).map(mode=><TrendChart key={mode} mode={mode} title={`Reference trends — ${mode}`} labels={Array.from({length:8},(_,i)=>`Period ${i+1}`)} series={chartOrder.slice(0,6).map(key=>({key,label:key,values:chartSeed[chartOrder.indexOf(key)]}))}/>)}
+      </section>
+      </div>
   );
 }

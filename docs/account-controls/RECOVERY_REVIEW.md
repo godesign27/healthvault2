@@ -27,3 +27,21 @@ The branch service reports main MIGRATIONS_FAILED from April 7 while the main pr
 6. Approve backup/retention wording only after confirming operational deletion handling and vendor retention, including mail held in Resend/Gmail.
 
 Do not mark recovery passed solely because backups are listed. Do not use a production restore as a test.
+
+## October 2 follow-up: preview suitability
+
+Read-only inspection found zero Auth users and zero Storage objects in the preview,
+but only 43 public tables. It lacks account_deletion_requests, vital_measurements,
+connected_health_records, wellness_check_ins, wellness_insights,
+wellness_insight_feedback, wellness_partner_enrollments, patient_clinical_records
+and provider_access_grants required by the current export. Existing reference or
+other table data has not been certified disposable. No preview schema was changed.
+Owner choice of using/updating this preview is pending; do not overwrite it or claim
+authenticated end-to-end export passed against this stale schema.
+
+## Authorized preview update and acceptance
+
+Owner subsequently authorized the preview update. Scoped schema-only bootstrap and
+two-user HTTP export/deletion-request acceptance completed; see PREVIEW_ACCEPTANCE.md.
+Reference data was preserved, all test users/rows cleaned up, no production data copied.
+This does not establish full preview/production parity or pass the recovery rehearsal.

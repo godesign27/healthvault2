@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { LoginPage } from './LoginPage';
 
 export function FhirConnectCompletePage() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'signin' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [orgName, setOrgName] = useState<string | null>(null);
 
@@ -28,8 +29,7 @@ export function FhirConnectCompletePage() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-          setStatus('error');
-          setMessage('Please sign in to finish connecting your provider.');
+          setStatus('signin');
           return;
         }
 
@@ -67,6 +67,18 @@ export function FhirConnectCompletePage() {
   const goToApp = () => {
     window.location.href = '/';
   };
+
+  if (status === 'signin') {
+    return (
+      <LoginPage
+        title="Sign in to verify your connection"
+        description="Sign in with the Health Vault account you used to connect your provider. If you started in the mobile app, you can return there and tap Check connection."
+        allowSignup={false}
+        onLoginSuccess={() => window.location.reload()}
+        onCancel={goToApp}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface-page flex items-center justify-center p-6">

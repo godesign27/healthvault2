@@ -7,9 +7,14 @@ import { MEDICAL_FORM_REVIEW_WIDGET_HTML } from './medical-form-review-widget.ts
 import { MEDICAL_FORM_WIDGET_HTML } from './medical-form-widget.ts';
 import { MEDICAL_FORM_SHARE_WIDGET_HTML } from './medical-form-share-widget.ts';
 
+import { HEALTH_IMPORT_WIDGET_HTML } from './health-import-widget.ts';
+import { CLINICAL_IMPORT_WIDGET_HTML } from './clinical-import-widget.ts';
+
 const preview = { proposalId: 'fixture', templateId: 'patient-reg', templateTitle: 'Test form', willComplete: true, reviewFields: [] };
 const share = { templateId: 'patient-reg', templateTitle: 'Test form', recipientName: 'Test recipient', recipientEmail: 'test@example.invalid', expiresInHours: 24, categories: ['conditions'], expiresInDays: 7 };
 const cases = [
+  ['vitals import', HEALTH_IMPORT_WIDGET_HTML, { preview: { proposalId: 'fixture', items: [{ metric: 'steps', value: 3, unit: 'count' }] } }, 'confirm', { imported: { importedCount: 1 } }],
+  ['clinical import', CLINICAL_IMPORT_WIDGET_HTML, { preview: { proposalId: 'fixture', items: [{ title: 'Test', recordType: 'document' }] } }, 'save', { imported: { importedCount: 1 } }],
   ['Life Signal', LIFE_SIGNAL_WIDGET_HTML, {}, 'log', { saved: { id: 'fixture' } }],
   ['health share', SHARE_WIDGET_HTML, { preview: share }, 'confirm-share', { share: { id: 'fixture', shareUrl: 'https://example.invalid' } }],
   ['form review', MEDICAL_FORM_REVIEW_WIDGET_HTML, { preview }, 'confirm', { saved: { savedAs: 'completed_form' } }],
@@ -26,15 +31,15 @@ for (const [name, html, output, buttonId, saved] of cases) {
         let markup = '';
         const value: any = { value: id === 'note' ? '' : '3', dataset: {}, textContent: '', disabled: false,
           get innerHTML() { return markup; }, set innerHTML(v) { markup = v; renders++; },
-          addEventListener: (n, fn) => value[n] = fn, querySelector: () => null, insertAdjacentHTML: () => {},
+          removeAttribute: () => {}, addEventListener: (n, fn) => value[n] = fn, querySelector: () => null, insertAdjacentHTML: () => {},
         }; elements.set(id, value);
       }
       return elements.get(id);
     };
     const parent = { postMessage: m => sent.push(m) };
     const window = { parent, openai: legacy ? { toolOutput: output, callTool: async (...args) => { calls.push(args); return { structuredContent: saved }; } } : undefined,
-      addEventListener: (n, fn) => listeners.set(n, fn) };
-    vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)![1], { window, document: { getElementById: element, querySelectorAll: () => [], querySelector: element }, setTimeout, clearTimeout });
+      removeAttribute: () => {}, addEventListener: (n, fn) => listeners.set(n, fn) };
+    vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)![1], { URL, window, document: { getElementById: element, querySelectorAll: () => [], querySelector: element }, setTimeout, clearTimeout });
     const message = data => listeners.get('message')({ source: parent, data: { jsonrpc: '2.0', ...data } });
     if (!legacy) {
       message({ id: 'hv-init', result: {} });

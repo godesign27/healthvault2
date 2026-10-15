@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const source=readFileSync('apps/mobile/src/lib/passwordRecovery.js','utf8');
+const {parseRecoveryLink,requestPasswordRecovery,saveRecoveredPassword}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+assert.equal(parseRecoveryLink('https://evil.invalid/auth/recovery#type=recovery&access_token=x&refresh_token=y'),null);
+assert.equal(parseRecoveryLink('healthvault://provider/return'),null);
+assert.throws(()=>parseRecoveryLink('healthvault://auth/recovery#type=signup&access_token=x&refresh_token=y'),/incomplete/);
+assert.throws(()=>parseRecoveryLink('healthvault://auth/recovery#error=expired'),/expired/);
+assert.deepEqual(parseRecoveryLink('healthvault://auth/recovery#type=recovery&access_token=x&refresh_token=y'),{access_token:'x',refresh_token:'y'});
+const calls=[];const auth={resetPasswordForEmail:async(...x)=>{calls.push(x);return{}},updateUser:async x=>{calls.push(x);return{}}};
+await assert.rejects(requestPasswordRecovery(auth,'no-email'),/valid email/);assert.equal(calls.length,0);
+await requestPasswordRecovery(auth,' PERSON@EXAMPLE.INVALID ');assert.deepEqual(calls[0],['person@example.invalid',{redirectTo:'https://healthvault.me'}]);
+await assert.rejects(saveRecoveredPassword(auth,'short','short'),/12/);
+await assert.rejects(saveRecoveredPassword(auth,'long-test-password','mismatch'),/match/);
+await saveRecoveredPassword(auth,'long-test-password','long-test-password');assert.deepEqual(calls[1],{password:'long-test-password'});
+await assert.rejects(saveRecoveredPassword({updateUser:async()=>({error:Error('Expired')})},'long-test-password','long-test-password'),/Expired/);
+console.log('PASS recovery: exact callback, wrong/expired links, normalized email, password validation, backend errors; no email sent');

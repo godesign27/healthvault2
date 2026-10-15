@@ -25,7 +25,8 @@ export interface HealthRecord {
   source: RecordSource;
   fileType: "pdf" | "jpg" | "png" | "dicom" | "txt" | "unknown";
   fileSizeBytes?: number;
-  previewUrl?: string;       // signed URL or local mock
+  previewUrl?: string;       // external/FHIR/local sources only; never a Vault bearer URL
+  fileAccess?: 'authenticated'; // fetch protected Vault bytes by record ID
   aiSummary?: string;        // optional short summary
   tags?: string[];
   fhirRef?: { system?: string; id?: string; resourceType?: string };

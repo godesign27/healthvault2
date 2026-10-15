@@ -1,0 +1,13 @@
+.hv-chart { background:var(--chart-surface);color:var(--chart-ink);padding:1rem;border-radius:1rem;min-width:0;margin:0; }
+.hv-chart figcaption {font-weight:600;font-size:1.125rem;margin-bottom:1rem;}
+.hv-chart-plot {overflow-x:auto;max-width:100%;}
+.hv-chart-plot>svg {width:100%;min-width:42.5rem;height:auto;display:block;}
+.hv-chart svg text {font:inherit;font-size:13px;}
+.hv-chart-legend {display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;list-style:none;padding:0;}
+.hv-chart-legend li {display:flex;gap:.5rem;align-items:center;}
+.hv-chart summary {cursor:pointer;padding:.75rem 0;min-height:3rem;}
+.hv-chart :focus-visible {outline:3px solid var(--focus-cyan-70);outline-offset:3px;}
+.hv-chart[data-chart-mode='dark'] :focus-visible {outline-color:var(--focus-cyan-40);}
+.hv-chart-table {overflow:auto;}
+.hv-chart table {border-collapse:collapse;width:100%;text-align:left;}
+.hv-chart th,.hv-chart td {padding:.75rem;border-bottom:1px solid var(--chart-grid);}

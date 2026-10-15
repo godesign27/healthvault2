@@ -31,6 +31,7 @@ export function buildMedicalFormShareEmail(details: MedicalFormShareEmailDetails
   const expiration = escapeHtml(new Date(details.expiresAt).toLocaleString("en-US", { timeZone: "America/Denver", timeZoneName: "short" }));
   return {
     subject: "A patient shared a secure Health Vault form with you",
+    text: `Hello ${details.recipientName},\n\n${details.patientName} has shared a private medical form with you through Health Vault.\n\nOpen secure form: ${details.shareUrl}\n\nThis read-only link expires ${new Date(details.expiresAt).toLocaleString("en-US", { timeZone: "America/Denver", timeZoneName: "short" })}. Do not forward it. Health Vault will never ask for a password through this email.`,
     html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#17223b"><h1 style="font-size:24px">Health Vault</h1><p>Hello ${recipientName},</p><p>${patientName} has shared a private medical form with you through Health Vault.</p><p><a href="${shareUrl}" style="display:inline-block;padding:12px 18px;border-radius:8px;background:#17223b;color:#fff;text-decoration:none;font-weight:700">Open secure form</a></p><p style="color:#667085">This read-only link expires ${expiration}. Do not forward it. Health Vault will never ask for a password through this email.</p></div>`,
   };
 }
@@ -59,6 +60,7 @@ export async function sendMedicalFormShareEmail(input: SendMedicalFormShareEmail
     to: [input.recipientEmail],
     subject: providerEmail.subject,
     html: providerEmail.html,
+    text: providerEmail.text,
   });
 
   let patientCopy: DeliveryResult | undefined;

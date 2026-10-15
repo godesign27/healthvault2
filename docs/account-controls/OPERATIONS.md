@@ -20,7 +20,7 @@ update or delete requests, or read someone else's request.
 
 Timothy McGuire, founder of the Health Vault product operated by GO Design, Inc., confirmed on October 2, 2026 that he will monitor team@healthvault.me and review account-deletion requests. Mail forwards to his selected Gmail inbox; incoming and outgoing delivery have been verified.
 
-No alert, scheduled poll or automatic processing is installed. Timothy must review the database request queue as well as the email inbox: submitting a deletion request does not send an email. Review cadence, response deadlines and the fulfillment procedure still need to be established before this gate passes.
+The approved weekday count-only digest is active; see DELETION_MONITORING.md. Timothy must also review the database queue and monitor health: submitting a request does not send an immediate email, and no automatic erasure is installed. Response deadlines and the complete fulfillment procedure remain readiness work.
 
 Read the queue in the Supabase dashboard using a trusted operator account:
 
@@ -58,11 +58,23 @@ See [DELETION_RETENTION_REVIEW.md](DELETION_RETENTION_REVIEW.md) for the reviewa
 ## Validation
 
 - `node --test supabase/functions/account-export/export.test.ts`
-- `supabase/tests/account-deletion-requests.sql`: run in rollback transaction after
-  setting health_vault.test_owner_a/b to two dedicated existing test identities.
+- `supabase/tests/account-export-schema.sql`: compiles all 34 explicit export
+  projections as authenticated with zero rows read; tests live schema and grants.
+- `supabase/tests/account-deletion-requests.sql`: creates two synthetic identities inside a
+  rollback transaction; does not require real account IDs or send email.
 - `npm run build`
 - Local harness `/tests/account-controls/` uses a synthetic client and creates no
   database requests. Test review/confirmation, a single receipt, disabled pending
   button, and the downloaded JSON. It is not imported into the production bundle.
-- Test authenticated deployed export with a dedicated synthetic account before
-  inviting users; no full export of a real account was performed by this change.
+- Authenticated preview HTTP export/deletion-request acceptance passed with two
+  synthetic accounts; see PREVIEW_ACCEPTANCE.md for evidence and remaining erasure and recovery gaps. Focused browser integration
+  also passed with a disposable preview session. No full export of a real account was performed.
+
+## Approved deletion digest — activated October 2, 2026
+
+Weekday 09:00 America/Denver count-only email to godesigngo@gmail.com is active.
+The verification arrived in Inbox; first scheduled check is October 5. See
+[DELETION_MONITORING.md](./DELETION_MONITORING.md) for tests, retries, pause SQL and
+restricted status queries. Timothy must check that status at/after 10 AM weekdays:
+no email can mean an empty queue **or a failed monitor**. There is no independent
+outage alert yet. No account status changes or erasure are performed by the digest.

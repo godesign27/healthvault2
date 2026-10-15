@@ -1,0 +1,13 @@
+---
+description: User feedback that is not page content uses a dismissable notification
+alwaysApply: true
+---
+
+# Dismissable feedback
+
+Action results are notifications, not page copy. Saved, added, sent, removed, failed, and “nothing changed” outcomes use a dismissable notification.
+
+- On the phone, use `NoticeBanner` from `apps/mobile/src/components/ui/NoticeBanner.js`. It includes a control labeled “Dismiss notification”.
+- On the website, use `Toast` from `src/components/Toast.tsx`. The close control dismisses it.
+- Success and info notifications may also disappear on their own. Errors stay until the person dismisses them.
+- Leave empty states, loading copy, field hints, and the data itself on the page. Those are content.

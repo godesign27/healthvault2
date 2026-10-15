@@ -1,0 +1,42 @@
+import assert from 'node:assert/strict';
+import {loadMedicalForms,saveMedicalForm,buildMedicalShare,sendMedicalShare,revokeMedicalShare,recoverMedicalShare,pendingMedicalShareReference} from '../apps/mobile/src/lib/medical-forms.js';
+let owner='owner-a',calls=[],invokeCount=0;
+const responses={patient_profiles:{data:{id:'patient-a'}},form_responses:{data:[{id:'response-a',template_id:'patient-reg',status:'complete',answers_json:{first_name:'Saved'}}]},share_events:{data:[]}};
+let result={data:{requestId:'a1111111-1111-4111-8111-111111111111',id:'share-a',emailSent:false}};
+const client={auth:{getSession:async()=>({data:{session:owner?{user:{id:owner}}:null}})},from(table){const q={then(resolve){return Promise.resolve(responses[table]).then(resolve);}};for(const method of ['select','eq','order','upsert'])q[method]=(...args)=>{calls.push([table,method,...args]);return q;};q.maybeSingle=q.single=async()=>responses[table];return q;},functions:{invoke:async()=>{invokeCount++;return result;}}};
+const loaded=await loadMedicalForms(client);assert.equal(loaded.patientId,'patient-a');assert.equal(loaded.responses['patient-reg'].id,'response-a');
+assert.ok(calls.some(c=>c[0]==='form_responses'&&c[1]==='eq'&&c[3]==='patient-a'));
+assert.ok(calls.some(c=>c[0]==='share_events'&&c[1]==='eq'&&c[3]==='owner-a'));
+const template={id:'patient-reg',title:'Patient Registration'};
+assert.throws(()=>buildMedicalShare(loaded,[template],{email:'test@example.com',consent:false}),/authorization/);
+const body=buildMedicalShare(loaded,[template],{email:'test@example.com',name:'Test',consent:true});assert.equal(body.forms[0].id,'response-a');assert.equal(body.patientId,'owner-a');
+assert.throws(()=>buildMedicalShare({...loaded,responses:{}},[template],{email:'test@example.com',name:'Test',consent:true}),/Save every/);
+responses.form_responses={data:{id:'response-a',template_id:'patient-reg',status:'complete'}};
+await saveMedicalForm(client,loaded,'patient-reg',{first_name:''});assert.ok(calls.some(c=>c[1]==='upsert'&&c[2].answers_json.first_name===''));
+owner='other';await assert.rejects(saveMedicalForm(client,loaded,'patient-reg',{}),/session changed/);owner='owner-a';
+const values=new Map(),storage={getItem:async k=>values.get(k),setItem:async(k,v)=>values.set(k,v),removeItem:async k=>values.delete(k)};
+const receipt=await sendMedicalShare(client,storage,loaded,body,()=>'a1111111-1111-4111-8111-111111111111');assert.equal(receipt.emailSent,false);assert.equal(values.size,0);
+result={error:new Error('timeout')};await assert.rejects(sendMedicalShare(client,storage,loaded,body,()=>'a1111111-1111-4111-8111-111111111111'),/unknown/);const before=invokeCount;
+await assert.rejects(sendMedicalShare(client,storage,loaded,body,()=>'a1111111-1111-4111-8111-111111111111'),/previous send/);assert.equal(invokeCount,before);assert.deepEqual(JSON.parse([...values.values()][0]),{requestId:'a1111111-1111-4111-8111-111111111111'});
+result={data:{pending:true}};assert.equal((await recoverMedicalShare(client,storage,owner)).pending,true);assert.equal(values.size,1);
+result={data:{requestId:'a1111111-1111-4111-8111-111111111111',id:'share-a',emailSent:true}};assert.equal((await recoverMedicalShare(client,storage,owner)).emailSent,true);assert.equal(values.size,0);
+result={data:{success:false}};await assert.rejects(revokeMedicalShare(client,'owner-a','share-a'),/not confirmed/);
+result={data:{success:true}};await revokeMedicalShare(client,'owner-a','share-a');
+console.log('PASS patient/owner scoping, saved UUIDs, consent gate, blank saves, account change, email receipt, durable uncertain-send guard and revocation receipt');
+
+const reference='a1111111-1111-4111-8111-111111111111',key=`hv:medical-share-pending:${owner}`;
+assert.equal(await pendingMedicalShareReference(client,storage,owner),null);
+await storage.setItem(key,JSON.stringify({requestId:reference,recipient:'must not be returned'}));
+const callsBeforeReference=invokeCount;
+assert.equal(await pendingMedicalShareReference(client,storage,owner),reference);
+assert.equal(invokeCount,callsBeforeReference,'Reading a reference must not contact the send endpoint');
+for(const marker of ['legacy','{}',JSON.stringify({requestId:'https://private.invalid/?token=secret'}),JSON.stringify({requestId:123})]){
+ await storage.setItem(key,marker);assert.equal(await pendingMedicalShareReference(client,storage,owner),null);
+ assert.equal(await storage.getItem(key),marker,'Invalid markers must not be cleared');
+}
+await storage.setItem(key,JSON.stringify({requestId:reference}));
+await assert.rejects(pendingMedicalShareReference(client,storage,'other-owner'),/session changed/);
+const changingStorage={...storage,getItem:async k=>{owner='other-owner';return storage.getItem(k);}};
+await assert.rejects(pendingMedicalShareReference(client,changingStorage,'owner-a'),/session changed/);
+owner='owner-a';values.clear();
+console.log('PASS support reference validation, read-only lookup, legacy marker retention and account-switch isolation');

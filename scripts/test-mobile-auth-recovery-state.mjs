@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+const source=fs.readFileSync('apps/mobile/src/hooks/useAuth.js','utf8');
+const service=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync('apps/mobile/src/lib/passwordRecovery.js','utf8')).toString('base64'));
+let slots=[],cursor=0,effects=[],cleanup,listener,authListener,session=null;
+const store=new Map(),calls=[];
+const react={useState(initial){const i=cursor++;if(!(i in slots))slots[i]=initial;return[slots[i],x=>{slots[i]=x}]},useEffect(fn){effects.push(fn)}};
+const auth={getSession:async()=>({data:{session}}),onAuthStateChange(fn){authListener=fn;return{data:{subscription:{unsubscribe(){}}}}},setSession:async tokens=>{calls.push('setSession');session={user:{id:'test'}};authListener('SIGNED_IN',session);return{}},updateUser:async()=>{calls.push('update');return{}},signOut:async()=>{calls.push('signOut');session=null;authListener('SIGNED_OUT',null);return{}},resetPasswordForEmail:async()=>({})};
+const exports={};vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:name=>name==='react'?react:name==='react-native'?{Linking:{getInitialURL:async()=>null,addEventListener:(_name,fn)=>{listener=fn;return{remove(){}}}}}:name.includes('async-storage')?{default:{getItem:async k=>store.get(k),setItem:async(k,v)=>store.set(k,v),removeItem:async k=>store.delete(k)}}:name.includes('passwordRecovery')?service:{supabase:{auth}}});
+const render=()=>{cursor=0;return exports.useAuth()};
+render();cleanup=effects.shift()();await new Promise(setImmediate);assert.equal(render().loading,false);
+listener({url:'healthvault://auth/recovery#type=recovery&access_token=test&refresh_token=test'});await new Promise(setImmediate);
+assert.equal(render().recovery,true);assert.equal(store.get('hv-password-recovery-pending'),'1');assert.equal(render().session.user.id,'test');
+await render().completeRecovery('long-test-password','long-test-password');assert.deepEqual(calls,['setSession','update','signOut']);assert.equal(render().recovery,false);assert.equal(render().session,null);assert.equal(store.size,0);
+listener({url:'healthvault://auth/recovery#error=expired'});await new Promise(setImmediate);assert.equal(render().recovery,true);assert.ok(render().recoveryError);await assert.rejects(render().completeRecovery('long-test-password','long-test-password'),/valid recovery/);assert.equal(calls.length,3);
+cleanup();console.log('PASS actual auth hook: recovery gates session, persists reset state, update then logout, expired link rejects update');
+// A process restart must not bypass an unfinished recovery session.
+slots=[];cursor=0;effects=[];session={user:{id:'test'}};
+store.set('hv-password-recovery-pending','1');
+render();cleanup=effects.shift()();await new Promise(setImmediate);
+assert.equal(render().recovery,true);assert.equal(render().loading,false);assert.equal(render().session.user.id,'test');
+await render().signOut();assert.equal(render().recovery,false);assert.equal(store.size,0);
+// A backend rejection must keep the recovery gate closed to the app and to updates.
+auth.setSession=async()=>({error:Error('Token rejected')});
+listener({url:'healthvault://auth/recovery#type=recovery&access_token=rejected&refresh_token=rejected'});await new Promise(setImmediate);
+assert.equal(render().recovery,true);assert.ok(render().recoveryError);assert.equal(render().loading,false);
+const beforeRejected=calls.length;
+await assert.rejects(render().completeRecovery('long-test-password','long-test-password'),/valid recovery/);
+assert.equal(calls.length,beforeRejected);
+cleanup();
+console.log('PASS recovery restart gate, cancel cleanup and backend-rejected callback without password update');

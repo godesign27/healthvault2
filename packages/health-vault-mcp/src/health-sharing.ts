@@ -131,7 +131,8 @@ export async function revokeHealthShare(supabase: SupabaseClient, shareId: strin
     .eq("id", shareId)
     .eq("is_revoked", false)
     .select("id, status, revoked_at")
-    .single();
+    .maybeSingle();
   if (error) throw new Error(`Unable to revoke secure share: ${error.message}`);
+  if (!data) throw new Error("This share was not found, is already revoked, or is unavailable to this account.");
   return data;
 }

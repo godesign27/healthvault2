@@ -1,5 +1,10 @@
+import { requestFileFingerprint } from "./fingerprint.ts";
+import { readJsonObject, RequestBodyError, UPLOAD_BODY_LIMIT, CONTROL_BODY_LIMIT } from "../inbound-records/body.ts";
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.112.3";
+
+import { ImportAccessError, requireActiveAccount, requireVerifiedUser } from "../inbound-records/access.ts";
+import { persistImport } from "../inbound-records/persist.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,7 +16,7 @@ const corsHeaders = {
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "private, no-store" },
   });
 }
 
@@ -58,6 +63,7 @@ Deno.serve(async (req: Request) => {
         return jsonResponse({ error: "Unauthorized" }, 401);
       }
 
+      await requireActiveAccount(supabase, user.id);
       return await handleCreateRequest(req, supabase, supabaseUrl, user.id);
     }
 
@@ -81,11 +87,23 @@ Deno.serve(async (req: Request) => {
       return await handleResendRequest(pathParts[0], req, supabase, supabaseUrl);
     }
 
+    if (req.method === "POST" && pathParts.length === 2 && pathParts[1] === "cancel") {
+      const userId = await requireVerifiedUser(supabase, req);
+      const { data, error } = await supabase.rpc("transition_record_request", {
+        p_request_id: pathParts[0], p_user_id: userId, p_action: "cancel",
+      });
+      if (error) throw error;
+      if (data?.state === "not_found") return jsonResponse({ error: "Request not found" }, 404);
+      if (data?.state !== "cancelled") return jsonResponse({ error: "This request cannot be cancelled" }, 409);
+      return jsonResponse({ id: data.id, status: "cancelled" });
+    }
+
     return jsonResponse({ error: "Not found" }, 404);
   } catch (error: any) {
-    console.error("Error:", error);
+    if (error instanceof RequestBodyError) return jsonResponse({ error: error.message, code: "request_body_rejected" }, error.status);
+    if (error instanceof ImportAccessError) return jsonResponse({ error: error.message }, error.status);
     return jsonResponse(
-      { error: error.message || "Internal server error" },
+      { error: "Unable to process this request." },
       500
     );
   }
@@ -195,7 +213,7 @@ async function handleCreateRequest(
   supabaseUrl: string,
   authenticatedUserId: string
 ) {
-  const body = await req.json();
+  const body = await readJsonObject(req, CONTROL_BODY_LIMIT);
   const {
     providerName,
     providerEmail,
@@ -333,10 +351,7 @@ async function handleResendRequest(
   supabase: any,
   supabaseUrl: string
 ) {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
-    return jsonResponse({ error: "Unauthorized" }, 401);
-  }
+  const userId = await requireVerifiedUser(supabase, req);
 
   const { data: request, error } = await supabase
     .from("health_record_requests")
@@ -348,26 +363,17 @@ async function handleResendRequest(
     return jsonResponse({ error: "Request not found" }, 404);
   }
 
-  if (request.status === "received") {
-    return jsonResponse({ error: "Records already received for this request" }, 400);
-  }
+  if (request.user_id !== userId) return jsonResponse({ error: "Request not found" }, 404);
 
   const newToken = crypto.randomUUID();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 10);
-
-  const { error: updateError } = await supabase
-    .from("health_record_requests")
-    .update({
-      secure_token: newToken,
-      expires_at: expiresAt.toISOString(),
-      status: "sent",
-      opened_at: null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", requestId);
-
+  // Serialize the state change with cancellation and upload finalization.
+  const { data: transition, error: updateError } = await supabase.rpc("transition_record_request", {
+    p_request_id: requestId, p_user_id: userId, p_action: "resend", p_token: newToken,
+  });
   if (updateError) throw updateError;
+  if (transition?.state === "not_found") return jsonResponse({ error: "Request not found" }, 404);
+  if (transition?.state !== "sent") return jsonResponse({ error: "This request is closed" }, 409);
+  const expiresAt = new Date(transition.expiresAt);
 
   const appUrl =
     Deno.env.get("APP_URL") || req.headers.get("origin") || supabaseUrl;
@@ -468,6 +474,8 @@ async function handleGetRequest(requestId: string, url: URL, supabase: any) {
     return jsonResponse({ error: "Request not found" }, 404);
   }
 
+  if (request.status === "cancelled") return jsonResponse({ error: "This request is closed" }, 410);
+
   if (request.secure_token !== token) {
     return jsonResponse({ error: "Invalid token" }, 403);
   }
@@ -476,6 +484,8 @@ async function handleGetRequest(requestId: string, url: URL, supabase: any) {
   if (request.expires_at && now > new Date(request.expires_at)) {
     return jsonResponse({ error: "This request has expired" }, 410);
   }
+
+  await requireActiveAccount(supabase, request.user_id);
 
   if (!request.opened_at) {
     await supabase
@@ -486,7 +496,7 @@ async function handleGetRequest(requestId: string, url: URL, supabase: any) {
 
   const { data: files } = await supabase
     .from("record_request_files")
-    .select("*")
+    .select("id,file_name,file_type,file_size_bytes,record_kind,created_at")
     .eq("request_id", requestId);
 
   return jsonResponse({
@@ -509,7 +519,7 @@ async function handleSubmitRecords(
   req: Request,
   supabase: any
 ) {
-  const body = await req.json();
+  const body = await readJsonObject(req, UPLOAD_BODY_LIMIT);
   const { token, files, providerNotes } = body;
 
   if (!token) {
@@ -534,120 +544,64 @@ async function handleSubmitRecords(
     return jsonResponse({ error: "This request has expired" }, 410);
   }
 
-  const fileRecords = [];
-  if (files && Array.isArray(files)) {
-    for (const file of files) {
-      const storagePath = `${requestId}/${crypto.randomUUID()}-${file.fileName}`;
-
-      const fileBytes = Uint8Array.from(atob(file.base64), (c) =>
-        c.charCodeAt(0)
-      );
-      const { error: uploadError } = await supabase.storage
-        .from("record-request-files")
-        .upload(storagePath, fileBytes, {
-          contentType: file.contentType || "application/pdf",
-          upsert: false,
+  await requireActiveAccount(supabase, request.user_id);
+  if (!["pending", "sent", "received"].includes(request.status)) return jsonResponse({ error: "This request is not accepting files." }, 409);
+  if (!Array.isArray(files) || files.length === 0 || files.length > 20) {
+    return jsonResponse({ error: "Send between 1 and 20 files." }, 400);
+  }
+  const saved: Array<{ index: number; id: string }> = [];
+  const fileErrors: Array<{ index: number; code: string; attemptId?: string }> = [];
+  for (const [index, file] of files.entries()) {
+    if (!file || typeof file.base64 !== "string" || !file.base64.length || typeof file.fileName !== "string") {
+      fileErrors.push({ index, code: "invalid_file" }); continue;
+    }
+    const kind = typeof file.recordKind === "string" ? file.recordKind.toLowerCase() : "other";
+    const result = await persistImport({
+      authorize: () => requireActiveAccount(supabase, request.user_id),
+      prepare: async (id, _path, input) => {
+        const fingerprint = await requestFileFingerprint(input.record, input.bytes!, input.contentType);
+        const { data, error } = await supabase.rpc("reserve_request_upload", {
+          p_request_id: requestId, p_token: token, p_attempt_id: id, p_fingerprint: fingerprint,
         });
-
-      if (uploadError) {
-        console.error("File upload error:", uploadError);
-        continue;
-      }
-
-      const { data: fileRow, error: fileInsertError } = await supabase
-        .from("record_request_files")
-        .insert({
-          request_id: requestId,
-          file_name: file.fileName,
-          file_type: file.fileType || "pdf",
-          file_size_bytes: fileBytes.length,
-          storage_path: storagePath,
-          record_kind: file.recordKind || "other",
-          provider_notes: file.notes || providerNotes || null,
-        })
-        .select()
-        .single();
-
-      if (!fileInsertError && fileRow) {
-        fileRecords.push(fileRow);
-      }
-    }
+        if (error || !data) throw error ?? new Error("Missing reservation");
+        if (data.state === "prepared") return;
+        if (data.state === "committed" || data.state === "busy") return data;
+        throw new Error("Invalid reservation");
+      },
+      upload: async (path, bytes, contentType) => {
+        const { error } = await supabase.storage.from("record-request-files").upload(path, bytes, { contentType, cacheControl: "0", upsert: false });
+        if (error) throw error;
+      },
+      finalize: async (id, record) => {
+        const { data, error } = await supabase.rpc("finalize_request_upload", { p_attempt_id: id, p_token: token, p_record: record });
+        if (error || !data) throw error ?? new Error("Missing receipt");
+        return data;
+      },
+      abandon: async (id) => {
+        const { data, error } = await supabase.rpc("abandon_inbound_upload", { p_attempt_id: id });
+        if (error || !data) throw error ?? new Error("Missing recovery receipt");
+        return data;
+      },
+      remove: async (path) => {
+        const { error } = await supabase.storage.from("record-request-files").remove([path]);
+        if (error) throw error;
+      },
+    }, requestId, { kind, title: KIND_LABELS[kind.toUpperCase()] || "Health Record", file_name: file.fileName,
+      file_type: file.fileType || "pdf", notes: file.notes || providerNotes || null }, file.base64, file.contentType || "application/pdf");
+    if ("saved" in result) saved.push({ index, id: result.saved.id });
+    else fileErrors.push({ index, code: result.error, ...(result.attemptId ? { attemptId: result.attemptId } : {}) });
   }
-
-  const kindToRecordKind: Record<string, string> = {
-    LAB: "lab",
-    IMAGING: "imaging",
-    PATHOLOGY: "pathology",
-    SPECIALIST_REPORT: "specialist_report",
-    OTHER: "other",
-  };
-
-  const kindToTitle: Record<string, string> = {
-    LAB: "Lab Results",
-    IMAGING: "Imaging & Scans",
-    PATHOLOGY: "Pathology Report",
-    SPECIALIST_REPORT: "Specialist Report",
-    OTHER: "Health Record",
-    lab: "Lab Results",
-    imaging: "Imaging & Scans",
-    pathology: "Pathology Report",
-    specialist_report: "Specialist Report",
-    other: "Health Record",
-  };
-
-  const requestedKind =
-    request.record_types && request.record_types.length > 0
-      ? request.record_types[0]
-      : null;
-
-  for (const file of fileRecords) {
-    const resolvedKind =
-      kindToRecordKind[file.record_kind] || file.record_kind;
-    const title =
-      kindToTitle[file.record_kind] ||
-      (requestedKind ? kindToTitle[requestedKind] : null) ||
-      "Health Record";
-
-    let previewUrl: string | null = null;
-    if (file.storage_path) {
-      const { data: signedData } = await supabase.storage
-        .from("record-request-files")
-        .createSignedUrl(file.storage_path, 60 * 60 * 24 * 365);
-      if (signedData?.signedUrl) {
-        previewUrl = signedData.signedUrl;
-      }
-    }
-
-    await supabase.from("health_records").insert({
-      user_id: request.user_id,
-      kind: resolvedKind,
-      title,
-      provider_name: request.doctor_name || request.provider_name,
-      source: "shared",
-      file_type: file.file_type,
-      file_size_bytes: file.file_size_bytes,
-      preview_url: previewUrl,
-      ai_summary: file.provider_notes || null,
-      tags: [resolvedKind, "requested"],
-      received_at: new Date().toISOString(),
-      service_date: new Date().toISOString().split("T")[0],
+  let complete = false;
+  if (!fileErrors.length) {
+    const { data, error } = await supabase.rpc("complete_request_upload", {
+      p_request_id: requestId, p_token: token, p_attempt_ids: saved.map(file => file.id),
     });
+    complete = !error && data === true;
   }
-
-  await supabase
-    .from("health_record_requests")
-    .update({
-      status: "received",
-      submitted_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", requestId);
-
-  return jsonResponse({
-    success: true,
-    filesReceived: fileRecords.length,
-    message: "Records submitted successfully",
-  });
+  return jsonResponse({ success: complete, filesReceived: saved.length, filesFailed: fileErrors.length,
+    saved, fileErrors, completionPending: !fileErrors.length && !complete,
+    message: complete ? "Records submitted successfully" : "Some files or the request status need attention. Review the results before retrying.",
+  }, complete ? 200 : saved.length ? 207 : 422);
 }
 
 function generateRequestEmailHtml(params: {

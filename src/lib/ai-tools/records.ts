@@ -86,7 +86,7 @@ export async function getHealthRecords(
       source: row.source,
       fileType: row.file_type,
       fileSizeBytes: row.file_size_bytes,
-      previewUrl: row.preview_url,
+      previewUrl: null, // Vault files must be opened through authenticated record-file access.
       aiSummary: row.ai_summary,
       tags: row.tags || [],
       fhirRef: row.fhir_ref,

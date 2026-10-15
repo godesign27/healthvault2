@@ -1,0 +1,7 @@
+{
+  "name": "health-vault-apple-health",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "description": "Reads the signed-in person's Apple Health measurements for review in Health Vault."
+}

@@ -1,5 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.112.3";
+import { requireActiveAccount } from "../inbound-records/access.ts";
+import { fhirReturnUrl } from "../_shared/fhir-return.ts";
 import {
   exchangeAuthorizationCode,
   tokenExpiresAt,
@@ -14,19 +16,20 @@ function redirectUri(): string {
 }
 
 function appCompleteUrl(connectionId: string, redirectAfter?: string | null): string {
-  if (redirectAfter) return redirectAfter;
-  const appUrl = (Deno.env.get("APP_URL") || "http://localhost:5173").replace(/\/+$/, "");
-  return `${appUrl}/connect/fhir/complete?connectionId=${encodeURIComponent(connectionId)}`;
+  const url = fhirReturnUrl(Deno.env.get("APP_URL") || "https://healthvault.me", redirectAfter);
+  url.searchParams.set("connectionId", connectionId);
+  return url.toString();
 }
 
-function errorRedirect(message: string): Response {
-  const appUrl = (Deno.env.get("APP_URL") || "http://localhost:5173").replace(/\/+$/, "");
-  const url = new URL(`${appUrl}/connect/fhir/complete`);
-  url.searchParams.set("error", message);
+function errorRedirect(_message: string): Response {
+  const url = fhirReturnUrl(Deno.env.get("APP_URL") || "https://healthvault.me");
+  // Never put provider errors, database details or tokens in browser URLs.
+  url.searchParams.set("error", "Authorization could not be completed. Please restart the connection.");
   return Response.redirect(url.toString(), 302);
 }
 
 Deno.serve(async (req: Request) => {
+  if (req.method !== "GET") return new Response("Method not allowed", {status:405});
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
@@ -52,9 +55,11 @@ Deno.serve(async (req: Request) => {
 
     const { data: oauthState, error: stateError } = await sb
       .from("fhir_oauth_states")
-      .select("*")
+      .update({consumed_at: new Date().toISOString()})
       .eq("state", state)
       .is("consumed_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .select("*")
       .maybeSingle();
 
     if (stateError || !oauthState) {
@@ -64,6 +69,9 @@ Deno.serve(async (req: Request) => {
     if (new Date(oauthState.expires_at).getTime() < Date.now()) {
       return errorRedirect("Authorization session expired. Please try again.");
     }
+
+    await requireActiveAccount(sb, oauthState.user_id);
+    const destination = appCompleteUrl(oauthState.connection_id, oauthState.redirect_after);
 
     const { data: org, error: orgError } = await sb
       .from("provider_organizations")
@@ -98,30 +106,16 @@ Deno.serve(async (req: Request) => {
       return errorRedirect("Authorization succeeded but patient context was missing");
     }
 
-    const { error: updateError } = await sb
-      .from("provider_connections")
-      .update({
-        status: "active",
-        fhir_access_token: accessToken,
-        fhir_refresh_token: refreshToken,
-        fhir_patient_id: patientId,
-        token_expires_at: tokenExpiresAt(tokenPayload.expires_in),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", oauthState.connection_id)
-      .eq("user_id", oauthState.user_id);
+    const { data: activated, error: updateError } = await sb.rpc("activate_fhir_connection", {
+      p_state_id: oauthState.id,
+      p_access_token: accessToken,
+      p_refresh_token: refreshToken,
+      p_patient_id: patientId,
+      p_expires_at: tokenExpiresAt(tokenPayload.expires_in),
+    });
+    if (updateError || activated !== true) return errorRedirect("Activation refused");
+    return Response.redirect(destination, 302);
 
-    if (updateError) return errorRedirect(updateError.message);
-
-    await sb
-      .from("fhir_oauth_states")
-      .update({ consumed_at: new Date().toISOString() })
-      .eq("id", oauthState.id);
-
-    return Response.redirect(
-      appCompleteUrl(oauthState.connection_id, oauthState.redirect_after),
-      302,
-    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Authorization failed";
     return errorRedirect(message);

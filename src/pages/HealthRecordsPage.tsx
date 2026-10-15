@@ -1,3 +1,4 @@
+import { UploadRecordForm } from '../components/records/UploadRecordForm';
 import { useState, useEffect, useCallback, type MutableRefObject } from 'react';
 import { Database, Upload, Link2, FileText, SendHorizontal as SendHorizonal, Clock, CheckCircle, AlertCircle, Mail, Eye, Building2, ArrowRight, X } from 'lucide-react';
 import { RecordList } from '../components/records/RecordList';
@@ -36,6 +37,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvider }: HealthRecordsPageProps) {
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
@@ -163,6 +165,10 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button onClick={() => setUploadOpen(value=>!value)} aria-expanded={uploadOpen}
+            className="inline-flex items-center gap-2 px-3 py-2.5 border border-stroke-default rounded-xl text-content-primary hover:bg-action-secondary">
+            <Upload className="w-4 h-4" /> Upload File
+          </button>
           <button
             onClick={onConnectProvider}
             className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-action-primary text-content-on-action rounded-xl font-medium hover:bg-action-primary-hover transition-colors shadow-sm"
@@ -199,6 +205,8 @@ export function HealthRecordsPage({ darkMode = false, actionsRef, onConnectProvi
           Total Records: {stats.totalRecords}
         </div>
       </div>
+
+      {uploadOpen && <UploadRecordForm onSaved={() => { setCurrentFilter('all'); void loadRecords(); }} />}
 
       <EhrConnectionsPanel
         onConnect={onConnectProvider}

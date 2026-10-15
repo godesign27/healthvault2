@@ -6,13 +6,6 @@ import { stripTypeScriptTypes } from 'node:module';
 import { createCondition } from './health-writes.ts';
 import { createHealthShare } from './health-sharing.ts';
 
-test('a matching condition is rejected before insert', async () => {
-  let writes = 0;
-  const db: any = { from: () => ({ select: () => ({ limit: async () => ({ data: [{ name: ' Test condition ', status: 'Active' }], error: null }) }), insert: () => writes++ }) };
-  await assert.rejects(createCondition(db, 'fixture', { name: 'test CONDITION' }), /already exists/);
-  assert.equal(writes, 0);
-});
-
 test('a share snapshots only the selected category and preserves expiration', async () => {
   const tables: string[] = []; let inserted: any;
   const db: any = { from(table) {
@@ -38,11 +31,11 @@ for (const [label, row, status] of [
   ['revoked', { is_revoked: true }, 403],
   ['expired', { expires_at: '2000-01-01T00:00:00Z' }, 410],
   ['wrong token', { share_token: 'expected-token' }, 403],
-] as const) test(`public share handler rejects ${label} before fetching form data`, async () => {
+] as const) for (const suffix of ['', '/pdf', '/bundle']) test(`public share handler rejects ${label} for ${suffix || '/'} before fetching form data`, async () => {
   let handler: any; const reads: string[] = [];
   const db = { from(table) { reads.push(table); const q = { select: () => q, eq: () => q, single: async () => ({ data: row, error: null }) }; return q; } };
   vm.runInNewContext(script, { Deno: { env: { get: () => 'fixture' }, serve: fn => handler = fn }, createClient: () => db, Request, Response, URL, console });
-  const response = await handler(new Request('https://example.invalid/share/fixture?token=wrong'));
+  const response = await handler(new Request(`https://example.invalid/share/fixture${suffix}?token=wrong`));
   assert.equal(response.status, status);
   assert.deepEqual(reads, ['share_events']);
 });

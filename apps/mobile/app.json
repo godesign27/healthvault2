@@ -13,13 +13,18 @@
       "backgroundColor": "#0f172a"
     },
     "ios": {
+      "deploymentTarget": "15.0",
       "supportsTablet": false,
       "bundleIdentifier": "com.healthvault.app",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Health Vault uses Face ID to keep your medical records secure.",
         "NSCameraUsageDescription": "Health Vault uses the camera to scan and upload medical documents.",
-        "NSPhotoLibraryUsageDescription": "Health Vault accesses your photos to upload medical documents."
+        "NSPhotoLibraryUsageDescription": "Health Vault accesses your photos to upload medical documents.",
+        "NSHealthShareUsageDescription": "Health Vault reads your Apple Health measurements so you can review them and choose which ones to save."
       }
+    },
+    "android": {
+      "package": "com.healthvault.app"
     },
     "plugins": [
       "expo-dev-client",

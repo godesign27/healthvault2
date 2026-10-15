@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   Apple,
@@ -14,6 +14,13 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Dialog } from '../components/ui/Dialog';
+import {
+  currentWellnessEnd,
+  formatWellnessRange,
+  isCurrentWellnessWindow,
+  shiftWellnessEnd,
+  wellnessBounds,
+} from '../../packages/api-client/src/wellness-range';
 
 type WellnessTab = 'diet' | 'signals';
 type MealFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink' | 'other';
@@ -119,30 +126,39 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
   const [deleting, setDeleting] = useState<DietEntry | null>(null);
   const [editForm, setEditForm] = useState<EditForm | null>(null);
   const [saving, setSaving] = useState(false);
+  const [rangeEnd, setRangeEnd] = useState(() => currentWellnessEnd());
+  const loadGeneration = useRef(0);
+  const bounds = wellnessBounds(rangeEnd);
+  const showingCurrent = isCurrentWellnessWindow(rangeEnd);
+  const rangeLabel = formatWellnessRange(bounds.start, bounds.end);
 
   const loadWellness = useCallback(async () => {
+    const run = ++loadGeneration.current;
     setLoading(true);
     setError('');
-    const since = new Date(Date.now() - 7 * DAY_MS).toISOString();
+    const { start, end } = wellnessBounds(rangeEnd);
     const [{ data: diet, error: dietError }, { data: signals, error: signalError }] = await Promise.all([
       supabase
         .from('diet_log_entries')
         .select('id, meal_type, consumed_at, items, water_ml, notes, source, confirmation_status')
-        .gte('consumed_at', since)
+        .gte('consumed_at', start.toISOString())
+        .lt('consumed_at', end.toISOString())
         .order('consumed_at', { ascending: false }),
       supabase
         .from('life_signal_entries')
         .select('id, energy, sleep, mood, stress, pain, note, recorded_at, source, confirmation_status')
-        .gte('recorded_at', since)
+        .gte('recorded_at', start.toISOString())
+        .lt('recorded_at', end.toISOString())
         .order('recorded_at', { ascending: false }),
     ]);
+    if (run !== loadGeneration.current) return;
     if (dietError || signalError) {
       setError(dietError?.message || signalError?.message || 'Unable to load wellness entries.');
     }
     setDietEntries((diet as DietEntry[] | null) ?? []);
     setLifeSignals((signals as LifeSignal[] | null) ?? []);
     setLoading(false);
-  }, []);
+  }, [rangeEnd]);
 
   useEffect(() => {
     void loadWellness();
@@ -278,7 +294,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         ) : tab === 'diet' ? (
           <>
             <div className="mb-6 grid grid-cols-1 divide-y divide-stroke-subtle rounded-xl border border-stroke-subtle bg-surface-raised sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-              <div className="p-4"><p className="text-xs text-content-tertiary">Entries, past 7 days</p><p className="mt-1 text-2xl font-bold text-content-primary">{dietEntries.length}</p></div>
+              <div className="p-4"><p className="text-xs text-content-tertiary">Entries in these 7 days</p><p className="mt-1 text-2xl font-bold text-content-primary">{dietEntries.length}</p></div>
               <div className="p-4"><p className="text-xs text-content-tertiary">Foods and drinks recorded</p><p className="mt-1 text-2xl font-bold text-content-primary">{uniqueFoods}</p></div>
               <div className="p-4"><p className="text-xs text-content-tertiary">Logged water</p><p className="mt-1 text-2xl font-bold text-content-primary">{totalWater ? `${totalWater.toLocaleString()} mL` : 'Not logged'}</p></div>
             </div>
@@ -298,9 +314,9 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
             {groupedDiet.length === 0 ? (
               <div className="rounded-xl border border-dashed border-stroke-default px-6 py-14 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Utensils className="h-5 w-5 text-action-primary" /></div>
-                <h2 className="text-lg font-semibold text-content-primary">No meals logged yet</h2>
-                <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">Tell the Health Vault assistant what you ate or drank. You will review the details before anything is saved.</p>
-                <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Log your first meal</button>
+                <h2 className="text-lg font-semibold text-content-primary">{showingCurrent ? 'No meals logged yet' : 'No meals in these 7 days'}</h2>
+                <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">{showingCurrent ? 'Tell the Health Vault assistant what you ate or drank. You will review the details before anything is saved.' : 'Use the arrows to look at another week.'}</p>
+                {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Log your first meal</button> : null}
               </div>
             ) : (
               <div className="space-y-8">
@@ -347,7 +363,7 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
               <div className="mt-8 border-t border-stroke-subtle pt-5">
                 <h2 className="text-sm font-semibold text-content-primary">Pattern notes</h2>
                 <ul className="mt-2 space-y-1.5 text-sm leading-6 text-content-secondary">
-                  <li>• Entries reflect only what you chose to report during the past seven days.</li>
+                  <li>• Entries reflect only what you chose to report during these seven days.</li>
                   {totalWater === 0 && <li>• No water amounts are currently recorded.</li>}
                   <li>• Health Vault can help summarize patterns, but it does not estimate unlogged nutrients or prescribe a medical diet.</li>
                 </ul>
@@ -357,9 +373,9 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         ) : lifeSignals.length === 0 ? (
           <div className="rounded-xl border border-dashed border-stroke-default px-6 py-14 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-action-primary-subtle"><Activity className="h-5 w-5 text-action-primary" /></div>
-            <h2 className="text-lg font-semibold text-content-primary">No Life Signals yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">A short daily check-in records energy, sleep, mood, stress, and pain on a 1–5 scale.</p>
-            <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Start your first check-in</button>
+            <h2 className="text-lg font-semibold text-content-primary">{showingCurrent ? 'No Life Signals yet' : 'No Life Signals in these 7 days'}</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">{showingCurrent ? 'A short daily check-in records energy, sleep, mood, stress, and pain on a 1–5 scale.' : 'Use the arrows to look at another week.'}</p>
+            {showingCurrent ? <button onClick={onOpenAssistant} className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-700 hover:text-blue-900"><MessageCircle className="h-4 w-4" /> Start your first check-in</button> : null}
           </div>
         ) : (
           <div className="space-y-4">
@@ -386,10 +402,10 @@ export function WellnessPage({ onOpenAssistant }: WellnessPageProps) {
         )}
 
         <div className="mt-10 flex items-center justify-between border-t border-stroke-subtle pt-5 text-xs text-content-tertiary">
-          <span>Showing the most recent 7 days</span>
-          <div className="flex items-center gap-1" aria-label="Date range navigation coming soon">
-            <button disabled className="rounded p-1 opacity-40"><ChevronLeft className="h-4 w-4" /></button>
-            <button disabled className="rounded p-1 opacity-40"><ChevronRight className="h-4 w-4" /></button>
+          <span>{showingCurrent ? `Most recent 7 days, ${rangeLabel}` : rangeLabel}</span>
+          <div className="flex items-center gap-1" aria-label="Date range">
+            <button type="button" onClick={() => setRangeEnd((end) => shiftWellnessEnd(end, 'earlier'))} className="rounded p-2 text-content-primary hover:bg-action-secondary" aria-label="Previous 7 days"><ChevronLeft className="h-4 w-4" /></button>
+            <button type="button" onClick={() => setRangeEnd((end) => shiftWellnessEnd(end, 'later'))} disabled={showingCurrent} className="rounded p-2 text-content-primary hover:bg-action-secondary disabled:opacity-40" aria-label="Next 7 days"><ChevronRight className="h-4 w-4" /></button>
           </div>
         </div>
       </div>

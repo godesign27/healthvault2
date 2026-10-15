@@ -7,6 +7,9 @@ export async function fetchFhirBundle(
   const base = fhirBaseUrl.replace(/\/+$/, "");
   const url = new URL(`${base}/${resourceType}`);
   url.searchParams.set("patient", patientId);
+  if (resourceType === "MedicationStatement") {
+    url.searchParams.set("_include", "MedicationStatement:medication");
+  }
 
   const res = await fetch(url.toString(), {
     headers: {
@@ -45,11 +48,49 @@ export async function fetchPatientResources(
   return { conditions, medications, allergies, immunizations };
 }
 
+function nonEmptyText(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
 function codingDisplay(code: unknown): string | null {
   if (!code || typeof code !== "object") return null;
-  const c = code as { text?: string; coding?: Array<{ display?: string }> };
-  if (c.text) return c.text;
-  return c.coding?.[0]?.display ?? null;
+  const c = code as { text?: unknown; coding?: Array<{ display?: unknown }> };
+  return nonEmptyText(c.text) || (Array.isArray(c.coding)
+    ? c.coding.map(coding => nonEmptyText(coding?.display)).find(Boolean) || null
+    : null);
+}
+
+type FhirResource = Record<string, unknown>;
+type BundleEntry = { fullUrl?: string; resource?: FhirResource };
+
+function medicationName(statement: FhirResource, entry: BundleEntry, entries: BundleEntry[]): string {
+  const direct = codingDisplay(statement.medicationCodeableConcept);
+  if (direct) return direct;
+  const ref = statement.medicationReference as { reference?: unknown; display?: unknown } | undefined;
+  const reference = nonEmptyText(ref?.reference);
+  let medication: FhirResource | undefined;
+  if (reference?.startsWith("#")) {
+    // Contained identifiers are scoped to this statement, never the whole bundle.
+    const contained = Array.isArray(statement.contained) ? statement.contained as FhirResource[] : [];
+    medication = contained.find(r => r?.resourceType === "Medication" && r.id === reference.slice(1));
+  } else if (reference) {
+    let absoluteReference: string | null = null;
+    // Resolve a relative Medication/id only against the enclosing statement's fullUrl.
+    // Do not match an external absolute reference to a local medication with the same id.
+    if (/^Medication\/[A-Za-z0-9.-]+$/.test(reference) && entry.fullUrl) {
+      try {
+        const base = entry.fullUrl.replace(/MedicationStatement\/[^/]+(?:\/_history\/[^/]+)?$/, "");
+        if (base !== entry.fullUrl) absoluteReference = new URL(reference, base).href;
+      } catch { /* Non-URL bundle identifiers can still be matched exactly below. */ }
+    }
+    medication = entries.find(e => e.resource?.resourceType === "Medication" && (
+      e.fullUrl === reference || (absoluteReference !== null && e.fullUrl === absoluteReference) ||
+      (!e.fullUrl && reference === `Medication/${e.resource.id}`)
+    ))?.resource;
+  }
+  // Resolve only resources already returned in this bundle. Never send the bearer
+  // token to a URL supplied by a clinical reference.
+  return codingDisplay(medication?.code) || nonEmptyText(ref?.display) || "Medication";
 }
 
 export function bundleToPreviewItems(
@@ -78,7 +119,7 @@ export function bundleToPreviewItems(
   }> = [];
 
   const entries = (bundle: Record<string, unknown>) =>
-    Array.isArray(bundle.entry) ? bundle.entry as Array<{ resource?: Record<string, unknown> }> : [];
+    Array.isArray(bundle.entry) ? bundle.entry as BundleEntry[] : [];
 
   for (const entry of entries(bundles.conditions)) {
     const r = entry.resource;
@@ -93,12 +134,14 @@ export function bundleToPreviewItems(
     });
   }
 
-  for (const entry of entries(bundles.medications)) {
+  const medicationEntries = entries(bundles.medications);
+  for (const entry of medicationEntries) {
     const r = entry.resource;
-    if (!r) continue;
+    // Included Medication resources supply names; they are not additional statements.
+    if (!r || r.resourceType !== "MedicationStatement") continue;
     items.push({
       resourceType: "medication",
-      name: codingDisplay(r.medicationCodeableConcept) || "Medication",
+      name: medicationName(r, entry, medicationEntries),
       date: (r.effectiveDateTime as string) || null,
       source,
       status: (r.status as string) || "Active",

@@ -1,5 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.112.3";
+import { requireActiveAccount } from "../inbound-records/access.ts";
+import { fhirReturnUrl } from "../_shared/fhir-return.ts";
 import {
   buildAuthorizeUrl,
   createPkcePair,
@@ -61,7 +63,12 @@ Deno.serve(async (req: Request) => {
     }
 
     const connectionMethod = body.connectionMethod || "direct_provider_connection";
+    if (!['direct_provider_connection','epic_connection'].includes(connectionMethod)) return json({error:'Invalid connection method'},400);
+    let returnUrl;
+    try {returnUrl=fhirReturnUrl(Deno.env.get('APP_URL') || 'https://healthvault.me',body.redirectAfter).toString();}
+    catch {return json({error:'Invalid return URL'},400);}
     const sb = createClient(supabaseUrl, serviceKey);
+    await requireActiveAccount(sb, user.id);
 
     const { data: org, error: orgError } = await sb
       .from("provider_organizations")
@@ -126,7 +133,7 @@ Deno.serve(async (req: Request) => {
       state,
       code_verifier: codeVerifier,
       connection_method: connectionMethod,
-      redirect_after: body.redirectAfter || null,
+      redirect_after: returnUrl,
       expires_at: expiresAt,
     });
 
@@ -153,6 +160,6 @@ Deno.serve(async (req: Request) => {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Internal error";
-    return json({ error: message }, 500);
+    return json({ error: "Unable to start authorization" }, 500);
   }
 });

@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {createRecordRequest,validateRecordRequest} from '../apps/mobile/src/lib/request-create.js';
+const input={providerName:'Synthetic Clinic',providerEmail:'test@example.invalid',recordTypes:['lab'],urgency:'routine'};
+for(const invalid of [{...input,providerEmail:'bad'},{...input,recordTypes:[]},{...input,recordTypes:['unknown']},{...input,providerName:''}])assert.throws(()=>validateRecordRequest(invalid));
+let mode='ok',calls=0;const values=new Map();const storage={getItem:async k=>values.get(k),setItem:async(k,v)=>values.set(k,v),removeItem:async k=>values.delete(k)};
+const args={input,storage,digest:async s=>createHash('sha256').update(s).digest('hex'),baseUrl:'https://preview.invalid',anonKey:'anon',getSession:async()=>({user:{id:'one'},access_token:'jwt'}),fetchImpl:async(url,init)=>{calls++;assert.equal(init.headers.Authorization,'Bearer jwt');assert.equal(JSON.parse(init.body).userId,undefined);if(mode==='lost')throw Error('network');if(mode==='deny')return Response.json({},{status:403});return Response.json({id:'11111111-1111-4111-8111-111111111111',emailSent:mode==='ok'});}};
+assert.equal((await createRecordRequest(args)).emailAccepted,true);await assert.rejects(createRecordRequest(args));assert.equal(calls,1);
+values.clear();mode='email-failed';assert.equal((await createRecordRequest(args)).emailAccepted,false);assert.equal(values.size,1);
+values.clear();mode='lost';await assert.rejects(createRecordRequest(args));const before=calls;await assert.rejects(createRecordRequest(args));assert.equal(calls,before);
+values.clear();mode='deny';await assert.rejects(createRecordRequest(args));assert.equal(values.size,0);
+const n=calls;let sessionCalls=0;await assert.rejects(createRecordRequest({...args,getSession:async()=>({user:{id:++sessionCalls===1?'one':'two'},access_token:'jwt'})}));assert.equal(calls,n);assert.equal(values.size,0);
+console.log('PASS request validation, authenticated payload, known/uncertain outcomes, duplicate prevention and account-change rejection');

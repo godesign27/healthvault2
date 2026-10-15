@@ -40,6 +40,7 @@
 - Sign In includes Forgot password. It asks for an email and sends the recovery link to https://healthvault.me.
 - Set new password shows the Health Vault mark. A password field shows an eye after text is entered. The recovery email template is branded for Health Vault.
 - The saved reset email uses the published Health Vault layout: the mark, a serif heading, and a Choose a new password button. No reset was sent and the password was not changed.
+- The operator approved the privacy notice on October 7, 2026. The public page no longer says it is a draft. Terms of use remain unapproved.
 
 ### Remaining
 

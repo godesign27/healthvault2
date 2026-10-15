@@ -50,3 +50,15 @@ test('an unavailable host does not consume the confirmation', async () => {
   const h = host(); await assert.rejects(h.api.callTool('save', { confirmed: true }), /not ready/);
   assert.equal(h.api.confirmationSubmitted, false);
 });
+
+test('initial standard tool errors notify subscribers but cannot overwrite a submitted confirmation', async () => {
+  const h = host(async () => ({ structuredContent: { saved: true } }));
+  let renders = 0; h.api.subscribe(() => renders++);
+  h.message({ method: 'ui/notifications/tool-result', params: { isError: true, content: [{ type: 'text', text: 'Rejected' }] } });
+  assert.equal(h.api.output.error, 'Rejected');
+  assert.equal(renders, 1);
+  await h.api.callTool('save', { confirmed: true });
+  h.message({ method: 'ui/notifications/tool-result', params: { isError: true, content: [{ type: 'text', text: 'Late error' }] } });
+  assert.equal(renders, 1);
+  assert.equal(h.api.confirmationSubmitted, true);
+});

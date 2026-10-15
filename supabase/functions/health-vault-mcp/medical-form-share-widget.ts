@@ -32,7 +32,23 @@ ${WIDGET_HOST_SCRIPT}
     app.dataset.state=done?'confirmed':'review';
     app.innerHTML='<section class="card"><div class="eyebrow">FINAL REVIEW · SECURE MEDICAL FORM</div><div class="title">'+esc(output.templateTitle)+'</div><div class="review">'+review+'</div><div class="well">'+esc(deliveryText)+'</div>'+(done?'<div class="success"><strong>Secure share created</strong><br><a id="open" class="link" href="#">Open secure share</a><br><span class="muted">Expires '+esc(output.expiresAt)+'</span></div>':'<button id="confirm" class="button" type="button">Confirm & Email Secure Share</button><div id="error"></div>')+'</section>';
     var confirmButton=document.getElementById('confirm');if(confirmButton)confirmButton.addEventListener('click',confirmShare);
-    var openLink=document.getElementById('open');if(openLink)openLink.addEventListener('click',function(event){event.preventDefault();var bridge=window.openai||{};if(output.shareUrl&&typeof bridge.openExternal==='function')bridge.openExternal({href:output.shareUrl})});
+    var openLink=document.getElementById('open');
+    if(openLink){
+      try{
+        var shareUrl=new URL(output.shareUrl);
+        if(shareUrl.origin!=='https://healthvault.me'||!shareUrl.pathname.startsWith('/share/'))throw new Error('Invalid secure share URL');
+        openLink.href=shareUrl.href;openLink.target='_blank';openLink.rel='noopener noreferrer';
+        openLink.addEventListener('click',function(event){
+          var bridge=window.openai||{};
+          if(typeof bridge.openExternal!=='function')return;
+          try{
+            var result=bridge.openExternal({href:shareUrl.href,redirectUrl:false});
+            event.preventDefault();
+            Promise.resolve(result).catch(function(){openLink.textContent='Open secure share in a new tab';openLink.replaceWith(openLink.cloneNode(true))});
+          }catch(error){/* Keep the real link's native navigation available. */}
+        });
+      }catch(error){openLink.removeAttribute('href');openLink.textContent='Secure link unavailable. Open the link in your email.'}
+    }
   }
   async function confirmShare(){
     if(busy)return;busy=true;

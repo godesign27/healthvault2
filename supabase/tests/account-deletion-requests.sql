@@ -1,5 +1,14 @@
--- Rollback-only regression. Supply two existing auth user UUIDs as session settings.
+-- Rollback-only regression with synthetic identities; never uses real accounts.
+-- No passwords, sessions, emails or committed auth users are created.
 begin;
+select set_config('health_vault.test_owner_a', gen_random_uuid()::text, true);
+select set_config('health_vault.test_owner_b', gen_random_uuid()::text, true);
+insert into auth.users(id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+select id, 'authenticated', 'authenticated', 'hv-deletion-test-' || id || '@example.invalid',
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"fixture":"rollback-only account deletion test"}'::jsonb, now(), now()
+from (values (current_setting('health_vault.test_owner_a')::uuid),
+             (current_setting('health_vault.test_owner_b')::uuid)) as owners(id);
 set local role authenticated;
 select set_config('request.jwt.claims', json_build_object('sub',current_setting('health_vault.test_owner_a'),'role','authenticated')::text,true);
 do $$ begin

@@ -1,10 +1,12 @@
+import {typeStyles} from '../theme/layout';
+import {AppText as Text,AppTextInput as TextInput} from '../components/ui/AppText';
 import React, { useState, useMemo } from 'react';
 import {
   View,
-  Text,
+
   ScrollView,
   TouchableOpacity,
-  TextInput,
+
   StyleSheet,
   RefreshControl,
 } from 'react-native';
@@ -108,14 +110,14 @@ function NetworkBadge({ type }) {
     return (
       <View style={[styles.badge, { backgroundColor: STEEL.successBg }]}>
         <Ionicons name="checkmark-circle-outline" size={11} color={STEEL.success} />
-        <Text style={[styles.badgeText, { color: STEEL.success }]}>In-Network</Text>
+        <Text variant="caption" style={[styles.badgeText, { color: STEEL.success }]}>In-Network</Text>
       </View>
     );
   }
   return (
     <View style={[styles.badge, { backgroundColor: STEEL.dangerBg }]}>
       <Ionicons name="close-circle-outline" size={11} color={STEEL.danger} />
-      <Text style={[styles.badgeText, { color: STEEL.danger }]}>Out-of-Network</Text>
+      <Text variant="caption" style={[styles.badgeText, { color: STEEL.danger }]}>Out-of-Network</Text>
     </View>
   );
 }
@@ -124,7 +126,7 @@ function RoleBadge({ role }) {
   const color = role === 'Primary' ? STEEL.accent : '#8B5CF6';
   return (
     <View style={[styles.roleBadge, { backgroundColor: color }]}>
-      <Text style={styles.roleBadgeText}>{role}</Text>
+      <Text variant="caption" style={styles.roleBadgeText}>{role}</Text>
     </View>
   );
 }
@@ -137,40 +139,40 @@ function ProviderCard({ provider, showSave }) {
       <View style={styles.providerCardTop}>
         {showSave ? (
           <View style={[styles.avatar, { backgroundColor: bg }]}>
-            <Text style={styles.avatarText}>{ini}</Text>
+            <Text variant="body" style={styles.avatarText}>{ini}</Text>
           </View>
         ) : null}
         <View style={{ flex: 1, marginLeft: showSave ? 10 : 0 }}>
           <View style={styles.providerNameRow}>
-            <Text style={styles.providerName}>{provider.name}</Text>
+            <Text variant="body" style={styles.providerName}>{provider.name}</Text>
             <NetworkBadge type={provider.network} />
           </View>
           {provider.role && !showSave ? <RoleBadge role={provider.role} /> : null}
-          <Text style={styles.providerSpecialty}>{provider.specialty}</Text>
+          <Text variant="secondary" style={styles.providerSpecialty}>{provider.specialty}</Text>
           {provider.clinic ? (
             <View style={styles.infoRow}>
               <Ionicons name="business-outline" size={13} color={STEEL.textMuted} />
-              <Text style={styles.infoText}>{provider.clinic}</Text>
+              <Text variant="secondary" style={styles.infoText}>{provider.clinic}</Text>
             </View>
           ) : null}
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
-            <Text style={styles.infoText}>{provider.address}</Text>
+            <Text variant="secondary" style={styles.infoText}>{provider.address}</Text>
           </View>
           <View style={styles.infoRow}>
             <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
-            <Text style={styles.infoText}>{provider.phone}</Text>
+            <Text variant="secondary" style={styles.infoText}>{provider.phone}</Text>
           </View>
           {provider.languages ? (
             <View style={styles.infoRow}>
               <Ionicons name="language-outline" size={13} color={STEEL.textMuted} />
-              <Text style={styles.infoText}>{provider.languages}</Text>
+              <Text variant="secondary" style={styles.infoText}>{provider.languages}</Text>
             </View>
           ) : null}
           {provider.lastVisit ? (
             <View style={styles.infoRow}>
               <Ionicons name="calendar-outline" size={13} color={STEEL.textMuted} />
-              <Text style={styles.infoText}>Last visit: {provider.lastVisit}</Text>
+              <Text variant="secondary" style={styles.infoText}>Last visit: {provider.lastVisit}</Text>
             </View>
           ) : null}
         </View>
@@ -179,21 +181,21 @@ function ProviderCard({ provider, showSave }) {
         <View style={styles.cardFooter}>
           <View style={styles.acceptingRow}>
             {provider.accepting ? (
-              <Text style={[styles.acceptingText, { color: STEEL.success }]}>Accepting patients</Text>
+              <Text variant="secondary" style={[styles.acceptingText, { color: STEEL.success }]}>Accepting patients</Text>
             ) : (
-              <Text style={styles.notAcceptingText}>Not accepting</Text>
+              <Text variant="secondary" style={styles.notAcceptingText}>Not accepting</Text>
             )}
-            <Text style={styles.distanceText}>{provider.distance || '—'}</Text>
+            <Text variant="secondary" style={styles.distanceText}>{provider.distance || '—'}</Text>
           </View>
           <TouchableOpacity style={styles.saveBtn} activeOpacity={0.85}>
             <Ionicons name="add" size={14} color="#fff" />
-            <Text style={styles.saveBtnText}>Save to My Network</Text>
+            <Text variant="secondary" style={styles.saveBtnText}>Save to My Network</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <TouchableOpacity style={styles.removeBtn} activeOpacity={0.85}>
           <Ionicons name="trash-outline" size={14} color={STEEL.danger} />
-          <Text style={styles.removeBtnText}>Remove</Text>
+          <Text variant="secondary" style={styles.removeBtnText}>Remove</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -206,35 +208,35 @@ function PharmacyCard({ pharmacy, isPreferred }) {
       {isPreferred ? (
         <View style={styles.preferredHeader}>
           <Ionicons name="star" size={16} color={STEEL.warning} />
-          <Text style={styles.preferredTitle}>Your Preferred Pharmacy</Text>
+          <Text variant="body" style={styles.preferredTitle}>Your Preferred Pharmacy</Text>
         </View>
       ) : null}
       <View style={styles.providerNameRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.providerName}>{pharmacy.name}</Text>
-          <Text style={styles.providerSpecialty}>{pharmacy.chain}</Text>
+          <Text variant="body" style={styles.providerName}>{pharmacy.name}</Text>
+          <Text variant="secondary" style={styles.providerSpecialty}>{pharmacy.chain}</Text>
         </View>
         <NetworkBadge type={pharmacy.network} />
       </View>
       <View style={styles.infoRow}>
         <Ionicons name="call-outline" size={13} color={STEEL.textMuted} />
-        <Text style={styles.infoText}>{pharmacy.phone}</Text>
+        <Text variant="secondary" style={styles.infoText}>{pharmacy.phone}</Text>
       </View>
       <View style={styles.infoRow}>
         <Ionicons name="location-outline" size={13} color={STEEL.textMuted} />
-        <Text style={styles.infoText}>{pharmacy.address}</Text>
+        <Text variant="secondary" style={styles.infoText}>{pharmacy.address}</Text>
       </View>
       {pharmacy.service ? (
         <View style={styles.infoRow}>
           <Ionicons name="cube-outline" size={13} color={STEEL.textMuted} />
-          <Text style={styles.infoText}>{pharmacy.service}</Text>
+          <Text variant="secondary" style={styles.infoText}>{pharmacy.service}</Text>
         </View>
       ) : null}
       {pharmacy.services ? (
         <View style={styles.servicesRow}>
           {pharmacy.services.map((s) => (
             <View key={s} style={styles.servicePill}>
-              <Text style={styles.servicePillText}>{s}</Text>
+              <Text variant="caption" style={styles.servicePillText}>{s}</Text>
             </View>
           ))}
         </View>
@@ -243,11 +245,11 @@ function PharmacyCard({ pharmacy, isPreferred }) {
         <View style={styles.pharmacyFooter}>
           <TouchableOpacity style={styles.setPreferredBtn} activeOpacity={0.85}>
             <Ionicons name="star-outline" size={13} color={STEEL.textSecondary} />
-            <Text style={styles.setPreferredText}>Set Preferred</Text>
+            <Text variant="secondary" style={styles.setPreferredText}>Set Preferred</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.removeBtnInline} activeOpacity={0.85}>
             <Ionicons name="trash-outline" size={14} color={STEEL.danger} />
-            <Text style={styles.removeBtnText}>Remove</Text>
+            <Text variant="secondary" style={styles.removeBtnText}>Remove</Text>
           </TouchableOpacity>
         </View>
       ) : null}
@@ -284,8 +286,8 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
     <View style={styles.container}>
       {!omitShellTitle ? (
         <View style={styles.pageHeader}>
-          <Text style={styles.nowViewing}>NOW VIEWING</Text>
-          <Text style={styles.pageTitle}>Network</Text>
+          <Text variant="caption" style={styles.nowViewing}>NOW VIEWING</Text>
+          <Text variant="page" style={styles.pageTitle}>Network</Text>
         </View>
       ) : null}
 
@@ -300,7 +302,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
             size={14}
             color={activeTab === 'providers' ? STEEL.accent : STEEL.textSecondary}
           />
-          <Text style={[styles.mainTabText, activeTab === 'providers' && styles.mainTabTextActive]}>
+          <Text variant="body" style={[styles.mainTabText, activeTab === 'providers' && styles.mainTabTextActive]}>
             Providers & Specialists
           </Text>
         </TouchableOpacity>
@@ -314,7 +316,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
             size={14}
             color={activeTab === 'pharmacies' ? STEEL.accent : STEEL.textSecondary}
           />
-          <Text style={[styles.mainTabText, activeTab === 'pharmacies' && styles.mainTabTextActive]}>
+          <Text variant="body" style={[styles.mainTabText, activeTab === 'pharmacies' && styles.mainTabTextActive]}>
             Pharmacies
           </Text>
         </TouchableOpacity>
@@ -336,13 +338,13 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
       >
         {activeTab === 'providers' ? (
           <>
-            {error ? <Text style={styles.inlineError}>{error}</Text> : null}
+            {error ? <Text variant="secondary" style={styles.inlineError}>{error}</Text> : null}
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="people-outline" size={18} color={STEEL.accent} />
-                <Text style={styles.sectionTitle}>Your Care Team</Text>
+                <Text variant="section" style={styles.sectionTitle}>Your Care Team</Text>
                 <View style={styles.countBadge}>
-                  <Text style={styles.countBadgeText}>{careTeam.all?.length ?? 0}</Text>
+                  <Text variant="caption" style={styles.countBadgeText}>{careTeam.all?.length ?? 0}</Text>
                 </View>
               </View>
             </View>
@@ -355,14 +357,14 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
             ) : showTeamEmpty ? (
               <View style={[styles.card, styles.emptyState]}>
                 <Ionicons name="people-outline" size={28} color="#94A3B8" />
-                <Text style={styles.emptyTitle}>No providers connected yet</Text>
-                <Text style={styles.emptySubtitle}>Connect a provider to see your care team here</Text>
+                <Text variant="body" style={styles.emptyTitle}>No providers connected yet</Text>
+                <Text variant="secondary" style={styles.emptySubtitle}>Connect a provider to see your care team here</Text>
               </View>
             ) : (
               <>
                 {careTeam.primaryCare?.length ? (
                   <>
-                    <Text style={styles.groupLabel}>PRIMARY CARE</Text>
+                    <Text variant="caption" style={styles.groupLabel}>PRIMARY CARE</Text>
                     {careTeam.primaryCare.map((p) => (
                       <ProviderCard key={p.id} provider={p} showSave={false} />
                     ))}
@@ -370,7 +372,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
                 ) : null}
                 {careTeam.specialists?.length ? (
                   <>
-                    <Text style={styles.groupLabel}>SPECIALISTS</Text>
+                    <Text variant="caption" style={styles.groupLabel}>SPECIALISTS</Text>
                     {careTeam.specialists.map((p) => (
                       <ProviderCard key={p.id} provider={p} showSave={false} />
                     ))}
@@ -382,9 +384,9 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
             <View style={[styles.sectionHeader, { marginTop: 8 }]}>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="pulse-outline" size={18} color={STEEL.success} />
-                <Text style={styles.sectionTitle}>Aetna In-Network Directory</Text>
+                <Text variant="section" style={styles.sectionTitle}>Aetna In-Network Directory</Text>
               </View>
-              <Text style={styles.sectionSubtitle}>Showing providers matched to your connected Aetna plan</Text>
+              <Text variant="secondary" style={styles.sectionSubtitle}>Showing providers matched to your connected Aetna plan</Text>
             </View>
 
             <View style={styles.searchBar}>
@@ -412,7 +414,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
                   style={[styles.filterPill, activeFilter === f && styles.filterPillActive]}
                   activeOpacity={0.85}
                 >
-                  <Text style={[styles.filterPillText, activeFilter === f && styles.filterPillTextActive]}>
+                  <Text variant="secondary" style={[styles.filterPillText, activeFilter === f && styles.filterPillTextActive]}>
                     {f}
                     {f === 'All' ? ` ${directory.length}` : ''}
                   </Text>
@@ -420,7 +422,7 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
               ))}
             </ScrollView>
 
-            <Text style={styles.resultsCount}>{filteredDirectory.length} providers found</Text>
+            <Text variant="secondary" style={styles.resultsCount}>{filteredDirectory.length} providers found</Text>
 
             {filteredDirectory.map((p) => (
               <ProviderCard key={p.id} provider={p} showSave={true} />
@@ -428,12 +430,12 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
           </>
         ) : (
           <>
-            <Text style={styles.groupLabel}>YOUR ADDRESSES</Text>
-            <Text style={styles.groupSubLabel}>Used to find nearby pharmacies</Text>
+            <Text variant="caption" style={styles.groupLabel}>YOUR ADDRESSES</Text>
+            <Text variant="secondary" style={styles.groupSubLabel}>Used to find nearby pharmacies</Text>
             <View style={[styles.card, styles.dashedCard]}>
               <Ionicons name="location-outline" size={28} color={STEEL.textMuted} />
-              <Text style={styles.emptyTitle}>Add your first address</Text>
-              <Text style={styles.emptySubtitle}>
+              <Text variant="body" style={styles.emptyTitle}>Add your first address</Text>
+              <Text variant="secondary" style={styles.emptySubtitle}>
                 Home, second home, or work — used to find pharmacies near you
               </Text>
             </View>
@@ -443,27 +445,27 @@ export default function NetworkScreen({ omitShellTitle = false, scrollFabProps =
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="location-outline" size={18} color={STEEL.danger} />
-                <Text style={styles.sectionTitle}>Nearby Pharmacies</Text>
+                <Text variant="section" style={styles.sectionTitle}>Nearby Pharmacies</Text>
               </View>
             </View>
             <View style={[styles.card, styles.emptyState]}>
               <Ionicons name="location-outline" size={28} color={STEEL.textMuted} />
-              <Text style={styles.emptyTitle}>Add an address to see nearby pharmacies</Text>
-              <Text style={styles.emptySubtitle}>
+              <Text variant="body" style={styles.emptyTitle}>Add an address to see nearby pharmacies</Text>
+              <Text variant="secondary" style={styles.emptySubtitle}>
                 Use the address section above, or add a pharmacy manually.
               </Text>
               <View style={styles.emptyActions}>
                 <TouchableOpacity style={styles.addAddressBtn} activeOpacity={0.85}>
                   <Ionicons name="add" size={14} color="#fff" />
-                  <Text style={styles.addAddressBtnText}>Add Address</Text>
+                  <Text variant="body" style={styles.addAddressBtnText}>Add Address</Text>
                 </TouchableOpacity>
                 <TouchableOpacity activeOpacity={0.85}>
-                  <Text style={styles.addPharmacyLink}>+ Add Pharmacy</Text>
+                  <Text variant="body" style={styles.addPharmacyLink}>+ Add Pharmacy</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            <Text style={styles.groupLabel}>OTHER SAVED PHARMACIES</Text>
+            <Text variant="caption" style={styles.groupLabel}>OTHER SAVED PHARMACIES</Text>
             {mockOtherPharmacies.map((p) => (
               <PharmacyCard key={p.id} pharmacy={p} isPreferred={false} />
             ))}
@@ -478,14 +480,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: STEEL.canvas },
   pageHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
   nowViewing: {
-    fontSize: 11,
+    ...typeStyles.caption,
     fontWeight: '600',
     color: '#E53935',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginBottom: 2,
   },
-  pageTitle: { fontSize: 32, fontWeight: '800', color: STEEL.textPrimary },
+  pageTitle: { ...typeStyles.page, fontWeight: '800', color: STEEL.textPrimary },
   mainTabs: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -502,22 +504,22 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   mainTabActive: { borderBottomColor: STEEL.accent },
-  mainTabText: { fontSize: 14, fontWeight: '500', color: STEEL.textSecondary },
+  mainTabText: { ...typeStyles.body, fontWeight: '500', color: STEEL.textSecondary },
   mainTabTextActive: { color: STEEL.accent, fontWeight: '600' },
   scroll: { flex: 1 },
   sectionHeader: { marginTop: 16, marginBottom: 8 },
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: STEEL.textPrimary },
-  sectionSubtitle: { fontSize: 13, color: STEEL.textSecondary, marginTop: 2 },
+  sectionTitle: { ...typeStyles.section, fontWeight: '700', color: STEEL.textPrimary },
+  sectionSubtitle: { ...typeStyles.secondary, color: STEEL.textSecondary, marginTop: 2 },
   countBadge: {
     backgroundColor: STEEL.accentBg,
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
-  countBadgeText: { fontSize: 12, fontWeight: '600', color: STEEL.accent },
+  countBadgeText: { ...typeStyles.caption, fontWeight: '600', color: STEEL.accent },
   groupLabel: {
-    fontSize: 11,
+    ...typeStyles.caption,
     fontWeight: '600',
     letterSpacing: 1.2,
     color: STEEL.textMuted,
@@ -525,7 +527,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 4,
   },
-  groupSubLabel: { fontSize: 13, color: STEEL.textSecondary, marginBottom: 8 },
+  groupSubLabel: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 8 },
   card: {
     backgroundColor: STEEL.surface,
     borderRadius: 16,
@@ -554,7 +556,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  avatarText: { color: '#fff', fontWeight: '700', ...typeStyles.body },
   providerNameRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -562,10 +564,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     gap: 8,
   },
-  providerName: { fontSize: 15, fontWeight: '700', color: STEEL.textPrimary, flex: 1 },
-  providerSpecialty: { fontSize: 13, color: STEEL.textSecondary, marginBottom: 6 },
+  providerName: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary, flex: 1 },
+  providerSpecialty: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 6 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
-  infoText: { fontSize: 13, color: STEEL.textSecondary, flex: 1 },
+  infoText: { ...typeStyles.secondary, color: STEEL.textSecondary, flex: 1 },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -574,7 +576,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 10,
   },
-  badgeText: { fontSize: 11, fontWeight: '600' },
+  badgeText: { ...typeStyles.caption, fontWeight: '600' },
   roleBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 10,
@@ -582,7 +584,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 4,
   },
-  roleBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  roleBadgeText: { color: '#fff', ...typeStyles.caption, fontWeight: '700' },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -593,9 +595,9 @@ const styles = StyleSheet.create({
     borderTopColor: STEEL.border,
   },
   acceptingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  acceptingText: { fontSize: 13, fontWeight: '500' },
-  notAcceptingText: { fontSize: 13, color: STEEL.textSecondary },
-  distanceText: { fontSize: 13, color: STEEL.textMuted },
+  acceptingText: { ...typeStyles.secondary, fontWeight: '500' },
+  notAcceptingText: { ...typeStyles.secondary, color: STEEL.textSecondary },
+  distanceText: { ...typeStyles.secondary, color: STEEL.textMuted },
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -605,7 +607,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
-  saveBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  saveBtnText: { color: '#fff', ...typeStyles.secondary, fontWeight: '600' },
   removeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -619,7 +621,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   removeBtnInline: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  removeBtnText: { color: STEEL.danger, fontSize: 13, fontWeight: '500' },
+  removeBtnText: { color: STEEL.danger, ...typeStyles.secondary, fontWeight: '500' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -632,7 +634,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: STEEL.border,
   },
-  searchInput: { flex: 1, fontSize: 14, color: STEEL.textPrimary },
+  searchInput: { flex: 1, ...typeStyles.body, color: STEEL.textPrimary },
   filterRow: { marginBottom: 10, flexGrow: 0 },
   filterPill: {
     paddingHorizontal: 14,
@@ -643,18 +645,18 @@ const styles = StyleSheet.create({
     borderColor: STEEL.border,
   },
   filterPillActive: { backgroundColor: STEEL.accent, borderColor: STEEL.accent },
-  filterPillText: { fontSize: 13, fontWeight: '500', color: STEEL.textSecondary },
+  filterPillText: { ...typeStyles.secondary, fontWeight: '500', color: STEEL.textSecondary },
   filterPillTextActive: { color: '#FFFFFF' },
-  resultsCount: { fontSize: 13, color: STEEL.textSecondary, marginBottom: 8 },
+  resultsCount: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 8 },
   teamSkeletonCard: {
     height: 120,
     borderRadius: 16,
     backgroundColor: '#E2E8F0',
     marginBottom: 10,
   },
-  inlineError: { fontSize: 13, color: '#EF4444', marginBottom: 10, lineHeight: 18 },
+  inlineError: { ...typeStyles.secondary, color: '#EF4444', marginBottom: 10, },
   preferredHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  preferredTitle: { fontSize: 15, fontWeight: '700', color: STEEL.textPrimary },
+  preferredTitle: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary },
   servicesRow: { flexDirection: 'row', gap: 8, marginTop: 6, flexWrap: 'wrap' },
   servicePill: {
     backgroundColor: STEEL.successBg,
@@ -662,7 +664,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  servicePillText: { fontSize: 12, fontWeight: '500', color: STEEL.success },
+  servicePillText: { ...typeStyles.caption, fontWeight: '500', color: STEEL.success },
   pharmacyFooter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -673,10 +675,10 @@ const styles = StyleSheet.create({
     borderTopColor: STEEL.border,
   },
   setPreferredBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  setPreferredText: { fontSize: 13, color: STEEL.textSecondary },
+  setPreferredText: { ...typeStyles.secondary, color: STEEL.textSecondary },
   emptyState: { alignItems: 'center', paddingVertical: 20, gap: 8 },
-  emptyTitle: { fontSize: 15, fontWeight: '600', color: STEEL.textPrimary, textAlign: 'center' },
-  emptySubtitle: { fontSize: 13, color: STEEL.textSecondary, textAlign: 'center', lineHeight: 18 },
+  emptyTitle: { ...typeStyles.body, fontWeight: '600', color: STEEL.textPrimary, textAlign: 'center' },
+  emptySubtitle: { ...typeStyles.secondary, color: STEEL.textSecondary, textAlign: 'center', },
   emptyActions: { flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 8 },
   addAddressBtn: {
     flexDirection: 'row',
@@ -687,6 +689,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  addAddressBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  addPharmacyLink: { fontSize: 14, color: STEEL.textSecondary, fontWeight: '500' },
+  addAddressBtnText: { color: '#fff', fontWeight: '600', ...typeStyles.body },
+  addPharmacyLink: { ...typeStyles.body, color: STEEL.textSecondary, fontWeight: '500' },
 });

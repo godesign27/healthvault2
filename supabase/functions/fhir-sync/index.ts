@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.112.3";
 import {
   refreshAccessToken,
   tokenExpiresAt,
@@ -8,6 +8,8 @@ import {
   bundleToPreviewItems,
   fetchPatientResources,
 } from "../_shared/fhir-resources.ts";
+
+import { requireActiveAccount, ImportAccessError } from "../inbound-records/access.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,9 +26,10 @@ function json(body: unknown, status = 200) {
 }
 
 async function ensureAccessToken(
-  sb: ReturnType<typeof createClient>,
-  connection: Record<string, unknown>,
+  sb: SupabaseClient,
+  connection: Record<string, unknown> & { id: string },
   org: Record<string, unknown>,
+  userId: string,
 ): Promise<string> {
   let accessToken = connection.fhir_access_token as string | null;
   const refreshToken = connection.fhir_refresh_token as string | null;
@@ -55,17 +58,16 @@ async function ensureAccessToken(
     : null;
   if (!accessToken) throw new Error("Token refresh did not return an access token");
 
-  await sb
-    .from("provider_connections")
-    .update({
-      fhir_access_token: accessToken,
-      fhir_refresh_token: typeof refreshed.refresh_token === "string"
-        ? refreshed.refresh_token
-        : refreshToken,
-      token_expires_at: tokenExpiresAt(refreshed.expires_in),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", connection.id);
+  const { data: saved, error: refreshError } = await sb.rpc("refresh_fhir_connection", {
+    p_user_id: userId,
+    p_connection_id: connection.id,
+    p_expected_token: connection.fhir_access_token ?? null,
+    p_access_token: accessToken,
+    p_refresh_token: typeof refreshed.refresh_token === "string" ? refreshed.refresh_token : refreshToken,
+    p_expires_at: tokenExpiresAt(refreshed.expires_in),
+  });
+  if (refreshError) throw new Error("Unable to save the refreshed provider connection");
+  if (saved !== true) throw new ImportAccessError(409, "Connection changed. Please reconnect or try again.");
 
   return accessToken;
 }
@@ -91,10 +93,13 @@ Deno.serve(async (req: Request) => {
 
     if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-    const body = await req.json() as { connectionId?: string };
-    if (!body.connectionId) return json({ error: "connectionId is required" }, 400);
+    const body = await req.json().catch(() => null);
+    if (typeof body?.connectionId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.connectionId)) {
+      return json({ error: "A valid connectionId is required" }, 400);
+    }
 
     const sb = createClient(supabaseUrl, serviceKey);
+    await requireActiveAccount(sb, user.id);
 
     const { data: connection, error: connError } = await sb
       .from("provider_connections")
@@ -103,7 +108,7 @@ Deno.serve(async (req: Request) => {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (connError) return json({ error: connError.message }, 500);
+    if (connError) return json({ error: "Unable to verify connection" }, 500);
     if (!connection) return json({ error: "Connection not found" }, 404);
     if (connection.status !== "active") {
       return json({ error: `Connection is ${connection.status}` }, 409);
@@ -122,7 +127,7 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Provider FHIR endpoint not configured" }, 422);
     }
 
-    const accessToken = await ensureAccessToken(sb, connection, org);
+    const accessToken = await ensureAccessToken(sb, connection, org, user.id);
     const bundles = await fetchPatientResources(
       org.fhir_endpoint_url,
       accessToken,
@@ -145,34 +150,26 @@ Deno.serve(async (req: Request) => {
       itemsByType[item.resourceType].push(item);
     }
 
-    const { data: job } = await sb
-      .from("record_import_jobs")
-      .insert({
-        user_id: user.id,
-        provider_connection_id: connection.id,
-        strategy: connection.connection_method,
-        status: "preview",
-        preview_data: itemsByType,
-        counts,
-      })
-      .select("id")
-      .single();
-
-    await sb
-      .from("provider_connections")
-      .update({ last_synced_at: new Date().toISOString() })
-      .eq("id", connection.id);
+    const { data: jobId, error: jobError } = await sb.rpc("save_fhir_preview", {
+      p_user_id: user.id,
+      p_connection_id: connection.id,
+      p_expected_token: accessToken,
+      p_preview: itemsByType,
+      p_counts: counts,
+    });
+    if (jobError) return json({ error: "Unable to save the record preview. Please try again." }, 500);
+    if (!jobId) return json({ error: "Account or connection changed. Please try again." }, 409);
 
     return json({
       source: "fhir",
       counts,
       itemsByType,
-      importJobId: job?.id ?? null,
+      importJobId: jobId,
       bundles,
       message: `Fetched ${counts.total} records from ${org.name}.`,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Internal error";
-    return json({ error: message }, 500);
+    if (err instanceof ImportAccessError) return json({ error: err.message }, err.status);
+    return json({ error: "Unable to retrieve the record preview. Please try again." }, 500);
   }
 });

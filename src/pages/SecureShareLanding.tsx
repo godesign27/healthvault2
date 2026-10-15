@@ -17,6 +17,24 @@
  *    (Use light gray text, small font, right-aligned)
  */
 
+/**
+ * Secure Share Landing Page
+ *
+ * IMPORTANT SECURITY NOTES:
+ *
+ * 1. Prevent caching of sensitive shared data
+ *    Backend should set these headers:
+ *    - Cache-Control: no-store, max-age=0
+ *    - For Next.js API routes, also export:
+ *      export const dynamic = 'force-dynamic';
+ *      export const revalidate = 0;
+ *      export const fetchCache = 'force-no-store';
+ *
+ * 2. PDF Integrity Footer
+ *    TODO: Backend PDF generation should include on every page:
+ *    "Digitally signed by Health Vault • Timestamp: [ISO timestamp]"
+ *    (Use light gray text, small font, right-aligned)
+ */
 import { useEffect, useState } from 'react';
 import { Clock, Shield, FileText, User, Building2, Calendar, AlertCircle, Lock, Download, ArrowLeft } from 'lucide-react';
 

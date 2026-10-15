@@ -1,4 +1,4 @@
-import { uploadRecord, shareRecord, requestInsights, listRecords } from '../records/query';
+import { shareRecord, requestInsights, listRecords } from '../records/query';
 import { UploadInput, ShareInput, InsightInput } from '../records/zod';
 import { RecordKind } from '../records/types';
 
@@ -64,21 +64,8 @@ export async function routeCommand(
   }
 }
 
-async function handleUploadRecord(input: UploadInput): Promise<CommandResult> {
-  try {
-    const record = await uploadRecord(input);
-    return {
-      success: true,
-      message: `✓ Uploaded "${record.title}" successfully.`,
-      data: record,
-      action: 'UPDATE_LIST'
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: "Failed to upload record. Please try again."
-    };
-  }
+async function handleUploadRecord(_input: UploadInput): Promise<CommandResult> {
+  return { success: false, message: 'Open Health Records and choose Upload File to select and save the actual document. A filename alone cannot be uploaded.' };
 }
 
 function handleConnectProvider(): CommandResult {

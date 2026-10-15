@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const source=readFileSync('apps/mobile/src/lib/careData.js','utf8');
+const {loadCareData}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const calls=[];let failure=null;let signedIn=true;
+const client={auth:{getUser:async()=>({data:{user:signedIn?{id:'owner'}:null}})},from(table){const filters=[];calls.push({table,filters});const q={select(){return q},eq(...args){filters.push(args);return q},gte(...args){filters.push(['gte',...args]);return q},order(){return Promise.resolve({data:[{id:table}],error:table===failure?Error('Denied'):null})}};return q;}};
+const data=await loadCareData(client,'2026-10-03T00:00:00Z');
+assert.deepEqual(calls.map(c=>c.table),['appointments','encounters','claims']);
+assert.ok(calls.every(c=>c.filters.some(f=>f[0]==='user_id'&&f[1]==='owner')));
+assert.ok(calls[0].filters.some(f=>f[0]==='gte'&&f[1]==='scheduled_at'));
+assert.equal(data.encounters[0].id,'encounters');
+failure='claims';await assert.rejects(loadCareData(client),/Denied/);
+signedIn=false;calls.length=0;await assert.rejects(loadCareData(client),/Sign in/);assert.equal(calls.length,0);
+console.log('PASS Care: actual tables, owner scope, future scheduled appointments, errors not empty success, no anonymous queries');

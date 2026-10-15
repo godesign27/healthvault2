@@ -1,3 +1,4 @@
+import {validRequestId,shareFingerprint,claimShareRequest,recordShareProgress} from './share-request.ts';
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
@@ -152,6 +153,16 @@ Deno.serve(async (req: Request) => {
   const pathParts = url.pathname.split('/').filter(Boolean).slice(1);
 
   try {
+    if (req.method === 'POST' && pathParts.length === 1 && pathParts[0] === 'status') {
+      const token=req.headers.get('Authorization')?.replace(/^Bearer /i,'')||'';
+      const {data:{user}}=await supabase.auth.getUser(token);
+      if(!user)return new Response(JSON.stringify({error:'Authentication required'}),{status:401,headers:{...corsHeaders,'Content-Type':'application/json'}});
+      const {requestId}=await req.json();
+      if(!validRequestId(requestId))return new Response(JSON.stringify({error:'Invalid request ID'}),{status:400,headers:{...corsHeaders,'Content-Type':'application/json'}});
+      const {data,error}=await supabase.from('medical_share_requests').select('receipt').eq('owner_id',user.id).eq('request_id',requestId).maybeSingle();
+      if(error)throw new Error('Share status could not be checked');
+      return new Response(JSON.stringify(data?.receipt||{pending:true}),{status:data?.receipt?200:202,headers:{...corsHeaders,'Content-Type':'application/json'}});
+    }
     if (req.method === 'GET' && pathParts.length >= 1) {
       const shareId = pathParts[0];
       const token = url.searchParams.get('token');
@@ -442,12 +453,20 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      const { error } = await supabase
+      const { data: revokedShare, error } = await supabase
         .from('share_events')
         .update({ status: 'revoked', is_revoked: true, revoked_at: new Date().toISOString() })
-        .eq('id', shareId);
+        .eq('id', shareId)
+        .eq('patient_id', user.id)
+        .select('id, is_revoked')
+        .maybeSingle();
 
       if (error) throw error;
+      if (revokedShare?.id !== shareId || revokedShare.is_revoked !== true) {
+        return new Response(JSON.stringify({ error: 'Revocation could not be confirmed. Refresh share history before retrying.' }), {
+          status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       return new Response(
         JSON.stringify({ success: true }),
@@ -457,7 +476,8 @@ Deno.serve(async (req: Request) => {
 
     if (req.method === 'POST' && pathParts.length === 0) {
       const body = await req.json();
-      const { patientId, forms, recipient, note, options } = body;
+      const { patientId, forms, recipient, note, options, requestId } = body;
+      if(requestId!==undefined&&!validRequestId(requestId))return new Response(JSON.stringify({error:"Invalid request ID"}),{status:400,headers:{...corsHeaders,"Content-Type":"application/json"}});
 
       if (!patientId || !forms || !Array.isArray(forms) || forms.length === 0) {
         throw new Error('Missing required fields');
@@ -490,13 +510,7 @@ Deno.serve(async (req: Request) => {
 
       const formIds = forms.map((f: any) => f.id);
 
-      console.log('Sharing forms:', {
-        patientId,
-        formIds,
-        recipient,
-        note,
-        options,
-      });
+
 
       // Fetch patient DOB to store with the share event
       const { data: patientProfile } = await supabase
@@ -529,7 +543,14 @@ Deno.serve(async (req: Request) => {
         });
       }
 
+      if(requestId){
+        const hash=await shareFingerprint({patientId,forms,recipient,note,options});
+        const claim=await claimShareRequest(supabase,user.id,requestId,hash);
+        if(!claim.claimed)return new Response(JSON.stringify(claim.conflict?{error:'Request ID already used for different content'}:claim.receipt||{pending:true}),{status:claim.conflict?409:claim.receipt?200:202,headers:{...corsHeaders,'Content-Type':'application/json'}});
+      }
       const shareEventId = crypto.randomUUID();
+      // Reserve the exact share identifier before storage or email side effects.
+      if(requestId)await recordShareProgress(supabase,user.id,requestId,{share_event_id:shareEventId});
       const shareToken = crypto.randomUUID();
       const appUrl = Deno.env.get('APP_URL') || req.headers.get('origin') || supabaseUrl;
       const shareUrl = `${appUrl}/share/${shareEventId}?token=${shareToken}`;
@@ -583,7 +604,7 @@ Deno.serve(async (req: Request) => {
         });
 
       if (bundleUploadError) {
-        console.error('Error uploading bundle:', bundleUploadError);
+        throw new Error('Share bundle could not be stored');
       }
 
       // Generate a real PDF packet from the authorized form responses.
@@ -602,7 +623,7 @@ Deno.serve(async (req: Request) => {
         });
 
       if (pdfUploadError) {
-        console.error('Error uploading PDF:', pdfUploadError);
+        throw new Error('Share PDF could not be stored');
       }
 
       const { error: insertError } = await supabase
@@ -638,6 +659,7 @@ Deno.serve(async (req: Request) => {
       });
 
       let emailSent = false;
+      let emailUncertain = false;
       let emailError = null;
       let patientReceiptSent = false;
       let patientReceiptError = null;
@@ -656,6 +678,15 @@ Deno.serve(async (req: Request) => {
             html: emailHtml,
           };
 
+          if(requestId){
+            try {
+              await recordShareProgress(supabase,user.id,requestId,{email_attempt_started_at:new Date().toISOString()});
+            } catch {
+              return new Response(JSON.stringify({pending:true}),{status:202,headers:{...corsHeaders,'Content-Type':'application/json'}});
+            }
+          }
+          // Once submitted, a transport error cannot prove the provider rejected it.
+          emailUncertain = true;
           const emailResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -665,18 +696,28 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify(emailPayload),
           });
 
-          const responseText = await emailResponse.text();
-
           if (!emailResponse.ok) {
-            emailError = `Failed to send email: ${emailResponse.status} ${responseText}`;
+            // A server error can occur after acceptance. Keep those outcomes pending.
+            emailUncertain = emailResponse.status >= 500;
+            emailError = `Email provider returned HTTP ${emailResponse.status}`;
             console.error(emailError);
           } else {
+            // Acceptance survives an unreadable body; the provider ID is optional evidence.
             emailSent = true;
-            console.log('Email sent successfully:', responseText);
+            let providerMessageId = null;
+            try {
+              const result = await emailResponse.json();
+              if(typeof result?.id==='string' && /^[a-zA-Z0-9_-]{1,128}$/.test(result.id))providerMessageId=result.id;
+            } catch { /* HTTP acceptance remains valid if the response stream is lost. */ }
+            if(requestId)await recordShareProgress(supabase,user.id,requestId,{
+              provider_message_id:providerMessageId,
+              provider_accepted_at:new Date().toISOString(),
+            });
+            emailUncertain = false;
           }
 
           const wantsPatientReceipt = Boolean(options?.cc?.me || options?.cc?.patient);
-          if (wantsPatientReceipt) {
+          if (wantsPatientReceipt && emailSent) {
             if (!patientProfile?.email_verified || !patientProfile?.email) {
               patientReceiptError = 'The patient email is not verified';
             } else {
@@ -717,13 +758,13 @@ Deno.serve(async (req: Request) => {
           recipient: {
             ...recipient,
             patientName: patientFullName,
-            emailDelivery: emailSent ? 'accepted' : 'failed',
+            emailDelivery: emailUncertain ? 'unknown' : emailSent ? 'accepted' : 'failed',
             patientReceipt: patientReceiptSent ? 'accepted' : 'failed',
           },
           audit: [
             { event: 'created', at: deliveredAt, actor: 'patient' },
             {
-              event: emailSent ? 'email_accepted' : 'email_delivery_failed',
+              event: emailUncertain ? 'email_delivery_unknown' : emailSent ? 'email_accepted' : 'email_delivery_failed',
               at: deliveredAt,
               actor: 'system',
               ...(emailError ? { error: emailError } : {}),
@@ -739,7 +780,11 @@ Deno.serve(async (req: Request) => {
         .eq('id', shareEventId)
         .eq('patient_id', user.id);
 
+      // Do not persist a failed receipt (or clear the mobile guard) for an ambiguous send.
+      if(emailUncertain)return new Response(JSON.stringify({pending:true}),{status:202,headers:{...corsHeaders,'Content-Type':'application/json'}});
+
       const response = {
+        requestId,
         id: shareEventId,
         status: emailSent ? 'delivered' : 'sent',
         bundleUrl: bundleUrl,
@@ -753,6 +798,12 @@ Deno.serve(async (req: Request) => {
         deliveryReceiptSaved: !deliveryUpdateError,
       };
 
+      if(requestId){
+        // Recovery returns only a delivery receipt, never a private link or email error payload.
+        const receipt={requestId,id:shareEventId,status:response.status,emailSent,deliveryReceiptSaved:!deliveryUpdateError};
+        const {data:savedReceipt,error:receiptError}=await supabase.from('medical_share_requests').update({receipt}).eq('owner_id',user.id).eq('request_id',requestId).select('request_id').maybeSingle();
+        if(receiptError||savedReceipt?.request_id!==requestId)return new Response(JSON.stringify({pending:true}),{status:202,headers:{...corsHeaders,'Content-Type':'application/json'}});
+      }
       return new Response(
         JSON.stringify(response),
         {

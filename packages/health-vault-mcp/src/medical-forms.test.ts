@@ -562,3 +562,31 @@ describe("Patient Registration interview", () => {
     assert.match(MEDICAL_FORM_WIDGET_HTML, /Create a secure share/);
   });
 */
+
+for (const mode of ['native', 'legacy', 'throw', 'reject', 'unsafe']) {
+  test(`secure share link handles ${mode} navigation without a save`, async () => {
+    const handlers: Record<string, Function> = {};
+    let cloned = false; let opened = ''; let prevented = false;
+    const link: any = { addEventListener: (n: string, fn: Function) => handlers[n] = fn,
+      removeAttribute: () => {}, cloneNode: () => ({}), replaceWith: () => { cloned = true; } };
+    const shareUrl = mode === 'unsafe' ? 'javascript:alert(1)' : 'https://healthvault.me/share/test?token=test';
+    const openai: any = { toolOutput: { share: { templateId: 'patient-reg', recipientEmail: 'test@example.com', confirmationState: 'confirmed', shareUrl } } };
+    if (mode === 'legacy') openai.openExternal = ({href}: any) => { opened = href; };
+    if (mode === 'throw') openai.openExternal = () => { throw new Error('Unavailable'); };
+    if (mode === 'reject') openai.openExternal = () => Promise.reject(new Error('Unavailable'));
+    const app = { dataset: {}, innerHTML: '' };
+    const document = { getElementById: (id: string) => id === 'app' ? app : id === 'open' ? link : null };
+    const window = { openai, parent: {postMessage() {}}, addEventListener() {} };
+    const script = MEDICAL_FORM_SHARE_WIDGET_HTML.match(/<script>([\s\S]*?)<\/script>/)![1];
+    new Function('window', 'document', script)(window, document);
+    if (mode === 'unsafe') { assert.equal(link.href, undefined); return; }
+    assert.equal(link.href, shareUrl);
+    assert.equal(link.target, '_blank');
+    assert.equal(link.rel, 'noopener noreferrer');
+    handlers.click({preventDefault: () => { prevented = true; }});
+    await Promise.resolve();
+    assert.equal(prevented, mode === 'legacy' || mode === 'reject');
+    assert.equal(cloned, mode === 'reject');
+    if (mode === 'legacy') assert.equal(opened, shareUrl);
+  });
+}

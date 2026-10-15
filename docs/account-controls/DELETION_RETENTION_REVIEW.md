@@ -14,7 +14,8 @@ retention promise or an executable erasure implementation.
   date before the target is missed. Never mark a partially fulfilled request complete.
 
 These targets require Timothy's acceptance and an operational queue reminder or alert.
-Neither reminders nor automated deletion are currently installed.
+The owner-approved weekday count-only digest is now active (DELETION_MONITORING.md).
+Automated deletion is not installed.
 
 ## Data scope and treatment
 
@@ -46,8 +47,9 @@ retention periods until the implementation and vendor behavior support them.
    a dry run that demonstrates another account will remain untouched.
 4. Use a tested account-level access/write block and revoke shares, sessions, grants,
    tokens and pending confirmations. Stop imports and queued work that could recreate
-   data. This block still needs implementation/validation; it is not provided by the
-   request queue.
+   data. A preview candidate now blocks authenticated RLS access and export, but
+   bearer URLs, privileged jobs and complete coverage still require validation.
+   The request queue itself does not block access.
 5. Execute only the reviewed account-specific erasure plan, with foreign-key order
    and object cleanup established in the isolated rehearsal. Do not use a generic
    cascade or run destructive SQL against a real account as a test.
@@ -79,3 +81,10 @@ identified the categories above; it is not a completed live-schema audit.
 - Select and verify an isolated test destination; implement and test the access block,
   erasure plan, queue monitoring and restore safeguards.
 - Review final public wording against measured behavior before publication.
+
+## Preview rehearsal update — October 2, 2026
+
+See ERASURE_REHEARSAL.md. Two-account fixture erasure, old-JWT blocking,
+refresh denial, file/API isolation and failure/retry checks passed. Immediate
+signed-file URL revocation failed because cached responses remained readable.
+No real-account deletion or production access-block deployment performed.

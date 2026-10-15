@@ -38,6 +38,7 @@ import RecordsScreen from './src/screens/RecordsScreen';
 import MedicalScreen from './src/screens/MedicalScreen';
 import MedicalProfileScreen from './src/screens/MedicalProfileScreen';
 import VitalsScreen from './src/screens/VitalsScreen';
+import WellnessScreen from './src/screens/WellnessScreen';
 import InsuranceScreen from './src/screens/InsuranceScreen';
 import ProfileSettingsScreen from './src/screens/ProfileSettingsScreen';
 import { SteelSurfaceBackground } from './src/components/SteelSurfaceBackground';
@@ -75,6 +76,7 @@ const NAV_MAIN = [
   { key: 'insurance', label: 'Insurance', icon: 'shield-outline' },
   { key: 'records', label: 'Records', icon: 'document-text-outline' },
   { key: 'medical', label: 'Medical Forms', icon: 'clipboard-outline' },
+  { key: 'wellness', label: 'Wellness', icon: 'nutrition-outline' },
   { key: 'vitals', label: 'Vitals', icon: 'pulse-outline' },
 ];
 
@@ -244,12 +246,11 @@ function AppDrawer({
       }}
       style={[
         styles.drawerRow,
-        stack && styles.drawerRowStacked,
         isActive && [styles.drawerRowActive, { backgroundColor: activeCardBg, borderColor: stroke }],
       ]}
     >
       <Ionicons name={item.icon} size={22} color={isActive ? colors.accent : muted} />
-      <Text variant="body" style={[styles.drawerRowLabel, stack && styles.drawerRowLabelStacked, { color: text }, isActive && { fontWeight: '700', color: darkShell ? '#fff' : STEEL.text }]}>
+      <Text variant="body" style={[styles.drawerRowLabel, { color: text }, isActive && { fontWeight: '700', color: darkShell ? '#fff' : STEEL.text }]}>
         {item.label}
       </Text>
     </Pressable>
@@ -295,7 +296,7 @@ function AppDrawer({
 
             {signOut ? (
               <Pressable
-                style={[styles.drawerRow, stack && styles.drawerRowStacked, { marginTop: 8 }]}
+                style={[styles.drawerRow, { marginTop: 8 }]}
                 onPress={handleSignOut}
                 disabled={signingOut}
                 accessibilityState={{ disabled: signingOut, busy: signingOut }}
@@ -303,7 +304,7 @@ function AppDrawer({
                 accessibilityLabel="Sign out"
               >
                 <Ionicons name="log-out-outline" size={22} color={colors.dangerAction} />
-                <Text variant="body" style={[styles.drawerRowLabel, stack && styles.drawerRowLabelStacked, { color: colors.dangerAction, flex: 1 }]}>{signingOut ? 'Signing out…' : 'Sign Out'}</Text>
+                <Text variant="body" style={[styles.drawerRowLabel, { color: colors.dangerAction, flex: 1 }]}>{signingOut ? 'Signing out…' : 'Sign Out'}</Text>
               </Pressable>
             ) : null}
             {signOutError && <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" style={{ color: colors.danger }}>{signOutError}</Text>}
@@ -705,6 +706,9 @@ function AppShell({ signOut, user }) {
     case 'vitals':
       body = <VitalsScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
+    case 'wellness':
+      body = <WellnessScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
+      break;
     case 'insurance':
       body = <InsuranceScreen darkMode={darkShell} omitShellTitle={omit} scrollFabProps={fabScrollProps} />;
       break;
@@ -921,8 +925,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 4,
   },
-  drawerRowStacked: { flexDirection: 'column', alignItems: 'stretch' },
-  drawerRowLabelStacked: { width: '100%' },
   drawerRowActive: {
     borderWidth: 1,
     ...Platform.select({

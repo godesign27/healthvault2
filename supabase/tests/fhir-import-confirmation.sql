@@ -1,0 +1,40 @@
+begin;
+do $$
+declare u uuid:=gen_random_uuid(); o uuid:=gen_random_uuid(); c uuid:=gen_random_uuid(); j uuid; j2 uuid; bad uuid; r jsonb; again jsonb; refused boolean;
+ preview jsonb:='{"condition":[{"name":"Synthetic condition","date":"2020-01-01","status":"Active","source":"Synthetic import"}],"medication":[{"name":"Synthetic medication","source":"Synthetic import"}],"allergy":[{"name":"Synthetic allergen"}],"immunization":[{"name":"Synthetic vaccine","date":"2020-01-01"}]}';
+ selection jsonb:='{"condition":[0],"medication":[0],"allergy":[0],"immunization":[0]}';
+begin
+ insert into auth.users(id,email) values(u,'hv-confirm-test-'||u||'@example.invalid');
+ insert into public.provider_organizations(id,name) values(o,'Synthetic import');
+ insert into public.provider_connections(id,user_id,provider_organization_id,connection_method,status,fhir_access_token,fhir_patient_id)
+ values(c,u,o,'direct_provider_connection','active','synthetic','synthetic-patient');
+ bad:=public.save_fhir_preview(u,c,'synthetic','{"condition":[{"name":"Rollback first","date":"2020-01-01"},{"name":"Rollback invalid","date":"invalid"}]}','{}');
+ refused:=false;
+ begin perform public.confirm_fhir_preview(u,bad,'{"condition":[0,1]}');exception when others then refused:=true;end;
+ assert refused,'Invalid batch accepted';
+ assert not exists(select 1 from public.conditions where user_id=u::text),'Partial condition persisted';
+ assert not exists(select 1 from public.fhir_import_items where user_id=u),'Partial dedup marker persisted';
+ assert (select status='preview' from public.record_import_jobs where id=bad),'Failed batch completed';
+ j:=public.save_fhir_preview(u,c,'synthetic',preview,'{}');
+ r:=public.confirm_fhir_preview(u,j,selection);
+ assert r->>'status'='complete' and r->>'conditions'='1' and r->>'medications'='1' and r->>'allergies'='1' and r->>'immunizations'='1','Wrong receipt';
+ again:=public.confirm_fhir_preview(u,j,selection);assert again=r,'Retry receipt changed';
+ assert (select count(*)=1 from public.health_records where user_id=u::text),'Retry duplicated summary';
+ assert (select count(*)=4 from public.fhir_import_items where user_id=u),'Wrong dedup count';
+ refused:=false;
+ begin perform public.confirm_fhir_preview(u,j,'{"condition":[0]}');exception when others then refused:=true;end;
+ assert refused,'Changed selection reused receipt';
+ j2:=public.save_fhir_preview(u,c,'synthetic',preview,'{}');
+ again:=public.confirm_fhir_preview(u,j2,selection);assert again->>'duplicates'='4' and again->>'conditions'='0','New preview duplicated records';
+ assert (select count(*)=1 from public.conditions where user_id=u::text),'Duplicate clinical record';
+ assert (select count(*)=1 from public.health_records where user_id=u::text),'Duplicate-only import added summary';
+ insert into public.account_erasure_blocks(user_id,request_id) values(u,gen_random_uuid());
+ refused:=false;
+ begin perform public.confirm_fhir_preview(u,j,selection);exception when others then refused:=true;end;
+ assert refused,'Blocked account received receipt';
+ assert not has_function_privilege('authenticated','public.confirm_fhir_preview(uuid,uuid,jsonb)','execute'),'Client RPC allowed';
+ assert not has_table_privilege('authenticated','public.record_import_jobs','insert'),'Client can forge preview';
+ assert not has_table_privilege('authenticated','public.record_import_jobs','update'),'Client can forge receipt';
+end;
+$$;
+rollback;

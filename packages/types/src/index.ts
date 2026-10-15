@@ -86,4 +86,6 @@ export interface UploadedFile {
   fileType: string;
   fileSizeBytes: number;
   previewUrl: string | null;
+  fileAccess?: 'authenticated';
+  importBatchId?: string;
 }

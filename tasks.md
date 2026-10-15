@@ -7,6 +7,9 @@ by a later verified entry. They are not a fresh release certification.
 
 ### Latest follow-up
 
+- [x] October 12: Phone Settings includes Download My Data and Request Account Deletion. Download uses the existing account export and saves a private JSON file. Deletion submits a review request only after DELETE is typed, and an existing open request is reused. Local regression passed. No account was exported or deleted. A signed-in phone check is still open.
+- [x] October 12: Health Vault GPT plugin submitted. MCP is https://mcp.healthvault.me/, domain verified and authorized. Reviewer login is godesigngo+hv-review@gmail.com. The plugin is not published; OpenAI still has to approve it, and the scanned tools stay held until that review finishes.
+- [x] October 7: Hosted recovery email and redirect. The message to godesigngo@gmail.com was delivered from Health Vault at team@healthvault.me. The link opened https://healthvault.me on Set new password, with the mark, both password fields, and the authenticator code. The password was not changed.
 - [x] October 6 preview device pass. Reduced motion opens the menu in one frame. Largest text stacks the dashboard title, menu label, profile name, email, and allergies, then text size was restored to large. A new recovery email redirects to https://healthvault.me; the link was not opened and the password was not changed. On the iPhone 16e, the Health Vault mark returns from Records to the dashboard, and the allergy line expands. On the Android 14 emulator, the signed-in dashboard, the mark returning from Records, and the expanded allergy list were checked. TalkBack was installed from the Play Store and read the menu as “Open menu, Button.”
 - [x] Capture TalkBack speech on the Android allergy line. With the line focused, TalkBack spoke “collapsed,” the full allergy list through “Penicillin, Penicillin,” “Button,” and “Shows the full text.” The on-screen value stayed collapsed.
 - [x] Open Vault Assistant with Reduce Motion on. A 30fps capture goes from the dashboard to the full “Vault Assistant” sheet in one frame, with no sliding frame between. Reduce Motion was turned back off.
@@ -22,7 +25,11 @@ by a later verified entry. They are not a fresh release certification.
 - [ ] Complete successful backend flows, Release, Android and physical-device acceptance before adoption.
 - [x] Remove fabricated dashboard activity/unsupported counts and wire three quick actions; actual-component regression passes.
 - [x] Replace active Care samples with owner-scoped queries and truthful failures; implement native recovery flow and sign-in accessibility. Isolated regressions pass.
-- [ ] Verify hosted recovery redirect/email flow, interactive Care/recovery and physical VoiceOver; resolve remaining placeholder routes.
+- [x] October 12 simulator Care. On the signed-in Health Vault SDK52 QA simulator, the time menu changed from All time to Last 6 months and back. All sources, Labs only, Encounters, and Claims each showed the selected chip. Search accepted “visit” and was cleared. Pull to refresh showed the loading dashes, then Lab Results 0, Encounters 0, Medications 13, Claims 0, and no upcoming appointments. No error appeared. This account has no encounters or claims, so history stayed “No care history yet.”
+- [x] October 12 phone Settings. On the signed-in iPhone 16e, Profile Settings shows Download My Data and Request Account Deletion. No download was made and no deletion request was submitted.
+- [x] October 12: Wellness date arrows page through saved entries in seven-day windows and stop at the current week. Local range checks passed. This is not on the live site yet.
+- [ ] October 12 phone Wellness. Meals show a count for meals, foods, and water. Life Signals use the website’s five-step ratings, with stress and pain reversed. An empty current week offers Show latest meals when older meals exist. Needs a look on the phone. Insurance account connection and card-photo reading stay unavailable on the website and the phone.
+- [x] October 12 phone Vitals. On the signed-in iPhone 16e, Apple Health review showed new readings with a New badge and Add to Health Vault at the bottom. The user tapped Add and the page confirmed those measurements are now in Health Vault. Saved readings are one card per measurement. Actions stay in the More menu beside the Vitals title.
 
 - [x] Apply isolated, compatible security patches; web build/iOS export and targeted tests pass. Audit 87→84; critical tar remains for coordinated native-stack migration.
 

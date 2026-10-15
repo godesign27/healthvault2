@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../lib/api';
 
 export function useVaultStats() {
@@ -6,22 +6,27 @@ export function useVaultStats() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetch = useCallback(async () => {
+  const generation = useRef(0);
+  const fetch = useCallback(async (overrides = {}) => {
+    const run = ++generation.current;
     try {
       setLoading(true);
       setError(null);
       const data = await api.getStats();
       // Edge Function returns { data: VaultStats } or the stats directly
-      setStats(data?.data || data);
+      if (run === generation.current) setStats(data?.data || data);
+      return true;
     } catch (err) {
-      setError(err.message);
+      if (run === generation.current) setError(err.message);
+      return false;
     } finally {
-      setLoading(false);
+      if (run === generation.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetch();
+    return () => { generation.current++; };
   }, [fetch]);
 
   return { stats, loading, error, refetch: fetch };

@@ -62,11 +62,6 @@ export function usePendingRequests() {
     expired: r.expires_at ? new Date(r.expires_at) < new Date() : false,
     timeline: {
       created: r.created_at ? new Date(r.created_at).toLocaleString() : null,
-      emailSent: r.submitted_at
-        ? new Date(r.submitted_at).toLocaleString()
-        : r.created_at
-          ? new Date(r.created_at).toLocaleString()
-          : null,
       opened: r.opened_at ? new Date(r.opened_at).toLocaleString() : null,
       submitted: r.submitted_at ? new Date(r.submitted_at).toLocaleString() : null,
     },
