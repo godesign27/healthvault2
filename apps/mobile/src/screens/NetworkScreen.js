@@ -299,7 +299,7 @@ function NetworkBody({ omitShellTitle = false, scrollFabProps = {} }) {
         keyboardShouldPersistTaps="handled"
         nestedScrollEnabled
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#4F46E5" />
+          <RefreshControl refreshing={loading} onRefresh={refetch} tintColor={STEEL.accent} />
         }
         {...scrollFabProps}
       >
@@ -323,7 +323,7 @@ function NetworkBody({ omitShellTitle = false, scrollFabProps = {} }) {
               </>
             ) : showTeamEmpty ? (
               <View style={[styles.card, styles.emptyState]}>
-                <Ionicons name="people-outline" size={28} color="#94A3B8" />
+                <Ionicons name="people-outline" size={28} color={STEEL.textMuted} />
                 <Text variant="body" style={styles.emptyTitle}>No providers connected yet</Text>
                 <Text variant="secondary" style={styles.emptySubtitle}>Connect a provider to see your care team here</Text>
               </View>
@@ -500,14 +500,14 @@ const createStyles = (STEEL) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  preferredCard: { borderWidth: 1.5, borderColor: '#86EFAC' },
+  preferredCard: { borderWidth: 1.5, borderColor: STEEL.successBorder },
   dashedCard: {
     borderWidth: 1.5,
     borderColor: STEEL.border,
     borderStyle: 'dashed',
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: STEEL.surfaceMuted,
   },
   providerCardTop: { flexDirection: 'row' },
   avatar: {
@@ -517,7 +517,7 @@ const createStyles = (STEEL) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#fff', fontWeight: '700', ...typeStyles.body },
+  avatarText: { color: STEEL.onAction, fontWeight: '700', ...typeStyles.body },
   providerNameRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -546,7 +546,7 @@ const createStyles = (STEEL) => StyleSheet.create({
     borderRadius: 10,
     marginBottom: 4,
   },
-  roleBadgeText: { color: '#fff', ...typeStyles.caption, fontWeight: '700' },
+  roleBadgeText: { color: STEEL.onAction, ...typeStyles.caption, fontWeight: '700' },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -569,7 +569,7 @@ const createStyles = (STEEL) => StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
-  saveBtnText: { color: '#fff', ...typeStyles.secondary, fontWeight: '600' },
+  saveBtnText: { color: STEEL.onAction, ...typeStyles.secondary, fontWeight: '600' },
   removeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -602,21 +602,21 @@ const createStyles = (STEEL) => StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 20,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: STEEL.surfaceMuted,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: STEEL.border,
   },
   filterPillActive: { backgroundColor: STEEL.accent, borderColor: STEEL.accent },
   filterPillText: { ...typeStyles.secondary, fontWeight: '500', color: STEEL.textSecondary },
-  filterPillTextActive: { color: '#FFFFFF' },
+  filterPillTextActive: { color: STEEL.onAction },
   resultsCount: { ...typeStyles.secondary, color: STEEL.textSecondary, marginBottom: 8 },
   teamSkeletonCard: {
     height: 120,
     borderRadius: 16,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: STEEL.skeleton,
     marginBottom: 10,
   },
-  inlineError: { ...typeStyles.secondary, color: '#EF4444', marginBottom: 10, },
+  inlineError: { ...typeStyles.secondary, color: STEEL.danger, marginBottom: 10, },
   preferredHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
   preferredTitle: { ...typeStyles.body, fontWeight: '700', color: STEEL.textPrimary },
   servicesRow: { flexDirection: 'row', gap: 8, marginTop: 6, flexWrap: 'wrap' },
@@ -651,7 +651,7 @@ const createStyles = (STEEL) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  addAddressBtnText: { color: '#fff', fontWeight: '600', ...typeStyles.body },
+  addAddressBtnText: { color: STEEL.onAction, fontWeight: '600', ...typeStyles.body },
   addPharmacyLink: { ...typeStyles.body, color: STEEL.textSecondary, fontWeight: '500' },
 });
 

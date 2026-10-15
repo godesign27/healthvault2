@@ -23,6 +23,9 @@ assert.match(medical, /RefreshControl/);
 assert.match(medical, /Next Due/);
 assert.match(medical, /recordsColors/);
 assert.match(medical, /darkMode/);
+const settings = fs.readFileSync('apps/mobile/src/screens/ProfileSettingsScreen.js', 'utf8');
+assert.match(settings, /email_verified/);
+assert.match(settings, /emailVerified \?/);
 const saved = await saveSignedInProfile({
   client: {
     auth: {

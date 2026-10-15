@@ -55,7 +55,22 @@ export default function ProfileSettingsScreen({
   const [avatarUri, setAvatarUri] = useState(userProfile?.avatarUri || '');
   const [email] = useState(userProfile?.email || '');
   const [saving, setSaving] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
   const {notice, showNotice, dismissNotice} = useNotice();
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id;
+      if (!userId) return;
+      const { data, error } = await supabase.from('user_profiles').select('email_verified').eq('user_id', userId).maybeSingle();
+      if (!alive || error) return;
+      setEmailVerified(data?.email_verified === true);
+    })();
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     const { first, last } = splitName(userProfile?.name);
@@ -102,6 +117,19 @@ export default function ProfileSettingsScreen({
     }
   };
 
+  const handleSignOut = async () => {
+    if (signingOut || !onSignOut) return;
+    setSigningOut(true);
+    dismissNotice();
+    try {
+      await onSignOut();
+    } catch {
+      showNotice('Unable to sign out. Please try again.', 'error');
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   return (
     <ScrollView
       style={[styles.scroll, { backgroundColor: T.canvas }]}
@@ -136,11 +164,11 @@ export default function ProfileSettingsScreen({
             )}
             <Pressable
               onPress={pickImage}
-              style={styles.uploadFab}
+              style={[styles.uploadFab, { backgroundColor: T.accent, borderColor: T.surface }]}
               accessibilityRole="button"
               accessibilityLabel="Upload profile photo"
             >
-              <Ionicons name="cloud-upload-outline" size={20} color="#fff" />
+              <Ionicons name="cloud-upload-outline" size={20} color={T.onAction} />
             </Pressable>
           </View>
           <Text variant="section" style={[styles.displayName, { color: T.textPrimary }]}>
@@ -152,10 +180,12 @@ export default function ProfileSettingsScreen({
               {email || '—'}
             </Text>
           </View>
-          <View style={styles.verifiedRow}>
-            <Ionicons name="shield-checkmark" size={14} color="#10B981" />
-            <Text variant="caption" style={[styles.verifiedText, { color: T.textSecondary }]}>Verified account</Text>
-          </View>
+          {emailVerified ? (
+            <View style={styles.verifiedRow}>
+              <Ionicons name="shield-checkmark" size={14} color={T.success} />
+              <Text variant="caption" style={[styles.verifiedText, { color: T.textSecondary }]}>Verified account</Text>
+            </View>
+          ) : null}
         </View>
       </View>
 
@@ -190,13 +220,15 @@ export default function ProfileSettingsScreen({
 
       {onSignOut ? (
         <Pressable
-          onPress={onSignOut}
+          onPress={handleSignOut}
+          disabled={signingOut}
+          accessibilityState={{ disabled: signingOut, busy: signingOut }}
           style={[styles.signOutBtn, { borderColor: T.border, backgroundColor: T.surface }]}
           accessibilityRole="button"
           accessibilityLabel="Sign out"
         >
           <Ionicons name="log-out-outline" size={20} color={T.danger} />
-          <Text variant="body" style={[styles.signOutText, { color: T.danger }]}>Sign out</Text>
+          <Text variant="body" style={[styles.signOutText, { color: T.danger }]}>{signingOut ? 'Signing out…' : 'Sign out'}</Text>
         </Pressable>
       ) : null}
 
@@ -264,11 +296,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#059669',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#fff',
   },
   displayName: { ...typeStyles.section, fontWeight: '700', marginBottom: 4 },
   emailRow: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
